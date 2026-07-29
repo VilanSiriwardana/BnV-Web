@@ -128,10 +128,11 @@ Use [../references/Brand-Identity.md](../references/Brand-Identity.md) for the d
 
 ## Database Standards
 
-Use [../references/Database-Design.md](../references/Database-Design.md) for PostgreSQL and Prisma modeling rules.
+Use [../references/Database-Design.md](../references/Database-Design.md) for PostgreSQL and Prisma modeling rules, and [../references/Database-Standards.md](../references/Database-Standards.md) for database engineering standards that agents must preserve.
 
 - PostgreSQL is the database standard.
 - Prisma is the ORM and migration standard.
+- Prisma Client uses the standard `prisma-client-js` generator and must generate into `node_modules/@prisma/client`, not custom source folders.
 - Review generated migration SQL before applying it.
 - Never run migrations, destructive SQL, seeders, or data writes without explicit approval.
 - Do not edit generated Prisma artifacts manually.
@@ -221,6 +222,7 @@ Then read only the specific reference document needed for the task:
 - Business/content strategy: [../references/Business-Strategy.md](../references/Business-Strategy.md)
 - Stack/tooling work: [../references/Technology-Stack.md](../references/Technology-Stack.md)
 - Database/schema work: [../references/Database-Design.md](../references/Database-Design.md)
+- Database standards work: [../references/Database-Standards.md](../references/Database-Standards.md)
 - SEO/routing/metadata work: [../references/SEO-Guide.md](../references/SEO-Guide.md)
 - Architecture notes: [../architecture/README.md](../architecture/README.md)
 - ADR conventions: [../decisions/README.md](../decisions/README.md)
@@ -250,6 +252,7 @@ Then read only the specific reference document needed for the task:
 - [Business Strategy](../references/Business-Strategy.md)
 - [Technology Stack](../references/Technology-Stack.md)
 - [Database Design](../references/Database-Design.md)
+- [Database Standards](../references/Database-Standards.md)
 - [SEO Guide](../references/SEO-Guide.md)
 - [Reference Library Index](../references/README.md)
 - [Architecture Index](../architecture/README.md)

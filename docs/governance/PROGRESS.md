@@ -124,3 +124,36 @@ Reorganized project documentation so root `AGENTS.md` remains a lightweight repo
 ### Next Step
 
 - Verify relative links in governance documents and confirm `git diff` contains only documentation changes from this task.
+
+## 2026-07-29 - Prisma Client Generation Standard
+
+### Summary
+
+Documented the standard Prisma Client generation workflow so future agents preserve the default `prisma-client-js` generator and avoid custom generated source folders.
+
+### Files Changed
+
+- `docs/references/Database-Standards.md`
+- `docs/references/README.md`
+- `docs/governance/AGENTS.md`
+- `.gitignore`
+
+### Database Changes
+
+- None.
+
+### API Changes
+
+- None.
+
+### UI Changes
+
+- None.
+
+### Tests
+
+- Import search found no references to `src/generated`.
+
+### Next Step
+
+- Continue using `npx prisma generate` with Prisma Client generated under `node_modules/@prisma/client`.

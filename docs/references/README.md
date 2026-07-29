@@ -8,6 +8,7 @@ This directory contains source-of-truth project references. Governance documents
 - [Business Strategy](Business-Strategy.md): couple brand, business ideas, positioning, and website strategy.
 - [Technology Stack](Technology-Stack.md): approved frameworks, tooling, architecture philosophy, infrastructure, and engineering stack.
 - [Database Design](Database-Design.md): PostgreSQL and Prisma schema conventions, relationships, migrations, indexes, and data modeling rules.
+- [Database Standards](Database-Standards.md): database engineering standards that future agents must preserve, including Prisma Client generation.
 - [SEO Guide](SEO-Guide.md): metadata, structured data, routing, image SEO, monitoring, and SEO acceptance criteria.
 
 ## Pending References
