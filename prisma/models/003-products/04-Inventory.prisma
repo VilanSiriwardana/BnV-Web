@@ -1,0 +1,14 @@
+model Inventory {
+  id                String         @id @default(uuid()) @db.Uuid
+  variantId         String         @unique @map("variant_id") @db.Uuid
+  quantity          Int            @default(0)
+  reservedQuantity  Int            @default(0) @map("reserved_quantity")
+  lowStockThreshold Int            @default(0) @map("low_stock_threshold")
+  status            String         @default("active")
+  variant           ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  createdAt         DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([status])
+  @@map("inventory")
+}
