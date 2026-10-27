@@ -99,7 +99,7 @@ Each decision should include:
 
 ## ADR-0006 - Use Docker Compose for Local Database Services
 
-- Status: Accepted
+- Status: Partially superseded by ADR-0010 (database services)
 - Date: 2026-07-26
 - Context: `docker-compose.yml` defines PostgreSQL and pgAdmin services with persistent volumes.
 - Decision: Use Docker Compose for local database and database administration services.
@@ -159,3 +159,20 @@ Each decision should include:
   - [PLAN.md](PLAN.md)
   - [PROGRESS.md](PROGRESS.md)
   - [../AI_SESSION_LOG.md](../AI_SESSION_LOG.md)
+
+## ADR-0010 - Use Native PostgreSQL + pgAdmin for Local Development
+
+- Status: Accepted
+- Date: 2026-10-28
+- Context: Local database and administration services ran as Docker Compose containers (`postgres:16-alpine` and `dpage/pgadmin4`) per ADR-0006. The owner requested moving local development off Docker to a natively installed PostgreSQL server managed through native pgAdmin 4, for local development only; production hosting (D-01) is unaffected.
+- Decision: Install PostgreSQL 16 and pgAdmin 4 natively on the local development machine, reusing the existing `bnv` role, `bnv` database, and `bnvpassword` credential on port 5432 so `DATABASE_URL` keeps its existing shape. Remove the `postgres` and `pgadmin` services from `docker-compose.yml`, leaving the file as a placeholder. Recreate the schema with `prisma migrate deploy` against the existing migrations rather than restoring data. The Docker volume is kept until the owner deletes it manually.
+- Alternatives: Keep Docker Compose for local database services (status quo, rejected by owner); create a new dedicated `bv_app`/`bv_dev` role and database instead of reusing `bnv` (rejected - unnecessary churn for a local-only dev database); hosted development database (not requested).
+- Consequences:
+  - Local Postgres and pgAdmin now require manual installation and OS-service management instead of `docker compose up`.
+  - `docker-compose.yml` no longer defines database services; ADR-0006 is partially superseded.
+  - Version parity with the previous Docker image tag (16) must be maintained manually going forward.
+  - The Docker volume remains until explicitly deleted by the owner; deleting it is a separate, manual, destructive action outside this decision.
+- Related Documents:
+  - [../references/Technology-Stack.md](../references/Technology-Stack.md)
+  - [AGENTS.md](AGENTS.md)
+  - [PLAN.md](PLAN.md)

@@ -99,7 +99,7 @@ Verified from repository files:
 - Styling: Tailwind CSS v4 through `@tailwindcss/postcss`.
 - Database: PostgreSQL.
 - ORM: Prisma `7.8.0`.
-- Local services: Docker Compose with PostgreSQL and pgAdmin.
+- Local services: native PostgreSQL 16 + pgAdmin 4 (ADR-0010).
 - Package manager: npm.
 
 Do not update framework, package, Docker, or database tooling without an explicit implementation task.
@@ -345,6 +345,7 @@ Reference documents in `../references/` describe approved strategy, design, and 
 
 ## AGENTS.md Changelog
 
+- 2026-10-28: Local database and pgAdmin moved from Docker Compose to a native install (ADR-0010). Updated Technology Overview accordingly.
 - 2026-10-28: Reference library refreshed (pack v1.1). Added Phase Development, Phase 1 Step-by-Step, Phase 1 Reconciled Decisions, Database Design Reference, and Visual Asset Inventory to the reference map. Agents must check Reconciled Decisions before choosing between conflicting reference options.
 - 2026-08-23: Added State Management Protocol, Mechanical Enforcement, When Stuck, and Self-Improvement & Feedback sections; wired in root `plan.md`/`progress.md` and `docs/AI_SESSION_LOG.md` after a full AI-workflow audit. See the corresponding [../AI_SESSION_LOG.md](../AI_SESSION_LOG.md) entry.
 - 2026-07-26: Initial governance handbook created from repository audit (documented in [PROGRESS.md](PROGRESS.md)).

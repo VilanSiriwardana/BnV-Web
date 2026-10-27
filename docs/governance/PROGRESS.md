@@ -59,6 +59,36 @@ Established the initial project governance documentation set.
 - Expand design tokens once brand identity references are finalized.
 - Add automated test strategy once a test pattern is approved.
 
+## 2026-10-28 - Local Database Moved to Native PostgreSQL + pgAdmin
+
+### Summary
+
+Migrated the local development database from Docker Compose (`postgres:16-alpine` + `dpage/pgadmin4`) to a natively installed PostgreSQL 16 + pgAdmin 4, per owner request and ADR-0010. Reused the existing `bnv` role/database/password so `DATABASE_URL`'s shape is unchanged. This was requested explicitly by the owner and is an approved exception to the M0.3 milestone's "no Docker changes this milestone" note.
+
+### Files Changed
+
+- `docker-compose.yml` (postgres/pgadmin services removed, left as placeholder)
+- `.env.example` (created)
+- `docs/decisions/DECISIONS.md` (ADR-0010 added, ADR-0006 marked partially superseded)
+- `docs/governance/AGENTS.md`, `docs/governance/PLAN.md`, `docs/references/Technology-Stack.md`
+- `README.md` (Local database setup section added)
+
+### Database Changes
+
+- No schema or migration content changes. Existing migrations (`init`, `001_identity_foundation`, `002_catalog_foundation`, `003_product_domain`, `004_commerce_domain`) are reapplied via `prisma migrate deploy` against the native instance.
+
+### Infrastructure
+
+- Local Postgres and pgAdmin now run as natively installed Windows services/applications instead of Docker containers. The Docker volume is retained until the owner deletes it manually.
+
+### Tests
+
+- Not run from this session; native install, role/database creation, and `prisma migrate deploy` are manual/owner steps outside this environment's reach.
+
+### Next Step
+
+- Owner to install PostgreSQL 16 + pgAdmin 4, create the `bnv` role/database, and run `prisma migrate deploy` per the README's Local database setup section.
+
 ### Next Step
 
 - Use the governance documents as the source of truth before future application work.

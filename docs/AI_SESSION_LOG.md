@@ -82,3 +82,29 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 
 - Approve D-01 to D-19 and record ADR-0010 onwards.
 - Review the pre-existing uncommitted `package.json`, `package-lock.json`, and `prisma.config.ts` changes.
+
+## 2026-10-28 - Local Database Migrated from Docker to Native PostgreSQL + pgAdmin
+
+### Summary
+
+- Executed an owner-approved blueprint to move the local development database off Docker Compose onto a natively installed PostgreSQL 16 + pgAdmin 4, recorded as ADR-0010 in `docs/decisions/DECISIONS.md` (ADR-0006 marked partially superseded).
+- Verified current repo state against the blueprint's assumptions before editing: confirmed `docker-compose.yml`'s actual services (`postgres:16-alpine`, `dpage/pgadmin4`, user/db `bnv`/`bnv`/`bnvpassword`), confirmed `docker/postgres/init/` has no files to replay, confirmed `.env.example` did not previously exist, confirmed `prisma.config.ts` already reads `DATABASE_URL` from `process.env` with no hardcoded host, and confirmed 5 real migrations exist (not just `HealthCheck` as an earlier, stale PROGRESS.md entry implied).
+- Owner confirmed via explicit questions: reuse the existing `bnv`/`bnvpassword` identity rather than create a new role, and leave `docker-compose.yml` as a near-empty `services: {}` placeholder rather than deleting it.
+- Updated `docker-compose.yml`, created `.env.example`, and updated governance/reference docs (`docs/decisions/DECISIONS.md`, `docs/governance/AGENTS.md`, `docs/governance/PLAN.md`, `docs/references/Technology-Stack.md`, `README.md`, `docs/governance/PROGRESS.md`) to match.
+- Did not perform the install, role/database creation, or `prisma migrate deploy` steps - this session's environment has no native PostgreSQL installed and Docker Desktop was not running, so those are owner/manual follow-ups documented in the new README section.
+
+### Files Modified / Created
+
+- Modified: `docker-compose.yml`, `docs/decisions/DECISIONS.md`, `docs/governance/AGENTS.md`, `docs/governance/PLAN.md`, `docs/references/Technology-Stack.md`, `README.md`, `docs/governance/PROGRESS.md`.
+- Created: `.env.example`.
+- Not modified: Prisma schema/migrations, `.env`, `prisma.config.ts` (already correct), application code, package files.
+
+### Verification
+
+- Confirmed via `where psql`, `pg_isready`, and `docker ps -a` that native PostgreSQL is not installed and Docker Desktop is not running in this session's environment, so the manual installation and `prisma migrate deploy` steps could not be executed here.
+- Did not run `npm run lint`/`npm run build`: no application source was touched.
+
+### Remaining Work (owner, manual)
+
+- Install PostgreSQL 16 + pgAdmin 4 natively, create the `bnv` role/database per the README's "Local database setup" section, and run `npx prisma migrate deploy` + `npx prisma generate`.
+- Delete the Docker volume manually once the native database is verified working (out of scope for this session).

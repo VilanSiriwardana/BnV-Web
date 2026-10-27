@@ -20,6 +20,23 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Local database setup
+
+Local PostgreSQL and pgAdmin run natively, not via Docker (see ADR-0010 in `docs/decisions/DECISIONS.md`).
+
+1. Install PostgreSQL 16 and pgAdmin 4 (Windows: the official PostgreSQL installer, components Server + pgAdmin 4 + Command Line Tools). Use port 5432.
+2. In pgAdmin's Query Tool, connected as `postgres`, create the app role and database:
+   ```sql
+   CREATE ROLE <user> WITH LOGIN PASSWORD '<password>' CREATEDB;
+   CREATE DATABASE <db> OWNER <user> ENCODING 'UTF8';
+   ```
+3. Copy `.env.example` to `.env` and set `DATABASE_URL` to match the role/database you created.
+4. Apply the existing migrations:
+   ```bash
+   npx prisma migrate deploy
+   npx prisma generate
+   ```
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
