@@ -35,16 +35,47 @@ Confidence labels:
 - `INFERRED`: strongly implied by source or framework convention, but not directly verified.
 - `UNCERTAIN`: insufficient evidence.
 
+## State Management Protocol
+
+This project uses seven workflow artifacts. Each answers a different question; do not blend their purposes.
+
+- [AGENTS.md](AGENTS.md) (this file): What rules must every agent always follow? Permanent. Committed.
+- [PLAN.md](PLAN.md): What is the permanent, living project roadmap (phases, sprints, milestones, backlog)? Permanent. Committed. Updated when priorities, scope, or phase status change.
+- [PROGRESS.md](PROGRESS.md): What milestone-level engineering work has completed, chronologically, against [PLAN.md](PLAN.md)? Permanent, append-only. Committed. One entry per completed milestone or significant governance/infrastructure change.
+- [DECISIONS.md](DECISIONS.md): What architectural decisions have been accepted, and why? Permanent. Committed.
+- Root `plan.md` (repository root, outside `docs/`): What is the strategy for the _current, active task_ (may not exist between tasks)? Ephemeral, task-scoped, local/gitignored. Replaced when the task changes. Not permanent project knowledge - do not confuse with [PLAN.md](PLAN.md).
+- Root `progress.md` (repository root): Where exactly are we right now on the current task (may not exist between tasks)? Ephemeral, local/gitignored, target under 50 lines. Reset when the task completes.
+- [../AI_SESSION_LOG.md](../AI_SESSION_LOG.md): What happened, permanently, session by session, across all AI-assisted work? Permanent, append-only. Committed. Finer-grained than [PROGRESS.md](PROGRESS.md): every meaningful AI session gets an entry here (investigation, fix, feature, decision, or documentation change), including sessions too small to warrant a [PROGRESS.md](PROGRESS.md) milestone entry. When a session also completes a [PLAN.md](PLAN.md) milestone, add a corresponding (shorter) [PROGRESS.md](PROGRESS.md) entry as well - the two are not mutually exclusive.
+
+### Start-of-Session Sequence
+
+1. Read [AGENTS.md](AGENTS.md), [PLAN.md](PLAN.md), [PROGRESS.md](PROGRESS.md), [DECISIONS.md](DECISIONS.md).
+2. Check the repository root for `plan.md`/`progress.md`; if present, they describe an in-progress task - reconcile before continuing it.
+3. Read only the reference document(s) relevant to the task (see Agent Workflow below).
+4. Read the most recent [../AI_SESSION_LOG.md](../AI_SESSION_LOG.md) entries relevant to the task's area, not the whole file.
+
+### End-of-Session Sequence
+
+1. Update root `progress.md` if the task is incomplete; delete/reset it once the task is complete.
+2. Update root `plan.md` only if strategy/scope changed; remove it once the task is complete.
+3. Append a new entry to [../AI_SESSION_LOG.md](../AI_SESSION_LOG.md) for any meaningful session, regardless of whether `plan.md`/`progress.md` also changed.
+4. If a [PLAN.md](PLAN.md) milestone completed, append a matching [PROGRESS.md](PROGRESS.md) entry and update [PLAN.md](PLAN.md).
+5. If a stable new rule was discovered, propose adding it to this file's Changelog section at the bottom.
+6. If source code contradicts any of these files, source code wins - correct the file, do not silently trust it next time.
+
 ## Repository Structure
 
 - `app/`: Next.js App Router routes, layouts, global CSS, and page modules.
-- `public/`: public static assets.
-- `prisma/`: Prisma schema, configuration, and migrations.
+- `public/`: public static assets (currently the default `create-next-app` placeholders).
+- `src/`: reserved for future centralized config/lib code; currently empty.
+- `prisma/`: Prisma schema (`schema.prisma`), configuration (`prisma.config.ts`), split domain models under `models/`, migrations under `migrations/`, and a seed entry point configured at `prisma/seed/index.ts` (directory exists; seed script not yet written).
 - `docker/`: Docker service initialization files.
 - `docs/governance/`: AI governance, roadmap, progress, and decision index.
 - `docs/references/`: authoritative project reference documents.
 - `docs/architecture/`: architecture overviews and diagrams.
 - `docs/decisions/`: future standalone ADR files.
+- `docs/AI_SESSION_LOG.md`: permanent, append-only AI session history (see State Management Protocol above).
+- `plan.md`, `progress.md` (repository root, gitignored): ephemeral current-task state (see State Management Protocol above).
 - `node_modules/next/dist/docs/`: local Next.js documentation to consult before application code changes.
 
 ## Engineering Philosophy
@@ -186,14 +217,45 @@ Prefer file-scoped or narrow verification when possible. Do not introduce a new 
 - Do not create branches, stage, commit, push, or open pull requests unless requested.
 - Keep unrelated file changes out of the task.
 - Mention unverified or skipped checks in the final handoff.
+- Commit: this file, [PLAN.md](PLAN.md), [PROGRESS.md](PROGRESS.md), [DECISIONS.md](DECISIONS.md), `../../CLAUDE.md`, `../../AGENTS.md`, `../references/*.md`, `../architecture/*.md`, `../decisions/*.md`, `../AI_SESSION_LOG.md`. These are permanent project knowledge.
+- Keep local/gitignored: root `plan.md`, root `progress.md`. These are ephemeral and task-scoped (see `.gitignore`).
+- Do not modify `.gitignore` to change this strategy without explicit request.
+
+## Mechanical Enforcement
+
+Prose guardrails above are backed by mechanical enforcement only where verified below; everything else is prose-only and depends on the agent honoring it.
+
+- **Verified - Husky pre-commit hook** (`.husky/pre-commit` running `npx lint-staged`): staged `.ts/.tsx/.js/.jsx` files are run through `eslint --fix`, and `.ts/.tsx/.js/.jsx/.css/.json/.md` files through `prettier --write`, before a commit completes. This mechanically enforces lint/format standards, not the safety boundaries below.
+- **Not yet configured - Claude Code hooks**: no `PreToolUse`/`PostToolUse` hook rules exist in `.claude/settings.json` (no such file is present). The "Requires explicit approval" list above (dependency installs, migrations, destructive SQL, schema changes, deletes, full builds/tests, git push/branch changes) is currently enforced by agent judgment only, not blocked mechanically. Adding hooks for this list is a recommended future improvement, not yet approved or implemented.
+- **Not yet configured - Codex sandbox/approval policy**: no Codex-specific configuration exists in this repository.
+- If a tool's mechanical configuration and this file ever disagree, treat that as a bug to fix immediately, not a conflict to silently tolerate.
+
+## When Stuck
+
+If blocked on a fact, file, or decision:
+
+1. Re-read the relevant governance/reference file(s) and search for exact route, table, component, or command names before guessing.
+2. Apply the Anti-Loop Rules above (max two discovery attempts per target) before concluding information is missing.
+3. Mark unresolved facts as `UNCERTAIN` rather than guessing or hallucinating behavior.
+4. State plainly what was checked and what remains unknown.
+5. Ask a precise question, or propose a short investigation plan, instead of proceeding on an assumption.
+
+## Self-Improvement & Feedback
+
+- If a recurring mistake, friction point, or reusable gotcha surfaces during a session, record it in root `progress.md` while the task is active, and as a Known Gotcha/Decision in that session's [../AI_SESSION_LOG.md](../AI_SESSION_LOG.md) entry.
+- If a gotcha proves stable across sessions, propose promoting it into the relevant section of this file, with a dated line in the Changelog section at the bottom.
+- Do not add generic advice that does not prevent a real, observed mistake in this repository.
 
 ## Documentation Standards
 
 - Root [../../AGENTS.md](../../AGENTS.md): lightweight repository entry point.
+- Root [../../CLAUDE.md](../../CLAUDE.md): Claude Code adapter file; contains nothing but a pointer to the root `AGENTS.md`.
+- Root `plan.md`, `progress.md` (gitignored, may not exist): ephemeral current-task state.
 - [AGENTS.md](AGENTS.md): permanent engineering handbook.
 - [PLAN.md](PLAN.md): living roadmap and execution tracker.
-- [PROGRESS.md](PROGRESS.md): chronological engineering journal.
+- [PROGRESS.md](PROGRESS.md): chronological, milestone-level engineering journal.
 - [DECISIONS.md](DECISIONS.md): decision index.
+- [../AI_SESSION_LOG.md](../AI_SESSION_LOG.md): permanent, append-only, session-level AI work history.
 - [../references/README.md](../references/README.md): reference library index.
 - [../architecture/README.md](../architecture/README.md): architecture documentation index.
 - [../decisions/README.md](../decisions/README.md): standalone ADR convention.
@@ -218,14 +280,19 @@ Before implementation, read:
 
 Then read only the specific reference document needed for the task:
 
+- Any Phase 1 feature, route, schema, or navigation work: first check [../references/Phase-1-Reconciled-Decisions.md](../references/Phase-1-Reconciled-Decisions.md); if the topic is listed there and still PROPOSED, ask before choosing an option
+- Phase scope and build order: [../references/Phase-Development.md](../references/Phase-Development.md) and [../references/Phase-1-Step-by-Step.md](../references/Phase-1-Step-by-Step.md)
 - Brand/design work: [../references/Brand-Identity.md](../references/Brand-Identity.md)
+- Images and mockups: [../references/Visual-Asset-Inventory.md](../references/Visual-Asset-Inventory.md)
 - Business/content strategy: [../references/Business-Strategy.md](../references/Business-Strategy.md)
 - Stack/tooling work: [../references/Technology-Stack.md](../references/Technology-Stack.md)
-- Database/schema work: [../references/Database-Design.md](../references/Database-Design.md)
+- Database/schema work: [../references/Database-Design-Reference.md](../references/Database-Design-Reference.md) (tables) and [../references/Database-Design.md](../references/Database-Design.md) (Prisma conventions)
 - Database standards work: [../references/Database-Standards.md](../references/Database-Standards.md)
 - SEO/routing/metadata work: [../references/SEO-Guide.md](../references/SEO-Guide.md)
 - Architecture notes: [../architecture/README.md](../architecture/README.md)
 - ADR conventions: [../decisions/README.md](../decisions/README.md)
+
+Reference documents in `../references/` describe approved strategy, design, and data-modeling _intent_. They are not implementation-status trackers - verify against current source/schema before treating any section as already built, and mark unconfirmed claims `UNCERTAIN`.
 
 ## Anti-Loop Rules
 
@@ -251,19 +318,33 @@ Then read only the specific reference document needed for the task:
 - [Brand Identity](../references/Brand-Identity.md)
 - [Business Strategy](../references/Business-Strategy.md)
 - [Technology Stack](../references/Technology-Stack.md)
-- [Database Design](../references/Database-Design.md)
+- [Database Design Reference](../references/Database-Design-Reference.md)
+- [Database BaseModel Convention](../references/Database-Design.md)
+- [Phase Development](../references/Phase-Development.md)
+- [Phase 1 Step-by-Step](../references/Phase-1-Step-by-Step.md)
+- [Phase 1 Reconciled Decisions](../references/Phase-1-Reconciled-Decisions.md)
+- [Visual Asset Inventory](../references/Visual-Asset-Inventory.md)
 - [Database Standards](../references/Database-Standards.md)
 - [SEO Guide](../references/SEO-Guide.md)
 - [Reference Library Index](../references/README.md)
 - [Architecture Index](../architecture/README.md)
 - [ADR Directory](../decisions/README.md)
+- [AI Session Log](../AI_SESSION_LOG.md)
 
 ## Quick Checklist
 
-- Read governance files in order.
+- Read governance files in order; check the repository root for `plan.md`/`progress.md`.
 - Check whether a specialized reference document is needed.
 - Keep edits scoped to the request.
 - Preserve user changes.
 - Use relative Markdown links for docs.
 - Run only appropriate verification.
-- Update [PROGRESS.md](PROGRESS.md) for governance/documentation milestones.
+- Update root `progress.md` for an in-progress task; remove it once the task completes.
+- Append an entry to [../AI_SESSION_LOG.md](../AI_SESSION_LOG.md) for any meaningful session.
+- Update [PROGRESS.md](PROGRESS.md) and [PLAN.md](PLAN.md) when a roadmap milestone completes.
+
+## AGENTS.md Changelog
+
+- 2026-10-28: Reference library refreshed (pack v1.1). Added Phase Development, Phase 1 Step-by-Step, Phase 1 Reconciled Decisions, Database Design Reference, and Visual Asset Inventory to the reference map. Agents must check Reconciled Decisions before choosing between conflicting reference options.
+- 2026-08-23: Added State Management Protocol, Mechanical Enforcement, When Stuck, and Self-Improvement & Feedback sections; wired in root `plan.md`/`progress.md` and `docs/AI_SESSION_LOG.md` after a full AI-workflow audit. See the corresponding [../AI_SESSION_LOG.md](../AI_SESSION_LOG.md) entry.
+- 2026-07-26: Initial governance handbook created from repository audit (documented in [PROGRESS.md](PROGRESS.md)).

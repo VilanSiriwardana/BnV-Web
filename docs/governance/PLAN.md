@@ -2,204 +2,73 @@
 
 ## Project Information
 
-- Project: B&V / BuwiNVila web platform.
-- Stack: Next.js App Router, TypeScript, Tailwind CSS v4, Prisma, PostgreSQL, Docker.
+- Project: B&V / BuwiNVila — modern romantic lifestyle ecommerce web platform.
+- Stack: Next.js 16 App Router, React 19, TypeScript, Tailwind CSS v4, Prisma 7, PostgreSQL, Docker Compose (local).
 - Governance Entry Point: [../../AGENTS.md](../../AGENTS.md).
 - Authoritative Handbook: [AGENTS.md](AGENTS.md).
 - Reference Library: [../references/README.md](../references/README.md).
+- Conflict resolutions: [../references/Phase-1-Reconciled-Decisions.md](../references/Phase-1-Reconciled-Decisions.md).
 - Architecture Index: [../architecture/README.md](../architecture/README.md).
 - ADR Directory: [../decisions/README.md](../decisions/README.md).
 
 ## Current Phase
 
-- Phase: Phase 0 - documentation governance and infrastructure baseline.
-- Status: Documentation governance reorganization in progress.
-- Current Branch: `UNCERTAIN`; check `git branch --show-current` before branch-specific work.
-
-## Current Sprint
-
-- Name: Governance documentation structure.
-- Goal: Make root `AGENTS.md` a lightweight entry point and make [AGENTS.md](AGENTS.md), [PLAN.md](PLAN.md), [PROGRESS.md](PROGRESS.md), and [DECISIONS.md](DECISIONS.md) the authoritative governance set under `docs/governance/`.
+- Phase: Phase 0 → Phase 1 transition (reference refresh and decision approval).
+- Status: Reference library refreshed 2026-10-28. Phase 1 decisions D-01 to D-19 await approval.
+- Current Branch: `UNCERTAIN` — run `git branch --show-current` and `git status --short` before branch-specific work.
 
 ## Current Milestone
 
-### Documentation Governance Reorganization
+### M0.3 — Reference Refresh and Phase 1 Decision Approval
 
 - Priority: High.
-- Dependencies:
-  - Existing root `AGENTS.md`.
-  - Existing governance files.
-  - Existing project reference documents.
-- Estimated Impact: Gives all future AI coding agents one consistent project operating model.
-- Files:
-  - `AGENTS.md`
-  - `docs/governance/AGENTS.md`
-  - `docs/governance/PLAN.md`
-  - `docs/governance/PROGRESS.md`
-  - `docs/governance/DECISIONS.md`
-  - `docs/references/`
-  - `docs/architecture/`
-  - `docs/decisions/`
+- Dependencies: Reference pack v1.1; owner availability for decisions.
+- Files: `docs/references/*`, `docs/governance/AGENTS.md`, `docs/governance/DECISIONS.md`, `docs/governance/PLAN.md`, `docs/governance/PROGRESS.md`, `docs/AI_SESSION_LOG.md`.
 - Acceptance Criteria:
-  - Root `AGENTS.md` remains lightweight and links to governance docs.
-  - Governance files live in `docs/governance/`.
-  - Reference documents live in `docs/references/`.
-  - Architecture and decision directories exist with README anchors.
-  - Governance docs use relative links.
-  - No application, schema, Docker, package, or framework configuration files are changed.
-- Notes:
-  - Reference documents should be linked, not duplicated.
-  - Existing progress and ADR history should be preserved.
+  - Refreshed references are committed under `docs/references/`, and the links in `references/README.md` resolve.
+  - Each of D-01 to D-19 is ACCEPTED, REJECTED, or CHANGED, and accepted items are recorded as ADR-0010 onwards.
+  - Pre-existing uncommitted changes to `package.json`, `package-lock.json`, and `prisma.config.ts` are reviewed and either committed or reverted by the owner.
+  - No application, schema, Docker, or package changes are made in this milestone.
 
-## Repository Status
+## Phase 1 Sprint Plan (adapted from Phase-1-Step-by-Step.md to the verified repository)
 
-- Governance docs: Being reorganized.
-- Reference docs: Available under [../references/README.md](../references/README.md).
-- Architecture docs: Directory prepared at [../architecture/README.md](../architecture/README.md).
-- Decision docs: Directory prepared at [../decisions/README.md](../decisions/README.md).
-- Application code: Out of scope for the current milestone.
-- Database schema: Out of scope for the current milestone.
-- Docker configuration: Out of scope for the current milestone.
+| Sprint | Name                       | Already done (VERIFIED)                                                                                                                                           | Remaining scope                                                                                                                                                                                                                              | Approval needed                                                        |
+| ------ | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| S0     | Foundation                 | Next.js 16, TypeScript, Tailwind v4, ESLint, Prettier, Husky/lint-staged, Docker Compose Postgres + pgAdmin, Prisma config + split models + HealthCheck migration | `.env.example` review; `typecheck` script; `src/` folder skeleton (`config`, `components`, `features`, `lib`, `data`, `types`); `src/config/{brand,navigation,routes,seo}.ts`; README replacement                                            | `package.json` script edit                                             |
+| S1     | Design System              | —                                                                                                                                                                 | Tokens (light/dark) in `app/globals.css` via Tailwind v4 theme; Playfair Display + Inter via `next/font`; theme provider + toggle; UI primitives; layout shell (Header, MegaMenu, MobileNav, Footer); internal `/style-guide` page (noindex) | Installs: next-themes, lucide-react (if missing), clsx, tailwind-merge |
+| S2     | Database + Seed            | HealthCheck model only                                                                                                                                            | Phase 1 models per D-02 to D-05; Prisma client singleton; seed entry `prisma/seed/index.ts` (categories, collections, sample products, first super_admin)                                                                                    | Schema change, migration, seeding                                      |
+| S3     | Homepage                   | —                                                                                                                                                                 | Sections in the approved homepage order (Brand Identity §23) using static then DB data; newsletter action                                                                                                                                    | —                                                                      |
+| S4     | Catalog + PDP              | —                                                                                                                                                                 | `/shop`, category pillars, `/collections/[slug]`, `/products/[slug]`; filters (non-indexable); Product JSON-LD                                                                                                                               | —                                                                      |
+| S5     | Cart + Checkout Inquiry    | —                                                                                                                                                                 | Cart actions, drawer, page; checkout with Zod; transactional order + snapshots + manual payment row; success page with WhatsApp link                                                                                                         | Test tooling proposal (D-18) before this sprint                        |
+| S6     | Custom, Contact, Portfolio | —                                                                                                                                                                 | `/custom`, `/love-websites`, `/contact`, `/portfolio`, `/portfolio/[slug]`, `/collaborate` (collaboration, consultation request, event invitation); Cloudinary uploads                                                                       | Cloudinary install + credentials                                       |
+| S7     | Admin MVP                  | —                                                                                                                                                                 | Auth.js Credentials (JWT) admin login; server-side guards; dashboard; product CRUD with images; categories/collections; inbox views                                                                                                          | Auth.js install; secrets                                               |
+| S8     | SEO, QA, Deploy            | —                                                                                                                                                                 | `sitemap.ts`, `robots.ts`, metadata utilities, JSON-LD; Lighthouse/PSI/accessibility QA; hosting per D-01; GA4 + Search Console                                                                                                              | Hosting accounts, domain                                               |
 
 ## Known Risks
 
-- AI agents may read only root `AGENTS.md`; mitigation is a lightweight root entry point with explicit links.
-- Internal links may break after moving files; mitigation is relative-link verification.
-- Governance docs may duplicate long references; mitigation is linking to [../references/README.md](../references/README.md).
-- Empty documentation directories may be lost in Git; mitigation is README files.
-- Existing unrelated working tree changes may be present; mitigation is to avoid touching non-documentation files.
-
-## Current Priorities
-
-### P0 - Complete Governance Reorganization
-
-- Dependencies: Existing Markdown files.
-- Estimated Impact: High.
-- Files: Governance and documentation directories.
-- Acceptance Criteria: New hierarchy exists and links resolve.
-- Notes: Documentation-only.
-
-### P1 - Preserve Reference Documents
-
-- Dependencies: Existing reference files.
-- Estimated Impact: High.
-- Files: `docs/references/*.md`.
-- Acceptance Criteria: Reference contents are moved without rewriting.
-- Notes: Use shorter filenames for stable relative links.
-
-### P2 - Prepare Architecture and ADR Expansion
-
-- Dependencies: Governance structure.
-- Estimated Impact: Medium.
-- Files: `docs/architecture/README.md`, `docs/decisions/README.md`.
-- Acceptance Criteria: Directories explain their intended use.
-- Notes: No standalone ADR migration required yet.
-
-## Active Tasks
-
-- Reorganize documentation hierarchy.
-- Update root `AGENTS.md`.
-- Refactor [AGENTS.md](AGENTS.md) to reference source documents instead of duplicating them.
-- Improve [PLAN.md](PLAN.md), [PROGRESS.md](PROGRESS.md), and [DECISIONS.md](DECISIONS.md).
-- Verify documentation links and Git diff scope.
-
-## Upcoming Tasks
-
-### Phase 1 - Product Shell and Design System
-
-- Priority: High.
-- Dependencies: [../references/Brand-Identity.md](../references/Brand-Identity.md), [../references/Business-Strategy.md](../references/Business-Strategy.md), local Next.js documentation.
-- Estimated Impact: Creates the reusable UI foundation.
-- Files: `app/layout.tsx`, `app/page.tsx`, `app/globals.css`, future shared UI folders.
-- Acceptance Criteria:
-  - Layout uses accessible HTML and metadata.
-  - Tailwind v4 theme variables align with the brand reference.
-  - No one-off visual system conflicts are introduced.
-- Notes: Application code is not part of the current documentation reorganization.
-
-### Phase 1 - SEO Baseline
-
-- Priority: High.
-- Dependencies: [../references/SEO-Guide.md](../references/SEO-Guide.md), page/content requirements.
-- Estimated Impact: Improves crawlability and public page quality.
-- Files: `app/layout.tsx`, route metadata files, future sitemap/robots files.
-- Acceptance Criteria:
-  - Metadata is accurate and brand-specific.
-  - Public pages have clear headings and indexable content.
-  - Canonical, robots, and structured data changes are intentional.
-- Notes: Do not add broad indexing directives without review.
-
-### Phase 1 - Prisma Domain Schema
-
-- Priority: High.
-- Dependencies: [../references/Database-Design.md](../references/Database-Design.md), approved entities.
-- Estimated Impact: Establishes the data model for application features.
-- Files: `prisma/schema.prisma`, `prisma/migrations/`.
-- Acceptance Criteria:
-  - Models have clear ownership, relations, indexes, and timestamps.
-  - Migration SQL is reviewed.
-  - Major schema decisions are logged in [DECISIONS.md](DECISIONS.md) or [../decisions/](../decisions/).
-- Notes: Database writes and migration application require explicit approval.
+- Agents may act on stale or conflicting references. Mitigation: the Reconciled Decisions file plus the AGENTS.md rule to ask while a decision is PROPOSED.
+- Next.js 16 and Prisma 7 conventions differ from the 2025-era guides. Mitigation: consult local docs before structural changes (D-12, Database-Standards.md).
+- AI-generated imagery could leak into production as "real" content. Mitigation: Visual-Asset-Inventory rules and the D-10 checklist.
+- Approval rules are prose-only (no hooks). Mitigation: optional Claude Code hooks task (backlog).
 
 ## Backlog
 
-- Replace default README content with B&V-specific project setup.
-- Add architecture overview documents under [../architecture/](../architecture/).
-- Split major ADRs from [DECISIONS.md](DECISIONS.md) into standalone files when the list grows.
-- Add CI/CD once build, lint, and deployment requirements are stable.
-- Add automated tests once a test framework and pattern are approved.
-- Add analytics and monitoring after privacy and event taxonomy decisions.
+- Replace the default README with B&V setup instructions.
+- Architecture overview under `docs/architecture/` (route map, data flow, auth boundary).
+- Claude Code `PreToolUse` hooks for the approval list.
+- CI (GitHub Actions: lint, typecheck, build) once D-01 is decided.
+- Vitest + Playwright (D-18).
+- Real photography briefs from the Visual Asset Inventory.
+- Business content: delivery areas and fees in LKR, policies, WhatsApp number, social URLs.
 
-## Parking Lot
+## Parking Lot (Phase 2+)
 
-- CMS integration.
-- Cloudinary media workflows.
-- Authentication and authorization.
-- Admin workflows.
-- Content operations and editorial preview.
+Customer accounts and Google sign-in, wishlist, reviews, gift box builder, Sanity journal, PayHere/KOKO webhooks, coupons, multilingual routes, love website builder, AI features.
 
 ## Completed
 
-### Initial Governance Baseline
-
-- Priority: High.
-- Dependencies: Existing repository structure.
-- Estimated Impact: Established a first governance source of truth.
-- Files:
-  - `docs/AGENTS.md`
-  - `docs/PLAN.md`
-  - `docs/PROGRESS.md`
-  - `docs/DECISIONS.md`
-- Acceptance Criteria:
-  - Governance files existed in one documentation location.
-  - Root application source remained unchanged.
-  - Files had distinct responsibilities.
-- Notes: This milestone is superseded by the current `docs/governance/` reorganization.
-
-### Local Infrastructure Baseline
-
-- Priority: High.
-- Dependencies: Docker Desktop or compatible Docker runtime.
-- Estimated Impact: Enables local PostgreSQL-backed development.
-- Files: `docker-compose.yml`, `docker/postgres/init/`, `prisma/`.
-- Acceptance Criteria:
-  - PostgreSQL service is defined.
-  - pgAdmin service is defined.
-  - Prisma configuration points to `prisma/schema.prisma`.
-- Notes: Existing files indicate Docker Compose, PostgreSQL, pgAdmin, Prisma config, and one initial migration.
-
-## Dependencies
-
-- [../references/Brand-Identity.md](../references/Brand-Identity.md)
-- [../references/Business-Strategy.md](../references/Business-Strategy.md)
-- [../references/Technology-Stack.md](../references/Technology-Stack.md)
-- [../references/Database-Design.md](../references/Database-Design.md)
-- [../references/SEO-Guide.md](../references/SEO-Guide.md)
-- [../architecture/README.md](../architecture/README.md)
-- [../decisions/README.md](../decisions/README.md)
-
-## Notes
-
-- Use [PROGRESS.md](PROGRESS.md) for chronological implementation history.
-- Use [DECISIONS.md](DECISIONS.md) for accepted architectural decisions.
-- Use [../references/README.md](../references/README.md) as the reference-document index.
+- Initial Governance Baseline (2026-07-26).
+- Documentation Governance Reorganization (2026-07-26).
+- Local Infrastructure Baseline (Docker Compose, PostgreSQL, pgAdmin, Prisma config).
+- Prisma Client Generation Standard (2026-07-29).
+- AI Agent Workflow Files (2026-08-23).

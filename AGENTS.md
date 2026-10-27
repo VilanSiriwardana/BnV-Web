@@ -20,6 +20,8 @@ Before implementing any feature, bug fix, refactor, schema change, or documentat
 3. [docs/governance/PROGRESS.md](docs/governance/PROGRESS.md)
 4. [docs/governance/DECISIONS.md](docs/governance/DECISIONS.md)
 
+If a current task is in progress, also check the repository root for [plan.md](plan.md) and [progress.md](progress.md) (local, ephemeral, task-scoped; may not exist). Append meaningful AI-assisted work to [docs/AI_SESSION_LOG.md](docs/AI_SESSION_LOG.md). See [docs/governance/AGENTS.md](docs/governance/AGENTS.md) for the full State Management Protocol.
+
 Use the reference library only when the task needs that domain context:
 
 - [docs/references/](docs/references/)

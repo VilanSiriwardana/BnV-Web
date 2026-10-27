@@ -1,502 +1,191 @@
-**B&V Database BaseModel Convention v1.0**
+# B&V Database BaseModel Convention
 
-This becomes our **Database Engineering Standard** for the project.
+| Field               | Value                                                                                  |
+| ------------------- | -------------------------------------------------------------------------------------- |
+| Version             | 1.1                                                                                    |
+| Status              | Approved engineering standard                                                          |
+| Converted / updated | 2026-10-28                                                                             |
+| Based on            | B&V Database BaseModel Convention v1.0 (previous `docs/references/Database-Design.md`) |
 
-**1\. Primary Key**
+> **Reference-library note.** This file keeps its original filename so existing governance links still resolve. It contains the **Prisma modelling conventions**. The full Phase 1–4 table blueprint (tables, columns, indexes, statuses, seed plan) is in [Database-Design-Reference.md](Database-Design-Reference.md). v1.1 changes formatting only, plus two clarifications marked _Clarified_.
 
-Every table uses UUID.
+## 1. Primary Key
 
+Every table uses a UUID primary key.
+
+```prisma
 id String @id @default(uuid()) @db.Uuid
+```
 
-Database
+Why: safe for public URLs, cannot be enumerated, friendly to distributed systems, and matches the PostgreSQL design reference. _Clarified:_ the design reference also allows database-generated `gen_random_uuid()`. Pick one convention per project and record it as an ADR before the first domain migration (D-13).
 
-id UUID PRIMARY KEY
+## 2. Timestamps
 
-**Why**
+Every mutable table includes:
 
-- Safe for public URLs
-- Impossible to enumerate IDs
-- Distributed-system friendly
-- Matches our PostgreSQL design reference.
+```prisma
+createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+updatedAt DateTime @updatedAt      @map("updated_at") @db.Timestamptz
+```
 
-**2\. Timestamp Convention**
+Event-only tables may have `createdAt` only.
 
-Every mutable table contains
+## 3. Naming
 
-createdAt DateTime @default(now()) @map("created_at")
+| Layer            | Convention                    | Example                                            |
+| ---------------- | ----------------------------- | -------------------------------------------------- |
+| Prisma fields    | camelCase                     | `passwordHash`, `emailVerifiedAt`, `firstName`     |
+| Database columns | snake_case via `@map`         | `password_hash`, `email_verified_at`, `first_name` |
+| Prisma models    | PascalCase singular           | `User`, `Product`, `Order`                         |
+| Database tables  | snake_case plural via `@@map` | `users`, `products`, `orders`                      |
 
-updatedAt DateTime @updatedAt @map("updated_at")
-
-Database
-
-created_at
-
-updated_at
-
-Benefits
-
-- Auditing
-- Sorting
-- Analytics
-- Syncing
-- Admin history
-
-**3\. Naming Convention**
-
-**Prisma**
-
-Everything uses **camelCase**
-
-createdAt
-
-updatedAt
-
-passwordHash
-
-emailVerifiedAt
-
-firstName
-
-Database
-
-Everything uses **snake_case**
-
-created_at
-
-updated_at
-
-password_hash
-
-email_verified_at
-
-first_name
-
-using
-
-@map(...)
-
-Example
-
+```prisma
 passwordHash String @map("password_hash")
-
-**4\. Table Naming**
-
-Every Prisma model
-
-model User
-
-maps to
-
-users
-
-using
-
 @@map("users")
+```
 
-Examples
+## 4. Foreign Keys
 
-User
+Always `<entity>Id`, mapped to `<entity>_id`: `userId` → `user_id`, `productId` → `product_id`.
 
-Role
+## 5. Relation Names
 
-Permission
+Single relations are singular (`role Role`). Collection relations are plural (`orders Order[]`). Never name a single relation in the plural.
 
-Order
+## 6. Booleans
 
-Product
+Start with `is`, `has`, `can`, or `should`: `isActive`, `isVerified`, `isPrimary`, `hasAcceptedTerms`, `canLogin`.
 
-↓
+## 7. Money
 
-users
+Never use `Float`. Always use:
 
-roles
+```prisma
+price Decimal @db.Decimal(12, 2)
+```
 
-permissions
+This applies to `price`, `salePrice`, `subtotal`, `discount`, `tax`, `shippingFee`, `grandTotal`, and every other money field. Store the currency explicitly (`currencyCode`, default `LKR`).
 
-orders
+## 8. Status Fields
 
-products
+Use strings until workflows stabilise, then migrate to enums.
 
-**5\. Foreign Keys**
+```prisma
+status String @default("active") @db.VarChar(30)
+```
 
-Always
+Controlled vocabularies are listed in the design reference, Section 10, and in [Phase-1-Reconciled-Decisions.md](Phase-1-Reconciled-Decisions.md) (D-04).
 
-&lt;entity&gt;Id
+## 9. JSON Fields
 
-Example
+Only for flexible data: `selectedOptions`, `gatewayPayload`, `metadata`, `personalization`, `seo`. Never for `productName`, `price`, `email`, or any field you filter or sort on.
 
-userId
+## 10. URLs
 
-roleId
+Always `String`: `imageUrl`, `secureUrl`, `avatarUrl`, `videoUrl`.
 
-productId
+## 11. Slugs
 
-categoryId
+Every public entity has `slug String @unique`. This covers products, collections, categories, portfolio shoots, and love websites.
 
-Mapped
+## 12. Sort Order
 
-user_id
+Wherever manual ordering exists: `sortOrder Int @default(0)`.
 
-role_id
+## 13. Soft Delete
 
-product_id
+Use `status` or `archivedAt` instead of deleting. Never permanently delete orders, payments, users, or custom requests.
 
-category_id
+## 14. Audit Fields
 
-**6\. Relation Names**
+The naming convention `createdById` / `updatedById` starts now. The fields are added to important tables when admin auditing arrives; they are not required on every Phase 1 table.
 
-Relations are always singular.
+## 15. Indexes
 
-Example
+```prisma
+@@index([status])
+@@index([createdAt])
+@@index([userId])            // every foreign key
+@@index([status, createdAt]) // composite lookups
+```
 
-role Role
+## 16. Unique Constraints
 
-Collection relations are plural.
+Single-column examples: `email`, `slug`, `sku`. Composite: `@@unique([productId, categoryId])` on join tables.
 
-orders Order\[\]
+_Clarified:_ v1.0 used `roleName`, `permissionKey`, and `@@unique([roleId, permissionId])` as examples. These are **naming examples only**. Phase 1 uses a `role` string on `users`; table-based RBAC is deferred (D-02).
 
-Never
+## 17. Relation Delete Rules
 
-roles Role
+The default is `Restrict`. Use `Cascade` only for pure join tables. Never cascade-delete orders, payments, or products.
 
-for a single relation.
+## 18. Model Layout
 
-**7\. Boolean Naming**
+Every model follows the same order:
 
-Always begin with
-
-is
-
-has
-
-can
-
-should
-
-Examples
-
-isActive
-
-isVerified
-
-isPrimary
-
-hasAcceptedTerms
-
-canLogin
-
-**8\. Money**
-
-Never use Float.
-
-Always
-
-Decimal
-
-price Decimal @db.Decimal(12,2)
-
-Examples
-
-price
-
-salePrice
-
-subtotal
-
-discount
-
-tax
-
-shippingFee
-
-grandTotal
-
-**9\. Status**
-
-Until workflows stabilize, use strings instead of Prisma enums, matching our design guidance.
-
-Example
-
-status String @default("active")
-
-Later we can migrate safely to
-
-enum ProductStatus
-
-**10\. JSON Fields**
-
-Only for flexible data.
-
-Allowed
-
-selectedOptions
-
-gatewayPayload
-
-metadata
-
-personalization
-
-seo
-
-Never
-
-productName
-
-price
-
-email
-
-Those deserve real columns.
-
-**11\. URLs**
-
-Always
-
-String
-
-Examples
-
-imageUrl
-
-secureUrl
-
-avatarUrl
-
-videoUrl
-
-**12\. Slugs**
-
-Every public entity
-
-slug String @unique
-
-Examples
-
-Products
-
-Collections
-
-Categories
-
-Portfolio Shoots
-
-Love Websites
-
-**13\. Sort Order**
-
-Whenever manual ordering exists
-
-sortOrder Int @default(0)
-
-**14\. Soft Delete Strategy**
-
-Instead of deleting
-
-Use
-
-status
-
-or
-
-archivedAt
-
-depending on the table.
-
-Never permanently delete
-
-- Orders
-- Payments
-- Users
-- Custom Requests
-
-**15\. Audit Fields**
-
-Future-proof every important table.
-
-Eventually we'll support
-
-createdById
-
-updatedById
-
-Not in every Phase 1 table, but the naming convention starts now.
-
-**16\. Common Indexes**
-
-Frequently queried fields should always be indexed.
-
-Example
-
-@@index(\[status\])
-
-@@index(\[createdAt\])
-
-@@index(\[updatedAt\])
-
-For foreign keys
-
-@@index(\[userId\])
-
-For composite lookups
-
-@@index(\[status, createdAt\])
-
-**17\. Unique Constraints**
-
-Examples
-
-email
-
-slug
-
-sku
-
-roleName
-
-permissionKey
-
-Composite examples
-
-@@unique(\[roleId, permissionId\])
-
-**18\. Relation Delete Rules**
-
-Default
-
-Restrict
-
-Only use
-
-Cascade
-
-for pure join tables.
-
-Never cascade delete
-
-- Orders
-- Payments
-- Products
-
-**19\. Common Column Order**
-
-Every model should follow the same layout:
-
-Primary Key
-
-Business Fields
-
-Foreign Keys
-
-Relations
-
-Metadata
-
-Indexes
-
-Mapping
-
-For example:
-
+```prisma
 model Product {
+  // Primary key
+  id          String   @id @default(uuid()) @db.Uuid
 
-// Primary Key
+  // Business fields
+  name        String
+  slug        String   @unique
+  description String?
+  status      String   @default("draft") @db.VarChar(30)
 
-id
+  // Foreign keys
+  categoryId  String?  @map("category_id") @db.Uuid
 
-// Business Fields
+  // Relations
+  category    Category? @relation(fields: [categoryId], references: [id])
+  variants    ProductVariant[]
 
-name
+  // Metadata
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
-slug
+  // Indexes
+  @@index([status])
+  @@index([categoryId])
 
-description
-
-status
-
-// Foreign Keys
-
-categoryId
-
-// Relations
-
-category
-
-variants
-
-// Metadata
-
-createdAt
-
-updatedAt
-
-// Indexes
-
-@@index(...)
-
-@@unique(...)
-
-// Mapping
-
-@@map("products")
-
+  // Mapping
+  @@map("products")
 }
+```
 
-This makes every model immediately recognizable to anyone working on the codebase.
+This is an illustration of layout only. The real `Product` model links to categories through the `product_categories` join table.
 
-**20\. File Organization**
+## 19. File Organization
 
-As the schema grows, we'll split it by domain while keeping a single generated Prisma schema:
-
+```text
 prisma/
-
-│
-
-├── schema.prisma # Root entry
-
-├── prisma.config.ts
-
+├── schema.prisma          # root entry (generator + datasource)
+├── prisma.config.ts       # repository keeps this at the root; verify location
 ├── migrations/
+├── seed/
+│   ├── index.ts           # configured in prisma.config.ts; not yet written
+│   └── data/
+└── models/
+    ├── foundation.prisma
+    ├── identity.prisma
+    ├── catalog.prisma
+    ├── commerce.prisma
+    ├── cms.prisma
+    ├── marketing.prisma
+    ├── portfolio.prisma
+    ├── analytics.prisma
+    └── settings.prisma
+```
 
-├── seed.ts
+## 20. Development Workflow for Every New Table
 
-│
-
-├── models/
-
-│ ├── foundation.prisma
-
-│ ├── identity.prisma
-
-│ ├── catalog.prisma
-
-│ ├── commerce.prisma
-
-│ ├── cms.prisma
-
-│ ├── marketing.prisma
-
-│ ├── portfolio.prisma
-
-│ ├── analytics.prisma
-
-│ └── settings.prisma
-
-This keeps the project manageable as Phase 2-4 introduce dozens more models.
-
-**Development Workflow Standard**
-
-Every new table will follow this sequence:
-
-- Design the model against the database reference.
-- Apply the BaseModel convention.
-- Add relationships.
-- Add indexes and unique constraints.
-- Format:
-- npx prisma format
-- Validate:
-- npx prisma validate
-- Generate the migration:
-- npx prisma migrate dev --name &lt;migration_name&gt;
-- Verify the schema in pgAdmin.
-- Add or update seed data if required.
+1. Design the model against [Database-Design-Reference.md](Database-Design-Reference.md).
+2. Apply this convention.
+3. Add relations.
+4. Add indexes and unique constraints.
+5. Run `npx prisma format`.
+6. Run `npx prisma validate`.
+7. **With explicit approval**, run `npx prisma migrate dev --name <migration_name>` and review the generated SQL.
+8. Verify the schema in pgAdmin.
+9. Add or update seed data if required (approval required to run seeders).

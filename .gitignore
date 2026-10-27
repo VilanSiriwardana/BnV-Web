@@ -42,3 +42,8 @@ next-env.d.ts
 
 /app/generated/prisma
 /src/generated/
+
+# AI agent ephemeral task state (see docs/governance/AGENTS.md State Management Protocol)
+/plan.md
+/progress.md
+.claude

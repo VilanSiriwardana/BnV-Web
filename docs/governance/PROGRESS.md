@@ -157,3 +157,67 @@ Documented the standard Prisma Client generation workflow so future agents prese
 ### Next Step
 
 - Continue using `npx prisma generate` with Prisma Client generated under `node_modules/@prisma/client`.
+
+## 2026-08-23 - AI Agent Workflow Files Established
+
+### Summary
+
+Audited the repository against the AGENTS.md Reference Guide methodology and added the remaining tool-agnostic AI workflow artifacts: an ephemeral task-state pair (`plan.md`, `progress.md`) at the repository root, and a permanent session-level history file (`docs/AI_SESSION_LOG.md`). Extended [AGENTS.md](AGENTS.md) with a State Management Protocol, Mechanical Enforcement notes, a When Stuck protocol, a Self-Improvement & Feedback protocol, and a Changelog. Full session detail is recorded in [../AI_SESSION_LOG.md](../AI_SESSION_LOG.md).
+
+### Files Changed
+
+- `docs/governance/AGENTS.md`
+- `docs/governance/PLAN.md`
+- `docs/governance/DECISIONS.md`
+- `docs/AI_SESSION_LOG.md` (new)
+- `plan.md`, `progress.md` (new, repository root)
+- `.gitignore`
+- `AGENTS.md` (root)
+
+### Database Changes
+
+- None.
+
+### API Changes
+
+- None.
+
+### UI Changes
+
+- None.
+
+### Infrastructure
+
+- Verified `.husky/pre-commit` already mechanically enforces lint/format via `lint-staged` on staged files.
+- Confirmed no `.claude/settings.json` hooks and no Codex sandbox/approval configuration exist; the safety/approval boundary in [AGENTS.md](AGENTS.md) is currently prose-only beyond the lint/format hook.
+
+### Tests
+
+- Not run; no application, schema, Docker, or package files were changed.
+
+### Known Issues
+
+- `prisma.config.ts` points its seed script at `prisma/seed/index.ts`, but that file does not yet exist (`prisma/seed/data/` is present, the seed entry point is not). Seed data implementation remains a next step, consistent with [PLAN.md](PLAN.md)'s Phase 1 Prisma Domain Schema milestone.
+- Pre-existing uncommitted changes to `package.json`, `package-lock.json`, and `prisma.config.ts` were present at session start and are unrelated to this task; they were left untouched.
+
+### Technical Debt
+
+- No Claude Code `PreToolUse`/`PostToolUse` hooks exist yet to mechanically enforce the "Requires explicit approval" boundary in [AGENTS.md](AGENTS.md) (dependency installs, migrations, destructive SQL, schema changes, deletes, full builds/tests, git push/branch changes). Recommended future improvement, not yet approved.
+
+### Next Step
+
+- Use `docs/AI_SESSION_LOG.md` for all future AI-assisted session entries; continue using this file for milestone-level roadmap completion against [PLAN.md](PLAN.md).
+
+## 2026-10-28 - Reference Library Refresh (Pack v1.1)
+
+### Summary
+
+- Replaced stale references and added the missing Phase references and a conflict-resolution document. See [docs/AI_SESSION_LOG.md](../AI_SESSION_LOG.md) for detail.
+
+### Database Changes / API Changes / UI Changes
+
+- None.
+
+### Next Step
+
+- Owner review of [docs/references/Phase-1-Reconciled-Decisions.md](../references/Phase-1-Reconciled-Decisions.md).

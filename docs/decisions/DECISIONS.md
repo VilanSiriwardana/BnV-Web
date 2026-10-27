@@ -143,3 +143,19 @@ Each decision should include:
 - Related Documents:
   - [../references/SEO-Guide.md](../references/SEO-Guide.md)
   - [../references/Business-Strategy.md](../references/Business-Strategy.md)
+
+## ADR-0009 - Add Ephemeral Task State and a Session-Level AI Log Alongside Existing Governance
+
+- Status: Accepted
+- Date: 2026-08-23
+- Context: An AI-workflow audit found that `docs/governance/PLAN.md` and `docs/governance/PROGRESS.md` already serve as a permanent living roadmap and a permanent milestone-level engineering journal, but the repository had no ephemeral, task-scoped working memory (a `plan.md`/`progress.md` pair) and no permanent, session-level record of every AI-assisted work session (finer-grained than a roadmap milestone).
+- Decision: Add root `plan.md` and `progress.md` as local, gitignored, ephemeral state for the currently active task, distinct from `docs/governance/PLAN.md`. Add `docs/AI_SESSION_LOG.md` as a permanent, append-only, session-level record, distinct from `docs/governance/PROGRESS.md`'s milestone-level scope. Do not create a new `docs/plans/` directory or STATUS-headered domain documents; `docs/references/*.md` continues to serve that role via the existing reference map in [AGENTS.md](AGENTS.md).
+- Alternatives: Treat `docs/governance/PROGRESS.md` as already fulfilling the session-log role (rejected: loses per-session granularity and root-cause/gotcha detail for small sessions that never rise to a roadmap milestone); rename/restructure the existing `docs/governance/` files to match the reference-guide naming exactly (rejected: would rewrite an already-working, committed governance system for no functional gain).
+- Consequences:
+  - Two permanent chronological logs now exist with different granularity: `docs/governance/PROGRESS.md` (milestone-level, tied to `PLAN.md` acceptance criteria) and `docs/AI_SESSION_LOG.md` (every meaningful AI session). Agents must append to both when a session also completes a milestone, and must not treat this as duplicate governance.
+  - `plan.md`/`progress.md` are now gitignored; they must not be force-added.
+- Related Documents:
+  - [AGENTS.md](AGENTS.md)
+  - [PLAN.md](PLAN.md)
+  - [PROGRESS.md](PROGRESS.md)
+  - [../AI_SESSION_LOG.md](../AI_SESSION_LOG.md)
