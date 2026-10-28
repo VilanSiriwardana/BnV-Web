@@ -1,6 +1,6 @@
 # DECISIONS.md - B&V Architecture Decision Index
 
-This file indexes accepted architectural decisions. Future standalone ADRs belong in [../decisions/](../decisions/) using the convention documented in [../decisions/README.md](../decisions/README.md).
+This file indexes accepted architectural decisions. Future standalone ADRs belong in [./](./) using the Decision Format section below (the former `docs/decisions/README.md` was removed in commit e01b1ed).
 
 Related documentation:
 

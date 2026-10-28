@@ -15,7 +15,7 @@ The reference library was written over several months. Several documents disagre
 When a decision is approved:
 
 1. Change its status here to **ACCEPTED** (or **REJECTED** / **CHANGED**, with the final choice).
-2. Add a matching ADR to `docs/governance/DECISIONS.md`, continuing from ADR-0010.
+2. Add a matching ADR to `docs/decisions/DECISIONS.md`, continuing from ADR-0011 (ADR-0010 is now the native PostgreSQL decision).
 3. Append a `docs/AI_SESSION_LOG.md` entry.
 
 Until then, an agent that meets one of these topics must stop and ask rather than pick an option.

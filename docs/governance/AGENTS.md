@@ -21,10 +21,10 @@ Use this source-of-truth order:
 2. [AGENTS.md](AGENTS.md).
 3. [PLAN.md](PLAN.md).
 4. [PROGRESS.md](PROGRESS.md).
-5. [DECISIONS.md](DECISIONS.md).
+5. [DECISIONS.md](../decisions/DECISIONS.md).
 6. Reference documents in [../references/README.md](../references/README.md).
 7. Architecture notes in [../architecture/README.md](../architecture/README.md).
-8. Future ADR files in [../decisions/README.md](../decisions/README.md).
+8. Future ADR files in [../decisions/DECISIONS.md](../decisions/DECISIONS.md).
 9. Prior AI summaries.
 
 If documents conflict with source code, source code wins and the affected documentation should be corrected.
@@ -42,14 +42,14 @@ This project uses seven workflow artifacts. Each answers a different question; d
 - [AGENTS.md](AGENTS.md) (this file): What rules must every agent always follow? Permanent. Committed.
 - [PLAN.md](PLAN.md): What is the permanent, living project roadmap (phases, sprints, milestones, backlog)? Permanent. Committed. Updated when priorities, scope, or phase status change.
 - [PROGRESS.md](PROGRESS.md): What milestone-level engineering work has completed, chronologically, against [PLAN.md](PLAN.md)? Permanent, append-only. Committed. One entry per completed milestone or significant governance/infrastructure change.
-- [DECISIONS.md](DECISIONS.md): What architectural decisions have been accepted, and why? Permanent. Committed.
+- [DECISIONS.md](../decisions/DECISIONS.md): What architectural decisions have been accepted, and why? Permanent. Committed.
 - Root `plan.md` (repository root, outside `docs/`): What is the strategy for the _current, active task_ (may not exist between tasks)? Ephemeral, task-scoped, local/gitignored. Replaced when the task changes. Not permanent project knowledge - do not confuse with [PLAN.md](PLAN.md).
 - Root `progress.md` (repository root): Where exactly are we right now on the current task (may not exist between tasks)? Ephemeral, local/gitignored, target under 50 lines. Reset when the task completes.
 - [../AI_SESSION_LOG.md](../AI_SESSION_LOG.md): What happened, permanently, session by session, across all AI-assisted work? Permanent, append-only. Committed. Finer-grained than [PROGRESS.md](PROGRESS.md): every meaningful AI session gets an entry here (investigation, fix, feature, decision, or documentation change), including sessions too small to warrant a [PROGRESS.md](PROGRESS.md) milestone entry. When a session also completes a [PLAN.md](PLAN.md) milestone, add a corresponding (shorter) [PROGRESS.md](PROGRESS.md) entry as well - the two are not mutually exclusive.
 
 ### Start-of-Session Sequence
 
-1. Read [AGENTS.md](AGENTS.md), [PLAN.md](PLAN.md), [PROGRESS.md](PROGRESS.md), [DECISIONS.md](DECISIONS.md).
+1. Read [AGENTS.md](AGENTS.md), [PLAN.md](PLAN.md), [PROGRESS.md](PROGRESS.md), [DECISIONS.md](../decisions/DECISIONS.md).
 2. Check the repository root for `plan.md`/`progress.md`; if present, they describe an in-progress task - reconcile before continuing it.
 3. Read only the reference document(s) relevant to the task (see Agent Workflow below).
 4. Read the most recent [../AI_SESSION_LOG.md](../AI_SESSION_LOG.md) entries relevant to the task's area, not the whole file.
@@ -67,9 +67,9 @@ This project uses seven workflow artifacts. Each answers a different question; d
 
 - `app/`: Next.js App Router routes, layouts, global CSS, and page modules.
 - `public/`: public static assets (currently the default `create-next-app` placeholders).
-- `src/`: reserved for future centralized config/lib code; currently empty.
-- `prisma/`: Prisma schema (`schema.prisma`), configuration (`prisma.config.ts`), split domain models under `models/`, migrations under `migrations/`, and a seed entry point configured at `prisma/seed/index.ts` (directory exists; seed script not yet written).
-- `docker/`: Docker service initialization files.
+- `src/`: planned location for centralized config/lib code; does not exist yet (VERIFIED 2026-10-28).
+- `prisma/`: Prisma schema (`schema.prisma`), migrations under `migrations/` (5 as of 2026-10-28: `init` through `004_commerce_domain`), and per-model reference copies under `models/`. `prisma.config.ts` lives at the repository root and configures a seed entry at `prisma/seed/index.ts`; the `prisma/seed/` directory does not exist yet (VERIFIED 2026-10-28).
+- `docker/`: empty `postgres/` folder kept from the Docker era; `docker-compose.yml` is an empty `services: {}` placeholder (ADR-0010).
 - `docs/governance/`: AI governance, roadmap, progress, and decision index.
 - `docs/references/`: authoritative project reference documents.
 - `docs/architecture/`: architecture overviews and diagrams.
@@ -101,6 +101,14 @@ Verified from repository files:
 - ORM: Prisma `7.8.0`.
 - Local services: native PostgreSQL 16 + pgAdmin 4 (ADR-0010).
 - Package manager: npm.
+- Installed in `package.json` but not yet imported by any code (VERIFIED 2026-10-28): `next-themes`, `lucide-react`, `clsx`, `tailwind-merge`, `class-variance-authority`, `framer-motion`, `zod`, `tsx` (dev). Do not re-request approval to install these.
+- `node_modules/` may be absent on a fresh checkout (it was on 2026-10-28). Run `npm install` (approval required) before relying on `node_modules/next/dist/docs/` or Prisma CLI commands. `npx prisma …` without a local install downloads an unpinned Prisma version, so do not use it as a substitute.
+
+### Prisma Schema Source of Truth (Critical Invariant)
+
+- `prisma.config.ts` sets `schema: 'prisma/schema.prisma'`, a **single file**. Prisma does not read `prisma/models/**/*.prisma`.
+- `prisma/schema.prisma` is the only schema source for migrations and the client. Any model change must be made there.
+- The `prisma/models/` files are reference copies and are already out of date: they lack the back-relation fields (for example `User.carts`, `Product.cartItems`) that exist in `schema.prisma` (VERIFIED by diff 2026-10-28). Do not treat them as authoritative, and do not switch Prisma to folder-based schema loading without an approved ADR.
 
 Do not update framework, package, Docker, or database tooling without an explicit implementation task.
 
@@ -110,7 +118,7 @@ Do not update framework, package, Docker, or database tooling without an explici
 - Prefer server components unless client-side state, effects, browser APIs, or interactivity require a client component.
 - Keep public pages indexable, accessible, and semantic by default.
 - Keep database access typed and isolated behind clear server-side boundaries.
-- Record major architectural choices in [DECISIONS.md](DECISIONS.md); place future standalone ADRs in [../decisions/](../decisions/).
+- Record major architectural choices in [DECISIONS.md](../decisions/DECISIONS.md); place future standalone ADRs in [../decisions/](../decisions/).
 
 ## Coding Standards
 
@@ -217,7 +225,7 @@ Prefer file-scoped or narrow verification when possible. Do not introduce a new 
 - Do not create branches, stage, commit, push, or open pull requests unless requested.
 - Keep unrelated file changes out of the task.
 - Mention unverified or skipped checks in the final handoff.
-- Commit: this file, [PLAN.md](PLAN.md), [PROGRESS.md](PROGRESS.md), [DECISIONS.md](DECISIONS.md), `../../CLAUDE.md`, `../../AGENTS.md`, `../references/*.md`, `../architecture/*.md`, `../decisions/*.md`, `../AI_SESSION_LOG.md`. These are permanent project knowledge.
+- Commit: this file, [PLAN.md](PLAN.md), [PROGRESS.md](PROGRESS.md), [DECISIONS.md](../decisions/DECISIONS.md), `../../CLAUDE.md`, `../../AGENTS.md`, `../references/*.md`, `../architecture/*.md`, `../decisions/*.md`, `../AI_SESSION_LOG.md`. These are permanent project knowledge.
 - Keep local/gitignored: root `plan.md`, root `progress.md`. These are ephemeral and task-scoped (see `.gitignore`).
 - Do not modify `.gitignore` to change this strategy without explicit request.
 
@@ -254,11 +262,11 @@ If blocked on a fact, file, or decision:
 - [AGENTS.md](AGENTS.md): permanent engineering handbook.
 - [PLAN.md](PLAN.md): living roadmap and execution tracker.
 - [PROGRESS.md](PROGRESS.md): chronological, milestone-level engineering journal.
-- [DECISIONS.md](DECISIONS.md): decision index.
+- [DECISIONS.md](../decisions/DECISIONS.md): decision index.
 - [../AI_SESSION_LOG.md](../AI_SESSION_LOG.md): permanent, append-only, session-level AI work history.
 - [../references/README.md](../references/README.md): reference library index.
 - [../architecture/README.md](../architecture/README.md): architecture documentation index.
-- [../decisions/README.md](../decisions/README.md): standalone ADR convention.
+- [../decisions/DECISIONS.md](../decisions/DECISIONS.md): standalone ADR convention.
 
 Governance documents should link to reference documents instead of duplicating their full content.
 
@@ -266,7 +274,7 @@ Governance documents should link to reference documents instead of duplicating t
 
 - Source code and schema are the first authority for current behavior.
 - Reference documents are authoritative for approved strategy, design, SEO, stack, and data modeling intent.
-- Architectural decisions belong in [DECISIONS.md](DECISIONS.md) or future files under [../decisions/](../decisions/).
+- Architectural decisions belong in [DECISIONS.md](../decisions/DECISIONS.md) or future files under [../decisions/](../decisions/).
 - Mark unresolved claims as `UNCERTAIN` rather than guessing.
 
 ## Agent Workflow
@@ -276,7 +284,7 @@ Before implementation, read:
 1. [AGENTS.md](AGENTS.md)
 2. [PLAN.md](PLAN.md)
 3. [PROGRESS.md](PROGRESS.md)
-4. [DECISIONS.md](DECISIONS.md)
+4. [DECISIONS.md](../decisions/DECISIONS.md)
 
 Then read only the specific reference document needed for the task:
 
@@ -289,8 +297,11 @@ Then read only the specific reference document needed for the task:
 - Database/schema work: [../references/Database-Design-Reference.md](../references/Database-Design-Reference.md) (tables) and [../references/Database-Design.md](../references/Database-Design.md) (Prisma conventions)
 - Database standards work: [../references/Database-Standards.md](../references/Database-Standards.md)
 - SEO/routing/metadata work: [../references/SEO-Guide.md](../references/SEO-Guide.md)
+- Checkout, customer flows, marketing, PDPA, or porting from the prototype: [../references/Research_and_Prototype.md](../references/Research_and_Prototype.md)
+- Authentication, OAuth, sessions, or account linking: [../references/Authentication.md](../references/Authentication.md)
+- Hosting, deployment, backups, or environments: [../references/Hosting_Deployment.md](../references/Hosting_Deployment.md) (the B&V platform choice is OPEN and conflicts with D-01; ask before assuming Vercel or a VPS)
 - Architecture notes: [../architecture/README.md](../architecture/README.md)
-- ADR conventions: [../decisions/README.md](../decisions/README.md)
+- ADR conventions: [../decisions/DECISIONS.md](../decisions/DECISIONS.md)
 
 Reference documents in `../references/` describe approved strategy, design, and data-modeling _intent_. They are not implementation-status trackers - verify against current source/schema before treating any section as already built, and mark unconfirmed claims `UNCERTAIN`.
 
@@ -326,9 +337,12 @@ Reference documents in `../references/` describe approved strategy, design, and 
 - [Visual Asset Inventory](../references/Visual-Asset-Inventory.md)
 - [Database Standards](../references/Database-Standards.md)
 - [SEO Guide](../references/SEO-Guide.md)
+- [Research and Prototype Audit](../references/Research_and_Prototype.md)
+- [Authentication](../references/Authentication.md)
+- [Hosting and Deployment](../references/Hosting_Deployment.md)
 - [Reference Library Index](../references/README.md)
 - [Architecture Index](../architecture/README.md)
-- [ADR Directory](../decisions/README.md)
+- [ADR Directory](../decisions/DECISIONS.md)
 - [AI Session Log](../AI_SESSION_LOG.md)
 
 ## Quick Checklist
@@ -345,6 +359,9 @@ Reference documents in `../references/` describe approved strategy, design, and 
 
 ## AGENTS.md Changelog
 
+- 2026-10-28 (update-audit): Added the Prisma Schema Source of Truth invariant (`schema.prisma` is the only schema file Prisma reads; `prisma/models/` copies are stale). Corrected the repository structure (`src/` and `prisma/seed/` don't exist; `docker/` is vestigial). Recorded the dependencies that are already installed and the missing `node_modules/` caveat. Repointed every `DECISIONS.md` link to `docs/decisions/DECISIONS.md`, where the file moved in commit e01b1ed.
+
+- 2026-10-28: Added Research and Prototype Audit, Authentication, and Hosting and Deployment references to the reference map. Hosting flags an open Vercel-versus-VPS conflict with D-01.
 - 2026-10-28: Local database and pgAdmin moved from Docker Compose to a native install (ADR-0010). Updated Technology Overview accordingly.
 - 2026-10-28: Reference library refreshed (pack v1.1). Added Phase Development, Phase 1 Step-by-Step, Phase 1 Reconciled Decisions, Database Design Reference, and Visual Asset Inventory to the reference map. Agents must check Reconciled Decisions before choosing between conflicting reference options.
 - 2026-08-23: Added State Management Protocol, Mechanical Enforcement, When Stuck, and Self-Improvement & Feedback sections; wired in root `plan.md`/`progress.md` and `docs/AI_SESSION_LOG.md` after a full AI-workflow audit. See the corresponding [../AI_SESSION_LOG.md](../AI_SESSION_LOG.md) entry.

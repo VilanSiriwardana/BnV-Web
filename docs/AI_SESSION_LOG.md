@@ -108,3 +108,39 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 
 - Install PostgreSQL 16 + pgAdmin 4 natively, create the `bnv` role/database per the README's "Local database setup" section, and run `npx prisma migrate deploy` + `npx prisma generate`.
 - Delete the Docker volume manually once the native database is verified working (out of scope for this session).
+
+## 2026-10-28 - Mapped Research, Authentication, and Hosting References
+
+### Summary
+
+- Added `Research_and_Prototype.md`, `Authentication.md`, and `Hosting_Deployment.md` to the reference library index and the governance reference map, with task-routing entries.
+- Flagged that the hosting review leaves the B&V platform open (Vercel vs VPS), which conflicts with D-01.
+- Noted that the Logging & Observability and Payment Gateway references cited by these reviews are not yet in `docs/references/`.
+
+### Files Modified
+
+- `docs/references/README.md`, `docs/governance/AGENTS.md`, `docs/AI_SESSION_LOG.md`. Reference content was not changed.
+
+## 2026-10-28 - Update-Audit: Docs Reconciled Against Repository
+
+### Summary
+
+- Ran `/update-audit` with an empty scope. The command template refers to `rettzy-docs/`, but this workspace's docs live in-repo under `BnV-Web/docs/`, so those were reconciled instead. There is no `PROJECT_CONTEXT.md`; `docs/governance/{AGENTS,PLAN,PROGRESS}.md` fill that role.
+- Verified the repository on branch `main`. Staged but uncommitted: Research, Authentication, and Hosting references plus their index/governance entries.
+- Found and repointed broken `DECISIONS.md` and `decisions/README.md` links left by the file move in e01b1ed.
+- Found that `prisma.config.ts` loads only `prisma/schema.prisma`, while the `prisma/models/` per-model files are stale copies. Added a critical invariant to `docs/governance/AGENTS.md` and a reality note to `docs/references/Database-Design.md` §19.
+- Corrected stale claims: HealthCheck-only schema, pending package changes, `src/` "currently empty", S1 installs pending, and ADR numbering. Recorded that `.env.example` (claimed created by the native-DB session), `prisma/seed/`, and `node_modules/` are absent.
+
+### Files Modified
+
+- `AGENTS.md` (root, one link), `docs/governance/{AGENTS,PLAN,PROGRESS}.md`, `docs/decisions/DECISIONS.md` (header link), `docs/architecture/README.md`, `docs/references/{README,Database-Standards,Database-Design,Database-Design-Reference,Phase-1-Reconciled-Decisions}.md` (link or path fixes; Database-Design §19 note), and this file.
+- No application, Prisma, config, Docker, or package files were touched.
+
+### Verification
+
+- `git status`/`git log`/`git show --stat`, directory listings, a `package.json` read, and a diff of `prisma/models/*` against `schema.prisma` (the copies lack back-relations). A grep afterwards confirmed no remaining `governance/DECISIONS.md` links outside historical entries.
+- `npx prisma validate` was aborted: with no local `node_modules`, npx began fetching an unpinned `prisma@8.0.0-rc` into its cache. No project files were affected.
+
+### Remaining Work
+
+- Owner decisions: D-01 vs the Hosting reference; whether the migrated coupons/wishlists stay in Phase 1; recreate `.env.example` with a gitignore exception; delete or regenerate the `prisma/models/` copies; `npm install`.

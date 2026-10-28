@@ -18,7 +18,7 @@ generator client {
 }
 ```
 
-Do not change the generator provider or configure a custom output directory unless an architectural decision has been approved and recorded in [../governance/DECISIONS.md](../governance/DECISIONS.md).
+Do not change the generator provider or configure a custom output directory unless an architectural decision has been approved and recorded in [../decisions/DECISIONS.md](../decisions/DECISIONS.md).
 
 The generated Prisma Client lives in `node_modules/@prisma/client`. AI agents must not generate or commit custom client code under `src/generated` unless explicitly instructed.
 

@@ -19,15 +19,18 @@ Last refreshed: 2026-10-28 (reference pack v1.1).
 | [Database-Standards.md](Database-Standards.md)                     | 1.1            | Prisma Client generation standard and approval boundary                                               |
 | [SEO-Guide.md](SEO-Guide.md)                                       | 3.0            | Metadata, structured data, routing, facets, media, analytics, launch checklist                        |
 | [Visual-Asset-Inventory.md](Visual-Asset-Inventory.md)             | 1.0            | What the mockups and image sets contain, and how to handle assets                                     |
+| [Research_and_Prototype.md](Research_and_Prototype.md)             | 1.0            | Ecommerce research, Sri Lanka market/PDPA context, Figma Make prototype and image audit, build points |
+| [Authentication.md](Authentication.md)                             | 1.0            | Google OAuth + centralized auth review: canonical `users.id`, account linking, Auth.js spike, gaps    |
+| [Hosting_Deployment.md](Hosting_Deployment.md)                     | 1.0 (OPEN)     | Hosting options, single-VPS pilot, backups, and impact on other docs. **Conflicts with D-01 (Vercel)** |
 
 ## Precedence When References Conflict
 
 1. Current source code, schema, and configuration.
-2. Accepted ADRs in [../governance/DECISIONS.md](../governance/DECISIONS.md).
+2. Accepted ADRs in [../decisions/DECISIONS.md](../decisions/DECISIONS.md).
 3. [Phase-1-Reconciled-Decisions.md](Phase-1-Reconciled-Decisions.md), once each item is accepted.
 4. The newest version of the relevant reference document.
 5. Figma mockups (visual direction only, never content truth).
 
 ## Pending References
 
-None. The Phase Development and Phase 1 Step-by-Step references were added in this refresh.
+The Authentication and Hosting reviews cross-reference a **Logging & Observability Reference v1.0** and a **Payment Gateway Integration Reference v1.0**, which are not yet in this directory.

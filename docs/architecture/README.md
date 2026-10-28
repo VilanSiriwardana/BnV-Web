@@ -5,7 +5,7 @@ Use this directory for architecture overviews, diagrams, system maps, data-flow 
 ## Current Status
 
 - No standalone architecture documents have been added yet.
-- Current accepted decisions are indexed in [../governance/DECISIONS.md](../governance/DECISIONS.md).
+- Current accepted decisions are indexed in [../decisions/DECISIONS.md](../decisions/DECISIONS.md).
 - Future ADR files belong in [../decisions/](../decisions/).
 - Reference material lives in [../references/](../references/).
 

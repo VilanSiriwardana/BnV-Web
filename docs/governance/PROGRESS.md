@@ -6,10 +6,10 @@ Related documentation:
 
 - Governance handbook: [AGENTS.md](AGENTS.md)
 - Roadmap: [PLAN.md](PLAN.md)
-- Decision index: [DECISIONS.md](DECISIONS.md)
+- Decision index: [DECISIONS.md](../decisions/DECISIONS.md)
 - Reference library: [../references/README.md](../references/README.md)
 - Architecture index: [../architecture/README.md](../architecture/README.md)
-- ADR directory: [../decisions/README.md](../decisions/README.md)
+- ADR directory: [../decisions/DECISIONS.md](../decisions/DECISIONS.md)
 
 ## 2026-07-26 - Governance Documentation Baseline
 
@@ -149,7 +149,7 @@ Reorganized project documentation so root `AGENTS.md` remains a lightweight repo
 
 - Add phase development and phase 1 step-by-step references to `docs/references/` if supplied later.
 - Add architecture overview documents under `docs/architecture/`.
-- Split ADRs into individual files under `docs/decisions/` if [DECISIONS.md](DECISIONS.md) grows too large.
+- Split ADRs into individual files under `docs/decisions/` if [DECISIONS.md](../decisions/DECISIONS.md) grows too large.
 
 ### Next Step
 
@@ -251,3 +251,36 @@ Audited the repository against the AGENTS.md Reference Guide methodology and add
 ### Next Step
 
 - Owner review of [docs/references/Phase-1-Reconciled-Decisions.md](../references/Phase-1-Reconciled-Decisions.md).
+
+## 2026-10-28 - Documentation Reconciliation Audit (update-audit)
+
+### Summary
+
+Reconciled the governance docs against the current repository. This was a documentation-only session: no application, schema, config, or package files were changed. Full detail is in [../AI_SESSION_LOG.md](../AI_SESSION_LOG.md).
+
+### Corrections (VERIFIED against source)
+
+- `DECISIONS.md` moved from `docs/governance/` to `docs/decisions/` and `docs/decisions/README.md` was deleted in commit e01b1ed. About 20 links pointed at the old paths; they are repointed. Historical file lists in this journal were left unchanged.
+- The schema is no longer "HealthCheck only". There are 5 migrations and 22 models, and HealthCheck was dropped in `001_identity_foundation`.
+- The `package.json`/`package-lock.json`/`prisma.config.ts` changes listed as pending were committed in e01b1ed.
+- `src/`, `prisma/seed/`, `.env.example`, and `node_modules/` are all absent on disk.
+- Sprint S1's listed installs are already present in `package.json`.
+- ADR-0010 is taken, so Phase 1 decisions start at ADR-0011.
+
+### New Findings
+
+- Prisma loads only `prisma/schema.prisma`. The `prisma/models/` copies are stale (no back-relations). This is recorded as a critical invariant in [AGENTS.md](AGENTS.md).
+- `Product` uses direct `categoryId`/`collectionId` FKs, which differs from the join-table design in the Database Design Reference.
+- Coupons and wishlists are already migrated, although PLAN parks them in Phase 2+.
+
+### Database Changes / API Changes / UI Changes
+
+- None.
+
+### Tests
+
+- Not run. `npx prisma validate` could not run because there is no local install, and it was aborted rather than fetching an unpinned Prisma release.
+
+### Next Step
+
+- Owner: resolve the M0.3 items, which now include D-01 vs Hosting, the Phase 1 scope of coupons/wishlists, `.env.example`, and the `prisma/models/` copies.

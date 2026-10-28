@@ -3213,7 +3213,7 @@ newsletter_subscribers
 
 ## 18. Addendum v1.1 — Phase 1 Reconciliation (2026-10-28)
 
-This addendum does not change the tables above. It records where this reference disagrees with the Phase 1 Step-by-Step Guidance, the Phase Development Reference v1.1, and the Database BaseModel Convention, and points to the proposed resolution in [Phase-1-Reconciled-Decisions.md](Phase-1-Reconciled-Decisions.md). Every item is **PROPOSED** until it is approved and recorded as an ADR in `docs/governance/DECISIONS.md`.
+This addendum does not change the tables above. It records where this reference disagrees with the Phase 1 Step-by-Step Guidance, the Phase Development Reference v1.1, and the Database BaseModel Convention, and points to the proposed resolution in [Phase-1-Reconciled-Decisions.md](Phase-1-Reconciled-Decisions.md). Every item is **PROPOSED** until it is approved and recorded as an ADR in `docs/decisions/DECISIONS.md`.
 
 | Topic                   | This reference (v1.0)                                                  | Conflicting source                                                                                                | Proposed resolution                                                                                                                                                              |
 | ----------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
