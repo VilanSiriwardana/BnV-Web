@@ -219,3 +219,21 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 
 - Run `npx prisma` only from `BnV-Web/`. Run from the parent folder, npx picked up a cached `prisma@8.0.0-rc` (where `validate` and `migrate diff` are "unknown/moved" commands).
 - In Windows PowerShell 5, `Set-Content -Encoding utf8` writes a BOM, which makes a temp `.prisma` file unreadable for `migrate diff`. Write temp files from bash, or use a BOM-free encoding.
+
+## 2026-10-28 - Phase-1-Step-by-Step v2.0 (Decisions and Design Sync)
+
+### Summary
+
+- Rewrote `docs/references/Phase-1-Step-by-Step.md` as v2.0, applying the accepted decisions D-01 to D-19, ADR-0010 to ADR-0016, and the Brand-Identity v1.2 design rules (full light/dark token set, shape/motion rules, dark component rules, §23 homepage order, §42 portfolio rules).
+- Marked Gate B items as OPEN (D-20 to D-23, Brand-Identity contrast/muted/shadcn gaps) instead of deciding them. Added a "Changes from v1.0" section; v1.0 text stays in git history.
+- Section 20 now maps v1.0 sprints S0–S8 to Gate A/B and sprints 1A–1I and links to Implementation-Plan.md instead of duplicating it.
+
+### Findings recorded in the guide (VERIFIED)
+
+- `tsconfig.json` maps `@/*` to `./*`, not `./src/*`; sprint 1A must settle it.
+- `orders.status` defaults to `pending` (D-04 starts at `inquiry_received`); `orders.payment_status` (D-04) does not exist; products have no SEO columns. Listed as sprint 1C changes.
+- Next.js 16 renamed Middleware to Proxy (`node_modules/next/dist/docs/01-app/01-getting-started/16-proxy.md`); D-12 server-side guards stand.
+
+### Files Modified
+
+- `docs/references/Phase-1-Step-by-Step.md`, `docs/references/README.md` (version row), this file. No code, schema, config or asset changes.
