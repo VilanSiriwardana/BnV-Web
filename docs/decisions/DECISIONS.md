@@ -89,7 +89,7 @@ Each decision should include:
 - Decision: Use Prisma as the ORM and migration tool.
 - Alternatives: Direct SQL only, Drizzle ORM, TypeORM.
 - Consequences:
-  - Database models live in `prisma/schema.prisma`.
+  - Database models live in `prisma/schema/*.prisma` (multi-file since ADR-0016).
   - Migration files live under `prisma/migrations/`.
   - Generated artifacts must not be edited manually.
   - Migration SQL should be reviewed before use.
@@ -176,3 +176,111 @@ Each decision should include:
   - [../references/Technology-Stack.md](../references/Technology-Stack.md)
   - [AGENTS.md](AGENTS.md)
   - [PLAN.md](PLAN.md)
+
+## ADR-0011 - Host Phase 1 on Vercel with Managed PostgreSQL
+
+- Status: Accepted
+- Date: 2026-10-28
+- Context: D-01 in the Reconciled Decisions weighed Vercel, a Docker VPS with Jenkins, and Railway. [Hosting_Deployment.md](../references/Hosting_Deployment.md) left Vercel vs VPS open.
+- Decision: Deploy the Next.js app on Vercel. Use a managed PostgreSQL provider (Neon, Supabase, or Railway Postgres; chosen in sprint 1I) through a pooled connection string. Run lint, typecheck and build in GitHub Actions. Jenkins is deferred.
+- Alternatives: Single VPS with Docker, Jenkins and nginx; Railway for both app and database.
+- Consequences:
+  - Serverless connection limits require a pooled `DATABASE_URL` in production.
+  - The single-VPS pilot in Hosting_Deployment.md is not used for Phase 1.
+  - Local development stays on native PostgreSQL (ADR-0010).
+- Related Documents:
+  - [../references/Phase-1-Reconciled-Decisions.md](../references/Phase-1-Reconciled-Decisions.md) (D-01)
+  - [../references/Hosting_Deployment.md](../references/Hosting_Deployment.md)
+
+## ADR-0012 - Keep Table-Based RBAC (D-02 Changed)
+
+- Status: Accepted
+- Date: 2026-10-28
+- Context: D-02 proposed a single `users.role` string and deferred RBAC tables to Phase 3. Migration `001_identity_foundation` had already created `roles`, `permissions`, `role_permissions` and `user_roles`.
+- Decision: Keep the migrated RBAC tables. Seed the roles `super_admin`, `admin`, `editor` and `customer`, and permissions named `module.action` (for example `products.manage`). Admin guards in S7 check role membership through `user_roles`.
+- Alternatives: Drop the RBAC tables and add `users.role` (destructive migration, no benefit).
+- Consequences:
+  - No schema change is needed for roles.
+  - `user_roles.assigned_by` is required, so the first super admin assigns its own role.
+  - Guard helpers (`requireRole`, `requireAdmin`, `requireSuperAdmin`) read roles through a join.
+- Related Documents:
+  - [../references/Phase-1-Reconciled-Decisions.md](../references/Phase-1-Reconciled-Decisions.md) (D-02)
+
+## ADR-0013 - Accept Phase 1 Reconciled Decisions D-03 to D-19
+
+- Status: Accepted
+- Date: 2026-10-28
+- Context: [Phase-1-Reconciled-Decisions.md](../references/Phase-1-Reconciled-Decisions.md) resolved conflicts between the reference documents. The owner accepted the recommendations.
+- Decision: Accept as recommended:
+  - D-03: Admin-only Auth.js Credentials with JWT sessions; guest checkout; adapter tables in Phase 2.
+  - D-04: One unified status vocabulary per entity.
+  - D-05: Static typed portfolio shoot data plus one `collaboration_inquiries` table.
+  - D-06: Consultation booking is a request form only.
+  - D-07: Routes `/portfolio`, `/portfolio/[slug]`, `/collaborate`.
+  - D-08: Primary navigation Shop, Women, Men, Jewelry, Gifts, Couples, Custom, Portfolio; Our Story in the footer and homepage.
+  - D-09: Love Websites landing and inquiry in Phase 1; builder in Phase 3.
+  - D-10: LKR, real payment methods, no fake ratings or stats.
+  - D-11: Tailwind v4 CSS-first tokens (already VERIFIED, ADR-0003).
+  - D-12: Server-side guards in layouts and actions.
+  - D-13: `@default(uuid()) @db.Uuid` (already VERIFIED in every model).
+  - D-14: `app/` at the root, shared code in `src/` with the `@/` alias.
+  - D-15: English only at launch.
+  - D-16: Sanity deferred to Phase 2.
+  - D-17: Inquiry, manual confirmation and WhatsApp at launch; PayHere and KOKO next.
+  - D-18: `typecheck` script now; Vitest and Playwright when approved.
+  - D-19: Exclude Bilesma Natural material from the repository.
+- Alternatives: Recorded per decision in the Reconciled Decisions document.
+- Consequences:
+  - Agents no longer need to stop on these topics.
+  - New conflicts found in Gate B become D-20 onwards.
+- Related Documents:
+  - [../references/Phase-1-Reconciled-Decisions.md](../references/Phase-1-Reconciled-Decisions.md)
+
+## ADR-0014 - Prisma 7 Connects Through @prisma/adapter-pg; Prisma Pinned to 7.8.0
+
+- Status: Accepted
+- Date: 2026-10-28
+- Context: Database-Standards.md left open how Prisma 7 connects. The installed `@prisma/client@7.8.0` runtime throws "Using engine type \"client\" requires either \"adapter\" or \"accelerateUrl\"". An accidental `npm i prisma@latest` also installed `8.0.0-rc.28`, which broke the CLI (`prisma validate` unknown) and mismatched the client.
+- Decision: Keep the `prisma-client-js` generator with its default output. Construct `PrismaClient` with `new PrismaPg({ connectionString }, { schema })` from `@prisma/adapter-pg`, with the `schema` query parameter stripped from `DATABASE_URL`. Pin `prisma`, `@prisma/client` and `@prisma/adapter-pg` to exactly `7.8.0`. Upgrading Prisma needs its own ADR.
+- Alternatives: Prisma Accelerate (`accelerateUrl`), unnecessary for local and Vercel use; upgrading to Prisma 8 (pre-release).
+- Consequences:
+  - `pg` is a runtime dependency.
+  - The seed client (`prisma/seed/client.ts`) holds the adapter setup now; `src/lib/prisma.ts` reuses the same pattern in sprint 1C.
+- Related Documents:
+  - [../references/Database-Standards.md](../references/Database-Standards.md)
+
+## ADR-0015 - Seeding Strategy
+
+- Status: Accepted
+- Date: 2026-10-28
+- Context: `prisma.config.ts` pointed its seed command at a missing `prisma/seed/index.ts`. Phase 1 needs reference data and a first super admin created without a public route (D-03).
+- Decision:
+  - `prisma/seed/index.ts` runs domain seeders in order: roles and permissions, super admin, brand, categories, collections, and demo products.
+  - Every seeder upserts on unique keys, so re-running is safe. Product images are replaced per product.
+  - Demo products load only with `--demo` (`npm run db:seed:demo`), never in a plain `db:seed`.
+  - The super admin comes from `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD` (12+ characters) and `SEED_ADMIN_NAME`, hashed with bcryptjs at cost 12. Re-seeding never overwrites the password.
+  - Products require a collection, so a neutral "Core Range" collection exists until `products.collection_id` becomes nullable in sprint 1C.
+  - The migrated coupon and wishlist tables stay but are unused and unseeded until Phase 2.
+  - The local database is named `bnv_db` (ADR-0010 assumed `bnv`).
+- Alternatives: One monolithic seed file; SQL seed scripts; seeding the admin through a setup route (rejected for security).
+- Consequences:
+  - Shipping methods, FAQ, policies and site settings are seeded once their tables exist (sprint 1C).
+  - Demo product image paths under `/images/prototype/` resolve only after the Gate B asset preparation.
+- Related Documents:
+  - [../references/Database-Design-Reference.md](../references/Database-Design-Reference.md) (§14 Seed Data Plan)
+  - [../references/Database-Standards.md](../references/Database-Standards.md)
+
+## ADR-0016 - Multi-File Prisma Schema Split by Domain
+
+- Status: Accepted
+- Date: 2026-10-28
+- Context: `prisma/schema.prisma` held all 22 models in one file. The earlier `prisma/models/` copies were never read by Prisma and drifted, so they were deleted (ADR-0015). The owner wants per-domain files for easier maintenance.
+- Decision: Point `prisma.config.ts` at the folder `prisma/schema`. Keep `generator` and `datasource` in `prisma/schema/schema.prisma`. Split the models verbatim into `identity.prisma` (Role, Permission, RolePermission, User, UserRole, Address), `catalog.prisma` (Category, Brand, Collection), `products.prisma` (Product, ProductVariant, ProductImage, Inventory) and `commerce.prisma` (Cart, CartItem, Order, OrderItem, Payment, Coupon, CouponRedemption, Wishlist, WishlistItem). Add `npm run db:validate`.
+- Alternatives: One file per model (more files, relations harder to follow); keep a single file.
+- Consequences:
+  - Verified on Prisma 7.8.0: `prisma validate` loads all files, and `prisma migrate diff` from the previous single file and from the live `bnv_db` both give an empty migration. No database or client change.
+  - Every `.prisma` file must live in `prisma/schema/`, and model names must be unique across files.
+  - Migrations stay in `prisma/migrations/` (set explicitly in `prisma.config.ts`).
+- Related Documents:
+  - [../governance/AGENTS.md](../governance/AGENTS.md) (Prisma Schema Source of Truth)
+  - [../references/Database-Design.md](../references/Database-Design.md)

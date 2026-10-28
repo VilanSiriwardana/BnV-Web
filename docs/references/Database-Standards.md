@@ -22,7 +22,7 @@ Do not change the generator provider or configure a custom output directory unle
 
 The generated Prisma Client lives in `node_modules/@prisma/client`. AI agents must not generate or commit custom client code under `src/generated` unless explicitly instructed.
 
-> **Open verification (UNCERTAIN, added v1.1).** The repository runs Prisma 7.8.0. Prisma 7 changed several defaults compared with Prisma 5 and 6, including configuration through `prisma.config.ts` and how the client connects to the database. Before the first domain migration, confirm against the Prisma 7 documentation that `prisma-client-js` without a custom output is still supported in this version and what connection setup it needs. Record the result as an ADR. Do not change the generator until that check is done.
+> **Resolved (2026-10-28, ADR-0014).** `prisma-client-js` with the default output works on Prisma 7.8.0. The client must be constructed with a driver adapter: `new PrismaClient({ adapter: new PrismaPg({ connectionString }, { schema }) })` from `@prisma/adapter-pg`. Prisma packages are pinned to exactly 7.8.0.
 
 ## Approval Boundary
 

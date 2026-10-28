@@ -144,3 +144,78 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 ### Remaining Work
 
 - Owner decisions: D-01 vs the Hosting reference; whether the migrated coupons/wishlists stay in Phase 1; recreate `.env.example` with a gitignore exception; delete or regenerate the `prisma/models/` copies; `npm install`.
+
+## 2026-10-28 - Status Analysis, Reference Sync Audit, Implementation Plan
+
+### Summary
+
+- Verified the repo state: 22 Prisma models and 5 migrations. There is no application code, `src/`, seed, `.env.example`, tests or CI.
+- Read-only audit of the prototype (`BnV Docs/B&V Ecommerce Prototype/src/app/App.tsx`, `src/styles/theme.css`) against Brand-Identity.md, Research_and_Prototype.md and the Reconciled Decisions. It found:
+  - Token-name mismatches.
+  - Stale nav and homepage order.
+  - D-10 violations (fake ratings, testimonials and claims) and D-15 violations (language switcher).
+  - Missing checkout and Portfolio pages.
+- Read-only audit of `BnV Docs/Images/` (316 files, 276 unique, about 583 MB of PNG) against Visual-Asset-Inventory.md. The inventory covers about 20% of the library. It also found:
+  - Duplicate Phase 2 folders.
+  - A watermarked file and wrong text inside one banner.
+  - Banner crops that don't match D-19.
+  - No logo, Portfolio or Our Story assets.
+- Published the master plan as `docs/references/Implementation-Plan.md` (findings, Gate A and Gate B, sprints 1A–1I, Phases 2–4). Reduced `docs/governance/PLAN.md` to a short tracker that links to it.
+
+### Files Modified
+
+- `docs/governance/PLAN.md`, `docs/governance/PROGRESS.md`, this file. No code, schema, config or asset changes.
+
+### Remaining Work
+
+- Gate B doc updates: Brand-Identity v1.2, D-20 to D-23, Research corrections, a new Phase-1-UX-Spec.md, and the Visual-Asset-Inventory rewrite.
+- Asset cleanup.
+
+## 2026-10-28 - Gate A Implementation (Blueprint 001)
+
+### Summary
+
+- Implemented `.claude/blueprints/001-gate-a-seeding-env.md`.
+- **Incident:** the owner ran `npm i prisma@latest`, which installed `prisma@8.0.0-rc.28` (`validate` became an unknown command, and the CLI no longer matched `@prisma/client@7.10.1`). It was reverted with `git checkout` of the package files. Prisma, the client and the adapter are now pinned to exactly 7.8.0 (ADR-0014).
+- Verified in `node_modules/@prisma/client/runtime/client.js` that Prisma 7 requires an `adapter` or `accelerateUrl`. Added `@prisma/adapter-pg` and `pg`.
+- Owner decisions:
+  - D-01: Vercel plus managed PostgreSQL.
+  - D-02: CHANGED, keep RBAC.
+  - D-03 to D-19: accepted as recommended.
+  - bcryptjs; a "Core Range" collection; a `--demo` flag; coupon and wishlist tables kept.
+  - The local database is `bnv_db`.
+- Recorded as ADR-0011 to ADR-0015.
+
+### Files Modified
+
+- See the PROGRESS.md entry "Gate A Closed".
+
+### Verification
+
+- `prisma -v`: CLI and client 7.8.0. `prisma validate`: valid. `prisma migrate status`: `bnv_db` up to date (5 migrations).
+- `npm run typecheck` and `npm run lint` passed. Prettier is clean on `prisma/seed`.
+- Ran `npm run db:seed` twice without `SEED_ADMIN_*`. Each run seeded roles 4, permissions 7 and role_permissions 15 (same counts both times, so idempotent), then stopped with the intended error "SEED_ADMIN_EMAIL is not set" (exit 1).
+- Super admin, brand, categories, collections and demo products are not yet verified against the DB: waiting for the owner to add `SEED_ADMIN_*` to `.env`.
+
+### Remaining Work
+
+- Owner: add `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD` (12+ characters) and `SEED_ADMIN_NAME` to `.env`, then run `npm run db:seed` and `npm run db:seed:demo`.
+- Commit the changes (not done; awaiting owner).
+
+## 2026-10-28 - Multi-File Prisma Schema (ADR-0016)
+
+### Summary
+
+- Split `prisma/schema.prisma` verbatim into `prisma/schema/{schema,identity,catalog,products,commerce}.prisma` (moved with `git mv`). `prisma.config.ts` now sets `schema: 'prisma/schema'`. Added `npm run db:validate`.
+- Updated: ADR-0016 (new), ADR-0005's consequences, `docs/governance/AGENTS.md` (Prisma Schema Source of Truth), Database-Design.md, Technology-Stack.md, Implementation-Plan.md, README.
+
+### Verification
+
+- `npm run db:validate`: "The schemas at prisma\schema are valid".
+- `prisma migrate diff` from the committed single-file schema, and from the live `bnv_db`, to `prisma/schema`: both give an empty migration.
+- `prisma migrate status`: up to date. `db:generate`, `typecheck` and ESLint on `prisma.config.ts` pass. The seed still runs with the same counts.
+
+### Gotchas
+
+- Run `npx prisma` only from `BnV-Web/`. Run from the parent folder, npx picked up a cached `prisma@8.0.0-rc` (where `validate` and `migrate diff` are "unknown/moved" commands).
+- In Windows PowerShell 5, `Set-Content -Encoding utf8` writes a BOM, which makes a temp `.prisma` file unreadable for `migrate diff`. Write temp files from bash, or use a BOM-free encoding.

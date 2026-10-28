@@ -2,8 +2,8 @@
 
 | Field   | Value                                                                            |
 | ------- | -------------------------------------------------------------------------------- |
-| Version | 1.0                                                                              |
-| Status  | **PROPOSED** — each decision needs owner approval before it becomes an ADR       |
+| Version | 1.1                                                                              |
+| Status  | **ACCEPTED** (2026-10-28) — D-01 to D-19 decided; see ADR-0011 to ADR-0015       |
 | Created | 2026-10-28                                                                       |
 | Owner   | B&V project owner                                                                |
 | Purpose | Resolve conflicts between the reference documents so agents do not have to guess |
@@ -27,7 +27,7 @@ Status key: **PROPOSED** (awaiting approval), **VERIFIED** (already true in the 
 | ID   | Topic                          | Recommendation                                                                                        | Blocks                        |
 | ---- | ------------------------------ | ----------------------------------------------------------------------------------------------------- | ----------------------------- |
 | D-01 | Hosting and deployment         | Vercel + managed PostgreSQL for Phase 1; GitHub Actions CI; Jenkins deferred                          | Deployment, env setup         |
-| D-02 | User roles                     | `users.role` string: customer, editor, admin, super_admin; RBAC tables deferred                       | Identity schema, admin guards |
+| D-02 | User roles                     | **CHANGED:** keep migrated RBAC tables; roles customer, editor, admin, super_admin                    | Identity schema, admin guards |
 | D-03 | Auth scope and tables          | Auth.js Credentials + JWT for admin only; Auth.js DB tables stay Phase 2                              | Identity schema               |
 | D-04 | Status vocabularies            | One unified list per entity (below)                                                                   | Orders, payments schema       |
 | D-05 | Portfolio data model           | Static typed shoot data + one `collaboration_inquiries` table                                         | Portfolio sprint              |
@@ -60,7 +60,7 @@ Status key: **PROPOSED** (awaiting approval), **VERIFIED** (already true in the 
 
 **Recommendation: A.** Keep Docker Compose for local development (already working). Defer Jenkins unless B&V moves to self-hosting. Reconsider if hosting cost or database connection limits become a problem; Railway (C) is the natural next step.
 
-**Status:** PROPOSED.
+**Status:** ACCEPTED (2026-10-28) — Option A, Vercel + managed PostgreSQL + GitHub Actions. See ADR-0011.
 
 ## D-02 — User Roles
 
@@ -68,7 +68,7 @@ Status key: **PROPOSED** (awaiting approval), **VERIFIED** (already true in the 
 
 **Recommendation.** A single `role` column on `users` (`varchar(30)`) with the values `customer` (default), `editor`, `admin`, and `super_admin`. Lowercase strings, consistent with the string-status rule. Guard helpers `requireRole`, `requireAdmin`, and `requireSuperAdmin` live in `src/lib/auth/`. Table-based RBAC (`roles`, `permissions`, `role_permissions`) arrives in Phase 3 together with `admin_activity_logs`. `staff` is dropped: `editor` covers content staff.
 
-**Status:** PROPOSED.
+**Status:** CHANGED (2026-10-28) — keep the migrated table-based RBAC (`roles`, `permissions`, `role_permissions`, `user_roles`) instead of a `users.role` column. Roles seeded: `super_admin`, `admin`, `editor`, `customer`. See ADR-0012.
 
 ## D-03 — Auth Scope and Auth.js Tables
 
@@ -85,7 +85,7 @@ Status key: **PROPOSED** (awaiting approval), **VERIFIED** (already true in the 
 
 Reconsider if customer Google sign-in becomes a launch requirement.
 
-**Status:** PROPOSED. Confirm the exact Auth.js v5 behaviour with the installed version.
+**Status:** ACCEPTED (2026-10-28). Confirm the exact Auth.js v5 behaviour with the installed version in S7. Passwords use bcryptjs (ADR-0015). See ADR-0013.
 
 ## D-04 — Unified Status Vocabularies
 
@@ -106,7 +106,7 @@ Reconsider if customer Google sign-in becomes a launch requirement.
 
 This supersedes Section 10 of the Database Design Reference for these entities. Keep them as strings and centralise the allowed values in one TypeScript constants module, validated with Zod.
 
-**Status:** PROPOSED.
+**Status:** ACCEPTED (2026-10-28). See ADR-0013.
 
 ## D-05 — Visual Portfolio Data Model
 
@@ -118,7 +118,7 @@ This supersedes Section 10 of the Database Design Reference for these entities. 
 - **Inquiries:** one `collaboration_inquiries` table with `inquiry_type` set to `collaboration`, `consultation`, or `event_invitation`. The full column list is in Section 18 of the Database Design Reference. Reference uploads follow the `custom_request_files` pattern.
 - Do not store collaboration inquiries in `contact_messages`. They have structured fields the admin will want to filter.
 
-**Status:** PROPOSED.
+**Status:** ACCEPTED (2026-10-28). See ADR-0013.
 
 ## D-06 — Creative Consultation Booking Scope
 
@@ -126,7 +126,7 @@ This supersedes Section 10 of the Database Design Reference for these entities. 
 
 **Recommendation.** Phase 1 delivers both as **request forms**. The consultation form collects meeting type, mode (online or in person), preferred date, and preferred time. The success screen offers a WhatsApp confirmation link. The admin confirms manually. There is no calendar, slot availability, or payment. Add both forms to Sprint 6 and update the phase gate wording to "consultation request flow".
 
-**Status:** PROPOSED.
+**Status:** ACCEPTED (2026-10-28). See ADR-0013.
 
 ## D-07 — Portfolio Routes
 
@@ -140,7 +140,7 @@ This supersedes Section 10 of the Database Design Reference for these entities. 
 
 Filter state uses query parameters, which are not indexable and canonicalise to `/portfolio`. Nothing has been published, so no redirects are needed.
 
-**Status:** PROPOSED.
+**Status:** ACCEPTED (2026-10-28). See ADR-0013.
 
 ## D-08 — Primary Navigation
 
@@ -156,7 +156,7 @@ Filter state uses query parameters, which are not indexable and canonicalise to 
 
 The mockup navigation is **REJECTED** as pre-pivot: it has no Women/Men pillars and uses the old "Love Notes" label. Define the navigation only in `src/config/navigation.ts`.
 
-**Status:** PROPOSED.
+**Status:** ACCEPTED (2026-10-28). See ADR-0013.
 
 ## D-09 — Love Websites Scope
 
@@ -164,7 +164,7 @@ The Business Strategy phase table lists love websites in Phase 2, but the Phase 
 
 **Recommendation.** Phase 1 has the `/love-websites` landing page (types, mockup previews, how it works, starting price or inquiry) plus an inquiry submitted as a `custom_requests` row with `request_type = love_website`. The builder and public generated pages are Phase 3.
 
-**Status:** PROPOSED.
+**Status:** ACCEPTED (2026-10-28). See ADR-0013.
 
 ## D-10 — Prototype Placeholder Content Rules
 
@@ -177,7 +177,7 @@ The Figma mockups contain placeholder content that must not reach production:
 - "12-Month Warranty", "100K+ customers", "© 2025" and similar claims → removed unless true. The year comes from the current date.
 - Visual Portfolio images → real B&V shoots only.
 
-**Status:** PROPOSED (strongly recommended; SEO Guide v3.0 already forbids fake reviews and claims).
+**Status:** ACCEPTED (2026-10-28). See ADR-0013.
 
 ## D-11 — Tailwind v4 Token Configuration
 
@@ -189,13 +189,13 @@ The Phase 1 guide says "create middleware". Next.js 16 changed some conventions,
 
 **Recommendation.** Treat the edge or proxy layer as a convenience redirect only. Enforce authorisation **server-side** in the `/admin` layout and inside every admin Server Action and Route Handler.
 
-**Status:** PROPOSED.
+**Status:** ACCEPTED (2026-10-28). See ADR-0013.
 
 ## D-13 — UUID Generation
 
 **Recommendation.** Use `@default(uuid()) @db.Uuid` (Prisma generates the ID), as in the BaseModel Convention. This keeps IDs available before insert, which helps transactional order creation. Database-side `gen_random_uuid()` is the rejected alternative, unless raw SQL inserts become common.
 
-**Status:** PROPOSED.
+**Status:** ACCEPTED (2026-10-28) — already VERIFIED in every migrated model. See ADR-0013.
 
 ## D-14 — Source Folder Layout
 
@@ -203,25 +203,25 @@ The Phase 1 guide says "create middleware". Next.js 16 changed some conventions,
 
 **Recommendation.** Keep `app/` at the root (no churn) and put shared code under `src/`: `src/components`, `src/config`, `src/features`, `src/lib`, `src/data`, `src/types`, and `src/i18n` (later). Use the `@/*` path alias, and confirm its target in `tsconfig.json`. Route groups: `app/(public)`, `app/(auth)`, `app/admin`, `app/api`.
 
-**Status:** PROPOSED.
+**Status:** ACCEPTED (2026-10-28). See ADR-0013.
 
 ## D-15 — Language Handling
 
 English only at launch. Centralise UI strings only if it is cheap to do so. Show no language switch until Sinhala and Tamil translations exist with locale routes and hreflang (SEO Guide, Section 13).
 
-**Status:** PROPOSED.
+**Status:** ACCEPTED (2026-10-28). See ADR-0013.
 
 ## D-16 — Sanity CMS
 
 Deferred to Phase 2 (journal, lookbook, portfolio editing). Phase 1 content is static typed data or Prisma data.
 
-**Status:** PROPOSED (consistent with the Phase 1 guide's parking lot).
+**Status:** ACCEPTED (2026-10-28). See ADR-0013.
 
 ## D-17 — Payments
 
 Phase 1 checkout creates an order with status `inquiry_received` and a `payments` row with `provider = manual`. A WhatsApp confirmation link is shown on success. PayHere and KOKO integration (with webhook verification and idempotency) follows once sandbox credentials exist.
 
-**Status:** PROPOSED.
+**Status:** ACCEPTED (2026-10-28). See ADR-0013.
 
 ## D-18 — Test Tooling
 
@@ -232,10 +232,10 @@ Phase 1 checkout creates an order with status `inquiry_received` and a `payments
 1. Add `"typecheck": "tsc --noEmit"` now. Low risk, but it edits `package.json`, so it needs approval.
 2. Propose Vitest (utilities, Zod schemas, price calculations) and Playwright (smoke tests for home, product, cart, checkout, and admin login) as a separate approved task before Sprint 5.
 
-**Status:** PROPOSED.
+**Status:** ACCEPTED (2026-10-28). See ADR-0013.
 
 ## D-19 — Non-B&V Assets
 
 The `Posters_and_Image_ideas` archive belongs to Bilesma Natural, an Ayurvedic skincare client used as the SEO audit reference. Do not import it into the B&V repository. Keep only the learnings: hero pairs at 1920×650 (web) and 1080×1080 (mobile), and product image sets of main, detail, benefits, and context shots.
 
-**Status:** PROPOSED.
+**Status:** ACCEPTED (2026-10-28). See ADR-0013.

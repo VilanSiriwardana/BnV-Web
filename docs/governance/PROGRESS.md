@@ -284,3 +284,50 @@ Reconciled the governance docs against the current repository. This was a docume
 ### Next Step
 
 - Owner: resolve the M0.3 items, which now include D-01 vs Hosting, the Phase 1 scope of coupons/wishlists, `.env.example`, and the `prisma/models/` copies.
+
+## 2026-10-28 - Status + Sync Audit and Full Implementation Plan
+
+### Summary
+
+Audited how far Phase 1 has got: Phase 0 is about 90% done and the Phase 1 MVP about 15%, with no application code yet. Cross-checked Brand-Identity.md, Research_and_Prototype.md, the Figma-Make prototype, the `BnV Docs/Images/` library, and Visual-Asset-Inventory.md. They are not in sync. Rewrote [PLAN.md](PLAN.md) as the full implementation plan: Gate A (Phase 0 close-out), Gate B (Sprint 0.5 Spec Sync), Phase 1 sprints 1A–1I with exit checks and reference links, and Phases 2–4.
+
+### Files Changed
+
+- `docs/references/Implementation-Plan.md` (new master plan), `docs/references/README.md`, `docs/governance/PLAN.md` (now a short tracker), `docs/governance/PROGRESS.md`, `docs/AI_SESSION_LOG.md`.
+
+### Database Changes / API Changes / UI Changes
+
+- None.
+
+### Next Step
+
+- Owner: work through Gate A (decisions D-01 to D-19), then Gate B.
+
+## 2026-10-28 - Gate A Closed: Decisions, Seeding, Env
+
+### Summary
+
+Closed Gate A (milestone M0.3):
+
+- D-01 to D-19 are decided: D-01 Vercel (ADR-0011), D-02 changed to keep the RBAC tables (ADR-0012), the rest accepted (ADR-0013).
+- Prisma is pinned to 7.8.0 and connects through `@prisma/adapter-pg` (ADR-0014).
+- Built `prisma/seed/` with idempotent seeders and the `db:*` scripts (ADR-0015).
+- Added `.env.example`, deleted the stale `prisma/models/` copies, and replaced the README.
+
+### Files Changed
+
+- `package.json`, `package-lock.json`, `.gitignore`, `.env.example` (new), `README.md`.
+- `prisma/seed/**` (new), `prisma/models/**` (deleted).
+- `docs/decisions/DECISIONS.md`, `docs/references/{Phase-1-Reconciled-Decisions,Database-Standards,Database-Design,Technology-Stack,Implementation-Plan}.md`, `docs/governance/{AGENTS,PLAN,PROGRESS}.md`, `docs/AI_SESSION_LOG.md`.
+
+### Database Changes
+
+- No schema or migration changes. The seed writes reference data (roles, permissions, super admin, brand, categories, collections) and, with `--demo`, demo products.
+
+### Tests
+
+- `npx prisma validate`, `npm run typecheck` and ESLint on `prisma/seed` passed. Seed runs are recorded in the AI session log.
+
+### Next Step
+
+- Gate B (Sprint 0.5 Spec Sync).

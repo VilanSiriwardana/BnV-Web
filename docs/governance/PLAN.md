@@ -1,72 +1,58 @@
 # PLAN.md - B&V Living Roadmap
 
+Master plan (stable, versioned): [../references/Implementation-Plan.md](../references/Implementation-Plan.md). It holds the full gate and sprint breakdown, deliverables, exit checks, reference map, and Phases 2–4.
+
+This file tracks only **where we are now**. Update it as work progresses, and record finished milestones in [PROGRESS.md](PROGRESS.md).
+
 ## Project Information
 
-- Project: B&V / BuwiNVila — modern romantic lifestyle ecommerce web platform.
-- Stack: Next.js 16 App Router, React 19, TypeScript, Tailwind CSS v4, Prisma 7, PostgreSQL, native PostgreSQL 16 + pgAdmin 4 (local, ADR-0010).
-- Governance Entry Point: [../../AGENTS.md](../../AGENTS.md).
-- Authoritative Handbook: [AGENTS.md](AGENTS.md).
-- Reference Library: [../references/README.md](../references/README.md).
-- Conflict resolutions: [../references/Phase-1-Reconciled-Decisions.md](../references/Phase-1-Reconciled-Decisions.md).
-- Architecture Index: [../architecture/README.md](../architecture/README.md).
-- ADR Directory: [../decisions/DECISIONS.md](../decisions/DECISIONS.md).
+- Project: B&V / BuwiNVila. A modern romantic lifestyle ecommerce web platform.
+- Stack: Next.js 16 App Router, React 19, TypeScript, Tailwind CSS v4, Prisma 7, PostgreSQL. Local development uses a native PostgreSQL 16 install with pgAdmin 4 (ADR-0010).
+- Governance entry point: [../../AGENTS.md](../../AGENTS.md). Authoritative handbook: [AGENTS.md](AGENTS.md).
+- Reference library: [../references/README.md](../references/README.md). Decisions: [../references/Phase-1-Reconciled-Decisions.md](../references/Phase-1-Reconciled-Decisions.md), [../decisions/DECISIONS.md](../decisions/DECISIONS.md).
+- Current branch: `main` (VERIFIED 2026-10-28).
 
-## Current Phase
+## Current Position
 
-- Phase: Phase 0 → Phase 1 transition (reference refresh and decision approval).
-- Status: Reference library refreshed 2026-10-28. Research, Authentication, and Hosting references added (staged, not committed). Phase 1 decisions D-01 to D-19 await approval.
-- Current Branch: `main` (VERIFIED 2026-10-28). Re-check with `git branch --show-current` and `git status --short` before branch-specific work.
+- Stage: **Gate B — Sprint 0.5 Spec Sync** (Implementation-Plan → Gate B).
+- Next: Phase 1 sprint 1A.
 
-## Current Milestone
+## Gate Progress
 
-### M0.3 — Reference Refresh and Phase 1 Decision Approval
+| Step                          | Status                                                            |
+| ----------------------------- | ----------------------------------------------------------------- |
+| Gate A — Phase 0 close-out    | Done (2026-10-28)                                                 |
+| Gate B — Spec Sync            | Next                                                              |
+| 1A Foundation finish          | Not started                                                       |
+| 1B Design system              | Not started                                                       |
+| 1C Database completion        | Partial (22 models migrated; seed done; schema additions pending) |
+| 1D Homepage                   | Not started                                                       |
+| 1E Catalog + PDP              | Not started                                                       |
+| 1F Cart + checkout inquiry    | Not started                                                       |
+| 1G Custom, Contact, Portfolio | Not started                                                       |
+| 1H Admin MVP                  | Not started                                                       |
+| 1I SEO, QA, deploy            | Not started                                                       |
 
-- Priority: High.
-- Dependencies: Reference pack v1.1; owner availability for decisions.
-- Files: `docs/references/*`, `docs/governance/AGENTS.md`, `docs/decisions/DECISIONS.md`, `docs/governance/PLAN.md`, `docs/governance/PROGRESS.md`, `docs/AI_SESSION_LOG.md`.
-- Acceptance Criteria:
-  - Refreshed references are committed under `docs/references/`, and the links in `references/README.md` resolve.
-  - Each of D-01 to D-19 is ACCEPTED, REJECTED, or CHANGED, and accepted items are recorded as ADR-0011 onwards (ADR-0010 was used for native PostgreSQL).
-  - ~~Pre-existing uncommitted changes to `package.json`, `package-lock.json`, and `prisma.config.ts` are reviewed and either committed or reverted by the owner.~~ Done: committed in e01b1ed (the `tsx` dev dependency and the seed command). VERIFIED 2026-10-28.
-  - D-01 hosting is reconciled with [../references/Hosting_Deployment.md](../references/Hosting_Deployment.md), which leaves Vercel versus VPS open.
-  - Decide whether the already-migrated Coupon, CouponRedemption, Wishlist, and WishlistItem tables stay in Phase 1. They exist in migration `004_commerce_domain`, but this plan parks coupons and wishlists in Phase 2+.
-  - No application, schema, Docker, or package changes are made in this milestone.
+## Current Milestone: Gate B (Sprint 0.5 Spec Sync)
 
-## Phase 1 Sprint Plan (adapted from Phase-1-Step-by-Step.md to the verified repository)
+See the Gate B checklist in [../references/Implementation-Plan.md](../references/Implementation-Plan.md).
 
-| Sprint | Name                       | Already done (VERIFIED)                                                                                                                                                     | Remaining scope                                                                                                                                                                                                                              | Approval needed                                                        |
-| ------ | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| S0     | Foundation                 | Next.js 16, TypeScript, Tailwind v4, ESLint, Prettier, Husky/lint-staged, native PostgreSQL 16 + pgAdmin 4 (ADR-0010), Prisma config + 5 migrations (22 models, HealthCheck dropped in 001) | `.env.example` (absent on disk; `.gitignore` `.env*` also ignores it, so it needs a `!.env.example` exception); `typecheck` script; `src/` folder skeleton (`config`, `components`, `features`, `lib`, `data`, `types`); `src/config/{brand,navigation,routes,seo}.ts`; README replacement                                            | `package.json` script edit                                             |
-| S1     | Design System              | —                                                                                                                                                                           | Tokens (light/dark) in `app/globals.css` via Tailwind v4 theme; Playfair Display + Inter via `next/font`; theme provider + toggle; UI primitives; layout shell (Header, MegaMenu, MobileNav, Footer); internal `/style-guide` page (noindex) | None for these: next-themes, lucide-react, clsx, tailwind-merge, cva, framer-motion are already installed (VERIFIED 2026-10-28) |
-| S2     | Database + Seed            | Identity (Role, Permission, RolePermission, User, UserRole, Address), catalog (Category, Brand, Collection), products (Product, Variant, Image, Inventory), commerce (Cart, CartItem, Order, OrderItem, Payment, Coupon, CouponRedemption, Wishlist, WishlistItem). Product uses direct `categoryId`/`collectionId` FKs, not the reference join tables. | Reconcile the migrated models with D-02 to D-05 (CMS, inquiries, portfolio, settings are not yet modelled); Prisma client singleton; seed entry `prisma/seed/index.ts` (categories, collections, sample products, first super_admin)                                                                                    | Schema change, migration, seeding                                      |
-| S3     | Homepage                   | —                                                                                                                                                                           | Sections in the approved homepage order (Brand Identity §23) using static then DB data; newsletter action                                                                                                                                    | —                                                                      |
-| S4     | Catalog + PDP              | —                                                                                                                                                                           | `/shop`, category pillars, `/collections/[slug]`, `/products/[slug]`; filters (non-indexable); Product JSON-LD                                                                                                                               | —                                                                      |
-| S5     | Cart + Checkout Inquiry    | —                                                                                                                                                                           | Cart actions, drawer, page; checkout with Zod; transactional order + snapshots + manual payment row; success page with WhatsApp link                                                                                                         | Test tooling proposal (D-18) before this sprint                        |
-| S6     | Custom, Contact, Portfolio | —                                                                                                                                                                           | `/custom`, `/love-websites`, `/contact`, `/portfolio`, `/portfolio/[slug]`, `/collaborate` (collaboration, consultation request, event invitation); Cloudinary uploads                                                                       | Cloudinary install + credentials                                       |
-| S7     | Admin MVP                  | —                                                                                                                                                                           | Auth.js Credentials (JWT) admin login; server-side guards; dashboard; product CRUD with images; categories/collections; inbox views                                                                                                          | Auth.js install; secrets                                               |
-| S8     | SEO, QA, Deploy            | —                                                                                                                                                                           | `sitemap.ts`, `robots.ts`, metadata utilities, JSON-LD; Lighthouse/PSI/accessibility QA; hosting per D-01; GA4 + Search Console                                                                                                              | Hosting accounts, domain                                               |
+## Gate A (M0.3) — Done 2026-10-28
 
-## Known Risks
-
-- Agents may act on stale or conflicting references. Mitigation: the Reconciled Decisions file plus the AGENTS.md rule to ask while a decision is PROPOSED.
-- Next.js 16 and Prisma 7 conventions differ from the 2025-era guides. Mitigation: consult local docs before structural changes (D-12, Database-Standards.md).
-- AI-generated imagery could leak into production as "real" content. Mitigation: Visual-Asset-Inventory rules and the D-10 checklist.
-- Approval rules are prose-only (no hooks). Mitigation: optional Claude Code hooks task (backlog).
-- Schema drift trap: Prisma reads only `prisma/schema.prisma`, but `prisma/models/` copies look authoritative and are already stale. Mitigation: invariant in [AGENTS.md](AGENTS.md); decide on deleting or regenerating the copies (backlog).
-- Hosting reference vs D-01 conflict (Vercel vs VPS). Mitigation: resolve as part of M0.3.
-- `.env.example` is documented as created (2026-10-28) but is absent on disk, and `.gitignore`'s `.env*` would exclude it from commits. Mitigation: recreate it with a `!.env.example` gitignore exception (approval: config change).
+- [x] D-01 to D-19 decided: D-01 Vercel (ADR-0011), D-02 CHANGED to keep RBAC (ADR-0012), the rest accepted (ADR-0013).
+- [x] Coupon and wishlist tables kept, unused until Phase 2 (ADR-0015).
+- [x] `prisma/models/` copies deleted.
+- [x] `.env.example` created, with a `!.env.example` exception in `.gitignore`.
+- [x] `typecheck` and `db:*` scripts added. Prisma pinned to 7.8.0 with `@prisma/adapter-pg` (ADR-0014).
+- [x] README replaced.
+- [x] `prisma/seed/` built: roles, permissions, super admin, brand, categories, collections, opt-in demo products (ADR-0015).
+- [x] Committed the pending package and Prisma config changes in e01b1ed.
 
 ## Backlog
 
-- Replace the default README with B&V setup instructions.
-- Decide the fate of `prisma/models/` copies (delete, or regenerate from `schema.prisma`).
-- Add Logging & Observability and Payment Gateway references (cited by the Authentication and Hosting reviews, not yet in `docs/references/`).
-- Architecture overview under `docs/architecture/` (route map, data flow, auth boundary).
+- Logging & Observability and Payment Gateway references.
+- Architecture overview under `docs/architecture/`.
 - Claude Code `PreToolUse` hooks for the approval list.
-- CI (GitHub Actions: lint, typecheck, build) once D-01 is decided.
-- Vitest + Playwright (D-18).
-- Real photography briefs from the Visual Asset Inventory.
-- Business content: delivery areas and fees in LKR, policies, WhatsApp number, social URLs.
 
 ## Parking Lot (Phase 2+)
 
@@ -76,6 +62,9 @@ Customer accounts and Google sign-in, wishlist, reviews, gift box builder, Sanit
 
 - Initial Governance Baseline (2026-07-26).
 - Documentation Governance Reorganization (2026-07-26).
-- Local Infrastructure Baseline (Docker Compose, PostgreSQL, pgAdmin, Prisma config).
+- Local Infrastructure Baseline. Moved to native PostgreSQL 2026-10-28 (ADR-0010).
+- Prisma Domain Schema: migrations 001–004 (2026-07-29).
 - Prisma Client Generation Standard (2026-07-29).
 - AI Agent Workflow Files (2026-08-23).
+- Reference Library Refresh, pack v1.1 (2026-10-28).
+- Status + Sync Audit; master plan published as `references/Implementation-Plan.md` (2026-10-28).

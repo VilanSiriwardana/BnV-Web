@@ -158,7 +158,7 @@ This is an illustration of layout only. The real `Product` model links to catego
 
 ## 19. File Organization
 
-> **Repository reality (VERIFIED 2026-10-28):** the tree below is the *target* layout and doesn't match the current repository. `prisma.config.ts` sits at the repository root and loads only `prisma/schema.prisma`, which holds every model. `prisma/models/00N-*/NN-Model.prisma` are per-model reference copies that Prisma does not read, and they are already out of date. `prisma/seed/` does not exist. Adopting the layout below requires an approved ADR. See the Prisma Schema Source of Truth section in [../governance/AGENTS.md](../governance/AGENTS.md).
+> **Repository reality (VERIFIED 2026-10-28):** the tree below is the _target_ layout and doesn't match the current repository. `prisma.config.ts` sits at the repository root and loads the multi-file schema folder `prisma/schema/` (ADR-0016): `schema.prisma` plus `identity`, `catalog`, `products` and `commerce` `.prisma` files. The old `prisma/models/` copies were deleted on 2026-10-28. Seeders live in `prisma/seed/` (ADR-0015). Adopting the layout below requires an approved ADR. See the Prisma Schema Source of Truth section in [../governance/AGENTS.md](../governance/AGENTS.md).
 
 ```text
 prisma/

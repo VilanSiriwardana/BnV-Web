@@ -1,53 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# B&V Web
 
-## Getting Started
+B&V (BuwiNVila) is a modern romantic lifestyle ecommerce site: fashion, jewelry, gifts, couple pieces, custom orders, and a visual portfolio. The build plan lives in [docs/references/Implementation-Plan.md](docs/references/Implementation-Plan.md).
 
-First, run the development server:
+Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, Prisma 7 (`@prisma/adapter-pg`), PostgreSQL 16.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Prerequisites
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Node.js 20 or later.
+- PostgreSQL 16 and pgAdmin 4, installed natively (ADR-0010 in [docs/decisions/DECISIONS.md](docs/decisions/DECISIONS.md)). On Windows, use the official PostgreSQL installer with Server, pgAdmin 4 and Command Line Tools. Use port 5432.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Local database setup
-
-Local PostgreSQL and pgAdmin run natively, not via Docker (see ADR-0010 in `docs/decisions/DECISIONS.md`).
-
-1. Install PostgreSQL 16 and pgAdmin 4 (Windows: the official PostgreSQL installer, components Server + pgAdmin 4 + Command Line Tools). Use port 5432.
-2. In pgAdmin's Query Tool, connected as `postgres`, create the app role and database:
+1. In pgAdmin's Query Tool, connected as `postgres`, create the app role and database:
    ```sql
-   CREATE ROLE <user> WITH LOGIN PASSWORD '<password>' CREATEDB;
-   CREATE DATABASE <db> OWNER <user> ENCODING 'UTF8';
+   CREATE ROLE bnv WITH LOGIN PASSWORD '<password>' CREATEDB;
+   CREATE DATABASE bnv_db OWNER bnv ENCODING 'UTF8';
    ```
-3. Copy `.env.example` to `.env` and set `DATABASE_URL` to match the role/database you created.
-4. Apply the existing migrations:
+2. Copy `.env.example` to `.env`. Set `DATABASE_URL` to match the role and database you created, and fill in the `SEED_ADMIN_*` values. The password must be 12 or more characters.
+3. Install and set up the database:
    ```bash
-   npx prisma migrate deploy
-   npx prisma generate
+   npm install
+   npm run db:setup
    ```
+   `db:setup` generates the Prisma client, applies the migrations, and seeds reference data (roles, permissions, the first super admin, brand, categories, collections).
+4. Optional: load demo products with `npm run db:seed:demo`.
+5. Start the app with `npm run dev` and open [http://localhost:3000](http://localhost:3000).
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+| Script                 | What it does                                                         |
+| ---------------------- | -------------------------------------------------------------------- |
+| `npm run dev`          | Start the development server                                         |
+| `npm run build`        | Production build                                                     |
+| `npm run lint`         | ESLint                                                               |
+| `npm run typecheck`    | TypeScript check (`tsc --noEmit`)                                    |
+| `npm run db:validate`  | Check that every schema file loads and is valid                      |
+| `npm run db:generate`  | Generate the Prisma client                                           |
+| `npm run db:migrate`   | Create and apply a new migration (development)                       |
+| `npm run db:deploy`    | Apply existing migrations                                            |
+| `npm run db:seed`      | Seed reference data and the super admin. Safe to re-run              |
+| `npm run db:seed:demo` | Seed reference data and demo products. **Development only**          |
+| `npm run db:reset`     | Drop and recreate the database, then seed. **Destructive, dev only** |
+| `npm run db:setup`     | Generate, deploy migrations, then seed                               |
+| `npm run db:studio`    | Open Prisma Studio                                                   |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The Prisma schema is split by domain in `prisma/schema/`: `schema.prisma` (generator and datasource), `identity`, `catalog`, `products` and `commerce`. Prisma loads every `.prisma` file in that folder. Run `npm run db:validate` after editing it.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Seeders live in `prisma/seed/` (`index.ts` runs `seeders/01-…06-` in order; data is in `data/`). They upsert by unique keys, so running them again updates rows instead of duplicating them. Re-seeding never changes an existing admin's password.
 
-## Deploy on Vercel
+## Documentation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [AGENTS.md](AGENTS.md): entry point for contributors and AI agents.
+- [docs/governance/PLAN.md](docs/governance/PLAN.md): current milestone and progress.
+- [docs/references/README.md](docs/references/README.md): reference library (brand, database, SEO, decisions).

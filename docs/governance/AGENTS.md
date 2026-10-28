@@ -68,7 +68,7 @@ This project uses seven workflow artifacts. Each answers a different question; d
 - `app/`: Next.js App Router routes, layouts, global CSS, and page modules.
 - `public/`: public static assets (currently the default `create-next-app` placeholders).
 - `src/`: planned location for centralized config/lib code; does not exist yet (VERIFIED 2026-10-28).
-- `prisma/`: Prisma schema (`schema.prisma`), migrations under `migrations/` (5 as of 2026-10-28: `init` through `004_commerce_domain`), and per-model reference copies under `models/`. `prisma.config.ts` lives at the repository root and configures a seed entry at `prisma/seed/index.ts`; the `prisma/seed/` directory does not exist yet (VERIFIED 2026-10-28).
+- `prisma/`: multi-file Prisma schema under `schema/` (ADR-0016), migrations under `migrations/` (5 as of 2026-10-28: `init` through `004_commerce_domain`), and seeders under `seed/` (ADR-0015). `prisma.config.ts` lives at the repository root.
 - `docker/`: empty `postgres/` folder kept from the Docker era; `docker-compose.yml` is an empty `services: {}` placeholder (ADR-0010).
 - `docs/governance/`: AI governance, roadmap, progress, and decision index.
 - `docs/references/`: authoritative project reference documents.
@@ -106,9 +106,9 @@ Verified from repository files:
 
 ### Prisma Schema Source of Truth (Critical Invariant)
 
-- `prisma.config.ts` sets `schema: 'prisma/schema.prisma'`, a **single file**. Prisma does not read `prisma/models/**/*.prisma`.
-- `prisma/schema.prisma` is the only schema source for migrations and the client. Any model change must be made there.
-- The `prisma/models/` files are reference copies and are already out of date: they lack the back-relation fields (for example `User.carts`, `Product.cartItems`) that exist in `schema.prisma` (VERIFIED by diff 2026-10-28). Do not treat them as authoritative, and do not switch Prisma to folder-based schema loading without an approved ADR.
+- `prisma.config.ts` sets `schema: 'prisma/schema'`, a **folder** (multi-file schema, ADR-0016). Prisma loads every `.prisma` file in `prisma/schema/`: `schema.prisma` (generator and datasource only), `identity.prisma`, `catalog.prisma`, `products.prisma`, `commerce.prisma`.
+- Those files are the only schema source for migrations and the client. Put new models in the file for their domain (or a new domain file in the same folder). Keep `generator` and `datasource` only in `schema.prisma`. Run `npm run db:validate` after every edit.
+- The former `prisma/models/` copies (never read by Prisma) were deleted on 2026-10-28. Never put `.prisma` files outside `prisma/schema/`: Prisma will not read them.
 
 Do not update framework, package, Docker, or database tooling without an explicit implementation task.
 
