@@ -1,3 +1,4 @@
+import { Reveal } from '@/components/motion/reveal';
 import { SectionHeading } from '@/components/marketing/section-heading';
 import { ProductGrid } from '@/components/product/product-grid';
 import type { ProductCardData } from '@/components/product/product-card';
@@ -25,7 +26,7 @@ export function ProductSection({
 
   return (
     <section aria-labelledby={id} className={className}>
-      <div className="mx-auto max-w-[1440px] px-4 py-12 md:px-8 md:py-16">
+      <Reveal className="mx-auto max-w-[1440px] px-4 py-12 md:px-8 md:py-16">
         <SectionHeading
           id={id}
           eyebrow={eyebrow}
@@ -36,7 +37,7 @@ export function ProductSection({
         <div className="mt-8">
           <ProductGrid products={products} />
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }

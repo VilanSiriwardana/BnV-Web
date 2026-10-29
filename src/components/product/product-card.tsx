@@ -3,7 +3,9 @@ import Link from 'next/link';
 
 import { Badge } from '@/components/ui/badge';
 import { routes } from '@/config/routes';
+import { imageSizes } from '@/config/images';
 import { formatLkr } from '@/lib/utils';
+import { blurFor } from '@/lib/utils/image';
 
 export type ProductCardData = {
   id: string;
@@ -27,8 +29,9 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             src={product.imageUrl}
             alt={product.imageAlt}
             fill
-            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-            className="ease-standard object-cover transition-transform duration-300 motion-safe:group-hover:scale-105"
+            sizes={imageSizes.card}
+            {...blurFor(product.imageUrl)}
+            className="ease-standard object-cover transition-transform duration-300 motion-safe:group-hover:scale-[1.03]"
           />
         )}
         {product.isNew && (

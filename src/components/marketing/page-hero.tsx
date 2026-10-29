@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { Reveal } from '@/components/motion/reveal';
 import { buttonVariants } from '@/components/ui/button';
 import type { ArtDirectedImage as ArtDirectedImageData } from '@/data/home';
 
@@ -14,7 +15,7 @@ type Props = {
   primaryCta?: Cta;
   secondaryCta?: Cta;
   image: ArtDirectedImageData;
-  priority?: boolean;
+  eager?: boolean;
 };
 
 export function PageHero({
@@ -24,12 +25,12 @@ export function PageHero({
   primaryCta,
   secondaryCta,
   image,
-  priority,
+  eager,
 }: Props) {
   return (
     <section aria-labelledby="page-hero-title">
-      <ArtDirectedImage image={image} priority={priority} />
-      <div className="mx-auto max-w-[1440px] px-4 py-10 text-center md:px-8 md:py-14">
+      <ArtDirectedImage image={image} eager={eager} />
+      <Reveal className="mx-auto max-w-[1440px] px-4 py-10 text-center md:px-8 md:py-14">
         {eyebrow && (
           <p className="text-caption text-primary-text font-semibold tracking-widest uppercase">
             {eyebrow}
@@ -66,7 +67,7 @@ export function PageHero({
             )}
           </div>
         )}
-      </div>
+      </Reveal>
     </section>
   );
 }

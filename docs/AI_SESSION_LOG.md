@@ -356,3 +356,23 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 - Zod 4: use `z.flattenError(error)`; `error.flatten()` is deprecated.
 - A Prisma select reused across queries needs `satisfies Prisma.ProductSelect`, not `as const`, because readonly `orderBy` arrays fail typecheck.
 - The announcement bar renders below the header because the header lives in the layout. Follow-up: move it into the layout when 1E needs it site-wide.
+
+## 2026-10-29 - Image Quality, Lazy Loading and Motion
+
+### Summary
+
+- Implemented blueprint `.claude/blueprints/008-image-quality-lazy-loading-motion.md`.
+- User decisions: generated blur, re-export now, AVIF + WebP, Framer Motion.
+- The user asked whether animations were planned from the start. Answer: yes (Brand-Identity §25, Step-by-Step §5.3). `framer-motion` was installed but unused, and 1D's `scale-105` broke the 1.03 maximum.
+
+### Deviations
+
+- `blurFor` lives in `src/lib/utils/image.ts` and is **not** re-exported from the `@/lib/utils` barrel, so client components importing `cn` never pull in the 36 KB placeholder map.
+- `ArtDirectedImage` puts the blur as a CSS background on `<picture>`, because `getImageProps` does not support `placeholder` (Next docs).
+
+### Known Gotchas
+
+- Banner originals (1672–1916×821) cannot produce 2× banners.
+- Every product original sits below 1200px wide, so all 119 were capped at their native 4:5 crop.
+- `Reveal` content is server-rendered at `opacity: 0` until hydration, so it is invisible without JS. The text is still in the HTML for SEO.
+- The light hero image is still fetched eagerly in dark mode (accepted cost).

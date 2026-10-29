@@ -197,6 +197,8 @@ Use [../references/SEO-Guide.md](../references/SEO-Guide.md) as the detailed SEO
 
 - Avoid unnecessary client JavaScript.
 - Optimize images and media using framework-supported patterns.
+- Images: use `next/image` with the `sizes`/quality presets in `src/config/images.ts` (quality values must be in `next.config.ts` `images.qualities`). Only the first above-the-fold image per route is eager (`loading="eager"` + `fetchPriority="high"`); everything else stays lazy. `priority` is deprecated in Next 16. Use `blurFor()` from `src/lib/utils/image.ts` for local images, and re-run `npx tsx scripts/images/placeholders.ts` after adding images.
+- Motion: use `Reveal`/`Stagger` from `src/components/motion/` (tokens in `src/config/motion.ts`, Brand-Identity §25.1). Never animate the LCP image. Hover scale is at most 1.03. Reduced motion means opacity only.
 - Avoid expensive effects and avoid broad re-renders.
 - Keep database queries explicit and indexed when query patterns are known.
 
@@ -358,6 +360,8 @@ Reference documents in `../references/` describe approved strategy, design, and 
 - Update [PROGRESS.md](PROGRESS.md) and [PLAN.md](PLAN.md) when a roadmap milestone completes.
 
 ## AGENTS.md Changelog
+
+- 2026-10-29: Added image (eager/lazy, presets, blur) and motion rules to Performance after the image and motion pass.
 
 - 2026-10-28 (update-audit): Added the Prisma Schema Source of Truth invariant (`schema.prisma` is the only schema file Prisma reads; `prisma/models/` copies are stale). Corrected the repository structure (`src/` and `prisma/seed/` don't exist; `docker/` is vestigial). Recorded the dependencies that are already installed and the missing `node_modules/` caveat. Repointed every `DECISIONS.md` link to `docs/decisions/DECISIONS.md`, where the file moved in commit e01b1ed.
 

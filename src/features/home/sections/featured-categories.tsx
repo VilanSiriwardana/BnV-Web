@@ -1,3 +1,4 @@
+import { Stagger, StaggerItem } from '@/components/motion/stagger';
 import { CategoryCard } from '@/components/marketing/category-card';
 import { SectionHeading } from '@/components/marketing/section-heading';
 import { featuredCategories } from '@/data/home';
@@ -13,13 +14,13 @@ export function FeaturedCategories() {
         eyebrow="Explore"
         title="Something for every moment"
       />
-      <ul className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
+      <Stagger className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
         {featuredCategories.map((category) => (
-          <li key={category.href}>
+          <StaggerItem key={category.href}>
             <CategoryCard {...category} />
-          </li>
+          </StaggerItem>
         ))}
-      </ul>
+      </Stagger>
     </section>
   );
 }

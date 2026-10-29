@@ -1,25 +1,22 @@
-import Image from 'next/image';
+import { getImageProps } from 'next/image';
 
+import { imageQuality, imageSizes } from '@/config/images';
 import type { ArtDirectedImage as ArtDirectedImageData } from '@/data/home';
 import { cn } from '@/lib/utils';
+import { imagePlaceholders } from '@/data/image-placeholders';
 
 type Props = {
   image: ArtDirectedImageData;
-  priority?: boolean;
+  eager?: boolean;
   className?: string;
 };
 
-// Light/dark and desktop (1920×650) / mobile (1:1) variants, swapped by CSS so layout never shifts.
-export function ArtDirectedImage({ image, priority, className }: Props) {
-  const variants = [
-    {
-      src: image.light.desktop,
-      cls: 'hidden md:block dark:md:hidden',
-      eager: priority,
-    },
-    { src: image.light.mobile, cls: 'md:hidden dark:hidden' },
-    { src: image.dark.desktop, cls: 'hidden dark:md:block' },
-    { src: image.dark.mobile, cls: 'hidden dark:block dark:md:hidden' },
+// <picture> downloads only the desktop (1920×650) or mobile (1:1) file; the theme swap is CSS.
+// Only the light variant of an eager image is fetched with high priority.
+export function ArtDirectedImage({ image, eager, className }: Props) {
+  const themes = [
+    { variant: image.light, cls: 'dark:hidden', isEager: eager },
+    { variant: image.dark, cls: 'hidden dark:block', isEager: false },
   ];
 
   return (
@@ -29,17 +26,40 @@ export function ArtDirectedImage({ image, priority, className }: Props) {
         className,
       )}
     >
-      {variants.map(({ src, cls, eager }) => (
-        <Image
-          key={src}
-          src={src}
-          alt={image.alt}
-          fill
-          sizes="100vw"
-          priority={eager}
-          className={cn('object-cover', cls)}
-        />
-      ))}
+      {themes.map(({ variant, cls, isEager }) => {
+        const common = {
+          alt: image.alt,
+          fill: true,
+          sizes: imageSizes.hero,
+          quality: isEager ? imageQuality.hero : imageQuality.default,
+        };
+        const {
+          props: { srcSet: desktopSrcSet },
+        } = getImageProps({ ...common, src: variant.desktop });
+        const { props } = getImageProps({
+          ...common,
+          src: variant.mobile,
+          loading: isEager ? 'eager' : 'lazy',
+          fetchPriority: isEager ? 'high' : undefined,
+        });
+        const blur = imagePlaceholders[variant.mobile];
+
+        return (
+          <picture
+            key={variant.desktop}
+            className={cn('absolute inset-0 bg-cover bg-center', cls)}
+            style={blur ? { backgroundImage: `url("${blur}")` } : undefined}
+          >
+            <source
+              media="(min-width: 768px)"
+              srcSet={desktopSrcSet}
+              sizes={imageSizes.hero}
+            />
+            {/* eslint-disable-next-line jsx-a11y/alt-text -- props come from getImageProps */}
+            <img {...props} className="object-cover" />
+          </picture>
+        );
+      })}
     </div>
   );
 }

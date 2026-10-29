@@ -453,3 +453,36 @@ Closed Gate A (milestone M0.3):
 ### Next Step
 
 - Manual QA (both themes; 360–1536px; newsletter new/duplicate/unsubscribed), then sprint 1E.
+
+## 2026-10-29 - Image Quality, Lazy Loading and Motion
+
+### Summary
+
+- Images:
+  - AVIF + WebP output, a qualities allowlist `[75, 85]` and a 31-day image cache.
+  - `sizes`/quality presets in `src/config/images.ts`.
+  - Generated blur placeholders.
+  - Art-directed `<picture>` banners.
+  - Only the hero is eager (`fetchPriority="high"`); `priority` was removed.
+- Sources re-exported from the originals: products about 1122×1403 (were 960×1200), banners at quality 85 with no resolution gain possible.
+- Motion: Framer Motion `Reveal`/`Stagger` with Brand-Identity §25.1 tokens and reduced motion as opacity only, applied to the homepage. Hover scale fixed to 1.03.
+
+### Files Changed
+
+- `next.config.ts`
+- `src/config/{images,motion}.ts`
+- `src/components/motion/*`
+- `src/components/marketing/{art-directed-image,page-hero,category-card,teaser-band}.tsx`
+- `src/components/product/product-card.tsx`
+- `src/features/home/sections/*`
+- `src/lib/utils/image.ts`
+- `src/data/image-placeholders.ts` (generated)
+- `scripts/images/{reexport,placeholders}.ts`
+- `public/images/prototype/*` (201 files)
+- Docs: AGENTS.md, UX-Spec §8, Visual-Asset-Inventory §8
+
+### Tests
+
+- Lint, typecheck and build pass.
+- The served HTML has 1 eager/high-priority image and 47 lazy images, `<picture>` art direction, blur backgrounds and no `scale-105`.
+- `/_next/image` returns `image/avif` (7.1 KB) for AVIF clients and `image/webp` (7.5 KB) otherwise.

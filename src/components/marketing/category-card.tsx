@@ -1,7 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { imageSizes } from '@/config/images';
 import { cn } from '@/lib/utils';
+import { blurFor } from '@/lib/utils/image';
 
 type Props = {
   label: string;
@@ -25,9 +27,10 @@ export function CategoryCard({ label, href, image }: Props) {
             src={src}
             alt=""
             fill
-            sizes="(min-width: 1024px) 14vw, (min-width: 640px) 25vw, 50vw"
+            sizes={imageSizes.categoryCard}
+            {...blurFor(src)}
             className={cn(
-              'ease-standard object-cover transition-transform duration-300 motion-safe:group-hover:scale-105',
+              'ease-standard object-cover transition-transform duration-300 motion-safe:group-hover:scale-[1.03]',
               cls,
             )}
           />

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { Reveal } from '@/components/motion/reveal';
 import { buttonVariants } from '@/components/ui/button';
 import type { ArtDirectedImage as ArtDirectedImageData } from '@/data/home';
 import { cn } from '@/lib/utils';
@@ -38,7 +39,7 @@ export function TeaserBand({
       )}
     >
       <ArtDirectedImage image={image} />
-      <div className="mx-auto max-w-[1440px] px-4 py-10 text-center md:px-8 md:py-14">
+      <Reveal className="mx-auto max-w-[1440px] px-4 py-10 text-center md:px-8 md:py-14">
         <p className="text-caption text-primary-text font-semibold tracking-widest uppercase">
           {eyebrow}
         </p>
@@ -61,7 +62,7 @@ export function TeaserBand({
             </Link>
           )}
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }

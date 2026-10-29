@@ -1,9 +1,10 @@
+import { Reveal } from '@/components/motion/reveal';
 import { NewsletterForm } from '@/features/newsletter/newsletter-form';
 
 export function NewsletterSection() {
   return (
     <section aria-labelledby="newsletter-title" className="bg-surface">
-      <div className="mx-auto max-w-[1440px] px-4 py-12 text-center md:px-8 md:py-16">
+      <Reveal className="mx-auto max-w-[1440px] px-4 py-12 text-center md:px-8 md:py-16">
         <p className="text-caption text-primary-text font-semibold tracking-widest uppercase">
           Stay close
         </p>
@@ -17,7 +18,7 @@ export function NewsletterSection() {
           New pieces, gift ideas and the occasional offer. No spam, ever.
         </p>
         <NewsletterForm />
-      </div>
+      </Reveal>
     </section>
   );
 }

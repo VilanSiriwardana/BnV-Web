@@ -261,6 +261,7 @@ Availability comes from `inventory.quantity - inventory.reserved_quantity`.
 - Use `fill` inside an aspect-ratio box so layout never shifts. Only the first hero image and the PDP primary image get `priority`.
 - Every image needs alt text describing the product or scene, not "image of". Decorative images use `alt=""`.
 - Placeholders live in `public/images/prototype/`; real images come from Cloudinary.
+- Output formats are AVIF then WebP. Allowed qualities are 75 (default) and 85 (hero, PDP primary). Presets live in `src/config/images.ts`. Local images get a generated blur placeholder (`src/data/image-placeholders.ts`). Art-directed banners use `<picture>` via `getImageProps`, so only one size downloads.
 
 ## 9. Catalog Rules
 

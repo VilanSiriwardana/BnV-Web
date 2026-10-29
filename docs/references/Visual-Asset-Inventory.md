@@ -140,6 +140,13 @@ The Posters and Image ideas material belongs to **Bilesma Natural** (Ayurvedic s
 
 ## 8. Asset Handling Rules
 
+**Re-export (2026-10-29, `scripts/images/reexport.ts`):**
+
+- The 201 exported files were regenerated from the originals with an attention crop.
+- Products are now about 1122×1403 at quality 82. The originals (≥1086×1402) are below the 1200×1500 target, and the script never upscales.
+- Banners are re-encoded at quality 85 at 1920×650 and 1080×1080. The originals are only 1672–1916×821, so 2× banners need new source art.
+- The folder grew from 12.4 MB to 16.8 MB.
+
 - Rename every asset before use. Do not keep export names such as `ChatGPT Image Jul 16, 2026, 11_48_19 AM (3).png`. Pattern: `<area>-<subject>-<variant>.webp`, for example `home-hero-couple-light.webp` or `product-heart-duo-necklace-01.webp`.
 - Temporary prototype images go in `public/images/prototype/`. Brand static assets go in `public/images/brand/`. Product, portfolio, and upload media go to **Cloudinary** with metadata in PostgreSQL.
 - Convert to WebP or AVIF and size for the actual layout. The source PNGs are about 1.5–2 MB each.
