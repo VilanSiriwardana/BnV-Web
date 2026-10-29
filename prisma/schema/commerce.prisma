@@ -79,6 +79,7 @@ model Order {
   confirmedAt       DateTime?          @map("confirmed_at") @db.Timestamptz(6)
   completedAt       DateTime?          @map("completed_at") @db.Timestamptz(6)
   cancelledAt       DateTime?          @map("cancelled_at") @db.Timestamptz(6)
+  dispatchedAt      DateTime?          @map("dispatched_at") @db.Timestamptz(6)
   user              User?              @relation(fields: [userId], references: [id], onDelete: Restrict)
   cart              Cart?              @relation(fields: [cartId], references: [id], onDelete: Restrict)
   items             OrderItem[]

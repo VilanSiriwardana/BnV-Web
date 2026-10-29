@@ -10,6 +10,7 @@ import {
   TextareaField,
   TextField,
 } from '@/components/forms/form-kit';
+import { ImageUploader } from '@/components/forms/image-uploader';
 import { whatsappUrl } from '@/config/brand';
 import type { CustomRequestType } from '@/constants/statuses';
 
@@ -18,6 +19,7 @@ import { occasionOptions, requestTypeOptions } from './options';
 import { customRequestFields, type CustomRequestState } from './schema';
 
 const initialState: CustomRequestState = { status: 'idle' };
+const UPLOADS_ENABLED = Boolean(process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME);
 const f = customRequestFields.shape;
 
 export function CustomRequestForm({
@@ -35,7 +37,7 @@ export function CustomRequestForm({
     return (
       <FormSuccess
         title="Request received"
-        message={`${state.message} You can send reference images on WhatsApp.`}
+        message={`${state.message} You can send more reference images on WhatsApp.`}
         whatsapp={{
           href: whatsappUrl(
             isLoveWebsite
@@ -131,8 +133,20 @@ export function CustomRequestForm({
             type="date"
           />
         </div>
+        {UPLOADS_ENABLED && (
+          <ImageUploader
+            name="referenceImages"
+            label="Reference images"
+            hint="Up to 3 images, JPG, PNG or WebP, under 5 MB each."
+            signUrl="/api/uploads/custom-request/sign"
+            max={3}
+            error={state.fieldErrors?.referenceImages}
+          />
+        )}
         <p className="text-caption text-muted-foreground">
-          Have reference images? Send them on WhatsApp after submitting.
+          {UPLOADS_ENABLED
+            ? 'You can also send more images on WhatsApp after submitting.'
+            : 'Have reference images? Send them on WhatsApp after submitting.'}{' '}
           Pricing, timing and any change terms are confirmed with your quote.
         </p>
       </fieldset>

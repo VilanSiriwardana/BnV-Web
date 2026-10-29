@@ -1,3 +1,5 @@
+import type { PermissionName as AppPermissionName } from '../../../src/constants/permissions';
+
 export const PERMISSIONS = [
   { name: 'products.manage', description: 'Create, edit and archive products' },
   { name: 'catalog.manage', description: 'Manage categories and collections' },
@@ -12,6 +14,13 @@ export const PERMISSIONS = [
 ] as const;
 
 export type PermissionName = (typeof PERMISSIONS)[number]['name'];
+
+// Keeps the app's guard list (src/constants/permissions.ts) in step with the seed.
+true satisfies [PermissionName] extends [AppPermissionName]
+  ? [AppPermissionName] extends [PermissionName]
+    ? true
+    : false
+  : false;
 
 const ALL_PERMISSIONS = PERMISSIONS.map((permission) => permission.name);
 

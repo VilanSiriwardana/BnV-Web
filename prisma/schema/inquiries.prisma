@@ -16,6 +16,7 @@ model CustomRequest {
   customerPhone       String    @map("customer_phone")
   customerEmail       String?   @map("customer_email")
   message             String?
+  referenceImageUrls  String[]  @default([]) @map("reference_image_urls")
   status              String    @default("new")
   user                User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
   order               Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)

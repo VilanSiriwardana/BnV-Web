@@ -372,3 +372,26 @@ Each decision should include:
 - Related Documents:
   - [../references/Phase-1-Step-by-Step.md](../references/Phase-1-Step-by-Step.md) §11
   - [../references/Phase-1-UX-Spec.md](../references/Phase-1-UX-Spec.md) §1
+
+## ADR-0021 - Sprint 1H Admin MVP
+
+- Status: Accepted
+- Date: 2026-10-29
+- Context: Sprint 1H adds the admin (D-03, D-12) and must decrement stock at dispatch (ADR-0020). `orders` had no dispatch timestamp, and reference images for custom requests were deferred from 1G.
+- Decision:
+  - Auth.js v5 (`next-auth@5.0.0-beta`) Credentials provider with JWT sessions, no adapter tables (`src/auth.ts`). Passwords are checked with bcryptjs against `users.password_hash`.
+  - `src/lib/auth/guards.ts`: `requireAdmin()` and `requirePermission()` re-read the user's status and RBAC permissions from the database on every request, so disabling a user takes effect at once. The `/admin/(panel)` layout, every admin page, Server Action and Route Handler calls them. `proxy.ts` only redirects when there is no session cookie.
+  - Permissions are per area, using the seeded names: `orders.manage`, `inquiries.manage`, `products.manage`, `catalog.manage`. `src/constants/permissions.ts` mirrors `prisma/seed/data/roles.ts`, with a type check that keeps them in step.
+  - Admin login is rate-limited **in memory** (owner decision): 5 tries per email and 20 per IP per 15 minutes. The login error is the same for every failure.
+  - Migration `admin_dispatch_and_reference_images` adds `orders.dispatched_at` and `custom_requests.reference_image_urls TEXT[]`.
+  - Order statuses follow a whitelisted transition map (`src/features/admin-orders/transitions.ts`). **Dispatch is the move to `shipped`.** It sets `dispatched_at` and decrements `inventory.quantity` in one transaction, using a conditional `quantity >= n` update that aborts on oversell and a status-guarded order update that makes a double submit a no-op. Cancelling a dispatched order restocks in the same way.
+  - Catalog images use Cloudinary signed direct uploads. The server signs (folder `bnv/catalog`, admin only; `bnv/custom-requests`, public and rate-limited per IP) and the browser uploads. Secure URLs are stored in the existing `image_url` columns. Saved URLs must come from our cloud and folder; local `/images/...` seed paths stay valid.
+  - Archive instead of delete: products, categories and collections move to `archived` because of the `Restrict` relations.
+- Consequences:
+  - The in-memory limiter resets on restart and is not shared across instances. Replace it with a DB-backed store before running more than one server process.
+  - Permission changes apply on the next request; JWTs only carry the user id.
+  - The `/admin` pages render inside the root layout; `StorefrontChrome` hides the storefront header, footer and cart drawer there.
+  - Public reference uploads appear only when `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` is set; WhatsApp remains the fallback.
+- Related Documents:
+  - [../references/Phase-1-Reconciled-Decisions.md](../references/Phase-1-Reconciled-Decisions.md) D-03, D-12
+  - `.claude/blueprints/014-sprint-1h-admin.md`

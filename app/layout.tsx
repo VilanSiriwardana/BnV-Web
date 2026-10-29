@@ -5,6 +5,7 @@ import { CartDrawer } from '@/components/cart/cart-drawer';
 import { CartProvider } from '@/components/cart/cart-provider';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
+import { StorefrontChrome } from '@/components/layout/storefront-chrome';
 import { ThemeProvider } from '@/components/theme/theme-provider';
 import { siteConfig } from '@/config/seo';
 
@@ -47,10 +48,14 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col">
         <ThemeProvider>
           <CartProvider>
-            <SiteHeader />
+            <StorefrontChrome>
+              <SiteHeader />
+            </StorefrontChrome>
             <main className="flex-1">{children}</main>
-            <SiteFooter />
-            <CartDrawer />
+            <StorefrontChrome>
+              <SiteFooter />
+              <CartDrawer />
+            </StorefrontChrome>
           </CartProvider>
         </ThemeProvider>
       </body>

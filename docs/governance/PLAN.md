@@ -14,8 +14,8 @@ This file tracks only **where we are now**. Update it as work progresses, and re
 
 ## Current Position
 
-- Stage: **Gate B — Partial** (docs and assets done; owner business values and commissions open). Next: **1D–1G manual QA**, then sprint 1H.
-- Next: 1D–1G manual QA, then 1H. Follow-up: Cloudinary reference-image uploads (deferred from 1G).
+- Stage: **Gate B — Partial** (docs and assets done; owner business values and commissions open). Next: **1D–1H manual QA**.
+- Next: 1D–1H manual QA. Fill Cloudinary keys in `.env` to enable uploads.
 
 ## Gate Progress
 
@@ -30,7 +30,7 @@ This file tracks only **where we are now**. Update it as work progresses, and re
 | 1E Catalog + PDP              | Built (2026-10-29); manual QA (themes, breakpoints, filters) pending    |
 | 1F Cart + checkout inquiry    | Built (2026-10-29); manual QA (full order flow, themes) pending         |
 | 1G Custom, Contact, Portfolio | Built (2026-10-29); manual QA (form submissions, themes) pending        |
-| 1H Admin MVP                  | Not started                                                             |
+| 1H Admin MVP                  | Built (2026-10-29); manual QA pending (login, dispatch, uploads)        |
 | 1I SEO, QA, deploy            | Not started                                                             |
 
 ## Current Milestone: Gate B (Sprint 0.5 Spec Sync)

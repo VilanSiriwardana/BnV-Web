@@ -614,3 +614,26 @@ Closed Gate A (milestone M0.3):
 ### Next Step
 
 - Manual QA: submit each form once and check the rows in Prisma Studio, in both themes at 360px and 1440px.
+
+## 2026-10-29 - Sprint 1H Admin MVP (built, manual QA pending)
+
+- Blueprint: `.claude/blueprints/014-sprint-1h-admin.md`; decisions in ADR-0021. Owner decisions: in-memory login rate limit, dispatch = `shipped` with restock on cancel, per-area permissions, reference uploads built last.
+- Auth.js v5 Credentials + JWT (`src/auth.ts`, `app/api/auth/[...nextauth]`), `/admin/login`, guards in `src/lib/auth/guards.ts`, convenience redirect in `proxy.ts`.
+- `/admin`: dashboard counts; inboxes for custom requests, collaboration inquiries and contact messages (filter, search, status, WhatsApp/email reply); orders (transition map, dispatch decrements stock, cancel after dispatch restocks); products (with variants, prices, stock, images), categories and collections (with product membership).
+- Cloudinary signed uploads: `src/lib/cloudinary.ts`, `app/api/admin/uploads/sign`, `app/api/uploads/custom-request/sign`, `src/components/forms/image-uploader.tsx`. `/custom` shows the uploader (max 3) when Cloudinary is configured.
+- Migration `admin_dispatch_and_reference_images`.
+
+### Tests
+
+- `npm test`: 37 passing (transitions, dispatch/restock with a fake transaction, guards, rate limit). Typecheck, lint and build pass.
+- Dev server: `/admin/orders` without a session → 307 to `/admin/login`; a forged session cookie gets the layout's redirect, no data; the admin upload signer returns 401.
+
+### Known Gotchas
+
+- Storefront route folders could not be moved into a `(store)` group (files locked by the running dev server), so `StorefrontChrome` hides the storefront chrome on `/admin` instead.
+- Restart `next dev` after this migration (stale Prisma client, see 1F).
+- Builds can hit Postgres "too many connections" while `next dev` is also running; rerun or stop the dev server.
+
+### Next Step
+
+- Manual QA: sign in as the seeded admin; change inquiry statuses; dispatch and cancel a test order and check `inventory` in Prisma Studio; with Cloudinary keys set, upload product and reference images.

@@ -174,7 +174,7 @@ export function TextField({
   placeholder,
   ...props
 }: BaseProps & {
-  type?: 'text' | 'email' | 'tel' | 'date' | 'number';
+  type?: 'text' | 'email' | 'tel' | 'date' | 'number' | 'password';
   autoComplete?: string;
   placeholder?: string;
 }) {

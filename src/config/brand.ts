@@ -31,11 +31,15 @@ export const brand = {
   returnsWindowDays: null,
 } as const satisfies Brand;
 
-export function whatsappUrl(text: string) {
-  const number = brand.contact.whatsapp as string | null;
-  return number
-    ? `https://wa.me/${number.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`
+export function whatsappUrlTo(number: string | null | undefined, text: string) {
+  const digits = number?.replace(/\D/g, '');
+  return digits
+    ? `https://wa.me/${digits}?text=${encodeURIComponent(text)}`
     : null;
+}
+
+export function whatsappUrl(text: string) {
+  return whatsappUrlTo(brand.contact.whatsapp as string | null, text);
 }
 
 // Neutral copy until the owner confirms delivery and returns values (Business-Facts.md).

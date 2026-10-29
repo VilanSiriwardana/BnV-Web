@@ -24,6 +24,18 @@ const budget = optional(
     .max(10_000_000, 'Please enter a smaller amount.'),
 );
 
+// Uploader URLs, one per line; the action checks they come from our Cloudinary folder.
+const referenceImagesSchema = z
+  .string()
+  .default('')
+  .transform((v) =>
+    v
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter(Boolean),
+  )
+  .pipe(z.array(z.string().max(500)).max(3, 'Please share up to 3 images.'));
+
 export const customRequestFields = z.object({
   requestType: requiredChoice(
     customRequestTypes,
@@ -44,6 +56,7 @@ export const customRequestFields = z.object({
     2000,
     'Please describe your idea (at least 10 characters).',
   ),
+  referenceImages: referenceImagesSchema,
   consent: consentSchema,
 });
 

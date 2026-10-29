@@ -1,2 +1,3 @@
 export { cn } from './cn';
-export { formatLkr } from './format';
+export { formatDateTime, formatLkr, formatStatus } from './format';
+export { slugify } from './slug';
