@@ -295,3 +295,18 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 ### Verification
 
 - 119 products, 227 variants, unique slugs and SKUs; every image URL exists. `db:seed:demo` twice: first run archived the 12 old demo products, second run identical with 0 archived. Typecheck and ESLint pass.
+
+## 2026-10-29 - Sprint 1B Design System
+
+### Summary
+
+- Implemented blueprint `.claude/blueprints/005-sprint-1b-design-system.md`: tokens and fonts, theme toggle, six shadcn primitives, header/footer/mobile drawer, `/style-guide`.
+
+### Verification
+
+- Typecheck, lint and build pass; built CSS contains the token utilities and `.dark` variant; `/style-guide` HTML has `noindex, nofollow`.
+
+### Known Gotchas
+
+- The shadcn CLI resolved a `utils` alias of `@/lib/utils/cn` to a bare `"cn"` import and installed the unrelated npm package `cn`. Fixed: `components.json` now uses `@/lib/utils`, backed by `src/lib/utils/index.ts` re-exporting `cn`. Keep that alias.
+- shadcn `add` without `init` does not install `tw-animate-css`; Sheet and Accordion animations need it.

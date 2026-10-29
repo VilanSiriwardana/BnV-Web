@@ -14,8 +14,8 @@ This file tracks only **where we are now**. Update it as work progresses, and re
 
 ## Current Position
 
-- Stage: **Gate B — Partial** (docs and assets done; owner business values and commissions open). Next: **Phase 1 sprint 1B** (design system).
-- Next: Phase 1 sprint 1B.
+- Stage: **Gate B — Partial** (docs and assets done; owner business values and commissions open). Next: **Phase 1 sprint 1C** (database completion).
+- Next: Phase 1 sprint 1C.
 
 ## Gate Progress
 
@@ -24,7 +24,7 @@ This file tracks only **where we are now**. Update it as work progresses, and re
 | Gate A — Phase 0 close-out    | Done (2026-10-28)                                                 |
 | Gate B — Spec Sync            | Partial (2026-10-29): owner values in Business-Facts.md open      |
 | 1A Foundation finish          | Done (2026-10-29)                                                 |
-| 1B Design system              | Next                                                              |
+| 1B Design system              | Done (2026-10-29)                                                 |
 | 1C Database completion        | Partial (22 models migrated; seed done; schema additions pending) |
 | 1D Homepage                   | Not started                                                       |
 | 1E Catalog + PDP              | Not started                                                       |

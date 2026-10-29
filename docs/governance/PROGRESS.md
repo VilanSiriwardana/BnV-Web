@@ -382,3 +382,29 @@ Closed Gate A (milestone M0.3):
 ### Next Step
 
 - Sprint 1B (design system).
+
+## 2026-10-29 - Sprint 1B Design System
+
+### Summary
+
+- Brand-Identity v1.3 tokens (light and dark), shadcn aliases, and the type, radius, shadow and motion scales in `app/globals.css` (Tailwind v4 `@theme inline`, class-based dark variant).
+- Playfair Display and Inter through `next/font`; next-themes provider and Sun/Moon toggle (Light/Dark only, saved).
+- shadcn Button (adds `luxury`, `whatsapp`), Badge (`rose`, `gold`), Input, Card, Sheet, Accordion, re-mapped to B&V tokens.
+- SiteHeader, MobileNav (Sheet) and SiteFooter from `src/config/navigation.ts`; null social/WhatsApp values are hidden.
+- `/style-guide` (noindex, nofollow).
+
+### Files Changed
+
+- `app/{globals.css,layout.tsx,style-guide/page.tsx}`, `components.json`, `src/components/{ui,layout,theme}/**`, `package.json`, `package-lock.json`, `docs/governance/{PLAN,PROGRESS}.md`, `docs/AI_SESSION_LOG.md`.
+
+### Dependencies
+
+- Added `radix-ui` and `tw-animate-css` (shadcn CLI, approved).
+
+### Tests
+
+- `npm run typecheck`, `npm run lint` and `npm run build` pass. `/style-guide` renders `noindex, nofollow`. Visual review in both themes is pending (owner).
+
+### Next Step
+
+- Sprint 1C (database completion).
