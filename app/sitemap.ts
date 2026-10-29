@@ -6,6 +6,7 @@ import {
   getProductSlugs,
   getSubcategorySlugs,
 } from '@/features/catalog/queries';
+import { shoots } from '@/data/portfolio';
 import { absoluteUrl } from '@/lib/seo/canonical';
 
 export const revalidate = 3600;
@@ -20,6 +21,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     { url: absoluteUrl(routes.home) },
     { url: absoluteUrl(routes.shop) },
+    ...[
+      routes.custom,
+      routes.loveWebsites,
+      routes.portfolio,
+      routes.collaborate,
+      routes.contact,
+    ].map((path) => ({ url: absoluteUrl(path) })),
+    ...shoots
+      .filter((s) => s.context)
+      .map((s) => ({ url: absoluteUrl(routes.shoot(s.slug)) })),
     ...pillars.map((pillar) => ({ url: absoluteUrl(`/${pillar}`) })),
     ...subcategories.flatMap(({ slug, updatedAt, parent }) =>
       parent

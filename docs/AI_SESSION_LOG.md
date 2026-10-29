@@ -427,3 +427,20 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 ### Summary
 
 - Implemented blueprint `.claude/blueprints/012-checkout-stale-prisma-client.md`. Checkout failed because `next dev` was started before migration 006 and kept the old Prisma client cached on `globalThis`. Fix: restart the dev server. Cart and checkout action `catch` blocks now log the cause with `console.error`.
+
+## 2026-10-29 - Sprint 1G Custom, Contact, Portfolio
+
+### Summary
+
+- Implemented blueprint `.claude/blueprints/013-sprint-1g-custom-contact-portfolio.md`. Decisions: uploads deferred, portfolio empty with "Coming soon", policy stubs.
+
+### Deviations
+
+- Textarea and Select primitives live in `src/components/ui/` (the blueprint's fallback path), next to `input.tsx`.
+- Instead of three loose components, one `form-kit.tsx` registers fields with `FormShell` for submit-time validation. Registration goes through a stable callback ref, so focus order survives re-renders.
+- `sriLankaPhoneSchema` moved to `src/lib/forms/fields.ts` and is re-exported from checkout. `checkout-form.tsx` now types `useInput<HTMLInputElement>` explicitly.
+- Optional step 9 (Our Story, FAQ) was skipped.
+
+### Known Gotchas
+
+- `Omit` on the collaboration discriminated union keeps only the shared keys at type level. The runtime spread still carries the variant fields to Prisma.

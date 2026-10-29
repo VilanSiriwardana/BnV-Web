@@ -591,3 +591,26 @@ Closed Gate A (milestone M0.3):
 ### Next Step
 
 - Manual QA: add → drawer → `/cart` → checkout (COD and bank transfer) → success; check rows in Prisma Studio; both themes at 360px and 1440px.
+
+## 2026-10-29 - Sprint 1G Custom, Contact, Portfolio (built, manual QA pending)
+
+- Blueprint: `.claude/blueprints/013-sprint-1g-custom-contact-portfolio.md`. Owner decisions: defer Cloudinary uploads; portfolio ships empty with "Coming soon"; policy pages are stubs until the owner supplies the text.
+- Shared form kit: `src/lib/forms/{fields,parse}.ts` (phone, email, consent, optional, future date, reference links, honeypot; `parseForm`) and `src/components/forms/form-kit.tsx` (`FormShell`, `TextField`, `TextareaField`, `SelectField`, `ConsentField`, `FormSuccess`). `useInput` now also binds textareas and selects.
+- `/custom` and `/love-websites` (preset `love_website`) save to `custom_requests`; `/contact` to `contact_messages`; `/collaborate` (three forms, `?type=` deep links) to `collaboration_inquiries`. Reference images go to WhatsApp after submit.
+- `/portfolio` (link filters, "Coming soon" while `src/data/portfolio` is empty) and `/portfolio/[slug]` (gallery, lightbox, related; indexable only with `context`).
+- `/policies/{terms,privacy,delivery,returns}` render a "being finalised" panel, `noindex`, not in the sitemap.
+
+### Tests
+
+- `npm test`: 28 passing (10 new inquiry schema tests). Typecheck, lint and build pass.
+- `next start`: all new routes 200; `/portfolio` shows "Coming soon"; policies carry `noindex`; sitemap lists the five new pages. No form submissions yet (DB writes need approval).
+
+### Known Gotchas
+
+- Unknown `/portfolio/*` and `/policies/*` slugs return HTTP 200 with `noindex`, the same as products (root `loading.tsx` streams).
+- Shoot media `cloudinaryId` values need `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` and a `next.config.ts` remote pattern once real shoots are added; local `/images/...` paths work now.
+- Our Story and FAQ pages (optional step 9) are not built yet.
+
+### Next Step
+
+- Manual QA: submit each form once and check the rows in Prisma Studio, in both themes at 360px and 1440px.
