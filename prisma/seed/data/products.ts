@@ -33,7 +33,7 @@ export const PRODUCTS: ProductSeed[] = [
     collectionSlug: 'new-arrivals',
     isFeatured: true,
     image: {
-      url: '/images/prototype/women-lavender-wrap-dress-01.webp',
+      url: '/images/prototype/product-women-01.webp',
       alt: 'Lavender wrap dress',
     },
     variants: sized('BNV-WDR-001', '12900.00', ['S', 'M', 'L']),
@@ -46,7 +46,7 @@ export const PRODUCTS: ProductSeed[] = [
     categorySlug: 'women-tops',
     collectionSlug: 'fashion-edit',
     image: {
-      url: '/images/prototype/women-blush-satin-top-01.webp',
+      url: '/images/prototype/product-women-02.webp',
       alt: 'Blush satin top',
     },
     variants: sized('BNV-WTP-001', '6900.00', ['S', 'M', 'L']),
@@ -59,7 +59,7 @@ export const PRODUCTS: ProductSeed[] = [
     categorySlug: 'women-loungewear',
     collectionSlug: 'core-range',
     image: {
-      url: '/images/prototype/women-ivory-lounge-set-01.webp',
+      url: '/images/prototype/product-women-03.webp',
       alt: 'Ivory lounge set',
     },
     variants: sized('BNV-WLG-001', '9800.00', ['S', 'M', 'L']),
@@ -73,7 +73,7 @@ export const PRODUCTS: ProductSeed[] = [
     collectionSlug: 'new-arrivals',
     isFeatured: true,
     image: {
-      url: '/images/prototype/men-linen-resort-shirt-01.webp',
+      url: '/images/prototype/product-men-01.webp',
       alt: 'Linen resort shirt',
     },
     variants: sized('BNV-MSH-001', '8500.00', ['M', 'L', 'XL']),
@@ -86,7 +86,7 @@ export const PRODUCTS: ProductSeed[] = [
     categorySlug: 'men-trousers',
     collectionSlug: 'core-range',
     image: {
-      url: '/images/prototype/men-tailored-chino-trousers-01.webp',
+      url: '/images/prototype/product-men-02.webp',
       alt: 'Tailored chino trousers',
     },
     variants: sized('BNV-MTR-001', '9200.00', ['30', '32', '34']),
@@ -100,7 +100,7 @@ export const PRODUCTS: ProductSeed[] = [
     collectionSlug: 'jewelry-highlight',
     isFeatured: true,
     image: {
-      url: '/images/prototype/jewelry-heart-pendant-necklace-01.webp',
+      url: '/images/prototype/product-jewelry-01.webp',
       alt: 'Heart pendant necklace',
     },
     variants: single('BNV-JNK-001', '7500.00'),
@@ -113,7 +113,7 @@ export const PRODUCTS: ProductSeed[] = [
     categorySlug: 'jewelry-rings',
     collectionSlug: 'jewelry-highlight',
     image: {
-      url: '/images/prototype/jewelry-promise-band-ring-01.webp',
+      url: '/images/prototype/product-jewelry-02.webp',
       alt: 'Promise band ring',
     },
     variants: sized('BNV-JRG-001', '5900.00', ['6', '7', '8']),
@@ -126,7 +126,7 @@ export const PRODUCTS: ProductSeed[] = [
     categorySlug: 'jewelry-earrings',
     collectionSlug: 'core-range',
     image: {
-      url: '/images/prototype/jewelry-pearl-drop-earrings-01.webp',
+      url: '/images/prototype/product-jewelry-03.webp',
       alt: 'Pearl drop earrings',
     },
     variants: single('BNV-JER-001', '4800.00'),
@@ -139,7 +139,7 @@ export const PRODUCTS: ProductSeed[] = [
     categorySlug: 'jewelry-bracelets',
     collectionSlug: 'gift-ready',
     image: {
-      url: '/images/prototype/jewelry-initial-charm-bracelet-01.webp',
+      url: '/images/prototype/product-jewelry-04.webp',
       alt: 'Initial charm bracelet',
     },
     variants: single('BNV-JBR-001', '5400.00'),
@@ -153,7 +153,7 @@ export const PRODUCTS: ProductSeed[] = [
     collectionSlug: 'gift-ready',
     isFeatured: true,
     image: {
-      url: '/images/prototype/gifts-self-love-gift-box-01.webp',
+      url: '/images/prototype/product-gift-box-01.webp',
       alt: 'Self-love gift box',
     },
     variants: single('BNV-GBX-001', '11500.00', 6),
@@ -166,7 +166,7 @@ export const PRODUCTS: ProductSeed[] = [
     categorySlug: 'gifts-candles-home',
     collectionSlug: 'core-range',
     image: {
-      url: '/images/prototype/gifts-vanilla-rose-candle-01.webp',
+      url: '/images/prototype/product-candles-home-01.webp',
       alt: 'Vanilla rose candle',
     },
     variants: single('BNV-GCH-001', '3200.00', 20),
@@ -180,7 +180,7 @@ export const PRODUCTS: ProductSeed[] = [
     collectionSlug: 'couple-collection',
     isFeatured: true,
     image: {
-      url: '/images/prototype/couples-matching-tee-set-01.webp',
+      url: '/images/prototype/product-couple-outfit-01.webp',
       alt: 'Matching couple tee set',
     },
     variants: sized('BNV-CPL-001', '10900.00', ['S-M', 'M-L', 'L-XL']),
