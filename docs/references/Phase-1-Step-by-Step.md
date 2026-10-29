@@ -2,16 +2,16 @@
 
 | Field               | Value                                                                                       |
 | ------------------- | ------------------------------------------------------------------------------------------- |
-| Version             | 2.0 (2026-10-28)                                                                            |
-| Status              | Approved; aligned with the accepted decisions D-01 to D-19 (ADR-0011 to ADR-0016)           |
-| Converted / updated | 2026-10-28                                                                                  |
+| Version             | 2.1 (2026-10-29)                                                                            |
+| Status              | Approved; aligned with the accepted decisions D-01 to D-23 (ADR-0011 to ADR-0017)           |
+| Converted / updated | 2026-10-29                                                                                  |
 | Based on            | BV_Phase_1_Step_by_Step_Guidance_Document.pdf (v1.0, July 2026), then updated for decisions |
 
 > **How to read this document.** This is the build guidance for Phase 1: what to build, in what order, and the rules for each module. It now reflects the accepted decisions in [Phase-1-Reconciled-Decisions.md](Phase-1-Reconciled-Decisions.md) and the ADRs in [../decisions/DECISIONS.md](../decisions/DECISIONS.md), and the design rules in [Brand-Identity.md](Brand-Identity.md) v1.2.
 >
 > - The sprint schedule, exit checks and approvals live in [Implementation-Plan.md](Implementation-Plan.md). Section 20 here only maps to it.
 > - Decision tags such as **(D-08)** or **(ADR-0012)** mark where a decision changed the original guidance.
-> - **OPEN** marks a topic still being decided in Gate B (D-20 to D-23). Stop and ask before building anything that depends on an OPEN item.
+> - **OPEN** marks a topic still being decided in Gate B (Brand-Identity gaps and the Phase-1-UX-Spec). Stop and ask before building anything that depends on an OPEN item.
 > - **VERIFIED** marks a statement checked against the repository on 2026-10-28.
 > - The v1.0 text (Jenkins pipeline, `src/app` layout, Docker database, Sanity in Phase 1) is in git history. Section 23 lists what changed.
 
@@ -475,12 +475,11 @@ Schema files live in `prisma/schema/` split by domain (ADR-0016). Every schema c
 
 ### 7.2 Changes Needed in Sprint 1C
 
-- Make `products.collection_id` nullable; the neutral "Core Range" collection exists only until then (ADR-0015).
+- Add the `collection_products` join table and drop `products.collection_id`; retire the `core-range`, `new-arrivals` and `custom` seed entries (D-21, ADR-0017).
 - Align status defaults with D-04: `orders.status` defaults to `pending` today, but D-04 starts orders at `inquiry_received`. `products.status` defaults to `active`; admin-created products should start as `draft`.
 - D-04 lists `orders.payment_status`; the column does not exist yet. Add it, or derive it from `payments` (decide in 1C).
 - Product SEO fields (SEO title, SEO description) used by the admin form are not in the schema yet.
-- **OPEN (D-20):** the allowed values of `payments.method` / `orders.payment_method` (COD, bank transfer, WhatsApp).
-- **OPEN (D-21):** how collections relate to categories, which decides whether `product_categories` / `collection_products` join tables replace the direct FKs.
+- `payments.method` / `orders.payment_method` values are `cod` and `bank_transfer` (D-20); the columns already exist.
 
 ### 7.3 Global Database Rules
 
@@ -498,21 +497,22 @@ Schema files live in `prisma/schema/` split by domain (ADR-0016). Every schema c
 
 Phase 1 values in bold.
 
-| Entity                                 | Values                                                                                          |
-| -------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `products.status`                      | **draft, active, archived**                                                                     |
-| `carts.status`                         | **active, converted, abandoned**                                                                |
-| `orders.status`                        | **inquiry_received, pending_confirmation, confirmed, preparing, cancelled**, shipped, delivered |
-| `orders.payment_status`                | **not_required, pending, paid**, failed, refunded                                               |
-| `payments.provider`                    | **manual**, payhere, koko                                                                       |
-| `payments.status`                      | **pending, paid**, failed, cancelled, refunded                                                  |
-| `custom_requests.status`               | **new, reviewing, quoted, accepted, rejected, completed**                                       |
-| `custom_requests.request_type`         | **custom_fashion, custom_jewelry, gift_box, embroidery, engraving, love_website, other**        |
-| `contact_messages.status`              | **new, read, replied, archived**                                                                |
-| `collaboration_inquiries.status`       | **new, reviewing, replied, accepted, declined, archived**                                       |
-| `collaboration_inquiries.inquiry_type` | **collaboration, consultation, event_invitation**                                               |
-| `newsletter_subscribers.status`        | **active, unsubscribed**                                                                        |
-| `users.status`                         | **active, disabled**                                                                            |
+| Entity                                     | Values                                                                                          |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `products.status`                          | **draft, active, archived**                                                                     |
+| `carts.status`                             | **active, converted, abandoned**                                                                |
+| `orders.status`                            | **inquiry_received, pending_confirmation, confirmed, preparing, cancelled**, shipped, delivered |
+| `orders.payment_status`                    | **not_required, pending, paid**, failed, refunded                                               |
+| `payments.provider`                        | **manual**, payhere, koko                                                                       |
+| `payments.status`                          | **pending, paid**, failed, cancelled, refunded                                                  |
+| `orders.payment_method`, `payments.method` | **cod, bank_transfer** (D-20)                                                                   |
+| `custom_requests.status`                   | **new, reviewing, quoted, accepted, rejected, completed**                                       |
+| `custom_requests.request_type`             | **custom_fashion, custom_jewelry, gift_box, embroidery, engraving, love_website, other**        |
+| `contact_messages.status`                  | **new, read, replied, archived**                                                                |
+| `collaboration_inquiries.status`           | **new, reviewing, replied, accepted, declined, archived**                                       |
+| `collaboration_inquiries.inquiry_type`     | **collaboration, consultation, event_invitation**                                               |
+| `newsletter_subscribers.status`            | **active, unsubscribed**                                                                        |
+| `users.status`                             | **active, disabled**                                                                            |
 
 ### 7.5 Migration and Seed Sequence
 
@@ -526,7 +526,7 @@ Sprint 1C:
 
 4. `src/lib/prisma.ts` singleton.
 5. Migration for custom requests, collaboration inquiries, contact messages, newsletter subscribers, settings.
-6. Migration for the 7.2 changes once D-20 and D-21 are decided.
+6. Migration for the 7.2 changes (D-20, D-21 decided).
 7. Seed shipping methods, FAQ, policies and settings once their tables exist.
 8. Run `npm run db:validate`, `npm run db:migrate`, `npm run db:seed`, then check relations in Prisma Studio before building forms.
 
@@ -604,12 +604,13 @@ Build public pages after the design system, database models and seed data are re
 | ------------------- | --------------------------------------------------------------------------------------------------- | ------------------ |
 | /                   | Homepage (order in 10.2).                                                                           | Brand-Identity §23 |
 | /shop               | All-product discovery landing page.                                                                 | —                  |
-| /women              | Women category landing and product grid.                                                            | **OPEN (D-21)**    |
-| /men                | Men category landing and product grid.                                                              | **OPEN (D-21)**    |
-| /jewelry            | Jewelry category landing and product grid.                                                          | **OPEN (D-21)**    |
-| /gifts              | Gift-focused landing page and collections.                                                          | **OPEN (D-21)**    |
-| /couples            | Couple capsule and signature couple collections.                                                    | **OPEN (D-21)**    |
-| /custom             | Custom order landing and inquiry flow.                                                              | —                  |
+| /women              | Women category landing and product grid.                                                            | D-21               |
+| /men                | Men category landing and product grid.                                                              | D-21               |
+| /jewelry            | Jewelry category landing and product grid.                                                          | D-21               |
+| /gifts              | Gift-focused landing page and collections.                                                          | D-21               |
+| /couples            | Couple capsule and signature couple collections.                                                    | D-21               |
+| /[pillar]/[sub]     | Subcategory grid, resolved to the category slug `<pillar>-<sub>` (for example `/women/dresses`).    | D-21               |
+| /custom             | Custom order service page and request form (not a product category).                                | D-21               |
 | /love-websites      | Love website landing (types, mockup previews, how it works, starting price or inquiry) and inquiry. | D-09               |
 | /portfolio          | Visual Portfolio with filters (query parameters, not indexable).                                    | D-07               |
 | /portfolio/[slug]   | Shoot detail.                                                                                       | D-07               |
@@ -625,7 +626,7 @@ Build public pages after the design system, database models and seed data are re
 | /checkout/success   | Order number, next steps, WhatsApp deep link (noindex).                                             | D-17               |
 | /style-guide        | Internal design preview (noindex).                                                                  | —                  |
 
-`/visual-portfolio` from v1.0 is replaced by `/portfolio` (D-07). **OPEN (D-21):** whether category pillars stay at the root (`/women`) or move under `/shop/women`, and what "New In" means. **OPEN (D-22):** whether Phase 1 has an order tracking route.
+`/visual-portfolio` from v1.0 is replaced by `/portfolio` (D-07). Pillars stay at the root and subcategories use `/[pillar]/[sub]`; "New In" links to `/shop?sort=newest` (D-21). No order tracking route in Phase 1 (D-22).
 
 ### 10.2 Homepage Build Order (Brand-Identity §23)
 
@@ -644,7 +645,7 @@ Build the shared layout first (Header, MegaMenu, MobileNavDrawer, Footer), then 
 11. Love Websites teaser.
 12. Visual Portfolio preview (real shoots only).
 13. Social gallery.
-14. Testimonials / Memories — **hidden until real content exists** (D-10; D-23 OPEN to formalise). No "Love Notes" label.
+14. Testimonials / Memories — **hidden until real, permissioned testimonials exist** (D-10, D-23). No "Love Notes" label.
 15. Newsletter — server action, consent checkbox, duplicate-email handling, warm success message.
 16. Footer.
 
@@ -694,7 +695,7 @@ Phase 1 uses a stable inquiry-friendly flow with **manual payment confirmation a
 6. Show the success page with the order number, next steps, and a **WhatsApp deep link** to confirm.
 7. The order appears in the admin inbox. Email notification is a placeholder.
 
-**OPEN (D-20):** which payment methods checkout offers (COD, bank transfer, WhatsApp) and the values stored in `payments.method`. **OPEN (D-22):** order tracking in Phase 1. Not in Phase 1: promo-code field (coupons are Phase 2), card/PayPal/Apple Pay, PayHere/KOKO.
+Payment methods: Cash on Delivery and bank transfer, stored as `cod` / `bank_transfer` in `orders.payment_method` and `payments.method`; phone required; COD confirmed by phone before dispatch (D-20). No order tracking route (D-22). Not in Phase 1: promo-code field (coupons are Phase 2), card/PayPal/Apple Pay, PayHere/KOKO.
 
 Vitest is added in this sprint (D-18) to cover price calculation, Zod schemas and snapshot building.
 
@@ -786,7 +787,7 @@ Every route and action is guarded server-side (D-12). Destructive and settings a
 2. Product form schema with Zod.
 3. Core fields: name, slug, description, short description, status (new products start as `draft`), category, brand, collection, featured flag, SEO title, SEO description (schema columns added in 1C).
 4. Variants: SKU, price, sale price, stock or availability status, option values.
-5. Category and collection assignment (shape depends on D-21).
+5. Category assignment (one category) and collection assignment (many-to-many through `collection_products`, D-21).
 6. Image upload, alt text, primary image and sort order.
 7. Save product and variants in one transaction.
 8. Preview the product page after save.
@@ -832,18 +833,19 @@ app/robots.ts
 
 ### 15.3 SEO-Friendly URL Structure
 
-| Page Type        | Route Pattern                                                      |
-| ---------------- | ------------------------------------------------------------------ |
-| Homepage         | /                                                                  |
-| Shop             | /shop                                                              |
-| Core Category    | /women, /men, /jewelry, /gifts, /couples (**OPEN, D-21**), /custom |
-| Love Websites    | /love-websites                                                     |
-| Visual Portfolio | /portfolio, /portfolio/[slug]                                      |
-| Collaborate      | /collaborate                                                       |
-| Product          | /products/[slug]                                                   |
-| Collection       | /collections/[slug]                                                |
-| Policy           | /policies/[slug]                                                   |
-| Journal          | /journal/[slug] (Phase 2, Sanity)                                  |
+| Page Type        | Route Pattern                                                    |
+| ---------------- | ---------------------------------------------------------------- |
+| Homepage         | /                                                                |
+| Shop             | /shop                                                            |
+| Core Category    | /women, /men, /jewelry, /gifts, /couples, /[pillar]/[sub] (D-21) |
+| Custom (service) | /custom                                                          |
+| Love Websites    | /love-websites                                                   |
+| Visual Portfolio | /portfolio, /portfolio/[slug]                                    |
+| Collaborate      | /collaborate                                                     |
+| Product          | /products/[slug]                                                 |
+| Collection       | /collections/[slug]                                              |
+| Policy           | /policies/[slug]                                                 |
+| Journal          | /journal/[slug] (Phase 2, Sanity)                                |
 
 Nothing has been published yet, so no redirects are needed for the v1.0 → v2.0 route changes.
 
@@ -964,19 +966,19 @@ Testing is built into every sprint. **Every sprint must pass `npm run lint`, `np
 
 The schedule, deliverables, exit checks and approvals are maintained in [Implementation-Plan.md](Implementation-Plan.md); live status is in [../governance/PLAN.md](../governance/PLAN.md). This table maps the v1.0 sprints to the current plan and to the sections of this guide.
 
-| Plan   | v1.0 sprint | Focus                                                                                        | Guide sections   | Status (2026-10-28)            |
-| ------ | ----------- | -------------------------------------------------------------------------------------------- | ---------------- | ------------------------------ |
-| Gate A | —           | Decisions, env, seed, schema split                                                           | 3, 4, 7          | Done                           |
-| Gate B | —           | Spec sync: Brand-Identity gaps, D-20 to D-23, UX spec, business content, assets              | 5.4, 9.2, 10, 11 | Next                           |
-| 1A     | S0          | `src/` folders, config files, `@/` alias                                                     | 3                | Not started                    |
-| 1B     | S1          | Tokens, fonts, theme toggle, shadcn primitives, header/footer, `/style-guide`                | 5, 6             | Not started                    |
-| 1C     | S2          | Schema additions, `src/lib/prisma.ts`, seeds                                                 | 7                | Partial (22 models, seed done) |
-| 1D     | S3          | Homepage                                                                                     | 10.2             | Not started                    |
-| 1E     | S4          | Shop, categories, collections, PDP                                                           | 10.1, 10.3, 15   | Not started                    |
-| 1F     | S5          | Cart, checkout inquiry, Vitest                                                               | 11               | Not started                    |
-| 1G     | S6          | Custom, Love Websites, Contact, Our Story, FAQ, policies, Portfolio, Collaborate, Cloudinary | 9, 12, 13        | Not started                    |
-| 1H     | S7          | Auth.js admin login, guards, admin screens                                                   | 8, 14            | Not started                    |
-| 1I     | S8          | SEO files, QA, CI, Vercel, GA4                                                               | 15, 17, 18, 19   | Not started                    |
+| Plan   | v1.0 sprint | Focus                                                                                               | Guide sections   | Status (2026-10-28)            |
+| ------ | ----------- | --------------------------------------------------------------------------------------------------- | ---------------- | ------------------------------ |
+| Gate A | —           | Decisions, env, seed, schema split                                                                  | 3, 4, 7          | Done                           |
+| Gate B | —           | Spec sync: Brand-Identity gaps, D-20 to D-23 (decided, ADR-0017), UX spec, business content, assets | 5.4, 9.2, 10, 11 | Next                           |
+| 1A     | S0          | `src/` folders, config files, `@/` alias                                                            | 3                | Not started                    |
+| 1B     | S1          | Tokens, fonts, theme toggle, shadcn primitives, header/footer, `/style-guide`                       | 5, 6             | Not started                    |
+| 1C     | S2          | Schema additions, `src/lib/prisma.ts`, seeds                                                        | 7                | Partial (22 models, seed done) |
+| 1D     | S3          | Homepage                                                                                            | 10.2             | Not started                    |
+| 1E     | S4          | Shop, categories, collections, PDP                                                                  | 10.1, 10.3, 15   | Not started                    |
+| 1F     | S5          | Cart, checkout inquiry, Vitest                                                                      | 11               | Not started                    |
+| 1G     | S6          | Custom, Love Websites, Contact, Our Story, FAQ, policies, Portfolio, Collaborate, Cloudinary        | 9, 12, 13        | Not started                    |
+| 1H     | S7          | Auth.js admin login, guards, admin screens                                                          | 8, 14            | Not started                    |
+| 1I     | S8          | SEO files, QA, CI, Vercel, GA4                                                                      | 15, 17, 18, 19   | Not started                    |
 
 Do not jump into page polish before the foundation, components, data model and admin workflows are stable.
 
@@ -984,21 +986,21 @@ Do not jump into page polish before the foundation, components, data model and a
 
 These should not block the Phase 1 launch unless a business decision changes the MVP scope.
 
-| Feature                                      | Reason to Wait                                                                 |
-| -------------------------------------------- | ------------------------------------------------------------------------------ |
-| Customer accounts, Google sign-in            | Admin-only auth in Phase 1 (D-03); needs the Auth.js adapter tables.           |
-| Wishlist, coupons                            | Tables exist but stay unused (ADR-0015); need account and campaign UX.         |
-| Saved addresses                              | Useful after customer accounts.                                                |
-| Order tracking dashboard                     | After the order lifecycle and shipment statuses mature (D-22 decides Phase 1). |
-| Reviews, testimonials, memories              | Need real customers and moderation rules (D-10).                               |
-| Gift box builder                             | Needs a product/box combination model and UX testing; teaser only in Phase 1.  |
-| PayHere / KOKO, webhooks, refunds            | Follow once sandbox credentials exist (D-17).                                  |
-| Sanity: journal, lookbook, portfolio editing | Deferred (D-16).                                                               |
-| Shoots / shoot media tables                  | Static portfolio data until admin editing is needed (D-05).                    |
-| Search results page                          | After catalog size justifies it.                                               |
-| Playwright E2E                               | After the core flows are stable (D-18).                                        |
-| Multilingual routes                          | Need real translations and hreflang (D-15).                                    |
-| AI gift finder / stylist                     | Needs mature catalog and analytics data (Phase 3).                             |
+| Feature                                      | Reason to Wait                                                                  |
+| -------------------------------------------- | ------------------------------------------------------------------------------- |
+| Customer accounts, Google sign-in            | Admin-only auth in Phase 1 (D-03); needs the Auth.js adapter tables.            |
+| Wishlist, coupons                            | Tables exist but stay unused (ADR-0015); need account and campaign UX.          |
+| Saved addresses                              | Useful after customer accounts.                                                 |
+| Order tracking dashboard                     | After the order lifecycle and shipment statuses mature (none in Phase 1, D-22). |
+| Reviews, testimonials, memories              | Need real customers and moderation rules (D-10).                                |
+| Gift box builder                             | Needs a product/box combination model and UX testing; teaser only in Phase 1.   |
+| PayHere / KOKO, webhooks, refunds            | Follow once sandbox credentials exist (D-17).                                   |
+| Sanity: journal, lookbook, portfolio editing | Deferred (D-16).                                                                |
+| Shoots / shoot media tables                  | Static portfolio data until admin editing is needed (D-05).                     |
+| Search results page                          | After catalog size justifies it.                                                |
+| Playwright E2E                               | After the core flows are stable (D-18).                                         |
+| Multilingual routes                          | Need real translations and hreflang (D-15).                                     |
+| AI gift finder / stylist                     | Needs mature catalog and analytics data (Phase 3).                              |
 
 ## 22. Final Acceptance Checklist
 
@@ -1055,31 +1057,32 @@ These should not block the Phase 1 launch unless a business decision changes the
 
 ## 23. Changes from v1.0
 
-| Area             | v1.0                                                             | v2.0                                                                                                                                 | Source              |
-| ---------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------- |
-| Hosting          | Docker image, Jenkins, VPS                                       | Vercel + managed PostgreSQL + GitHub Actions; Jenkins deferred                                                                       | D-01, ADR-0011      |
-| Local database   | Docker Compose PostgreSQL + pgAdmin                              | Native PostgreSQL 16 + pgAdmin 4                                                                                                     | ADR-0010            |
-| Roles            | `CUSTOMER`/`ADMIN`/`SUPER_ADMIN`/`EDITOR` concept                | Table-based RBAC; lowercase roles via `user_roles`                                                                                   | D-02, ADR-0012      |
-| Auth             | Admin + optional customer/Google, adapter tables                 | Admin only, Credentials + JWT, bcryptjs; customers are guests                                                                        | D-03                |
-| Statuses         | Suggested list                                                   | Unified D-04 vocabularies in one constants module                                                                                    | D-04                |
-| Portfolio        | `/visual-portfolio`, contact_messages or new table               | `/portfolio`, `/portfolio/[slug]`, `/collaborate`; static shoots; `collaboration_inquiries`                                          | D-05 to D-07        |
-| Consultation     | Not in sprints                                                   | Request form only, WhatsApp confirmation                                                                                             | D-06                |
-| Navigation       | Shop, Women, Men, Jewelry, Gifts, Couples, Custom, Love Websites | D-08 main nav with Portfolio; Our Story, Love Websites, Collaborate in footer; no wishlist/account placeholders                      | D-08                |
-| Love Websites    | Landing                                                          | Landing + `love_website` custom request; builder Phase 3                                                                             | D-09                |
-| Content          | —                                                                | LKR, Sri Lanka only, no fake ratings/testimonials/claims                                                                             | D-10                |
-| Tailwind         | `tailwind.config.ts`                                             | Tailwind v4 CSS-first tokens in `app/globals.css`                                                                                    | D-11                |
-| Route protection | "Create middleware"                                              | Server-side guards; `proxy.ts` only for optimistic redirects                                                                         | D-12                |
-| Folder layout    | `src/app/`                                                       | `app/` at root, shared code in `src/`                                                                                                | D-14                |
-| Language         | Dictionaries for en/si/ta                                        | English only, no switch                                                                                                              | D-15                |
-| CMS              | Sanity in stack                                                  | Deferred to Phase 2                                                                                                                  | D-16                |
-| Payments         | PayHere/KOKO in stack                                            | Manual + WhatsApp; PayHere/KOKO Phase 2                                                                                              | D-17                |
-| Tests            | lint/typecheck/test assumed                                      | `typecheck` exists; Vitest in 1F; Playwright Phase 2                                                                                 | D-18                |
-| Assets           | —                                                                | No Bilesma Natural material; naming and crop rules                                                                                   | D-19                |
-| Prisma           | Single `schema.prisma`                                           | Prisma 7.8.0 pinned, `@prisma/adapter-pg`, schema split by domain, idempotent seed                                                   | ADR-0014 to 0016    |
-| Design           | Token tables only                                                | Full Brand-Identity v1.2 token set, foregrounds, shape/motion rules, dark component rules, homepage order §23, portfolio imagery §42 | Brand-Identity v1.2 |
-| Sprints          | S0–S8                                                            | Mapped to Gate A, Gate B and sprints 1A–1I                                                                                           | Implementation-Plan |
+| Area             | v1.0                                                             | v2.0                                                                                                                                 | Source                 |
+| ---------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ---------------------- |
+| Hosting          | Docker image, Jenkins, VPS                                       | Vercel + managed PostgreSQL + GitHub Actions; Jenkins deferred                                                                       | D-01, ADR-0011         |
+| Local database   | Docker Compose PostgreSQL + pgAdmin                              | Native PostgreSQL 16 + pgAdmin 4                                                                                                     | ADR-0010               |
+| Roles            | `CUSTOMER`/`ADMIN`/`SUPER_ADMIN`/`EDITOR` concept                | Table-based RBAC; lowercase roles via `user_roles`                                                                                   | D-02, ADR-0012         |
+| Auth             | Admin + optional customer/Google, adapter tables                 | Admin only, Credentials + JWT, bcryptjs; customers are guests                                                                        | D-03                   |
+| Statuses         | Suggested list                                                   | Unified D-04 vocabularies in one constants module                                                                                    | D-04                   |
+| Portfolio        | `/visual-portfolio`, contact_messages or new table               | `/portfolio`, `/portfolio/[slug]`, `/collaborate`; static shoots; `collaboration_inquiries`                                          | D-05 to D-07           |
+| Consultation     | Not in sprints                                                   | Request form only, WhatsApp confirmation                                                                                             | D-06                   |
+| Navigation       | Shop, Women, Men, Jewelry, Gifts, Couples, Custom, Love Websites | D-08 main nav with Portfolio; Our Story, Love Websites, Collaborate in footer; no wishlist/account placeholders                      | D-08                   |
+| Love Websites    | Landing                                                          | Landing + `love_website` custom request; builder Phase 3                                                                             | D-09                   |
+| Content          | —                                                                | LKR, Sri Lanka only, no fake ratings/testimonials/claims                                                                             | D-10                   |
+| Tailwind         | `tailwind.config.ts`                                             | Tailwind v4 CSS-first tokens in `app/globals.css`                                                                                    | D-11                   |
+| Route protection | "Create middleware"                                              | Server-side guards; `proxy.ts` only for optimistic redirects                                                                         | D-12                   |
+| Folder layout    | `src/app/`                                                       | `app/` at root, shared code in `src/`                                                                                                | D-14                   |
+| Language         | Dictionaries for en/si/ta                                        | English only, no switch                                                                                                              | D-15                   |
+| CMS              | Sanity in stack                                                  | Deferred to Phase 2                                                                                                                  | D-16                   |
+| Payments         | PayHere/KOKO in stack                                            | Manual + WhatsApp; PayHere/KOKO Phase 2                                                                                              | D-17                   |
+| Tests            | lint/typecheck/test assumed                                      | `typecheck` exists; Vitest in 1F; Playwright Phase 2                                                                                 | D-18                   |
+| Assets           | —                                                                | No Bilesma Natural material; naming and crop rules                                                                                   | D-19                   |
+| Prisma           | Single `schema.prisma`                                           | Prisma 7.8.0 pinned, `@prisma/adapter-pg`, schema split by domain, idempotent seed                                                   | ADR-0014 to 0016       |
+| Design           | Token tables only                                                | Full Brand-Identity v1.2 token set, foregrounds, shape/motion rules, dark component rules, homepage order §23, portfolio imagery §42 | Brand-Identity v1.2    |
+| Sprints          | S0–S8                                                            | Mapped to Gate A, Gate B and sprints 1A–1I                                                                                           | Implementation-Plan    |
+| Decisions        | D-20 to D-23 OPEN                                                | Decided: COD + bank transfer, root pillars, `collection_products`, no tracking, testimonials hidden                                  | D-20 to D-23, ADR-0017 |
 
-**Still OPEN (Gate B):** D-20 payment methods, D-21 category URL scheme and collection/category relationship, D-22 order tracking, D-23 hiding testimonials, plus the Brand-Identity gaps in 5.4 and the Phase-1-UX-Spec.
+**Still OPEN (Gate B):** the Brand-Identity gaps in 5.4 and the Phase-1-UX-Spec. D-20 to D-23 were decided on 2026-10-29 (ADR-0017).
 
 ## Source Context Used
 

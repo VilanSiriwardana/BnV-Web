@@ -37,6 +37,8 @@ This file tracks only **where we are now**. Update it as work progresses, and re
 
 See the Gate B checklist in [../references/Implementation-Plan.md](../references/Implementation-Plan.md).
 
+- [x] Decisions D-20 to D-23 and the D-08 row fix (ADR-0017, 2026-10-29).
+
 ## Gate A (M0.3) — Done 2026-10-28
 
 - [x] D-01 to D-19 decided: D-01 Vercel (ADR-0011), D-02 CHANGED to keep RBAC (ADR-0012), the rest accepted (ADR-0013).

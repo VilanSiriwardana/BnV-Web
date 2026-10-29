@@ -2,8 +2,8 @@
 
 | Field   | Value                                                                            |
 | ------- | -------------------------------------------------------------------------------- |
-| Version | 1.1                                                                              |
-| Status  | **ACCEPTED** (2026-10-28) — D-01 to D-19 decided; see ADR-0011 to ADR-0015       |
+| Version | 1.2                                                                              |
+| Status  | **ACCEPTED** (2026-10-29) — D-01 to D-23 decided; see ADR-0011 to ADR-0017       |
 | Created | 2026-10-28                                                                       |
 | Owner   | B&V project owner                                                                |
 | Purpose | Resolve conflicts between the reference documents so agents do not have to guess |
@@ -24,27 +24,31 @@ Status key: **PROPOSED** (awaiting approval), **VERIFIED** (already true in the 
 
 ## Summary
 
-| ID   | Topic                          | Recommendation                                                                                        | Blocks                        |
-| ---- | ------------------------------ | ----------------------------------------------------------------------------------------------------- | ----------------------------- |
-| D-01 | Hosting and deployment         | Vercel + managed PostgreSQL for Phase 1; GitHub Actions CI; Jenkins deferred                          | Deployment, env setup         |
-| D-02 | User roles                     | **CHANGED:** keep migrated RBAC tables; roles customer, editor, admin, super_admin                    | Identity schema, admin guards |
-| D-03 | Auth scope and tables          | Auth.js Credentials + JWT for admin only; Auth.js DB tables stay Phase 2                              | Identity schema               |
-| D-04 | Status vocabularies            | One unified list per entity (below)                                                                   | Orders, payments schema       |
-| D-05 | Portfolio data model           | Static typed shoot data + one `collaboration_inquiries` table                                         | Portfolio sprint              |
-| D-06 | Consultation booking scope     | Request form only (preferred date/time), no availability engine                                       | Portfolio sprint, phase gate  |
-| D-07 | Portfolio routes               | `/portfolio`, `/portfolio/[slug]`, `/collaborate`                                                     | Routes config, SEO            |
-| D-08 | Primary navigation             | Shop / Women / Men / Jewelry / Gifts / Couples / Custom / Portfolio, with Our Story in utility/footer | Header build                  |
-| D-09 | Love Websites scope            | Landing + inquiry in Phase 1; builder Phase 3                                                         | Custom request types          |
-| D-10 | Prototype placeholder content  | LKR, real payment methods, no fake ratings/stats                                                      | All storefront UI             |
-| D-11 | Tailwind configuration         | Tailwind v4 CSS-first tokens in `globals.css`                                                         | **VERIFIED** (ADR-0003)       |
-| D-12 | Route protection in Next.js 16 | Server-side guards in layouts/actions; check local docs for the middleware/proxy file                 | Admin build                   |
-| D-13 | UUID generation                | Prisma `@default(uuid())` with `@db.Uuid`                                                             | First domain migration        |
-| D-14 | Source folder layout           | Keep `app/` at root; shared code in `src/` with the `@/` alias                                        | Every code task               |
-| D-15 | Language handling              | English only at launch; no language switch until translations exist                                   | Header build                  |
-| D-16 | Sanity CMS                     | Deferred to Phase 2                                                                                   | —                             |
-| D-17 | Payments                       | Inquiry + manual confirmation + WhatsApp at launch; PayHere/KOKO next                                 | Checkout                      |
-| D-18 | Test tooling                   | Add `typecheck` script now; Vitest + Playwright when approved                                         | QA gates                      |
-| D-19 | Non-B&V assets                 | Exclude Bilesma Natural material from the repository                                                  | Asset import                  |
+| ID   | Topic                          | Recommendation                                                                                                                                      | Blocks                        |
+| ---- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| D-01 | Hosting and deployment         | Vercel + managed PostgreSQL for Phase 1; GitHub Actions CI; Jenkins deferred                                                                        | Deployment, env setup         |
+| D-02 | User roles                     | **CHANGED:** keep migrated RBAC tables; roles customer, editor, admin, super_admin                                                                  | Identity schema, admin guards |
+| D-03 | Auth scope and tables          | Auth.js Credentials + JWT for admin only; Auth.js DB tables stay Phase 2                                                                            | Identity schema               |
+| D-04 | Status vocabularies            | One unified list per entity (below)                                                                                                                 | Orders, payments schema       |
+| D-05 | Portfolio data model           | Static typed shoot data + one `collaboration_inquiries` table                                                                                       | Portfolio sprint              |
+| D-06 | Consultation booking scope     | Request form only (preferred date/time), no availability engine                                                                                     | Portfolio sprint, phase gate  |
+| D-07 | Portfolio routes               | `/portfolio`, `/portfolio/[slug]`, `/collaborate`                                                                                                   | Routes config, SEO            |
+| D-08 | Primary navigation             | Shop ▾ / Women / Men / Jewelry / Gifts / Couples / Custom / Portfolio; Our Story, Love Websites, Collaborate in footer (Our Story also on homepage) | Header build                  |
+| D-09 | Love Websites scope            | Landing + inquiry in Phase 1; builder Phase 3                                                                                                       | Custom request types          |
+| D-10 | Prototype placeholder content  | LKR, real payment methods, no fake ratings/stats                                                                                                    | All storefront UI             |
+| D-11 | Tailwind configuration         | Tailwind v4 CSS-first tokens in `globals.css`                                                                                                       | **VERIFIED** (ADR-0003)       |
+| D-12 | Route protection in Next.js 16 | Server-side guards in layouts/actions; check local docs for the middleware/proxy file                                                               | Admin build                   |
+| D-13 | UUID generation                | Prisma `@default(uuid())` with `@db.Uuid`                                                                                                           | First domain migration        |
+| D-14 | Source folder layout           | Keep `app/` at root; shared code in `src/` with the `@/` alias                                                                                      | Every code task               |
+| D-15 | Language handling              | English only at launch; no language switch until translations exist                                                                                 | Header build                  |
+| D-16 | Sanity CMS                     | Deferred to Phase 2                                                                                                                                 | —                             |
+| D-17 | Payments                       | Inquiry + manual confirmation + WhatsApp at launch; PayHere/KOKO next                                                                               | Checkout                      |
+| D-18 | Test tooling                   | Add `typecheck` script now; Vitest + Playwright when approved                                                                                       | QA gates                      |
+| D-19 | Non-B&V assets                 | Exclude Bilesma Natural material from the repository                                                                                                | Asset import                  |
+| D-20 | Checkout payment methods       | `cod` and `bank_transfer` (`provider = manual`), with WhatsApp confirmation; existing columns                                                       | Checkout (1F)                 |
+| D-21 | Catalog URLs and collections   | Root pillars, `/[pillar]/[sub]`, New In = newest, no Home & Living, `collection_products` many-to-many                                              | Schema (1C), catalog (1E)     |
+| D-22 | Order tracking                 | None in Phase 1; status updates by WhatsApp or email                                                                                                | Checkout (1F), footer         |
+| D-23 | Testimonials                   | Hidden until real, permissioned testimonials exist; no review markup                                                                                | Homepage (1D)                 |
 
 ---
 
@@ -89,20 +93,21 @@ Reconsider if customer Google sign-in becomes a launch requirement.
 
 ## D-04 — Unified Status Vocabularies
 
-| Entity                           | Values (Phase 1 subset in bold)                                                                 |
-| -------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `products.status`                | **draft, active, archived**                                                                     |
-| `carts.status`                   | **active, converted, abandoned**                                                                |
-| `orders.status`                  | **inquiry_received, pending_confirmation, confirmed, preparing, cancelled**, shipped, delivered |
-| `orders.payment_status`          | **not_required, pending, paid**, failed, refunded                                               |
-| `payments.provider`              | **manual**, payhere, koko                                                                       |
-| `payments.status`                | **pending, paid**, failed, cancelled, refunded                                                  |
-| `custom_requests.status`         | **new, reviewing, quoted, accepted, rejected, completed**                                       |
-| `custom_requests.request_type`   | **custom_fashion, custom_jewelry, gift_box, embroidery, engraving, love_website, other**        |
-| `contact_messages.status`        | **new, read, replied, archived**                                                                |
-| `collaboration_inquiries.status` | **new, reviewing, replied, accepted, declined, archived**                                       |
-| `newsletter_subscribers.status`  | **active, unsubscribed**                                                                        |
-| `users.status`                   | **active, disabled** (deleted = soft state)                                                     |
+| Entity                                     | Values (Phase 1 subset in bold)                                                                 |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `products.status`                          | **draft, active, archived**                                                                     |
+| `carts.status`                             | **active, converted, abandoned**                                                                |
+| `orders.status`                            | **inquiry_received, pending_confirmation, confirmed, preparing, cancelled**, shipped, delivered |
+| `orders.payment_status`                    | **not_required, pending, paid**, failed, refunded                                               |
+| `payments.provider`                        | **manual**, payhere, koko                                                                       |
+| `payments.status`                          | **pending, paid**, failed, cancelled, refunded                                                  |
+| `orders.payment_method`, `payments.method` | **cod, bank_transfer** (D-20); Phase 2 methods arrive with PayHere/KOKO                         |
+| `custom_requests.status`                   | **new, reviewing, quoted, accepted, rejected, completed**                                       |
+| `custom_requests.request_type`             | **custom_fashion, custom_jewelry, gift_box, embroidery, engraving, love_website, other**        |
+| `contact_messages.status`                  | **new, read, replied, archived**                                                                |
+| `collaboration_inquiries.status`           | **new, reviewing, replied, accepted, declined, archived**                                       |
+| `newsletter_subscribers.status`            | **active, unsubscribed**                                                                        |
+| `users.status`                             | **active, disabled** (deleted = soft state)                                                     |
 
 This supersedes Section 10 of the Database Design Reference for these entities. Keep them as strings and centralise the allowed values in one TypeScript constants module, validated with Zod.
 
@@ -219,7 +224,7 @@ Deferred to Phase 2 (journal, lookbook, portfolio editing). Phase 1 content is s
 
 ## D-17 — Payments
 
-Phase 1 checkout creates an order with status `inquiry_received` and a `payments` row with `provider = manual`. A WhatsApp confirmation link is shown on success. PayHere and KOKO integration (with webhook verification and idempotency) follows once sandbox credentials exist.
+Phase 1 checkout creates an order with status `inquiry_received` and a `payments` row with `provider = manual`. A WhatsApp confirmation link is shown on success. PayHere and KOKO integration (with webhook verification and idempotency) follows once sandbox credentials exist. Checkout methods: see D-20.
 
 **Status:** ACCEPTED (2026-10-28). See ADR-0013.
 
@@ -239,3 +244,76 @@ Phase 1 checkout creates an order with status `inquiry_received` and a `payments
 The `Posters_and_Image_ideas` archive belongs to Bilesma Natural, an Ayurvedic skincare client used as the SEO audit reference. Do not import it into the B&V repository. Keep only the learnings: hero pairs at 1920×650 (web) and 1080×1080 (mobile), and product image sets of main, detail, benefits, and context shots.
 
 **Status:** ACCEPTED (2026-10-28). See ADR-0013.
+
+## D-20 — Checkout Payment Methods
+
+**Conflict.** D-17 only says "inquiry + manual confirmation + WhatsApp". [Research_and_Prototype.md](Research_and_Prototype.md) recommends naming Cash on Delivery (COD), bank transfer and WhatsApp at checkout, and no document says where the chosen method is stored.
+
+| Option                                                      | Advantages                                                    | Disadvantages                                                  |
+| ----------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------- |
+| A. `cod` and `bank_transfer`; WhatsApp confirms every order | Matches the 52% COD preference in Sri Lanka; clean vocabulary | Needs a COD courier and bank details (Gate B business content) |
+| B. Bank transfer only                                       | No COD refusals at the door                                   | Loses COD buyers                                               |
+| C. `cod`, `bank_transfer` and `whatsapp` as three methods   | Mirrors the research wording                                  | WhatsApp is a confirmation channel, not a payment method       |
+
+**Recommendation: A.**
+
+- Checkout offers Cash on Delivery and bank transfer. Both are `payments.provider = manual`.
+- The chosen value (`cod` or `bank_transfer`) is stored in `orders.payment_method` and in `payments.method` on the manual payment row created at checkout. **VERIFIED:** both columns already exist in `prisma/schema/commerce.prisma`, so no schema change is needed. The values live with the D-04 constants.
+- Phone is required at checkout (Zod validation; the `orders.customer_phone` column stays nullable).
+- COD orders are confirmed by phone or WhatsApp before dispatch.
+- Bank transfer: payment details are sent after the order is placed, and the admin marks the payment `paid` once the transfer is verified.
+- Bank details and the COD courier are Gate B business content and are not recorded here.
+- Online methods follow with PayHere/KOKO in Phase 2 (D-17).
+
+**Status:** ACCEPTED (2026-10-29). See ADR-0017.
+
+## D-21 — Catalog URL Scheme, New In, Home & Living, and Collections
+
+**Conflict.** The references disagree on `/women` versus `/shop/women` and on what "New In" means. The shop mockup has a Home & Living tab. Every product must belong to exactly one collection (`products.collection_id` is required), so a product cannot be in both Jewelry Highlight and Gift Ready.
+
+| Option (collections)                                               | Advantages                         | Disadvantages                    |
+| ------------------------------------------------------------------ | ---------------------------------- | -------------------------------- |
+| A. Keep one required collection per product ("Core Range" default) | No schema change                   | One collection per product       |
+| B. Make `products.collection_id` nullable                          | Small change                       | Still one collection per product |
+| C. `collection_products` many-to-many join table                   | Fits the curated homepage sections | Larger change in 1C              |
+
+**Recommendation.**
+
+- **URLs:** category pillars stay at the root (`/women`, `/men`, `/jewelry`, `/gifts`, `/couples`), as in [SEO-Guide.md](SEO-Guide.md) §8.
+  - Subcategories use `/[pillar]/[sub]`, resolved to the category slug `<pillar>-<sub>`. **VERIFIED:** the seeded child slugs follow this rule (`women-dresses`, `gifts-candles-home`); new child categories must keep it.
+  - `/shop` lists all products. `/collections/[slug]` and `/products/[slug]` are canonical and do not depend on the category.
+  - Filter and sort parameters are not indexable and canonicalise to the base path.
+- **New In:** computed as active products ordered by `created_at`, newest first. The "New In" navigation item links to `/shop?sort=newest`. Homepage section 5 shows the newest products plus the `limited-drop` collection.
+- **Home & Living:** no pillar. Home items sit under Gifts (`gifts-candles-home`).
+- **Collections: option C.** Collections are curated sets that cut across categories. In sprint 1C the `collection_products` join table (with a sort order; see [Database-Design-Reference.md](Database-Design-Reference.md)) replaces `products.collection_id`. Each product keeps a single `category_id` in Phase 1.
+- **Custom:** `/custom` is the custom-order service page and request form (D-09). The seeded `custom` category is retired in 1C.
+- **1C seed follow-ups:** retire the `core-range`, `new-arrivals` and `custom` seed entries; demo products move to `collection_products`.
+
+**Status:** ACCEPTED (2026-10-29). See ADR-0017.
+
+## D-22 — Order Tracking
+
+**Conflict.** [Research_and_Prototype.md](Research_and_Prototype.md) lists order tracking (order number plus phone or email) in Phase 1. [Phase-Development.md](Phase-Development.md) and [Database-Design-Reference.md](Database-Design-Reference.md) put it in Phase 2, and D-07 defines no route for it.
+
+| Option                                                       | Advantages                                           | Disadvantages                                                                      |
+| ------------------------------------------------------------ | ---------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| A. No tracking route in Phase 1                              | Smallest scope; fits the manual, WhatsApp-led launch | Customers ask for updates                                                          |
+| B. `/track-order` lookup by order number plus phone or email | Self-service; no schema change                       | Needs rate limiting against order-number guessing, a noindex page and another form |
+
+**Recommendation: A.** The admin sends status updates by WhatsApp or email. The footer does not show "Track Order". A rate-limited lookup route follows in Phase 2 together with shipments.
+
+**Status:** ACCEPTED (2026-10-29). See ADR-0017.
+
+## D-23 — Testimonials and Reviews
+
+**Conflict.** The homepage order (Brand-Identity §23, item 14) includes Testimonials / Memories. The prototype shows fixed ratings and invented testimonials (D-10), and [Research_and_Prototype.md](Research_and_Prototype.md) recommends "Love Notes" testimonials, a label D-08 rejects.
+
+**Recommendation.**
+
+- The Testimonials / Memories section renders only when at least one real testimonial exists with the customer's written permission. The data is typed static data in `src/data/` (D-14); the section is skipped when the list is empty.
+- No star ratings and no `Review` or `AggregateRating` structured data in Phase 1.
+- No "Love Notes" label (D-08).
+- The same rule applies to partner testimonials on `/collaborate`.
+- Verified-purchase reviews follow in Phase 2.
+
+**Status:** ACCEPTED (2026-10-29). See ADR-0017.

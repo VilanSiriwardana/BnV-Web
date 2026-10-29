@@ -13,7 +13,7 @@ Last refreshed: 2026-10-28 (reference pack v1.1).
 | [Brand-Identity.md](Brand-Identity.md)                             | 1.2            | Design system, semantic tokens, typography, UI, imagery, motion, accessibility, dark mode              |
 | [Phase-Development.md](Phase-Development.md)                       | 1.1            | Phase 1–4 roadmap, Phase 1 pages, portfolio hub spec, phase gate                                       |
 | [Phase-1-Step-by-Step.md](Phase-1-Step-by-Step.md)                 | 2.0            | Phase 1 build guidance aligned with D-01 to D-19, ADR-0010 to 0016 and Brand-Identity v1.2             |
-| [Phase-1-Reconciled-Decisions.md](Phase-1-Reconciled-Decisions.md) | 1.0 (PROPOSED) | Resolutions for conflicts between the documents above. **Check here first when references disagree.**  |
+| [Phase-1-Reconciled-Decisions.md](Phase-1-Reconciled-Decisions.md) | 1.2 (ACCEPTED) | Resolutions for conflicts between the documents above. **Check here first when references disagree.**  |
 | [Technology-Stack.md](Technology-Stack.md)                         | 1.1            | Approved and verified-installed stack, tools, version policy                                           |
 | [Database-Design-Reference.md](Database-Design-Reference.md)       | 1.0 + addendum | Full Phase 1–4 table blueprint, statuses, indexes, JSONB rules, seed plan                              |
 | [Database-Design.md](Database-Design.md)                           | 1.1            | Prisma BaseModel Convention: naming, keys, money, timestamps, layout, workflow                         |

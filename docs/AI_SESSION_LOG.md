@@ -237,3 +237,28 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 ### Files Modified
 
 - `docs/references/Phase-1-Step-by-Step.md`, `docs/references/README.md` (version row), this file. No code, schema, config or asset changes.
+
+## 2026-10-29 - Gate B: Decisions D-20 to D-23 (ADR-0017) and Spec Sync
+
+### Summary
+
+- Blueprint 003: Reconciled Decisions v1.2 (D-08 row fixed; D-20 to D-23 ACCEPTED), ADR-0017, Phase-1-Step-by-Step v2.1 (all `OPEN (D-2x)` markers resolved), Implementation-Plan (1C/1F rows corrected), PLAN.md.
+- Blueprint 002 steps 2–6: Brand-Identity v1.3 (computed contrast, full light/dark token set, shadcn mapping, `gold`/`primary-text`/`gold-text`, scales); new Business-Facts.md (all values TBD); Research_and_Prototype v1.1 (counts corrected, superseded notes); new Phase-1-UX-Spec.md (PROPOSED); `BnV Docs/` duplicates and non-B&V material moved to `BnV Docs/_archive/`.
+- Owner ran `npm run db:seed` twice: identical counts (roles 4, permissions 7, role_permissions 15, super admin, brands 1, categories 18, collections 7). Closes the Gate A seed verification. Demo seed not yet run.
+
+### Verification
+
+- Prototype counts re-verified from `App.tsx`: 56 `PageId` values; 22 unique Unsplash URLs (102 references).
+- Contrast: 36 token pairs computed with a script; all pass (≥ 4.5 text, ≥ 3 UI). Six v1.2 pairs failed and were changed.
+- Archive: every moved folder/zip was SHA-256 checked first (Phase 2 sets 40/40 match; all 9 zips fully present as loose files). `BnV Docs/` file count 451 before and after; hash multiset identical.
+- Image library after cleanup: 276 unique images, 533 MB, 0 duplicates.
+
+### Remaining Work
+
+- Owner approval of the image curation, then export to `public/images/prototype/` (blueprint 002 step 7), Visual-Asset-Inventory v2.0 (step 8), and housekeeping/gate close (step 10).
+- Owner values in Business-Facts.md; open items in Phase-1-UX-Spec.md.
+
+### Known Gotchas
+
+- No Python on this machine; use Node for scripted edits.
+- `D-20` needs no schema change: `orders.payment_method` and `payments.method` already exist.

@@ -284,3 +284,25 @@ Each decision should include:
 - Related Documents:
   - [../governance/AGENTS.md](../governance/AGENTS.md) (Prisma Schema Source of Truth)
   - [../references/Database-Design.md](../references/Database-Design.md)
+
+## ADR-0017 - Accept Phase 1 Decisions D-20 to D-23
+
+- Status: Accepted
+- Date: 2026-10-29
+- Context: The Gate B sync audit left four Phase 1 questions open (payment methods, catalog URLs and collections, order tracking, testimonials), and the D-08 summary row contradicted its own body. They block the Phase-1-UX-Spec, the sprint 1C schema work and the 1D–1F builds.
+- Decision:
+  - D-08: summary row corrected. Our Story, Love Websites and Collaborate are in the footer; Our Story is also on the homepage.
+  - D-20: checkout offers Cash on Delivery and bank transfer (`cod`, `bank_transfer`, `provider = manual`), with WhatsApp confirmation for every order. Phone is required at checkout; COD orders are confirmed before dispatch.
+  - D-21: category pillars at the root with subcategories at `/[pillar]/[sub]`; "New In" is the newest active products (`/shop?sort=newest`); no Home & Living pillar; collections become many-to-many through `collection_products`; `/custom` is a service page only.
+  - D-22: no order tracking route in Phase 1.
+  - D-23: testimonials stay hidden until real, permissioned ones exist; no `Review` or `AggregateRating` markup.
+- Alternatives: Bank transfer only, or WhatsApp as a third method (D-20); `/shop/[category]`, a curated New In collection, or a nullable single collection (D-21); a `/track-order` lookup (D-22).
+- Consequences:
+  - D-20 needs no schema change: `orders.payment_method` and `payments.method` already exist (verified in `prisma/schema/commerce.prisma`).
+  - Sprint 1C adds `collection_products`, drops `products.collection_id`, and retires the `core-range`, `new-arrivals` and `custom` seed entries. This supersedes ADR-0015's "Core Range until `products.collection_id` becomes nullable" line.
+  - Sprint 1F has no tracking route.
+  - The Research_and_Prototype corrections remain a separate Gate B item.
+- Related Documents:
+  - [../references/Phase-1-Reconciled-Decisions.md](../references/Phase-1-Reconciled-Decisions.md) (D-20 to D-23)
+  - [../references/SEO-Guide.md](../references/SEO-Guide.md) (§8 routes)
+  - [../references/Database-Design-Reference.md](../references/Database-Design-Reference.md) (`collection_products`)
