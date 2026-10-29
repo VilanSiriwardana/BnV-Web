@@ -444,3 +444,24 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 ### Known Gotchas
 
 - `Omit` on the collaboration discriminated union keeps only the shared keys at type level. The runtime spread still carries the variant fields to Prisma.
+
+## 2026-10-29 - Sprint 1I SEO, QA, CI (code only)
+
+### Summary
+
+- Implemented blueprint `.claude/blueprints/015-sprint-1i-seo-qa-ci.md`. Decisions: Supabase for production Postgres (ADR-0011 amendment); robots blocks only `/admin` and `/api/`; generated OG image, `/api/health` and security headers in scope; no deploy until the domain is confirmed.
+- Added Twitter/OG defaults to `pageMetadata`, Organization and WebSite JSON-LD in the root layout, `app/error.tsx`, `app/global-error.tsx`, `app/opengraph-image.tsx`, the cookie-consent banner with consent-gated GA4 (`src/components/consent/`, `src/lib/consent.ts`), a footer "Cookie settings" link, `.github/workflows/ci.yml` and `postinstall: prisma generate`.
+
+### Deviations
+
+- Step 3 skipped: `CatalogListing` already renders CollectionPage and Breadcrumb JSON-LD.
+- Next 16 error boundaries use `unstable_retry` (not `reset`).
+
+### Known Gotchas
+
+- `next build` queries the database (static product and collection params), so CI runs a Postgres 16 service plus `db:deploy` before the build.
+- `brand` values are typed as literal `null`; cast to `string | null` before narrowing.
+
+### Open
+
+- Lighthouse, PSI and accessibility passes; Vercel + Supabase setup; domain; GA4 and Search Console IDs.

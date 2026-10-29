@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { CookieSettingsButton } from '@/components/consent/cookie-consent';
 import { brand } from '@/config/brand';
 import { footerNav } from '@/config/navigation';
 
@@ -61,7 +62,7 @@ export function SiteFooter() {
         ))}
       </div>
       <div className="border-border text-caption text-muted-foreground border-t px-4 py-6 text-center">
-        © {new Date().getFullYear()} {brand.name}
+        © {new Date().getFullYear()} {brand.name} · <CookieSettingsButton />
       </div>
     </footer>
   );

@@ -31,7 +31,7 @@ This file tracks only **where we are now**. Update it as work progresses, and re
 | 1F Cart + checkout inquiry    | Built (2026-10-29); manual QA (full order flow, themes) pending         |
 | 1G Custom, Contact, Portfolio | Built (2026-10-29); manual QA (form submissions, themes) pending        |
 | 1H Admin MVP                  | Built (2026-10-29); manual QA pending (login, dispatch, uploads)        |
-| 1I SEO, QA, deploy            | Not started                                                             |
+| 1I SEO, QA, deploy            | Code built (2026-10-29); Lighthouse QA and deploy pending (domain TBD)  |
 
 ## Current Milestone: Gate B (Sprint 0.5 Spec Sync)
 

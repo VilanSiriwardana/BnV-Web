@@ -17,6 +17,7 @@
     "db:reset": "prisma migrate reset --force && npm run db:seed",
     "db:setup": "npm run db:generate && npm run db:deploy && npm run db:seed",
     "db:studio": "prisma studio",
+    "postinstall": "prisma generate",
     "prepare": "husky",
     "test": "vitest run"
   },

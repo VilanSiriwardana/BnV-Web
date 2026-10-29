@@ -1,4 +1,5 @@
 import { brand } from '@/config/brand';
+import { siteConfig } from '@/config/seo';
 
 import { absoluteUrl } from './canonical';
 
@@ -56,6 +57,39 @@ export const productJsonLd = (p: ProductLd) => ({
       ? 'https://schema.org/InStock'
       : 'https://schema.org/OutOfStock',
   },
+});
+
+export const organizationJsonLd = () => {
+  const sameAs = (Object.values(brand.social) as (string | null)[]).filter(
+    (href): href is string => !!href,
+  );
+  const logo = brand.logo.light as string | null;
+  const whatsapp = brand.contact.whatsapp as string | null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: brand.name,
+    url: absoluteUrl('/'),
+    description: siteConfig.description,
+    ...(logo && { logo: absoluteUrl(logo) }),
+    ...(sameAs.length > 0 && { sameAs }),
+    ...(whatsapp && {
+      contactPoint: {
+        '@type': 'ContactPoint',
+        telephone: whatsapp,
+        contactType: 'customer service',
+        areaServed: brand.country,
+      },
+    }),
+  };
+};
+
+export const websiteJsonLd = () => ({
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: brand.name,
+  url: absoluteUrl('/'),
+  inLanguage: brand.locale,
 });
 
 export function JsonLd({ data }: { data: object }) {

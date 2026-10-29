@@ -6,8 +6,12 @@ import { CartProvider } from '@/components/cart/cart-provider';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
 import { StorefrontChrome } from '@/components/layout/storefront-chrome';
+import { Analytics } from '@/components/consent/analytics';
+import { CookieConsent } from '@/components/consent/cookie-consent';
 import { ThemeProvider } from '@/components/theme/theme-provider';
+import { brand } from '@/config/brand';
 import { siteConfig } from '@/config/seo';
+import { JsonLd, organizationJsonLd, websiteJsonLd } from '@/lib/seo/jsonld';
 
 import './globals.css';
 
@@ -32,6 +36,15 @@ export const metadata: Metadata = {
     template: siteConfig.titleTemplate,
   },
   description: siteConfig.description,
+  openGraph: {
+    type: 'website',
+    siteName: brand.name,
+    locale: siteConfig.locale,
+  },
+  twitter: { card: 'summary_large_image' },
+  ...(process.env.NEXT_PUBLIC_GSC_VERIFICATION && {
+    verification: { google: process.env.NEXT_PUBLIC_GSC_VERIFICATION },
+  }),
 };
 
 export default function RootLayout({
@@ -46,6 +59,8 @@ export default function RootLayout({
       className={`${inter.variable} ${playfair.variable} h-full`}
     >
       <body className="flex min-h-full flex-col">
+        <JsonLd data={organizationJsonLd()} />
+        <JsonLd data={websiteJsonLd()} />
         <ThemeProvider>
           <CartProvider>
             <StorefrontChrome>
@@ -55,6 +70,8 @@ export default function RootLayout({
             <StorefrontChrome>
               <SiteFooter />
               <CartDrawer />
+              <CookieConsent />
+              <Analytics />
             </StorefrontChrome>
           </CartProvider>
         </ThemeProvider>

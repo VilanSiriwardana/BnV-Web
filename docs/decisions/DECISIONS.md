@@ -188,6 +188,7 @@ Each decision should include:
   - Serverless connection limits require a pooled `DATABASE_URL` in production.
   - The single-VPS pilot in Hosting_Deployment.md is not used for Phase 1.
   - Local development stays on native PostgreSQL (ADR-0010).
+  - Amendment 2026-10-29 (sprint 1I): the production provider is Supabase (pooled connection string).
 - Related Documents:
   - [../references/Phase-1-Reconciled-Decisions.md](../references/Phase-1-Reconciled-Decisions.md) (D-01)
   - [../references/Hosting_Deployment.md](../references/Hosting_Deployment.md)
