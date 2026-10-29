@@ -331,3 +331,30 @@ Closed Gate A (milestone M0.3):
 ### Next Step
 
 - Gate B (Sprint 0.5 Spec Sync).
+
+## 2026-10-29 - Gate B Spec Sync (Partial)
+
+### Summary
+
+- Decisions D-20 to D-23 accepted (ADR-0017); D-08 summary row fixed.
+- Brand-Identity v1.3 (computed contrast, full token set, shadcn mapping, scales), Research_and_Prototype v1.1, Phase-1-Step-by-Step v2.1, Implementation-Plan v1.2.
+- New references: Phase-1-UX-Spec.md (PROPOSED) and Business-Facts.md (values TBD).
+- Image library cleaned (duplicates and non-B&V material moved to `BnV Docs/_archive/`), 124 WebP placeholders exported to `public/images/prototype/`, Visual-Asset-Inventory v2.0 with a mapping CSV.
+
+### Files Changed
+
+- `docs/references/**` (including new `Business-Facts.md`, `Phase-1-UX-Spec.md`, `assets/image-mapping.csv`), `docs/decisions/DECISIONS.md`, `docs/governance/{PLAN,PROGRESS}.md`, `docs/AI_SESSION_LOG.md`.
+- `public/images/prototype/` (124 new WebP files).
+
+### Database Changes
+
+- None.
+
+### Tests
+
+- Contrast script: 36 pairs pass. Export check: 124 files, correct dimensions, all ≤ 300 KB. Archive move: file count and hashes unchanged.
+
+### Next Step
+
+- Owner: fill Business-Facts.md and commission the logo and real photography.
+- Phase 1 sprint 1A.

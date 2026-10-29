@@ -1,6 +1,6 @@
 # B&V Implementation Plan
 
-Version: 1.1 (2026-10-28)
+Version: 1.2 (2026-10-29)
 
 This is the master plan for building B&V, from where the project stands now through Phase 4. It is a stable reference: work through it top to bottom, finishing each gate before starting the next.
 
@@ -132,7 +132,7 @@ Overall: Brand-Identity and the Reconciled Decisions mostly agree. The prototype
 
 ### Gate B checklist
 
-- [ ] **Brand-Identity v1.2:**
+- [x] (2026-10-29) **Brand-Identity v1.3:**
   - Shadcn token mapping (decide what shadcn's hover `accent` is).
   - Contrast-safe lavender and gold text variants.
   - Fix `muted` and `muted-foreground`.
@@ -145,8 +145,8 @@ Overall: Brand-Identity and the Reconciled Decisions mostly agree. The prototype
   - Add D-21: category URL scheme (`/women` vs `/shop/women`), what "New In" means, whether Home & Living exists, and how collections relate to categories.
   - Add D-22: order tracking in Phase 1, yes or no, and its route.
   - Add D-23: hide the testimonials section until real reviews exist.
-- [ ] **Research_and_Prototype.md:** correct the counts. Mark Love Notes, promo codes and the checkout payment recommendations as superseded by the decisions.
-- [ ] **New reference `Phase-1-UX-Spec.md`** covering everything neither the docs nor the prototype define:
+- [x] (v1.1, 2026-10-29) **Research_and_Prototype.md:** correct the counts. Mark Love Notes, promo codes and the checkout payment recommendations as superseded by the decisions.
+- [x] (PROPOSED, 2026-10-29) **New reference `Phase-1-UX-Spec.md`** covering everything neither the docs nor the prototype define:
   - Sri Lanka checkout: district and city fields, delivery fee table, gift options, consent.
   - The Shop mega menu.
   - `/portfolio`, `/portfolio/[slug]` and `/collaborate` layouts, and the shoot and media data shape (D-05).
@@ -157,19 +157,19 @@ Overall: Brand-Identity and the Reconciled Decisions mostly agree. The prototype
   - `next/image` aspect-ratio rules.
   - Variant options per category, the size guide, and related-product rules.
   - Per-page metadata and OG templates.
-- [ ] **Business content (owner):**
+- [ ] **Business content (owner)** — fields set up as TBD in [Business-Facts.md](Business-Facts.md):
   - WhatsApp number, email, domain and social handles.
   - Delivery fees in LKR and the free-delivery threshold.
   - The returns window and policy texts.
   - Verified material claims (925 silver, 18k gold and similar).
-- [ ] **Asset preparation:**
+- [x] (2026-10-29) **Asset preparation:**
   - Remove the duplicate root `Phase 2/`, `Phase2/` and `Phase2.zip`. Archive the redundant zips.
   - Move `Posters and Image ideas*` out of the B&V folders (D-19).
   - Curate about 2 banners per Phase 1 page (light and dark) and 4–8 product images per category. Exclude the mockups, the watermarked file, the long-name JPG, and any image with wrong in-image text.
   - Rename to `<area>-<subject>-<variant>.webp` and keep an old→new mapping CSV.
   - Crop banners to 1920×650 and 1080×1080. Product images stay 4:5 at about 1200px. Export as WebP/AVIF at quality 75–80.
   - Place them in `public/images/prototype/` (placeholders) and `public/images/brand/`.
-- [ ] **Rewrite Visual-Asset-Inventory.md:** full inventory, a confirmed banner-to-page mapping, crop gaps, exclusions.
+- [x] (v2.0, 2026-10-29) **Rewrite Visual-Asset-Inventory.md:** full inventory, a confirmed banner-to-page mapping, crop gaps, exclusions.
 - [ ] **Commission (launch-blocking, not dev-blocking):** logo SVG, favicon and app icons, OG image, real Buwi and Vila photos (Our Story, Portfolio, Collaborate), real product photography.
 
 ---
@@ -183,7 +183,7 @@ Every sprint must pass `npm run lint`, `npm run typecheck` and `next build` befo
 | Sprint | Name                            | Deliverables                                                                                                                                                                                                                                                                                                                                                                                                  | Exit check                                    | Approval needed                  | References                                                              |
 | ------ | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- | -------------------------------- | ----------------------------------------------------------------------- |
 | 1A     | Foundation finish (S0)          | `src/{config,components,features,lib,data,types}`, `src/config/{brand,navigation,routes,seo}.ts` (brand config holds the business values from Gate B), `@/` alias                                                                                                                                                                                                                                             | lint + typecheck clean                        | —                                | D-14, Technology-Stack                                                  |
-| 1B     | Design system (S1)              | Brand-Identity v1.2 tokens (light and dark) in `app/globals.css`, Playfair + Inter via `next/font`, theme provider and saved toggle, shadcn via CLI + cva primitives (Button, Badge, Input, Card, Sheet, Accordion), Header, MegaMenu, MobileNav, Footer per D-08, noindex `/style-guide`                                                                                                                     | Visual review in both themes; contrast passes | shadcn CLI                       | Brand-Identity §14–41, D-08, D-11, D-15                                 |
+| 1B     | Design system (S1)              | Brand-Identity v1.3 tokens (light and dark) in `app/globals.css`, Playfair + Inter via `next/font`, theme provider and saved toggle, shadcn via CLI + cva primitives (Button, Badge, Input, Card, Sheet, Accordion), Header, MegaMenu, MobileNav, Footer per D-08, noindex `/style-guide`                                                                                                                     | Visual review in both themes; contrast passes | shadcn CLI                       | Brand-Identity §14–41, D-08, D-11, D-15                                 |
 | 1C     | Database completion (S2)        | Schema additions for D-02 to D-05 (role field, custom/collaboration/contact inquiries, newsletter subscribers, settings) and D-21 `collection_products` join table (drops `products.collection_id`; retires `core-range`, `new-arrivals`, `custom`); `src/lib/prisma.ts` singleton; `prisma/seed/index.ts` (categories, collections, sample products using the curated placeholder images, first super_admin) | `prisma migrate dev` + seed run clean         | Schema, migration, seed          | Database-Design-Reference, Database-Standards, D-02 to D-05, D-13, D-21 |
 | 1D     | Homepage (S3)                   | Sections in Brand-Identity §23 order (including Couple Collection, Custom Orders and the Portfolio preview); data from the DB; newsletter server action with consent                                                                                                                                                                                                                                          | Renders from the DB in both themes            | —                                | Brand-Identity §23, Phase-Development §4                                |
 | 1E     | Catalog + PDP (S4)              | `/shop`, category pillars (D-21 URL scheme), `/collections/[slug]`, `/products/[slug]` with variants and gallery, non-indexable filters, Product JSON-LD, size guide                                                                                                                                                                                                                                          | Browsing works end to end                     | —                                | SEO-Guide, UX-Spec                                                      |
@@ -249,3 +249,4 @@ Physical studio and showroom, photoshoot packages, content production house, caf
 
 - 1.0 (2026-10-28): First version, based on the status audit and on the cross-check of the brand docs, prototype and images.
 - 1.1 (2026-10-28): Gate A marked done (ADR-0011 to ADR-0015), seeding added.
+- 1.2 (2026-10-29): Gate B spec sync done except the owner business values and commissions; D-20 to D-23 accepted (ADR-0017); 1C and 1F rows corrected.

@@ -1,4 +1,5 @@
 # Ecommerce Hosting & Deployment — Cross-Document Review (B&V Impact)
+
 ## Final Knowledge and Reference Document
 
 **Project:** B&V (Buwi & Vila) Ecommerce Platform, and a separate agricultural ecommerce store (Anuradhapura)
@@ -7,6 +8,8 @@
 **Date generated:** 28 October 2026
 **Status:** Working Reference. The platform selection is pending validation.
 **Prepared from:** Review of the supplied Ecommerce Hosting & Deployment Final Reference Document v1.0 (28 October 2026). The review cross-checked it against the B&V Logging, Payment and Google OAuth references.
+
+> **Phase 1 hosting is decided by ADR-0011 (Vercel + managed PostgreSQL, D-01).** This document is retained for the self-hosting option.
 
 > This document records the review of the hosting decision and its consequences for the other B&V designs. The hosting source document remains the detailed specification. No server, deployment, bill or test was verified.
 
@@ -35,23 +38,23 @@
 19. AI Agent Handoff Context
 20. Glossary
 21. References
-Appendix A — Decision Register
-Appendix B — B&V Document Update Register
+    Appendix A — Decision Register
+    Appendix B — B&V Document Update Register
 
 ---
 
 ## Document Control
 
-| Field | Value |
-|---|---|
-| Document purpose | Hosting decision reference and cross-document impact record |
-| Scope | Deployment options, cost model, single-VPS architecture, operations, and impact on the B&V logging, payment and authentication designs |
-| Current status | Research complete; provider not selected; nothing deployed |
-| Intended audience | Developers, technical leads, business stakeholders, AI coding agents |
-| Source period covered | Hosting source dated 28 October 2026 |
-| Version | 1.0 |
-| Last updated | 28 October 2026 |
-| Primary source of truth | Live provider pricing and terms at procurement; current code when available |
+| Field                   | Value                                                                                                                                  |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Document purpose        | Hosting decision reference and cross-document impact record                                                                            |
+| Scope                   | Deployment options, cost model, single-VPS architecture, operations, and impact on the B&V logging, payment and authentication designs |
+| Current status          | Research complete; provider not selected; nothing deployed                                                                             |
+| Intended audience       | Developers, technical leads, business stakeholders, AI coding agents                                                                   |
+| Source period covered   | Hosting source dated 28 October 2026                                                                                                   |
+| Version                 | 1.0                                                                                                                                    |
+| Last updated            | 28 October 2026                                                                                                                        |
+| Primary source of truth | Live provider pricing and terms at procurement; current code when available                                                            |
 
 ---
 
@@ -100,6 +103,7 @@ The hosting research began for an **agricultural ecommerce store** in Anuradhapu
 ## 3. Scope
 
 ### In Scope
+
 - Deployment options.
 - Cost components.
 - One-instance architecture.
@@ -111,12 +115,14 @@ The hosting research began for an **agricultural ecommerce store** in Anuradhapu
 - Impact on the other B&V designs.
 
 ### Out of Scope
+
 - Storefront implementation.
 - Legal approval for regulated agrochemicals.
 - Tax and legal advice.
 - Multi-region high-availability design.
 
 ### Assumptions
+
 - Low initial traffic.
 - A small team.
 - PostgreSQL for B&V; the agricultural database engine is unconfirmed.
@@ -127,19 +133,20 @@ The hosting research began for an **agricultural ecommerce store** in Anuradhapu
 
 ## 4. Current Verified State
 
-| Item | State | Label |
-|---|---|---|
-| B&V stack baseline (Next.js, Prisma, PostgreSQL, Auth.js, Sanity, Cloudinary, PayHere/KOKO, Vercel→Railway) | Documented | VERIFIED (documentation only) |
-| Agricultural app runtime and database | Unknown | UNCERTAIN |
-| Hosting account, server, deployment, tests, bills | None supplied | NOT STARTED |
-| Provider choice | DigitalOcean recommended; Lightsail alternative | PLANNED / UNCERTAIN |
+| Item                                                                                                        | State                                           | Label                         |
+| ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------- | ----------------------------- |
+| B&V stack baseline (Next.js, Prisma, PostgreSQL, Auth.js, Sanity, Cloudinary, PayHere/KOKO, Vercel→Railway) | Documented                                      | VERIFIED (documentation only) |
+| Agricultural app runtime and database                                                                       | Unknown                                         | UNCERTAIN                     |
+| Hosting account, server, deployment, tests, bills                                                           | None supplied                                   | NOT STARTED                   |
+| Provider choice                                                                                             | DigitalOcean recommended; Lightsail alternative | PLANNED / UNCERTAIN           |
 
 ---
 
 ## 5. Review Findings
 
 ### From the Hosting Source
-1. **VPS capability.** DigitalOcean and Lightsail can both run Node.js with self-managed PostgreSQL. The operator owns patching, backups and monitoring. Next.js supports self-hosting as a Node server or Docker container. *(Official: providers, Next.js.)*
+
+1. **VPS capability.** DigitalOcean and Lightsail can both run Node.js with self-managed PostgreSQL. The operator owns patching, backups and monitoring. Next.js supports self-hosting as a Node server or Docker container. _(Official: providers, Next.js.)_
 2. **Cost.** One VPS can host every component; there is no second server fee. Total cost must still include:
    - backups and snapshots;
    - domain;
@@ -152,6 +159,7 @@ The hosting research began for an **agricultural ecommerce store** in Anuradhapu
 5. **Payments.** Callbacks need stable public HTTPS, signature verification, idempotency and reconciliation, regardless of host.
 
 ### Cross-Document Findings (this review)
+
 6. **Logging transport.** On a VPS, stdout goes to journald or Docker logs. These need rotation and size caps, and there is no Vercel Runtime Logs search. The logging document treats file logs as "dev / self-hosted only"; on a VPS they become the production design. Sentry is unaffected.
 7. **Scheduled jobs.** Retention cleanup and payment reconciliation would run as systemd timers or cron on the VPS instead of a Vercel scheduler.
 8. **Staging.** Vercel preview deployments disappear. A stable staging environment is required by both:
@@ -159,6 +167,7 @@ The hosting research began for an **agricultural ecommerce store** in Anuradhapu
    - the payment design (PayHere sandbox).
 
    On a VPS, that means a second server or a second deployment, with its own cost.
+
 9. **Callbacks and redirects.** Fixed domains simplify PayHere `notify_url` and Google exact-match redirect URIs. Deployments must keep the callback route available without downtime.
 10. **Media.** The hosting design plans local uploads, while B&V uses Cloudinary. If Cloudinary is kept, B&V needs no local upload storage. Backups get smaller and later migration gets easier.
 11. **Database concentration.** All Phase 1 tables promoted by the payment, logging and auth designs live on the same disk as the app. The off-server backup and restore drill becomes a hard prerequisite before accepting real payments.
@@ -167,15 +176,15 @@ The hosting research began for an **agricultural ecommerce store** in Anuradhapu
 
 ## 6. Options Considered
 
-| Option | Advantages | Disadvantages | Status |
-|---|---|---|---|
-| DigitalOcean Droplet | Simple, predictable pricing | Self-managed operations and backups | **RECOMMENDED pilot** |
-| AWS Lightsail | AWS ecosystem; gradual migration path | Transfer allowances; billing complexity | **Strong alternative** |
-| Hostinger VPS | Root access; low cost | Renewal terms, region and backups need review; shared hosting is not equivalent | **CONDITIONAL** |
-| Vercel | Best Next.js developer experience; previews | Needs a separate database and storage; commercial tiers | **DEFERRED** under the all-in-one requirement; the existing B&V direction |
-| Railway / Render | Managed deployments | Per-service billing; database durability needs review | **CONDITIONAL** |
-| EC2 + RDS + ALB + S3 | Enterprise-grade | Cost and operations not justified yet | **DEFERRED** |
-| WordPress/WooCommerce | Less custom development | A different product strategy, not a hosting option | **ALTERNATE STRATEGY** |
+| Option                | Advantages                                  | Disadvantages                                                                   | Status                                                                    |
+| --------------------- | ------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| DigitalOcean Droplet  | Simple, predictable pricing                 | Self-managed operations and backups                                             | **RECOMMENDED pilot**                                                     |
+| AWS Lightsail         | AWS ecosystem; gradual migration path       | Transfer allowances; billing complexity                                         | **Strong alternative**                                                    |
+| Hostinger VPS         | Root access; low cost                       | Renewal terms, region and backups need review; shared hosting is not equivalent | **CONDITIONAL**                                                           |
+| Vercel                | Best Next.js developer experience; previews | Needs a separate database and storage; commercial tiers                         | **DEFERRED** under the all-in-one requirement; the existing B&V direction |
+| Railway / Render      | Managed deployments                         | Per-service billing; database durability needs review                           | **CONDITIONAL**                                                           |
+| EC2 + RDS + ALB + S3  | Enterprise-grade                            | Cost and operations not justified yet                                           | **DEFERRED**                                                              |
+| WordPress/WooCommerce | Less custom development                     | A different product strategy, not a hosting option                              | **ALTERNATE STRATEGY**                                                    |
 
 ---
 
@@ -191,10 +200,10 @@ The hosting research began for an **agricultural ecommerce store** in Anuradhapu
 
 **Illustrative pricing (not quotes):**
 
-| Plan | Approx. USD/month | Approx. LKR at 330/USD |
-|---|---|---|
-| 2 GB Droplet or Lightsail | 12 | 3,960 |
-| 4 GB Lightsail | 24 | 7,920 |
+| Plan                      | Approx. USD/month | Approx. LKR at 330/USD |
+| ------------------------- | ----------------- | ---------------------- |
+| 2 GB Droplet or Lightsail | 12                | 3,960                  |
+| 4 GB Lightsail            | 24                | 7,920                  |
 
 The lean planning envelope is Rs. 5,000–7,000/month in total.
 
@@ -233,22 +242,23 @@ Backups → off-server storage (separate failure domain)
 
 ## 9. Detailed Functional Requirements
 
-| ID | Requirement | Status |
-|---|---|---|
-| FR-01 | HTTPS for the storefront and admin, with access controls | PLANNED |
+| ID    | Requirement                                                           | Status                |
+| ----- | --------------------------------------------------------------------- | --------------------- |
+| FR-01 | HTTPS for the storefront and admin, with access controls              | PLANNED               |
 | FR-02 | Supported Next.js, Node, Prisma and PostgreSQL versions on the server | REQUIRES VERIFICATION |
-| FR-03 | Orders, customers and inventory survive redeploys and restarts | PLANNED |
-| FR-04 | Media persists, is access-controlled and is backed up | PLANNED |
-| FR-05 | Payment callbacks are public, verified, idempotent and safely logged | PLANNED |
-| FR-06 | Rollback and migration safety | PLANNED |
-| FR-07 | Monitoring for downtime, disk, database, resources and backup failure | PLANNED |
-| FR-08 | Migration preserves domain, data integrity and order history | PLANNED |
+| FR-03 | Orders, customers and inventory survive redeploys and restarts        | PLANNED               |
+| FR-04 | Media persists, is access-controlled and is backed up                 | PLANNED               |
+| FR-05 | Payment callbacks are public, verified, idempotent and safely logged  | PLANNED               |
+| FR-06 | Rollback and migration safety                                         | PLANNED               |
+| FR-07 | Monitoring for downtime, disk, database, resources and backup failure | PLANNED               |
+| FR-08 | Migration preserves domain, data integrity and order history          | PLANNED               |
 
 ---
 
 ## 10. Technical Design and Impact on Other B&V Documents
 
 **No verified file paths.** Before writing deployment changes, inspect:
+
 - `package.json`;
 - Next.js configuration;
 - Prisma schema and migrations;
@@ -299,14 +309,14 @@ STORAGE_ROOT=<persistent-upload-path>
 
 ## 13. Implementation Status
 
-| Area | Status | Remaining Work |
-|---|---|---|
-| Research and comparison | Completed | — |
-| One-instance requirement | Agreed | Backup and security acceptance |
-| Provider | Recommended, not purchased | Live quotes; proof of concept |
-| Plan size and region | Open | Benchmark; latency test |
-| Domain, DNS, TLS, server, deploy, backups, monitoring, CI/CD | Not verified | All |
-| B&V document alignment | Not started | Appendix B |
+| Area                                                         | Status                     | Remaining Work                 |
+| ------------------------------------------------------------ | -------------------------- | ------------------------------ |
+| Research and comparison                                      | Completed                  | —                              |
+| One-instance requirement                                     | Agreed                     | Backup and security acceptance |
+| Provider                                                     | Recommended, not purchased | Live quotes; proof of concept  |
+| Plan size and region                                         | Open                       | Benchmark; latency test        |
+| Domain, DNS, TLS, server, deploy, backups, monitoring, CI/CD | Not verified               | All                            |
+| B&V document alignment                                       | Not started                | Appendix B                     |
 
 ---
 
@@ -315,6 +325,7 @@ STORAGE_ROOT=<persistent-upload-path>
 **Performed:** None.
 
 **Required:**
+
 - Clean-server reproducible deployment.
 - TLS check.
 - Authentication and permission tests.
@@ -329,6 +340,7 @@ STORAGE_ROOT=<persistent-upload-path>
 - 24-hour soak test.
 
 **Acceptance criteria:**
+
 - Checkout passes with documented evidence.
 - Recovery (backup restore) passes with documented evidence.
 
@@ -336,34 +348,35 @@ STORAGE_ROOT=<persistent-upload-path>
 
 ## 15. Lessons Learned
 
-| Earlier Claim | Correction |
-|---|---|
-| "One small VPS supports 500–5,000 users" | No load test was done; benchmark real traffic |
-| Frontend and backend priced separately | One server runs both; price the whole architecture |
-| Lightsail described as "final" | It was an evolving recommendation; DigitalOcean is now preferred |
-| "All-in-one" stated without qualification | B&V uses external Sanity and Cloudinary; define the term |
-| Two products discussed together | Keep the agricultural store and B&V decisions separate |
+| Earlier Claim                             | Correction                                                       |
+| ----------------------------------------- | ---------------------------------------------------------------- |
+| "One small VPS supports 500–5,000 users"  | No load test was done; benchmark real traffic                    |
+| Frontend and backend priced separately    | One server runs both; price the whole architecture               |
+| Lightsail described as "final"            | It was an evolving recommendation; DigitalOcean is now preferred |
+| "All-in-one" stated without qualification | B&V uses external Sanity and Cloudinary; define the term         |
+| Two products discussed together           | Keep the agricultural store and B&V decisions separate           |
 
 ---
 
 ## 16. Risks and Limitations
 
-| Risk | Likelihood | Impact | Mitigation | Status |
-|---|---|---|---|---|
-| Single-server outage or disk failure | High | High | Off-server backups; restore test; RPO/RTO | Open |
-| App and database compete for RAM | Medium | High | Build in CI; monitor; resize | Open |
-| Missing or failed backups | Medium | High | Automated verified dumps; restore drills | Open |
-| Webhook downtime or duplicates | Medium | High | Idempotency; reconciliation; alerts | Open |
-| Price, region or transfer surprises | Medium | Medium | Live quotes; billing alerts | Open |
-| Server compromise | Medium | High | Hardening; patching; least privilege | Open |
-| Hard migration from local database and uploads | Medium | Medium | Portable formats; rehearsal | Open |
-| B&V docs drift from the hosting choice | High | Medium | Appendix B updates | Open |
+| Risk                                           | Likelihood | Impact | Mitigation                                | Status |
+| ---------------------------------------------- | ---------- | ------ | ----------------------------------------- | ------ |
+| Single-server outage or disk failure           | High       | High   | Off-server backups; restore test; RPO/RTO | Open   |
+| App and database compete for RAM               | Medium     | High   | Build in CI; monitor; resize              | Open   |
+| Missing or failed backups                      | Medium     | High   | Automated verified dumps; restore drills  | Open   |
+| Webhook downtime or duplicates                 | Medium     | High   | Idempotency; reconciliation; alerts       | Open   |
+| Price, region or transfer surprises            | Medium     | Medium | Live quotes; billing alerts               | Open   |
+| Server compromise                              | Medium     | High   | Hardening; patching; least privilege      | Open   |
+| Hard migration from local database and uploads | Medium     | Medium | Portable formats; rehearsal               | Open   |
+| B&V docs drift from the hosting choice         | High       | Medium | Appendix B updates                        | Open   |
 
 ---
 
 ## 17. Open Questions and Blockers
 
 ### Blocking (before procurement)
+
 - Which product: the agricultural store or B&V?
 - Actual runtime and database engine.
 - External CMS and media in scope?
@@ -373,12 +386,14 @@ STORAGE_ROOT=<persistent-upload-path>
 - Acceptable RPO/RTO.
 
 ### Non-Blocking
+
 - CDN.
 - Worker queue.
 - Managed database timing.
 - Auto-scaling provider.
 
 ### Required Decisions
+
 - Provider, plan and region.
 - Backup retention and restore policy.
 - Payment and regulated-product compliance handling.
@@ -407,6 +422,7 @@ STORAGE_ROOT=<persistent-upload-path>
 **Agreed approach:** Single VPS pilot (DigitalOcean preferred), subject to validation.
 
 **Hard constraints:**
+
 - No secrets in Git.
 - No production database without off-server backups.
 - No public PostgreSQL port.
@@ -414,6 +430,7 @@ STORAGE_ROOT=<persistent-upload-path>
 - No invented paths or routes.
 
 **Preserve:**
+
 - Next.js and Prisma configuration.
 - Payment verification.
 - Audit patterns.
@@ -424,6 +441,7 @@ STORAGE_ROOT=<persistent-upload-path>
 **First action:** Confirm which project, then inspect the repository.
 
 **Do not assume:**
+
 - That a provider has been purchased.
 - That the app is deployed.
 - That a free tier is production-eligible.
@@ -434,21 +452,22 @@ STORAGE_ROOT=<persistent-upload-path>
 
 ## 20. Glossary
 
-| Term | Meaning |
-|---|---|
-| VPS | Virtual private server |
-| Droplet | DigitalOcean virtual machine |
-| Lightsail | AWS simplified VPS offering |
-| RPO / RTO | Maximum acceptable data loss / time to restore |
-| Reverse proxy | Web server routing public traffic to the app |
-| Failure domain | Set of components that fail together |
-| Log drain | Forwarding runtime logs to an external platform |
+| Term           | Meaning                                         |
+| -------------- | ----------------------------------------------- |
+| VPS            | Virtual private server                          |
+| Droplet        | DigitalOcean virtual machine                    |
+| Lightsail      | AWS simplified VPS offering                     |
+| RPO / RTO      | Maximum acceptable data loss / time to restore  |
+| Reverse proxy  | Web server routing public traffic to the app    |
+| Failure domain | Set of components that fail together            |
+| Log drain      | Forwarding runtime logs to an external platform |
 
 ---
 
 ## 21. References
 
 ### Official (prices and policies must be revalidated at procurement)
+
 - AWS Lightsail and its pricing page.
 - DigitalOcean Droplet pricing and Next.js hosting page.
 - Next.js deployment documentation.
@@ -456,6 +475,7 @@ STORAGE_ROOT=<persistent-upload-path>
 - Hostinger VPS.
 
 ### Project Files
+
 - Ecommerce Hosting & Deployment Final Reference Document v1.0.
 - B&V Technology Stack Reference v1.0.
 - B&V Logging & Observability Reference v1.0.
@@ -463,31 +483,32 @@ STORAGE_ROOT=<persistent-upload-path>
 - B&V Google OAuth & Centralized Authentication Final Reference Document v1.0.
 
 ### Community (non-authoritative)
+
 Reddit, DEV and Medium Lightsail/self-hosting guides, as cited in the source. The source notes that not every page was fully inspected.
 
 ---
 
 ## Appendix A — Decision Register
 
-| ID | Decision | Status |
-|---|---|---|
-| D-01 | One-instance start | User requirement; subject to backup and security acceptance |
-| D-02 | AWS Lightsail | Previously recommended; not purchased |
-| D-03 | DigitalOcean Droplet | Latest recommendation; awaiting validation |
-| D-04 | Full AWS multi-service | Deferred |
-| D-05 | Vercel | Deferred under all-in-one; still the documented B&V direction |
-| D-06 | Local database and uploads | Conditional; off-server backups mandatory |
-| D-07 | 2 GB vs 4 GB | Open pending measurement |
-| D-08 | B&V hosting platform | **Open**; requires an explicit decision (this review) |
+| ID   | Decision                   | Status                                                        |
+| ---- | -------------------------- | ------------------------------------------------------------- |
+| D-01 | One-instance start         | User requirement; subject to backup and security acceptance   |
+| D-02 | AWS Lightsail              | Previously recommended; not purchased                         |
+| D-03 | DigitalOcean Droplet       | Latest recommendation; awaiting validation                    |
+| D-04 | Full AWS multi-service     | Deferred                                                      |
+| D-05 | Vercel                     | Deferred under all-in-one; still the documented B&V direction |
+| D-06 | Local database and uploads | Conditional; off-server backups mandatory                     |
+| D-07 | 2 GB vs 4 GB               | Open pending measurement                                      |
+| D-08 | B&V hosting platform       | **Open**; requires an explicit decision (this review)         |
 
 ## Appendix B — B&V Document Update Register (if a VPS is chosen for B&V)
 
-| Document | Required Update |
-|---|---|
-| Technology Stack Reference | Replace Vercel→Railway direction with VPS plus growth path |
-| Logging & Observability | stdout via journald/Docker with rotation; production file-log design; no Vercel Runtime Logs; consider a log drain earlier |
-| Logging & Observability | Retention cleanup via systemd timer/cron |
-| Payment Gateway | Reconciliation jobs via systemd timer/cron; zero-downtime deploys for the callback route; stable `notify_url` |
-| Google OAuth | Fixed staging and production domains for redirect URIs; staging server required |
-| All | Off-server backup and restore drill required before the first paid release |
-| Hosting (this design) | Drop local uploads if Cloudinary is kept |
+| Document                   | Required Update                                                                                                            |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Technology Stack Reference | Replace Vercel→Railway direction with VPS plus growth path                                                                 |
+| Logging & Observability    | stdout via journald/Docker with rotation; production file-log design; no Vercel Runtime Logs; consider a log drain earlier |
+| Logging & Observability    | Retention cleanup via systemd timer/cron                                                                                   |
+| Payment Gateway            | Reconciliation jobs via systemd timer/cron; zero-downtime deploys for the callback route; stable `notify_url`              |
+| Google OAuth               | Fixed staging and production domains for redirect URIs; staging server required                                            |
+| All                        | Off-server backup and restore drill required before the first paid release                                                 |
+| Hosting (this design)      | Drop local uploads if Cloudinary is kept                                                                                   |

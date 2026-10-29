@@ -253,10 +253,14 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 - Archive: every moved folder/zip was SHA-256 checked first (Phase 2 sets 40/40 match; all 9 zips fully present as loose files). `BnV Docs/` file count 451 before and after; hash multiset identical.
 - Image library after cleanup: 276 unique images, 533 MB, 0 duplicates.
 
+- Owner approved the image picks. Exported 124 WebP placeholders (82 banner files for 21 pages, 42 product images for 7 categories); every file has the right size and is ≤ 300 KB (largest 136 KB). Excluded the Journal banners (Phase 2) and the dark FAQ banner, whose in-image text reads "BLUSH & VIOLET". Mapping: `docs/references/assets/image-mapping.csv`.
+- Visual-Asset-Inventory v2.0; references README, Hosting note, Implementation-Plan v1.2, PLAN.md (Gate B Partial, next 1A), PROGRESS.md.
+
 ### Remaining Work
 
-- Owner approval of the image curation, then export to `public/images/prototype/` (blueprint 002 step 7), Visual-Asset-Inventory v2.0 (step 8), and housekeeping/gate close (step 10).
-- Owner values in Business-Facts.md; open items in Phase-1-UX-Spec.md.
+- Owner values in Business-Facts.md and the launch-blocking commissions.
+- Open items in Phase-1-UX-Spec.md (optional checkout email, gift columns, variant options, double opt-in).
+- The demo seed's image paths (`prisma/seed/data/products.ts`) do not match the exported names; align them in 1C.
 
 ### Known Gotchas
 
