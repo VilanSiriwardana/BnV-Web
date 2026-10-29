@@ -14,24 +14,24 @@ This file tracks only **where we are now**. Update it as work progresses, and re
 
 ## Current Position
 
-- Stage: **Gate B — Partial** (docs and assets done; owner business values and commissions open). Next: **Phase 1 sprint 1C** (database completion).
-- Next: Phase 1 sprint 1C.
+- Stage: **Gate B — Partial** (docs and assets done; owner business values and commissions open). Next: **Phase 1 sprint 1D** (homepage).
+- Next: Phase 1 sprint 1D.
 
 ## Gate Progress
 
-| Step                          | Status                                                            |
-| ----------------------------- | ----------------------------------------------------------------- |
-| Gate A — Phase 0 close-out    | Done (2026-10-28)                                                 |
-| Gate B — Spec Sync            | Partial (2026-10-29): owner values in Business-Facts.md open      |
-| 1A Foundation finish          | Done (2026-10-29)                                                 |
-| 1B Design system              | Done (2026-10-29)                                                 |
-| 1C Database completion        | Partial (22 models migrated; seed done; schema additions pending) |
-| 1D Homepage                   | Not started                                                       |
-| 1E Catalog + PDP              | Not started                                                       |
-| 1F Cart + checkout inquiry    | Not started                                                       |
-| 1G Custom, Contact, Portfolio | Not started                                                       |
-| 1H Admin MVP                  | Not started                                                       |
-| 1I SEO, QA, deploy            | Not started                                                       |
+| Step                          | Status                                                       |
+| ----------------------------- | ------------------------------------------------------------ |
+| Gate A — Phase 0 close-out    | Done (2026-10-28)                                            |
+| Gate B — Spec Sync            | Partial (2026-10-29): owner values in Business-Facts.md open |
+| 1A Foundation finish          | Done (2026-10-29)                                            |
+| 1B Design system              | Done (2026-10-29)                                            |
+| 1C Database completion        | Done (2026-10-29)                                            |
+| 1D Homepage                   | Not started                                                  |
+| 1E Catalog + PDP              | Not started                                                  |
+| 1F Cart + checkout inquiry    | Not started                                                  |
+| 1G Custom, Contact, Portfolio | Not started                                                  |
+| 1H Admin MVP                  | Not started                                                  |
+| 1I SEO, QA, deploy            | Not started                                                  |
 
 ## Current Milestone: Gate B (Sprint 0.5 Spec Sync)
 

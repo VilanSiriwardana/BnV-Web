@@ -1,12 +1,14 @@
 // Demo data only (seeded with --demo). LKR prices; no ratings or unverified material claims (D-10).
 // One product per curated placeholder image in public/images/prototype/ (Visual-Asset-Inventory §2).
+import { RETIRED_COLLECTION_SLUGS } from './collections';
+
 export type ProductSeed = {
   name: string;
   slug: string;
   sku: string;
   shortDescription: string;
   categorySlug: string;
-  collectionSlug: string;
+  collectionSlugs: string[];
   isFeatured?: boolean;
   image: { url: string; alt: string };
   variants: { name: string; sku: string; price: string; quantity: number }[];
@@ -36,6 +38,25 @@ const slugify = (name: string) =>
     .replace(/&/g, 'and')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
+
+// Retired collections (D-21) fall back to the collection matching the product's pillar.
+const PILLAR_COLLECTIONS: Record<string, string> = {
+  women: 'fashion-edit',
+  men: 'fashion-edit',
+  jewelry: 'jewelry-highlight',
+  gifts: 'gift-ready',
+  couples: 'couple-collection',
+};
+
+const toCollectionSlugs = (categorySlug: string, collectionSlug: string) => {
+  if (
+    !(RETIRED_COLLECTION_SLUGS as readonly string[]).includes(collectionSlug)
+  ) {
+    return [collectionSlug];
+  }
+  const fallback = PILLAR_COLLECTIONS[categorySlug.split('-')[0]];
+  return fallback ? [fallback] : [];
+};
 
 const build = (
   imageGroup: string,
@@ -75,7 +96,7 @@ const build = (
         sku,
         shortDescription: description,
         categorySlug,
-        collectionSlug,
+        collectionSlugs: toCollectionSlugs(categorySlug, collectionSlug),
         isFeatured: featured,
         image: {
           url: `/images/prototype/product-${imageGroup}-${n}.webp`,

@@ -37,20 +37,34 @@ model Brand {
 }
 
 model Collection {
-  id             String    @id @default(uuid()) @db.Uuid
+  id             String              @id @default(uuid()) @db.Uuid
   name           String
-  slug           String    @unique
+  slug           String              @unique
   description    String?
-  bannerImageUrl String?   @map("banner_image_url")
-  startDate      DateTime? @map("start_date") @db.Timestamptz(6)
-  endDate        DateTime? @map("end_date") @db.Timestamptz(6)
-  status         String    @default("active")
-  products       Product[]
-  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  bannerImageUrl String?             @map("banner_image_url")
+  startDate      DateTime?           @map("start_date") @db.Timestamptz(6)
+  endDate        DateTime?           @map("end_date") @db.Timestamptz(6)
+  status         String              @default("active")
+  products       CollectionProduct[]
+  createdAt      DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@index([status])
   @@index([startDate])
   @@index([endDate])
   @@map("collections")
+}
+
+model CollectionProduct {
+  collectionId String     @map("collection_id") @db.Uuid
+  productId    String     @map("product_id") @db.Uuid
+  sortOrder    Int        @default(0) @map("sort_order")
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@id([collectionId, productId])
+  @@index([collectionId, sortOrder])
+  @@index([productId])
+  @@map("collection_products")
 }

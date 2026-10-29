@@ -306,3 +306,23 @@ Each decision should include:
   - [../references/Phase-1-Reconciled-Decisions.md](../references/Phase-1-Reconciled-Decisions.md) (D-20 to D-23)
   - [../references/SEO-Guide.md](../references/SEO-Guide.md) (§8 routes)
   - [../references/Database-Design-Reference.md](../references/Database-Design-Reference.md) (`collection_products`)
+
+## ADR-0018 - Sprint 1C Schema Completion
+
+- Status: Accepted
+- Date: 2026-10-29
+- Context: Sprint 1C had to apply D-21 (`collection_products`) and add the Phase 1 inquiry, newsletter and settings tables.
+- Decision:
+  - `collection_products` (composite key, `sort_order`, cascade) replaces `products.collection_id`. Migration `005_collections_and_inquiries` backfills the join table before dropping the column.
+  - New tables `custom_requests` (optional `user_id`, `order_id`), `collaboration_inquiries`, `contact_messages`, `newsletter_subscribers` and `site_settings`. Status defaults follow Phase-1-Reconciled-Decisions §status. Emails are stored lowercase with a plain unique index instead of a `lower(email)` index.
+  - Admin roles need no schema change (ADR-0012).
+  - Retired collections (`core-range`, `new-arrivals`, `custom`) are archived and unlinked, never deleted. Their demo products move to the collection for their pillar (women/men → `fashion-edit`, jewelry → `jewelry-highlight`, gifts → `gift-ready`, couples → `couple-collection`).
+  - Site settings are seeded as placeholders (`currency` LKR, `country` LK, empty WhatsApp, Instagram and TikTok) and are never overwritten on re-seed.
+  - `src/lib/prisma-client.ts` (`createPrismaClient`) is shared by the app singleton `src/lib/prisma.ts` and the seed.
+- Alternatives: delete retired collections; a functional `lower(email)` index through raw SQL; a separate seed client.
+- Consequences:
+  - `prisma migrate dev` is interactive and refuses a data-loss warning in a non-interactive shell; this migration was generated with `prisma migrate diff` and applied with `migrate deploy`.
+  - Shipping methods, FAQ and policies (ADR-0015) still have no tables; they move to the sprint that builds them.
+- Related Documents:
+  - [../references/Database-Design-Reference.md](../references/Database-Design-Reference.md)
+  - [../references/Phase-1-Reconciled-Decisions.md](../references/Phase-1-Reconciled-Decisions.md)

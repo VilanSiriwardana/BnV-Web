@@ -1,0 +1,94 @@
+model CustomRequest {
+  id                  String    @id @default(uuid()) @db.Uuid
+  userId              String?   @map("user_id") @db.Uuid
+  orderId             String?   @map("order_id") @db.Uuid
+  requestType         String    @map("request_type")
+  productType         String?   @map("product_type")
+  occasion            String?
+  customizationType   String?   @map("customization_type")
+  personalizationText String?   @map("personalization_text")
+  preferredColor      String?   @map("preferred_color")
+  preferredMaterial   String?   @map("preferred_material")
+  budgetMin           Decimal?  @map("budget_min") @db.Decimal(12, 2)
+  budgetMax           Decimal?  @map("budget_max") @db.Decimal(12, 2)
+  requiredDate        DateTime? @map("required_date") @db.Date
+  customerName        String    @map("customer_name")
+  customerPhone       String    @map("customer_phone")
+  customerEmail       String?   @map("customer_email")
+  message             String?
+  status              String    @default("new")
+  user                User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  order               Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([userId])
+  @@index([orderId])
+  @@index([requestType, status])
+  @@index([customerPhone])
+  @@index([createdAt(sort: Desc)])
+  @@map("custom_requests")
+}
+
+model CollaborationInquiry {
+  id               String    @id @default(uuid()) @db.Uuid
+  inquiryType      String    @map("inquiry_type")
+  name             String
+  brandName        String?   @map("brand_name")
+  email            String
+  phone            String?
+  projectType      String?   @map("project_type")
+  requiredPeople   String?   @map("required_people")
+  preferredDate    DateTime? @map("preferred_date") @db.Date
+  preferredTime    String?   @map("preferred_time")
+  meetingMode      String?   @map("meeting_mode")
+  location         String?
+  budgetRange      String?   @map("budget_range")
+  expectedAudience String?   @map("expected_audience")
+  requestedRole    String?   @map("requested_role")
+  message          String?
+  referenceLinks   Json?     @map("reference_links")
+  status           String    @default("new")
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([status, createdAt(sort: Desc)])
+  @@index([inquiryType])
+  @@index([email])
+  @@map("collaboration_inquiries")
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  email     String?
+  phone     String?
+  subject   String?
+  message   String
+  source    String   @default("contact_page")
+  status    String   @default("new")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@index([email])
+  @@map("contact_messages")
+}
+
+model NewsletterSubscriber {
+  id             String    @id @default(uuid()) @db.Uuid
+  userId         String?   @map("user_id") @db.Uuid
+  email          String    @unique
+  source         String?
+  status         String    @default("active")
+  subscribedAt   DateTime  @default(now()) @map("subscribed_at") @db.Timestamptz(6)
+  unsubscribedAt DateTime? @map("unsubscribed_at") @db.Timestamptz(6)
+  user           User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([userId])
+  @@index([status])
+  @@map("newsletter_subscribers")
+}

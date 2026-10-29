@@ -5,6 +5,7 @@ import { seedBrands } from './seeders/03-brands';
 import { seedCategories } from './seeders/04-categories';
 import { seedCollections } from './seeders/05-collections';
 import { seedProducts } from './seeders/06-products';
+import { seedSiteSettings } from './seeders/07-site-settings';
 
 const demo = process.argv.includes('--demo');
 
@@ -14,6 +15,7 @@ async function main() {
   const brandId = await seedBrands(prisma);
   const categoryIds = await seedCategories(prisma);
   const collectionIds = await seedCollections(prisma);
+  await seedSiteSettings(prisma);
 
   if (demo) {
     await seedProducts(prisma, { brandId, categoryIds, collectionIds });

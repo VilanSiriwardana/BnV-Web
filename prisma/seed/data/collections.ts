@@ -1,14 +1,11 @@
+// Retired by D-21: "New In" is the newest products, not a collection. Archived, never deleted.
+export const RETIRED_COLLECTION_SLUGS = [
+  'core-range',
+  'new-arrivals',
+  'custom',
+] as const;
+
 export const COLLECTIONS = [
-  {
-    name: 'Core Range',
-    slug: 'core-range',
-    description: 'Everyday B&V essentials',
-  },
-  {
-    name: 'New Arrivals',
-    slug: 'new-arrivals',
-    description: 'The latest pieces in store',
-  },
   {
     name: 'Limited Drop',
     slug: 'limited-drop',

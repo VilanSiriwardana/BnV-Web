@@ -408,3 +408,28 @@ Closed Gate A (milestone M0.3):
 ### Next Step
 
 - Sprint 1C (database completion).
+
+## 2026-10-29 - Sprint 1C Database Completion
+
+### Summary
+
+- `collection_products` join table (D-21); `products.collection_id` dropped after backfill.
+- New tables: `custom_requests`, `collaboration_inquiries`, `contact_messages`, `newsletter_subscribers`, `site_settings` (ADR-0018).
+- `src/lib/prisma.ts` app singleton over a shared `createPrismaClient()` (`src/lib/prisma-client.ts`); the seed uses the same factory.
+- Seed: products list `collectionSlugs`; retired collections archived; placeholder site settings.
+
+### Files Changed
+
+- `prisma/schema/{catalog,products,identity,commerce,inquiries,settings}.prisma`, `prisma/migrations/20261029105640_005_collections_and_inquiries/`, `prisma/seed/**`, `src/lib/{prisma,prisma-client}.ts`, `docs/decisions/DECISIONS.md`, `docs/governance/{PLAN,PROGRESS}.md`, `docs/AI_SESSION_LOG.md`.
+
+### Database Changes
+
+- Migration `005_collections_and_inquiries` applied; no schema drift. Collections: 5 active, 2 archived with 0 links; 119 active products, all linked; 5 site settings.
+
+### Tests
+
+- `prisma validate` and `tsc --noEmit` pass. `db:seed` and `db:seed:demo` each ran twice with exit 0 and stable counts.
+
+### Next Step
+
+- Sprint 1D (homepage).

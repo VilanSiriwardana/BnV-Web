@@ -310,3 +310,17 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 
 - The shadcn CLI resolved a `utils` alias of `@/lib/utils/cn` to a bare `"cn"` import and installed the unrelated npm package `cn`. Fixed: `components.json` now uses `@/lib/utils`, backed by `src/lib/utils/index.ts` re-exporting `cn`. Keep that alias.
 - shadcn `add` without `init` does not install `tw-animate-css`; Sheet and Accordion animations need it.
+
+## 2026-10-29 - Sprint 1C Database Completion
+
+### Summary
+
+- Implemented blueprint `.claude/blueprints/006-sprint-1c-database-completion.md`: join table, five Phase 1 tables, shared Prisma client, seed update (ADR-0018).
+
+### Verification
+
+- Migration applied with no drift; seeds run twice clean; every active product is linked to a collection; typecheck passes.
+
+### Known Gotchas
+
+- `prisma migrate dev` is refused in non-interactive shells when it raises a data-loss warning. Generate the SQL with `prisma migrate diff --from-config-datasource --to-schema prisma/schema --script`, hand-edit it, and apply it with `prisma migrate deploy`.

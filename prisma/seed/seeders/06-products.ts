@@ -11,10 +11,12 @@ export async function seedProducts(
 ) {
   let variantCount = 0;
 
-  for (const product of PRODUCTS) {
+  for (const [index, product] of PRODUCTS.entries()) {
     const categoryId = refs.categoryIds.get(product.categorySlug);
-    const collectionId = refs.collectionIds.get(product.collectionSlug);
-    if (!categoryId || !collectionId) {
+    const collectionIds = product.collectionSlugs.map((slug) =>
+      refs.collectionIds.get(slug),
+    );
+    if (!categoryId || collectionIds.some((id) => !id)) {
       throw new Error(
         `Unknown category or collection for product ${product.slug}`,
       );
@@ -27,13 +29,21 @@ export async function seedProducts(
       isFeatured: product.isFeatured ?? false,
       status: 'active',
       categoryId,
-      collectionId,
       brandId: refs.brandId,
     };
     const { id: productId } = await prisma.product.upsert({
       where: { slug: product.slug },
       update: data,
       create: { slug: product.slug, ...data },
+    });
+
+    await prisma.collectionProduct.deleteMany({ where: { productId } });
+    await prisma.collectionProduct.createMany({
+      data: collectionIds.map((collectionId) => ({
+        collectionId: collectionId!,
+        productId,
+        sortOrder: index,
+      })),
     });
 
     for (const { name, sku, price, quantity } of product.variants) {
