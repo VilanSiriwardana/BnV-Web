@@ -405,3 +405,25 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 ### Known Gotchas
 
 - `notFound()` on an ISR product page returns HTTP 200 with `noindex`, because the root `loading.tsx` streams the response.
+
+## 2026-10-29 - Sprint 1F Cart + Checkout Inquiry
+
+### Summary
+
+- Implemented blueprint `.claude/blueprints/011-sprint-1f-cart-checkout.md`. Owner decisions: add `orders.payment_status`, decrement stock at dispatch, `BNV-YYMMDD-XXXX` order numbers, delivery fee confirmed on WhatsApp, no COD limit yet.
+
+### Deviations
+
+- The cart count is fetched client-side after mount instead of in the root layout, because reading cookies in the layout would make every ISR page dynamic.
+- Vitest 3 instead of 5: Vitest 5 requires `@types/node` ≥ 22 and the project pins 20.
+- `order_items` has no gift-note or variant-title column, so the snapshot stores options in `selected_options` only.
+
+### Known Gotchas
+
+- React 19 resets uncontrolled fields after an action, so checkout selects, radios and textareas are controlled.
+
+## 2026-10-29 - 1F QA: checkout generic error
+
+### Summary
+
+- Implemented blueprint `.claude/blueprints/012-checkout-stale-prisma-client.md`. Checkout failed because `next dev` was started before migration 006 and kept the old Prisma client cached on `globalThis`. Fix: restart the dev server. Cart and checkout action `catch` blocks now log the cause with `console.error`.

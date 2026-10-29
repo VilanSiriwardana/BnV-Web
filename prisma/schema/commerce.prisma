@@ -74,7 +74,8 @@ model Order {
   orderSource       String             @default("web") @map("order_source")
   paymentMethod     String?            @map("payment_method")
   notes             String?
-  status            String             @default("pending")
+  status            String             @default("inquiry_received")
+  paymentStatus     String             @default("pending") @map("payment_status")
   confirmedAt       DateTime?          @map("confirmed_at") @db.Timestamptz(6)
   completedAt       DateTime?          @map("completed_at") @db.Timestamptz(6)
   cancelledAt       DateTime?          @map("cancelled_at") @db.Timestamptz(6)
@@ -89,6 +90,7 @@ model Order {
 
   @@index([userId])
   @@index([status])
+  @@index([paymentStatus])
   @@index([createdAt])
   @@map("orders")
 }

@@ -552,3 +552,42 @@ Closed Gate A (milestone M0.3):
 ### Next Step
 
 - Manual QA (both themes; 360–1536px; filters; variant selection), then sprint 1F.
+
+## 2026-10-29 - Sprint 1F Cart + Checkout Inquiry (built, manual QA pending)
+
+### Summary
+
+- Implemented blueprint `.claude/blueprints/011-sprint-1f-cart-checkout.md` (ADR-0020).
+- Migration `006_order_inquiry_status`: `orders.status` default `inquiry_received` (pending rows backfilled) and new `orders.payment_status` (default `pending`).
+- Guest cart (`src/features/cart/`): httpOnly `bnv_cart` cookie → `carts.guest_token`; `addToCart`, `updateCartItemQuantity`, `removeCartItem`, `getCartSnapshot` Server Actions. Same variant + options increments the line; quantity capped by stock and `commerce.maxLineQuantity` (10).
+- UI: `CartProvider` + `CartButton` (count badge) + `CartDrawer` (Sheet) + `/cart`; PDP Add to cart is live and opens the drawer.
+- Checkout (`src/features/checkout/`): UX-Spec §1.1 form, phone normalised to `+947XXXXXXXX`, province derived from district. `placeOrder` creates the order (`inquiry_received`), item snapshots, a `manual`/`pending` payment and marks the cart `converted` in one transaction, then redirects to `/checkout/success` (order number, next steps per method, WhatsApp CTA).
+- Vitest 3 added (`npm test`).
+
+### Files Changed
+
+- `prisma/schema/commerce.prisma`, `prisma/migrations/*_006_order_inquiry_status/`.
+- `src/features/cart/**`, `src/features/checkout/**`, `src/components/cart/**`, `src/data/sri-lanka-districts.ts`, `src/config/{commerce,images}.ts`.
+- `app/layout.tsx`, `app/cart/page.tsx`, `app/checkout/{page,success/page}.tsx`.
+- `src/components/layout/site-header.tsx`, `src/components/product/variant-selector.tsx`.
+- `package.json` (`test` script, `vitest` dev dependency), `vitest.config.ts`.
+
+### Tests
+
+- `npm test`: 18 passing (districts, pricing/totals/snapshot/order number, phone and checkout schema).
+- Typecheck, lint and build pass; product, pillar and collection pages are still ISR. `/cart`, `/checkout`, `/checkout/success` are dynamic and `noindex`.
+- Dev server: empty `/checkout` redirects to `/cart`; an unknown order number returns not-found.
+- DB: `orders.status` default `inquiry_received`, `payment_status` column present, 0 `pending` orders.
+
+### Known Gotchas
+
+- `prisma migrate dev` fails locally on the shadow database (`permission denied to terminate process`); the migration was applied by `migrate dev` before that error, and `migrate status` reports up to date. Use `--create-only` + `npm run db:deploy` if it recurs.
+- The cart count loads after mount, so the badge appears a moment after first paint (keeps ISR pages static).
+- Stock is not reserved or decremented at checkout (ADR-0020); decrement at dispatch belongs to 1H.
+- `/policies/*` pages are linked but not built.
+- After a migration or `prisma generate`, restart `next dev`: `src/lib/prisma.ts` caches the client on `globalThis`, so a running server keeps the old schema. During 1F QA this surfaced as checkout's generic "Something went wrong" (`paymentStatus` unknown). Cart and checkout actions now `console.error` the cause.
+- Harmless noise: `chrome-extension://invalid` console errors (browser extensions such as Grammarly) and Prisma Studio `ERR_STREAM_UNABLE_TO_PIPE` (cancelled Studio request).
+
+### Next Step
+
+- Manual QA: add → drawer → `/cart` → checkout (COD and bank transfer) → success; check rows in Prisma Studio; both themes at 360px and 1440px.

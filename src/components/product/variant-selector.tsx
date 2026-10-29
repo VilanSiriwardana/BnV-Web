@@ -1,10 +1,14 @@
 'use client';
 
 import { Minus, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 
+import { useCart } from '@/components/cart/cart-provider';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
+import { FormMessage } from '@/components/ui/field-error';
+import { commerce } from '@/config/commerce';
+import { addToCart } from '@/features/cart/actions';
 import { cn, formatLkr } from '@/lib/utils';
 
 export type SelectableVariant = {
@@ -23,12 +27,9 @@ type Props = {
   contactHref: string;
 };
 
-const MAX_QTY = 10;
-
 const matches = (v: SelectableVariant, options: string[]) =>
   v.options.every((o, i) => o === options[i]);
 
-// Emits the 1F cart payload { variantId, quantity, selectedOptions }; Add to cart stays disabled until the cart ships.
 export function VariantSelector({
   axes,
   variants,
@@ -38,10 +39,16 @@ export function VariantSelector({
   const initial = variants.find((v) => v.available > 0) ?? variants[0];
   const [selected, setSelected] = useState<string[]>(initial?.options ?? []);
   const [quantity, setQuantity] = useState(1);
+  const [adding, startAdding] = useTransition();
+  const [addError, setAddError] = useState<string>();
+  const { setCart, setOpen } = useCart();
 
   const variant = variants.find((v) => matches(v, selected));
   const soldOut = variants.every((v) => v.available === 0);
-  const maxQty = Math.max(1, Math.min(MAX_QTY, variant?.available ?? 1));
+  const maxQty = Math.max(
+    1,
+    Math.min(commerce.maxLineQuantity, variant?.available ?? 1),
+  );
 
   const choose = (axis: number, value: string) => {
     const next = selected.with(axis, value);
@@ -167,11 +174,22 @@ export function VariantSelector({
           <Button
             type="button"
             size="lg"
-            disabled
-            data-payload={payload ? JSON.stringify(payload) : undefined}
+            disabled={!payload || variant.available === 0 || adding}
+            onClick={() =>
+              payload &&
+              startAdding(async () => {
+                const result = await addToCart(payload);
+                setAddError(result.ok ? undefined : result.message);
+                if (result.ok) {
+                  setCart(result.cart);
+                  setOpen(true);
+                  setQuantity(1);
+                }
+              })
+            }
             className="sm:flex-1"
           >
-            Add to cart — coming soon
+            {adding ? 'Adding…' : 'Add to cart'}
           </Button>
         )}
         <a
@@ -195,6 +213,7 @@ export function VariantSelector({
           {whatsappHref ? 'Ask on WhatsApp' : 'Ask us about this piece'}
         </a>
       </div>
+      {addError && <FormMessage status="error" message={addError} />}
     </div>
   );
 }

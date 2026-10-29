@@ -6,6 +6,7 @@ export const imageSizes = {
   hero: '100vw',
   portfolioCover: '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw',
   videoPoster: '(min-width: 1024px) 50vw, 100vw',
+  cartThumb: '96px',
 } as const;
 
 export const imageQuality = {

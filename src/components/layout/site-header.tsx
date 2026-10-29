@@ -1,6 +1,7 @@
-import { Search, ShoppingBag } from 'lucide-react';
+import { Search } from 'lucide-react';
 import Link from 'next/link';
 
+import { CartButton } from '@/components/cart/cart-button';
 import { MobileNav } from '@/components/layout/mobile-nav';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 import { Button } from '@/components/ui/button';
@@ -20,13 +21,7 @@ const utilities: Record<(typeof utilityNav)[number], React.ReactNode> = {
     </Button>
   ),
   theme: <ThemeToggle />,
-  cart: (
-    <Button variant="ghost" size="icon" asChild>
-      <Link href={routes.cart} aria-label="Cart">
-        <ShoppingBag />
-      </Link>
-    </Button>
-  ),
+  cart: <CartButton />,
 };
 
 export function SiteHeader() {

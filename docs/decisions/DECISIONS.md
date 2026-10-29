@@ -352,3 +352,23 @@ Each decision should include:
 - Related Documents:
   - [../governance/AGENTS.md](../governance/AGENTS.md) (Forms)
   - [../references/Phase-1-UX-Spec.md](../references/Phase-1-UX-Spec.md) §6
+
+## ADR-0020 - Sprint 1F Cart and Checkout Inquiry
+
+- Status: Accepted
+- Date: 2026-10-29
+- Context: Sprint 1F needs a guest cart and an inquiry checkout (D-17, D-20). `orders.status` defaulted to `pending`, which violates D-04, and D-04 lists `orders.payment_status` but the column did not exist.
+- Decision:
+  - Migration `006_order_inquiry_status`: `orders.status` defaults to `inquiry_received` (and existing `pending` rows are backfilled); adds `orders.payment_status TEXT NOT NULL DEFAULT 'pending'` with an index.
+  - Guest cart: an httpOnly `bnv_cart` cookie maps to `carts.guest_token`; it is set only inside Server Actions. The client holds the cart view in context, loaded after mount so ISR pages stay static.
+  - Prices are always re-read from the variant; the client sends only `variantId`, `quantity` and `selectedOptions`.
+  - Order numbers are `BNV-YYMMDD-XXXX` (random suffix, retried on a unique conflict). `orders.cart_id` uniqueness makes a double submit idempotent.
+  - **Stock is not changed at checkout.** It is validated at add-to-cart and checkout and decremented when the order is dispatched (admin flow, 1H).
+  - Delivery fee shows "Delivery fee confirmed on WhatsApp" and stores `0`; no COD limit is enforced (`src/config/commerce.ts` placeholders) until Business-Facts.md values are CONFIRMED.
+  - Vitest 3 (not 5, which needs `@types/node` ≥ 22) for pure modules: `npm test`.
+- Consequences:
+  - Inquiries do not hold stock, so two customers can inquire for the last unit; the admin resolves this on confirmation.
+  - `/policies/terms` and `/policies/privacy` are linked from checkout but are not built yet.
+- Related Documents:
+  - [../references/Phase-1-Step-by-Step.md](../references/Phase-1-Step-by-Step.md) §11
+  - [../references/Phase-1-UX-Spec.md](../references/Phase-1-UX-Spec.md) §1
