@@ -62,5 +62,17 @@ export async function seedProducts(
     });
   }
 
-  console.log(`products: ${PRODUCTS.length}, variants: ${variantCount} (demo)`);
+  // Demo products dropped from the data file are archived, never deleted (they may have order history).
+  const { count: archived } = await prisma.product.updateMany({
+    where: {
+      sku: { startsWith: 'BNV-' },
+      slug: { notIn: PRODUCTS.map((p) => p.slug) },
+      status: { not: 'archived' },
+    },
+    data: { status: 'archived' },
+  });
+
+  console.log(
+    `products: ${PRODUCTS.length}, variants: ${variantCount}, archived: ${archived} (demo)`,
+  );
 }

@@ -55,22 +55,20 @@ Each banner is exported as `banner-<page>-<light|dark>-desktop.webp` (1920×650)
 
 ## 2. Exported Placeholders — `public/images/prototype/`
 
-124 WebP files, each at or under 300 KB (the largest is 136 KB), exported with `sharp` at quality 78. Banners use a cover crop with attention positioning.
+201 WebP files (124 from Gate B, 77 more product images added for the demo catalog on 2026-10-29), each at or under 300 KB (the largest is 168 KB), exported with `sharp` at quality 78. Banners use a cover crop with attention positioning.
 
 | Group                         | Files | Size (px)              | Source                       |
 | ----------------------------- | ----- | ---------------------- | ---------------------------- |
 | Banners                       | 82    | 1920×650 and 1080×1080 | Banners/01–05                |
-| `product-women-01…06`         | 6     | 960×1200               | LadyWare Images/Phase1       |
-| `product-men-01…06`           | 6     | 960×1200               | MensWare Images/Phase 1      |
-| `product-jewelry-01…06`       | 6     | 960×1200               | JewelleryImages              |
-| `product-accessories-01…06`   | 6     | 960×1200               | Accessories Images           |
-| `product-candles-home-01…06`  | 6     | 960×1200               | Candle Home LIfestyle Images |
-| `product-gift-box-01…06`      | 6     | 960×1200               | GiftBox Images               |
-| `product-couple-outfit-01…06` | 6     | 960×1200               | CoupleOutfit Images          |
+| `product-women-01…19`         | 19    | 960×1200               | LadyWare Images/Phase1       |
+| `product-men-01…20`           | 20    | 960×1200               | MensWare Images/Phase 1      |
+| `product-jewelry-01…20`       | 20    | 960×1200               | JewelleryImages              |
+| `product-accessories-01…20`   | 20    | 960×1200               | Accessories Images           |
+| `product-candles-home-01…20`  | 20    | 960×1200               | Candle Home LIfestyle Images |
+| `product-gift-box-01…10`      | 10    | 960×1200               | GiftBox Images               |
+| `product-couple-outfit-01…10` | 10    | 960×1200               | CoupleOutfit Images          |
 
 `public/images/brand/` stays empty until the logo, favicon and OG image are commissioned.
-
-**Known mismatch:** the demo seed (`prisma/seed/data/products.ts`) still points at file names such as `women-lavender-wrap-dress-01.webp`. Align it with these files in sprint 1C.
 
 ## 3. Crop Gaps
 
@@ -91,7 +89,7 @@ Each banner is exported as `banner-<page>-<light|dark>-desktop.webp` (1920×650)
 | Banners/05 FAQ dark                     | Wrong brand text in the image ("BLUSH & VIOLET")                                                         |
 | Website Images (30)                     | Love-website template previews; a reference for the Love Websites page, not exported yet                 |
 
-Product images beyond the first six per category are not exported but remain available.
+Every Phase 1 product image is exported and used by one demo product (`prisma/seed/data/products.ts`, 119 products).
 
 ## 5. Archive — `BnV Docs/_archive/`
 

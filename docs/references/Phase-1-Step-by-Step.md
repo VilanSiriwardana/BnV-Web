@@ -234,7 +234,7 @@ public/
   brand/
 ```
 
-- **VERIFIED gap:** `tsconfig.json` maps `@/*` to `./*`. Sprint 1A must point it at `./src/*` (or decide to keep `./*` and import as `@/src/...`) before the first shared module is written.
+- **Resolved in 1A (2026-10-29):** `tsconfig.json` maps `@/*` to `./src/*`. Next.js uses the root `app/` because `src/app/` does not exist.
 - `src/i18n/` is not created in Phase 1 (D-15).
 - Before any structural change, read the relevant guide in `node_modules/next/dist/docs/`.
 

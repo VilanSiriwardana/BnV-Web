@@ -266,3 +266,32 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 
 - No Python on this machine; use Node for scripted edits.
 - `D-20` needs no schema change: `orders.payment_method` and `payments.method` already exist.
+
+## 2026-10-29 - Sprint 1A Foundation Finish (Blueprint 004)
+
+### Summary
+
+- Pointed `@/*` at `./src/*` and created the sprint 1A config, constants and utils modules (Phase-1-Step-by-Step §3.2–3.3).
+- Fixed the demo seed image paths (pulled forward from 1C).
+
+### Verification
+
+- Checked `node_modules/next/dist/docs/01-app/01-getting-started/02-project-structure.md`: `src/` is supported; the root `app/` is used because there is no `src/app/`.
+- `typecheck`, `lint` and `build` pass. `db:seed:demo` twice with identical counts (products 12, variants 26).
+
+### Known Gotchas
+
+- Never create `src/app/`; routes stay in the root `app/` (D-14).
+
+## 2026-10-29 - Demo Catalog Expanded to 119 Products
+
+### Summary
+
+- One demo product per Phase 1 product image (owner request): 19 women, 20 men, 20 jewelry, 20 accessories, 20 candles & home, 10 gift boxes, 10 couples. Names come from viewing each image; no unverified material claims (`gold-tone`, `satin-finish`), LKR prices (D-10).
+- Exported 77 more WebP images (`product-<group>-07…`) and appended them to `docs/references/assets/image-mapping.csv`.
+- Added child categories women-knitwear, women-outerwear, men-knitwear, men-outerwear (categories now 22).
+- The products seeder now archives demo products that are no longer in the data file (never deletes).
+
+### Verification
+
+- 119 products, 227 variants, unique slugs and SKUs; every image URL exists. `db:seed:demo` twice: first run archived the 12 old demo products, second run identical with 0 archived. Typecheck and ESLint pass.

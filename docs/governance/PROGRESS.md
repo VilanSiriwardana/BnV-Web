@@ -358,3 +358,27 @@ Closed Gate A (milestone M0.3):
 
 - Owner: fill Business-Facts.md and commission the logo and real photography.
 - Phase 1 sprint 1A.
+
+## 2026-10-29 - Sprint 1A Foundation Finish
+
+### Summary
+
+- `@/*` now resolves to `./src/*` (D-14).
+- Added `src/config/{brand,routes,navigation,seo,theme}.ts`, `src/constants/statuses.ts` (D-04 + D-20 with Zod enums) and `src/lib/utils/cn.ts`. Unconfirmed business values in `brand.ts` are `null` (Business-Facts.md).
+- Pulled forward from 1C: the demo seed's image URLs now point at the exported `product-*.webp` placeholders.
+
+### Files Changed
+
+- `tsconfig.json`, `src/**` (new), `prisma/seed/data/products.ts`, `docs/references/{Phase-1-Step-by-Step,Visual-Asset-Inventory}.md`, `docs/governance/{PLAN,PROGRESS}.md`, `docs/AI_SESSION_LOG.md`.
+
+### Database Changes
+
+- None. Demo seed re-run twice: products 12, variants 26 both times.
+
+### Tests
+
+- `npm run typecheck`, `npm run lint` and `npm run build` pass. All 12 seed image URLs exist under `public/`.
+
+### Next Step
+
+- Sprint 1B (design system).
