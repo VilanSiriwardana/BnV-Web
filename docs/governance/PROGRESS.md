@@ -486,3 +486,20 @@ Closed Gate A (milestone M0.3):
 - Lint, typecheck and build pass.
 - The served HTML has 1 eager/high-priority image and 47 lazy images, `<picture>` art direction, blur backgrounds and no `scale-105`.
 - `/_next/image` returns `image/avif` (7.1 KB) for AVIF clients and `image/webp` (7.5 KB) otherwise.
+
+## 2026-10-29 - Form Validation Standard (ADR-0019)
+
+### Summary
+
+- Forms validate on both the client and the server with a shared Zod schema.
+- New: `useInput` / `useFormValidation` (`src/lib/forms/`), `FieldError` / `FormMessage` with a reserved line, and `FormState`.
+- Newsletter rebuilt on the new pieces:
+  - already-active emails get an "already on our list" notice;
+  - unsubscribed emails are reactivated with "Welcome back";
+  - the success panel has a "Subscribe another email" reset.
+- Docs: AGENTS.md Forms, ADR-0019, UX-Spec §6.
+
+### Tests
+
+- Lint, typecheck and build pass.
+- Calling the action directly: missing consent, bad email and empty email return field errors; the existing email in capitals returns the info notice with no write.

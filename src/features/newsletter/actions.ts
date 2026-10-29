@@ -1,10 +1,16 @@
 'use server';
 
+import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
 import { prisma } from '@/lib/prisma';
 
 import { newsletterSchema, type NewsletterState } from './schema';
+
+const ALREADY_SUBSCRIBED: NewsletterState = {
+  status: 'info',
+  message: "You're already on our list. Nothing more to do.",
+};
 
 export async function subscribeToNewsletter(
   _prev: NewsletterState,
@@ -19,7 +25,7 @@ export async function subscribeToNewsletter(
     const { fieldErrors } = z.flattenError(parsed.error);
     return {
       status: 'error',
-      email: String(formData.get('email') ?? ''),
+      values: { email: String(formData.get('email') ?? '') },
       fieldErrors: {
         email: fieldErrors.email?.[0],
         consent: fieldErrors.consent?.[0],
@@ -30,16 +36,37 @@ export async function subscribeToNewsletter(
   const { email } = parsed.data;
 
   try {
-    // Same response for new, existing and returning subscribers, so emails cannot be enumerated.
-    await prisma.newsletterSubscriber.upsert({
+    const existing = await prisma.newsletterSubscriber.findUnique({
       where: { email },
-      create: { email, source: 'homepage', status: 'active' },
-      update: { status: 'active', unsubscribedAt: null },
+      select: { status: true },
     });
-  } catch {
+
+    if (existing?.status === 'active') return ALREADY_SUBSCRIBED;
+
+    if (existing) {
+      await prisma.newsletterSubscriber.update({
+        where: { email },
+        data: { status: 'active', unsubscribedAt: null },
+      });
+      return {
+        status: 'success',
+        message: "Welcome back. You're subscribed again.",
+      };
+    }
+
+    await prisma.newsletterSubscriber.create({
+      data: { email, source: 'homepage', status: 'active' },
+    });
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    ) {
+      return ALREADY_SUBSCRIBED;
+    }
     return {
       status: 'error',
-      email,
+      values: { email },
       message: 'Something went wrong on our side. Please try again shortly.',
     };
   }

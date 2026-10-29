@@ -376,3 +376,16 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 - Every product original sits below 1200px wide, so all 119 were capped at their native 4:5 crop.
 - `Reveal` content is server-rendered at `opacity: 0` until hydration, so it is invisible without JS. The text is still in the HTML for SEO.
 - The light hero image is still fetched eagerly in dark mode (accepted cost).
+
+## 2026-10-29 - Form Validation Standard
+
+### Summary
+
+- Implemented blueprint `.claude/blueprints/009-form-validation-standard.md`.
+- The owner's "failure" was that a duplicate email showed the normal success message. The server was correct (no duplicate row); the behaviour was intentional anti-enumeration. It now shows an info notice (ADR-0019).
+
+### Known Gotchas
+
+- `useActionState` cannot be reset. The newsletter form tracks a `dismissed` state object to return from the success panel to the form.
+- Zod checkboxes: `useInput` parses an unchecked box as `null`, so `z.literal('on')` reports its custom message.
+- Hooks live in `src/lib/forms/` because D-14 defines no `src/hooks/`.

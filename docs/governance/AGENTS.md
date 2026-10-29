@@ -157,6 +157,17 @@ Use [../references/Brand-Identity.md](../references/Brand-Identity.md) for the d
 - Avoid ad hoc colors, spacing, and typography outside the design system.
 - Verify responsive layouts so text and controls do not overlap or overflow.
 
+## Forms
+
+Every form follows ADR-0019:
+
+- **Shared schema.** Define one Zod schema in `src/features/<feature>/schema.ts`. The client and the Server Action both import it; the server result is authoritative. Return `FormState` from `src/lib/forms/types.ts`.
+- **Input handling.** Use `useInput` from `src/lib/forms/use-input.ts` for every input, so inputs stay controlled. It validates on blur, then again on every change once the field has been touched.
+- **Submit.** Pass `useFormValidation([...inputs])` as `onSubmit`. It blocks the action on errors and focuses the first invalid field. Merge server `fieldErrors` back with `setServerError`.
+- **Messages.** Render `FieldError` under each field and `FormMessage` under the form (`src/components/ui/field-error.tsx`). Both are always rendered with a reserved `min-h-5` line, so there is no layout shift.
+- **Consent.** Forms that collect personal data need a privacy consent checkbox (UX-Spec §7).
+- **Libraries.** Do not add react-hook-form or another form library without a new ADR.
+
 ## Backend Standards
 
 - Keep server-side behavior explicit and typed.
@@ -361,6 +372,7 @@ Reference documents in `../references/` describe approved strategy, design, and 
 
 ## AGENTS.md Changelog
 
+- 2026-10-29: Added the Forms section (ADR-0019).
 - 2026-10-29: Added image (eager/lazy, presets, blur) and motion rules to Performance after the image and motion pass.
 
 - 2026-10-28 (update-audit): Added the Prisma Schema Source of Truth invariant (`schema.prisma` is the only schema file Prisma reads; `prisma/models/` copies are stale). Corrected the repository structure (`src/` and `prisma/seed/` don't exist; `docker/` is vestigial). Recorded the dependencies that are already installed and the missing `node_modules/` caveat. Repointed every `DECISIONS.md` link to `docs/decisions/DECISIONS.md`, where the file moved in commit e01b1ed.

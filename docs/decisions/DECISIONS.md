@@ -326,3 +326,29 @@ Each decision should include:
 - Related Documents:
   - [../references/Database-Design-Reference.md](../references/Database-Design-Reference.md)
   - [../references/Phase-1-Reconciled-Decisions.md](../references/Phase-1-Reconciled-Decisions.md)
+
+## ADR-0019 - Form Validation Standard
+
+- Status: Accepted
+- Date: 2026-10-29
+- Context: Newsletter QA showed that server-only validation gives late and invisible feedback. React 19 resets form fields after an action, and conditional error text shifts the layout. The owner asked for one standard for every form.
+- Decision:
+  - **One Zod schema per form** in `src/features/<feature>/schema.ts`. It is imported by both the client (for user experience) and the Server Action, which is the authority. Actions return `FormState` (`src/lib/forms/types.ts`).
+  - **`useInput`** (`src/lib/forms/use-input.ts`), a custom hook:
+    - inputs are controlled;
+    - each field is validated with its schema field (`schema.shape.<key>`) on blur, then on every change once it has been touched;
+    - checkboxes are supported;
+    - server field errors are merged back into the inputs.
+  - **`useFormValidation`** validates every field on submit, blocks the action and focuses the first invalid field.
+  - **`FieldError` and `FormMessage`** (`src/components/ui/field-error.tsx`) are always rendered with a reserved `min-h-5` line, so errors never shift the layout.
+  - **Newsletter** answers an already-active email with a neutral "already on our list" notice, and reactivates an unsubscribed email with a "Welcome back" message.
+- Alternatives:
+  - react-hook-form + `@hookform/resolvers` (a new dependency and a second pattern);
+  - server-only validation;
+  - native constraint validation.
+- Consequences:
+  - The newsletter reveals whether an email is subscribed. This is accepted as low sensitivity, and it must not be copied to auth or admin forms.
+  - No `src/hooks/` folder (D-14); form hooks live in `src/lib/forms/`.
+- Related Documents:
+  - [../governance/AGENTS.md](../governance/AGENTS.md) (Forms)
+  - [../references/Phase-1-UX-Spec.md](../references/Phase-1-UX-Spec.md) §6

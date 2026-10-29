@@ -224,18 +224,18 @@ Public product badges ([Brand-Identity.md](Brand-Identity.md) §24.4) are separa
 
 ## 6. Empty, Error, Loading and Stock States
 
-| State                       | Where                | Behaviour                                                                                                           |
-| --------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Loading                     | Route segments       | `loading.tsx` skeletons that match the final layout (cards, gallery, table rows); no spinners on full pages         |
-| Empty category / collection | Listing pages        | "New pieces are on their way" + links to other pillars; page stays indexable only if it has content                 |
-| Empty search / filters      | Shop, portfolio      | Message + "Clear filters"                                                                                           |
-| Empty cart                  | Drawer and `/cart`   | Short line + CTAs to New In and Gifts                                                                               |
-| Form error                  | All forms            | Inline field messages from Zod; a summary at the top linked to the fields; focus moves to the first error           |
-| Server error                | `error.tsx`          | Warm message, "Try again" (reset) and WhatsApp link; never shows raw errors                                         |
-| Not found                   | `not-found.tsx`      | H1 "This page has wandered off", links to Shop, Gifts and Custom; returns HTTP 404                                  |
-| Out of stock variant        | PDP variant selector | Variant shown but disabled with "Sold out"                                                                          |
-| Out of stock product        | PDP and cards        | "Sold out" badge (neutral); add-to-cart disabled; secondary CTA **Ask on WhatsApp** with the product name prefilled |
-| Low stock                   | PDP                  | "Only a few left" when quantity ≤ `low_stock_threshold`; never a fake countdown                                     |
+| State                       | Where                | Behaviour                                                                                                                                                                                                                                                          |
+| --------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Loading                     | Route segments       | `loading.tsx` skeletons that match the final layout (cards, gallery, table rows); no spinners on full pages                                                                                                                                                        |
+| Empty category / collection | Listing pages        | "New pieces are on their way" + links to other pillars; page stays indexable only if it has content                                                                                                                                                                |
+| Empty search / filters      | Shop, portfolio      | Message + "Clear filters"                                                                                                                                                                                                                                          |
+| Empty cart                  | Drawer and `/cart`   | Short line + CTAs to New In and Gifts                                                                                                                                                                                                                              |
+| Form error                  | All forms            | Shared Zod schema validated on blur and on submit (client) and in the Server Action (server). Each field has a reserved one-line message slot, so there is no layout shift. A summary at the top links to the fields. Focus moves to the first error. See ADR-0019 |
+| Server error                | `error.tsx`          | Warm message, "Try again" (reset) and WhatsApp link; never shows raw errors                                                                                                                                                                                        |
+| Not found                   | `not-found.tsx`      | H1 "This page has wandered off", links to Shop, Gifts and Custom; returns HTTP 404                                                                                                                                                                                 |
+| Out of stock variant        | PDP variant selector | Variant shown but disabled with "Sold out"                                                                                                                                                                                                                         |
+| Out of stock product        | PDP and cards        | "Sold out" badge (neutral); add-to-cart disabled; secondary CTA **Ask on WhatsApp** with the product name prefilled                                                                                                                                                |
+| Low stock                   | PDP                  | "Only a few left" when quantity ≤ `low_stock_threshold`; never a fake countdown                                                                                                                                                                                    |
 
 Availability comes from `inventory.quantity - inventory.reserved_quantity`.
 

@@ -1,14 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { FieldError, FormMessage } from '@/components/ui/field-error';
 import { Input } from '@/components/ui/input';
 import { routes } from '@/config/routes';
+import { useFormValidation, useInput } from '@/lib/forms/use-input';
 
 import { subscribeToNewsletter } from './actions';
-import type { NewsletterState } from './schema';
+import { newsletterSchema, type NewsletterState } from './schema';
 
 const initialState: NewsletterState = { status: 'idle' };
 
@@ -17,63 +19,78 @@ export function NewsletterForm() {
     subscribeToNewsletter,
     initialState,
   );
+  const [dismissed, setDismissed] = useState<NewsletterState | null>(null);
 
-  if (state.status === 'success') {
+  const email = useInput({
+    id: 'newsletter-email',
+    name: 'email',
+    schema: newsletterSchema.shape.email,
+  });
+  const consent = useInput({
+    id: 'newsletter-consent',
+    name: 'consent',
+    schema: newsletterSchema.shape.consent,
+    type: 'checkbox',
+  });
+  const onSubmit = useFormValidation([email, consent]);
+
+  const { setServerError: setEmailError } = email;
+  const { setServerError: setConsentError } = consent;
+  useEffect(() => {
+    if (state.status !== 'error') return;
+    setEmailError(state.fieldErrors?.email);
+    setConsentError(state.fieldErrors?.consent);
+  }, [state, setEmailError, setConsentError]);
+
+  if (state.status === 'success' && dismissed !== state) {
     return (
-      <p
-        role="status"
-        className="font-display text-h4 mx-auto max-w-xl text-center"
-      >
-        {state.message}
-      </p>
+      <div role="status" className="mx-auto max-w-xl text-center">
+        <p className="font-display text-h4">{state.message}</p>
+        <Button
+          variant="link"
+          className="mt-2"
+          onClick={() => {
+            email.reset();
+            consent.reset();
+            setDismissed(state);
+          }}
+        >
+          Subscribe another email
+        </Button>
+      </div>
     );
   }
 
-  const emailError = state.fieldErrors?.email;
-  const consentError = state.fieldErrors?.consent;
+  const shown = dismissed === state ? initialState : state;
 
   return (
-    <form action={formAction} noValidate className="mx-auto max-w-xl">
+    <form
+      action={formAction}
+      onSubmit={onSubmit}
+      noValidate
+      className="mx-auto max-w-xl"
+    >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
         <div className="flex-1">
           <label htmlFor="newsletter-email" className="sr-only">
             Email address
           </label>
           <Input
-            id="newsletter-email"
-            name="email"
+            {...email.bind}
             type="email"
             autoComplete="email"
             placeholder="Your email address"
-            defaultValue={state.email}
-            required
-            aria-invalid={emailError ? true : undefined}
-            aria-describedby={emailError ? 'newsletter-email-error' : undefined}
           />
-          {emailError && (
-            <p
-              id="newsletter-email-error"
-              className="text-small text-destructive mt-1 text-left"
-            >
-              {emailError}
-            </p>
-          )}
+          <FieldError id={email.errorId} message={email.error} />
         </div>
         <Button type="submit" size="lg" className="h-11" disabled={pending}>
           {pending ? 'Joining…' : 'Join the list'}
         </Button>
       </div>
-      <div className="mt-4 flex items-start gap-2 text-left">
+      <div className="mt-2 flex items-start gap-2 text-left">
         <input
-          id="newsletter-consent"
-          name="consent"
-          type="checkbox"
-          required
+          {...consent.bind}
           className="accent-primary mt-1 size-4 shrink-0"
-          aria-invalid={consentError ? true : undefined}
-          aria-describedby={
-            consentError ? 'newsletter-consent-error' : undefined
-          }
         />
         <label
           htmlFor="newsletter-consent"
@@ -89,19 +106,8 @@ export function NewsletterForm() {
           . You can unsubscribe at any time.
         </label>
       </div>
-      {consentError && (
-        <p
-          id="newsletter-consent-error"
-          className="text-small text-destructive mt-1 text-left"
-        >
-          {consentError}
-        </p>
-      )}
-      {state.status === 'error' && state.message && (
-        <p role="alert" className="text-small text-destructive mt-3">
-          {state.message}
-        </p>
-      )}
+      <FieldError id={consent.errorId} message={consent.error} />
+      <FormMessage status={shown.status} message={shown.message} />
     </form>
   );
 }
