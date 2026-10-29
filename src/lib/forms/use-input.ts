@@ -1,7 +1,16 @@
 'use client';
 
-import { useCallback, useRef, useState, type FormEvent } from 'react';
+import {
+  useCallback,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+  type RefObject,
+} from 'react';
 import type { ZodType } from 'zod';
+
+type FieldElement = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
 
 type Options = {
   id: string;
@@ -12,7 +21,7 @@ type Options = {
 };
 
 // Controlled input validated against its Zod field schema: on blur, then on every change once touched.
-export function useInput({
+export function useInput<E extends FieldElement = HTMLInputElement>({
   id,
   name,
   schema,
@@ -22,7 +31,7 @@ export function useInput({
   const [value, setValue] = useState(initial);
   const [touched, setTouched] = useState(false);
   const [error, setError] = useState<string | undefined>();
-  const ref = useRef<HTMLInputElement>(null);
+  const ref = useRef<E>(null);
   const errorId = `${id}-error`;
 
   const validate = useCallback(
@@ -36,10 +45,10 @@ export function useInput({
     [schema, type, value],
   );
 
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChange = (event: ChangeEvent<E>) => {
     const next =
       type === 'checkbox'
-        ? event.target.checked
+        ? (event.target as HTMLInputElement).checked
           ? 'on'
           : ''
         : event.target.value;
@@ -83,7 +92,10 @@ export function useInput({
   };
 }
 
-type Validatable = Pick<ReturnType<typeof useInput>, 'validate' | 'ref'>;
+export type Validatable = {
+  validate: () => boolean;
+  ref: RefObject<FieldElement | null>;
+};
 
 // Blocks submission when any input is invalid and focuses the first one (UX-Spec §6).
 export function useFormValidation(inputs: Validatable[]) {

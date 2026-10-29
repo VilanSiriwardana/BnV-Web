@@ -43,7 +43,7 @@ const selectClass =
 const textareaClass = cn(selectClass, 'h-auto min-h-20 py-2');
 const labelClass = 'text-small mb-1 block font-medium';
 
-type TextInput = ReturnType<typeof useInput>;
+type TextInput = ReturnType<typeof useInput<HTMLInputElement>>;
 
 function TextField({
   input,

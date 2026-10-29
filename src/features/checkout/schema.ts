@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { paymentMethods } from '@/constants/statuses';
 import { districts } from '@/data/sri-lanka-districts';
+import { sriLankaPhoneSchema } from '@/lib/forms/fields';
 import type { FormState } from '@/lib/forms/types';
 import { newsletterSchema } from '@/features/newsletter/schema';
 
@@ -13,21 +14,7 @@ const checkbox = z
   .nullish()
   .transform((v) => v === 'on');
 
-// Accepts 07X XXX XXXX, 7XXXXXXXX, 947XXXXXXXX or +947XXXXXXXX; stores +947XXXXXXXX (UX-Spec §1.1).
-export const sriLankaPhoneSchema = z
-  .string()
-  .trim()
-  .min(1, 'Please enter your mobile number.')
-  .transform((v) => v.replace(/[\s()-]/g, '').replace(/^(\+?94|0)/, ''))
-  .pipe(
-    z
-      .string()
-      .regex(
-        /^7\d{8}$/,
-        'Please enter a Sri Lankan mobile, e.g. 077 123 4567.',
-      ),
-  )
-  .transform((v) => `+94${v}`);
+export { sriLankaPhoneSchema };
 
 export const checkoutSchema = z.object({
   name: z
