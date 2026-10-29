@@ -25,8 +25,26 @@ export const brand = {
   country: 'LK',
   locale: 'en-LK',
   logo: { light: null, dark: null },
-  contact: { whatsapp: null, email: null },
+  contact: { whatsapp: '+94703802284', email: null },
   social: { instagram: null, tiktok: null, facebook: null },
   delivery: { freeThresholdLkr: null },
   returnsWindowDays: null,
 } as const satisfies Brand;
+
+export function whatsappUrl(text: string) {
+  const number = brand.contact.whatsapp as string | null;
+  return number
+    ? `https://wa.me/${number.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`
+    : null;
+}
+
+// Neutral copy until the owner confirms delivery and returns values (Business-Facts.md).
+export const policyCopy = {
+  delivery:
+    'Delivery charges and timing are confirmed with you when we confirm your order.',
+  returns:
+    'Questions about an order? Contact us and we will help. Full returns terms will be published soon.',
+  payment:
+    'Cash on delivery or bank transfer, confirmed with you after you place your order.',
+  giftPackaging: 'Ask us about gift packaging options when you order.',
+} as const;

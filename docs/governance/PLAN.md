@@ -14,8 +14,8 @@ This file tracks only **where we are now**. Update it as work progresses, and re
 
 ## Current Position
 
-- Stage: **Gate B — Partial** (docs and assets done; owner business values and commissions open). Next: **1D manual QA**, then sprint 1E (catalog + PDP).
-- Next: 1D manual QA, then 1E.
+- Stage: **Gate B — Partial** (docs and assets done; owner business values and commissions open). Next: **1D + 1E manual QA**, then sprint 1F (cart + checkout inquiry).
+- Next: 1D + 1E manual QA, then 1F.
 
 ## Gate Progress
 
@@ -27,7 +27,7 @@ This file tracks only **where we are now**. Update it as work progresses, and re
 | 1B Design system              | Done (2026-10-29)                                                       |
 | 1C Database completion        | Done (2026-10-29)                                                       |
 | 1D Homepage                   | Built (2026-10-29); manual QA (themes, breakpoints, newsletter) pending |
-| 1E Catalog + PDP              | Not started                                                             |
+| 1E Catalog + PDP              | Built (2026-10-29); manual QA (themes, breakpoints, filters) pending    |
 | 1F Cart + checkout inquiry    | Not started                                                             |
 | 1G Custom, Contact, Portfolio | Not started                                                             |
 | 1H Admin MVP                  | Not started                                                             |

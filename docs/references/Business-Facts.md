@@ -16,14 +16,14 @@
 
 ## Contact and Identity
 
-| Field            | Value | Status | Owner | Used by                                           |
-| ---------------- | ----- | ------ | ----- | ------------------------------------------------- |
-| WhatsApp number  | TBD   | TBD    | Owner | Header, checkout success deep link, contact, D-20 |
-| Public email     | TBD   | TBD    | Owner | Contact, footer, order emails                     |
-| Domain           | TBD   | TBD    | Owner | `NEXT_PUBLIC_SITE_URL`, canonical URLs, sitemap   |
-| Instagram handle | TBD   | TBD    | Owner | Footer, Organization JSON-LD `sameAs`             |
-| TikTok handle    | TBD   | TBD    | Owner | Footer, Organization JSON-LD `sameAs`             |
-| Facebook page    | TBD   | TBD    | Owner | Footer, Organization JSON-LD `sameAs`             |
+| Field            | Value        | Status                 | Owner | Used by                                           |
+| ---------------- | ------------ | ---------------------- | ----- | ------------------------------------------------- |
+| WhatsApp number  | +94703802284 | CONFIRMED (2026-10-29) | Owner | Header, checkout success deep link, contact, D-20 |
+| Public email     | TBD          | TBD                    | Owner | Contact, footer, order emails                     |
+| Domain           | TBD          | TBD                    | Owner | `NEXT_PUBLIC_SITE_URL`, canonical URLs, sitemap   |
+| Instagram handle | TBD          | TBD                    | Owner | Footer, Organization JSON-LD `sameAs`             |
+| TikTok handle    | TBD          | TBD                    | Owner | Footer, Organization JSON-LD `sameAs`             |
+| Facebook page    | TBD          | TBD                    | Owner | Footer, Organization JSON-LD `sameAs`             |
 
 ## Delivery (Sri Lanka only at launch)
 

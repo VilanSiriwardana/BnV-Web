@@ -389,3 +389,19 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 - `useActionState` cannot be reset. The newsletter form tracks a `dismissed` state object to return from the success panel to the form.
 - Zod checkboxes: `useInput` parses an unchecked box as `null`, so `z.literal('on')` reports its custom message.
 - Hooks live in `src/lib/forms/` because D-14 defines no `src/hooks/`.
+
+## 2026-10-29 - Sprint 1E Catalog + PDP
+
+### Summary
+
+- Implemented blueprint `.claude/blueprints/010-sprint-1e-catalog-pdp.md`. Decisions: dynamic `[pillar]` routing, add-to-cart stubbed until 1F, owner TBD placeholders, and a lean set of shop filters.
+
+### Deviations
+
+- Shop filters use a plain GET form (works without JS) instead of a client sort select.
+- The PDP primary image uses `loading="eager"` with `fetchPriority="high"`, because Next 16 deprecates `priority`.
+- `cardSelect` now also selects variant inventory. `toCard`/`toCards` output is unchanged.
+
+### Known Gotchas
+
+- `notFound()` on an ISR product page returns HTTP 200 with `noindex`, because the root `loading.tsx` streams the response.

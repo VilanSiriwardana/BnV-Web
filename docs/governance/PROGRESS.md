@@ -503,3 +503,52 @@ Closed Gate A (milestone M0.3):
 
 - Lint, typecheck and build pass.
 - Calling the action directly: missing consent, bad email and empty email return field errors; the existing email in capitals returns the info notice with no write.
+
+## 2026-10-29 - Sprint 1E Catalog + PDP (built, manual QA pending)
+
+### Summary
+
+- Implemented blueprint `.claude/blueprints/010-sprint-1e-catalog-pdp.md`.
+- Shared catalog data layer `src/features/catalog/` (`queries`, `schema`, `variants`). The homepage now reuses `cardSelect`/`toCards` from it. Public visibility is enforced in queries: active products and variants, active collections inside their start/end dates.
+- Routes:
+  - `/shop`: dynamic, GET-form filters (category, collection, min/max LKR, in stock) and sorts (newest, price asc/desc). Canonical is always `/shop`.
+  - `/[pillar]` and `/[pillar]/[sub]` (D-21): ISR. Unknown pillars return 404 (`dynamicParams = false`). Empty subcategories are `noindex`.
+  - `/collections/[slug]` and `/products/[slug]`: ISR with `generateStaticParams`.
+- PDP:
+  - Gallery (primary image eager, high fetch priority, quality 85).
+  - `VariantSelector` parses options from `variant.name` (UX-Spec §9.1) and shows sold-out and "Only a few left" states plus quantity.
+  - Add to cart is a disabled stub carrying the 1F payload `{variantId, quantity, selectedOptions}`.
+  - "Ask on WhatsApp" appears once `brand.contact.whatsapp` is set. Until then it links to `/contact`.
+  - Accordions and up to 4 related products (UX-Spec §9.3).
+- SEO:
+  - `src/lib/seo/{canonical,metadata,jsonld}`.
+  - Product JSON-LD with LKR offers and no ratings; Breadcrumb and CollectionPage JSON-LD.
+  - `app/sitemap.ts`, `app/robots.ts`, `app/not-found.tsx`.
+
+### Files Changed
+
+- `app/{shop,[pillar],collections,products}/**`, `app/{sitemap,robots}.ts`, `app/not-found.tsx`.
+- `src/features/catalog/**`, `src/features/home/queries.ts`.
+- `src/components/catalog/**`, `src/components/product/{product-gallery,variant-selector,product-accordions,size-guide-sheet}.tsx`.
+- `src/lib/seo/**`, `src/config/brand.ts` (`whatsappUrl`, `policyCopy`), `src/data/size-guides/index.ts`.
+
+### Tests
+
+- Typecheck, lint and build pass. Build output: 5 pillars, 15 subcategories, 5 collections and 119 products prerendered with 5m revalidation.
+- Against `next start`:
+  - `/shop` price sorts are correctly ordered.
+  - An impossible filter shows "No pieces match these filters." with "Clear filters".
+  - `/women/dresses` and `/jewelry/rings` return 200; `/foo` returns 404.
+  - PDP HTML has Product JSON-LD in LKR with no `aggregateRating` and no USD.
+  - `robots.txt` and `sitemap.xml` (146 URLs) are served.
+
+### Known Gotchas
+
+- `/products/<unknown>` renders the not-found page with `noindex` but HTTP 200. This is caused by streaming from the root `app/loading.tsx`.
+- Shop price sort and the in-stock filter run in memory. That is fine for the Phase 1 catalog size; add pagination or SQL sorting before the catalog grows large.
+- The demo seed has quantity 10 for every variant, so the sold-out and low-stock states are untested against real data. Verify them by editing inventory.
+- Size guide, care copy, delivery/returns values and the WhatsApp number are owner TBDs. The size guide stays hidden until `src/data/size-guides` has data.
+
+### Next Step
+
+- Manual QA (both themes; 360–1536px; filters; variant selection), then sprint 1F.
