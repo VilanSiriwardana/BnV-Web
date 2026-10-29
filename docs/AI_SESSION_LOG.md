@@ -324,3 +324,35 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 ### Known Gotchas
 
 - `prisma migrate dev` is refused in non-interactive shells when it raises a data-loss warning. Generate the SQL with `prisma migrate diff --from-config-datasource --to-schema prisma/schema --script`, hand-edit it, and apply it with `prisma migrate deploy`.
+
+## 2026-10-29 - Sprint 1D Homepage
+
+### Summary
+
+- Implemented blueprint `.claude/blueprints/007-sprint-1d-homepage.md`.
+- Decisions taken as the plan's recommended defaults:
+  - The Portfolio preview is a "coming soon" teaser with a Work With Us CTA.
+  - The social gallery is hidden until handles are confirmed.
+  - The announcement bar uses neutral copy with no claims.
+  - Consent time = `subscribedAt` (no schema change).
+  - Links to routes built in 1G are accepted.
+  - The `custom` seed category is untouched.
+  - Category images come from the prototype banners.
+
+### Deviations from the blueprint
+
+- The four teasers share one file, `src/features/home/sections/teasers.tsx`, and the product sections share `product-section.tsx`.
+- `ArtDirectedImage` was added for the light/dark × desktop/mobile swap.
+- "New Arrival" is computed in the query (`isNew`) because the React purity lint rule forbids `Date.now()` during render.
+
+### Verification
+
+- Typecheck, lint and build pass.
+- `next start` HTML contains all sections with LKR prices and the tagline title.
+- Newsletter submissions were not exercised, because DB writes need approval.
+
+### Known Gotchas
+
+- Zod 4: use `z.flattenError(error)`; `error.flatten()` is deprecated.
+- A Prisma select reused across queries needs `satisfies Prisma.ProductSelect`, not `as const`, because readonly `orderBy` arrays fail typecheck.
+- The announcement bar renders below the header because the header lives in the layout. Follow-up: move it into the layout when 1E needs it site-wide.

@@ -433,3 +433,23 @@ Closed Gate A (milestone M0.3):
 ### Next Step
 
 - Sprint 1D (homepage).
+
+## 2026-10-29 - Sprint 1D Homepage (built, manual QA pending)
+
+### Summary
+
+- Homepage in Brand-Identity §23 order, server-rendered from the DB with 5-minute revalidation: announcement bar, hero, featured categories, New In, Limited Drop, Fashion Edit, Jewelry Highlight, Couple Collection, Gift Box teaser, Custom Orders, Love Websites, Portfolio "coming soon", Testimonials (hidden while empty, D-23), newsletter.
+- Reusable primitives for 1E: `PageHero`, `SectionHeading`, `CategoryCard`, `TeaserBand`, `ArtDirectedImage`, `AnnouncementBar`, `ProductCard`, `ProductGrid`, `formatLkr`.
+- Newsletter Server Action with Zod and required consent; upsert with `source = 'homepage'`, reactivates unsubscribed emails, same response for duplicates.
+
+### Files Changed
+
+- `app/page.tsx`, `app/loading.tsx`, `src/components/{marketing,product}/**`, `src/features/{home,newsletter}/**`, `src/data/{home,testimonials}.ts`, `src/lib/utils/{format,index}.ts`, `docs/governance/{PLAN,PROGRESS}.md`, `docs/AI_SESSION_LOG.md`.
+
+### Tests
+
+- Typecheck, lint and build pass; `/` prerenders as static with 5m revalidate. Served HTML shows DB products with LKR prices and no USD, ratings or "Love Notes".
+
+### Next Step
+
+- Manual QA (both themes; 360–1536px; newsletter new/duplicate/unsubscribed), then sprint 1E.
