@@ -465,3 +465,18 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 ### Open
 
 - Lighthouse, PSI and accessibility passes; Vercel + Supabase setup; domain; GA4 and Search Console IDs.
+
+## 2026-10-30 - Design skills setup
+
+### Summary
+
+- Implemented blueprint `.claude/blueprints/016-design-skills-setup.md`. Installed 16 Emil Kowalski skills to `~/.claude/skills` with `npx skills@latest add emilkowalski/skills -g -a claude-code -y`.
+- Added the Design Skills section to `docs/governance/AGENTS.md` and ADR-0022.
+
+### Deviations
+
+- Adapted the setup doc for React: dropped its jQuery rules and kept the React Emil skills.
+
+### Open
+
+- User actions: `npx impeccable install`, Taste Skill `/plugin` install, restart, `/impeccable init` and `/impeccable document`.

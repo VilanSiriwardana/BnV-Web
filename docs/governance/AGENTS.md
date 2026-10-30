@@ -157,6 +157,33 @@ Use [../references/Brand-Identity.md](../references/Brand-Identity.md) for the d
 - Avoid ad hoc colors, spacing, and typography outside the design system.
 - Verify responsive layouts so text and controls do not overlap or overflow.
 
+## Design Skills
+
+Installed: Impeccable (project, `.claude/skills/impeccable`, with design hook), Emil Kowalski skills and Taste Skill (`design-taste-frontend`) at user level. Setup: [../references/Design_Skills_Setup.md](../references/Design_Skills_Setup.md) (ADR-0022). Context files: `PRODUCT.md` and `DESIGN.md` at the repo root; load them only for UI tasks. [../references/Brand-Identity.md](../references/Brand-Identity.md) wins where `DESIGN.md` disagrees.
+
+Call skills by name; roles do not overlap:
+
+| Job                             | Skill                                                                          |
+| ------------------------------- | ------------------------------------------------------------------------------ |
+| Project context / design system | Impeccable `init`, `document`                                                  |
+| New app screen or section       | Impeccable                                                                     |
+| New landing or marketing page   | Taste Skill (expensive; ask first)                                             |
+| Diagnose an existing page       | Impeccable `critique`, then `audit`                                            |
+| Refine an existing page         | Impeccable `polish`, `typeset`, `layout`, `quieter`                            |
+| Build motion                    | Emil `animate`                                                                 |
+| Review or audit motion          | Emil `review-animations`, `improve-animations`, `find-animation-opportunities` |
+| Janky motion                    | Emil `animation-performance`                                                   |
+| Stress test                     | Emil `break-ui`                                                                |
+| Mobile web feel                 | Emil `mobile-native`                                                           |
+
+Rules:
+
+- Use the theme tokens in `app/globals.css`, existing `src/components/ui` (shadcn/radix) components, `framer-motion` and `tw-animate-css`. Add no UI or animation dependency without approval.
+- Run `critique` before any change command on an existing page. Never run `bolder`, `overdrive` or a Taste rebuild on an existing page without approval.
+- Every animation respects `prefers-reduced-motion` and the motion rules under Performance.
+- Taste Skill images are placeholders; replace them with brand assets on Cloudinary before shipping.
+- Skip `animate-expo` and `write-swift` (native only).
+
 ## Forms
 
 Every form follows ADR-0019:
@@ -357,6 +384,7 @@ Reference documents in `../references/` describe approved strategy, design, and 
 - [Architecture Index](../architecture/README.md)
 - [ADR Directory](../decisions/DECISIONS.md)
 - [AI Session Log](../AI_SESSION_LOG.md)
+- [Design Skills Setup](../references/Design_Skills_Setup.md) — UI work also reads root `PRODUCT.md` and `DESIGN.md`
 
 ## Quick Checklist
 
@@ -372,6 +400,7 @@ Reference documents in `../references/` describe approved strategy, design, and 
 
 ## AGENTS.md Changelog
 
+- 2026-10-30: Added the Design Skills section (ADR-0022).
 - 2026-10-29: Added the Forms section (ADR-0019).
 - 2026-10-29: Added image (eager/lazy, presets, blur) and motion rules to Performance after the image and motion pass.
 

@@ -1,0 +1,250 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-30T00:00:00Z",
+  "title": "Design System: B&V",
+  "extensions": {
+    "colorMeta": {
+      "signature-lavender": {
+        "role": "primary",
+        "displayName": "Signature Lavender",
+        "canonical": "#c8b6e2",
+        "tonalRamp": [
+          "#2e2440",
+          "#45375f",
+          "#5d4b80",
+          "#6a5296",
+          "#9a86bf",
+          "#c8b6e2",
+          "#ddd2ee",
+          "#f1ecf8"
+        ]
+      },
+      "dusty-rose": {
+        "role": "secondary",
+        "displayName": "Dusty Rose",
+        "canonical": "#c98f94",
+        "tonalRamp": [
+          "#3a2224",
+          "#5a3438",
+          "#7c4a4f",
+          "#a06a70",
+          "#c98f94",
+          "#dbb0b4",
+          "#ebd0d2",
+          "#f8ecec"
+        ]
+      },
+      "champagne-gold": {
+        "role": "tertiary",
+        "displayName": "Champagne Gold",
+        "canonical": "#c6a15b",
+        "tonalRamp": [
+          "#33270f",
+          "#523f18",
+          "#7a5c22",
+          "#a07e3c",
+          "#c6a15b",
+          "#d8bd86",
+          "#e8d6b2",
+          "#f6efe0"
+        ]
+      },
+      "warm-ivory": {
+        "role": "neutral",
+        "displayName": "Warm Ivory",
+        "canonical": "#faf7f2",
+        "tonalRamp": [
+          "#1c1b1a",
+          "#3d3934",
+          "#5e524c",
+          "#8f7d71",
+          "#d8c8bd",
+          "#efe7e0",
+          "#f5eee8",
+          "#faf7f2"
+        ]
+      },
+      "soft-blush": {
+        "role": "neutral",
+        "displayName": "Soft Blush",
+        "canonical": "#f3d8d6"
+      },
+      "midnight-plum": {
+        "role": "neutral",
+        "displayName": "Midnight Plum (dark background)",
+        "canonical": "#17121d"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero headlines only."
+      },
+      "headline": { "displayName": "Headline", "purpose": "Section titles." },
+      "title": { "displayName": "Title", "purpose": "Card and block titles." },
+      "body": { "displayName": "Body", "purpose": "Running copy, 65-75ch." },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Buttons, navigation, form labels."
+      },
+      "caption": { "displayName": "Caption", "purpose": "Badges and meta." }
+    },
+    "shadows": [
+      {
+        "name": "sm",
+        "value": "0 1px 2px rgb(28 27 26 / 0.06)",
+        "purpose": "Cards and inputs at rest."
+      },
+      {
+        "name": "md",
+        "value": "0 4px 16px rgb(28 27 26 / 0.08)",
+        "purpose": "Hover lift, dropdowns, sticky header."
+      },
+      {
+        "name": "lg",
+        "value": "0 12px 40px rgb(28 27 26 / 0.12)",
+        "purpose": "Sheets, drawers, dialogs."
+      }
+    ],
+    "motion": [
+      {
+        "name": "duration-fast",
+        "value": "150ms",
+        "purpose": "Hover, focus, small state changes."
+      },
+      {
+        "name": "duration-base",
+        "value": "250ms",
+        "purpose": "Drawers, dropdowns, accordions."
+      },
+      {
+        "name": "duration-slow",
+        "value": "400ms",
+        "purpose": "Section reveals, hero transitions."
+      },
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.2, 0, 0, 1)",
+        "purpose": "Default easing."
+      },
+      {
+        "name": "ease-exit",
+        "value": "cubic-bezier(0.4, 0, 1, 1)",
+        "purpose": "Elements leaving the screen."
+      },
+      {
+        "name": "hover-scale",
+        "value": "1.03",
+        "purpose": "Maximum product and image hover scale."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main call to action.",
+      "html": "<button class=\"ds-btn-primary\">Shop the Edit</button>",
+      "css": ".ds-btn-primary{background:var(--primary,#c8b6e2);color:var(--primary-foreground,#1c1b1a);height:40px;padding:8px 20px;border:none;border-radius:10px;font:600 14px/1 Inter,system-ui,sans-serif;transition:background-color 150ms cubic-bezier(0.2,0,0,1);cursor:pointer}.ds-btn-primary:hover{background:var(--primary-hover,#d8c9f0)}.ds-btn-primary:focus-visible{outline:none;box-shadow:0 0 0 2px var(--background,#faf7f2),0 0 0 5px var(--ring,#6a5296)}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Supporting action.",
+      "html": "<button class=\"ds-btn-secondary\">View Collection</button>",
+      "css": ".ds-btn-secondary{background:transparent;color:var(--foreground,#1c1b1a);height:40px;padding:8px 20px;border:1px solid var(--input,#8f7d71);border-radius:10px;font:600 14px/1 Inter,system-ui,sans-serif;transition:background-color 150ms cubic-bezier(0.2,0,0,1);cursor:pointer}.ds-btn-secondary:hover{background:var(--accent,#f5eee8)}.ds-btn-secondary:focus-visible{outline:none;box-shadow:0 0 0 2px var(--background,#faf7f2),0 0 0 5px var(--ring,#6a5296)}"
+    },
+    {
+      "name": "Luxury Button",
+      "kind": "button",
+      "refersTo": "button-luxury",
+      "description": "Premium sections only; once per screen.",
+      "html": "<button class=\"ds-btn-luxury\">Build a Gift Box</button>",
+      "css": ".ds-btn-luxury{background:var(--gold,#c6a15b);color:var(--gold-foreground,#1c1b1a);height:40px;padding:8px 20px;border:none;border-radius:10px;box-shadow:0 1px 2px rgb(28 27 26/.06);font:600 14px/1 Inter,system-ui,sans-serif;transition:background-color 150ms cubic-bezier(0.2,0,0,1);cursor:pointer}.ds-btn-luxury:hover{background:color-mix(in srgb,var(--gold,#c6a15b) 90%,transparent)}.ds-btn-luxury:focus-visible{outline:none;box-shadow:0 0 0 2px var(--background,#faf7f2),0 0 0 5px var(--ring,#6a5296)}"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Form field with lavender focus ring.",
+      "html": "<input class=\"ds-input\" placeholder=\"Your name\" />",
+      "css": ".ds-input{height:44px;width:260px;padding:4px 12px;background:transparent;color:var(--foreground,#1c1b1a);border:1px solid var(--input,#8f7d71);border-radius:6px;box-shadow:0 1px 2px rgb(28 27 26/.06);font:400 16px Inter,system-ui,sans-serif;outline:none;transition:box-shadow 150ms,border-color 150ms}.ds-input::placeholder{color:var(--muted-foreground,#5e524c)}.ds-input:focus-visible{border-color:var(--ring,#6a5296);box-shadow:0 0 0 3px rgb(106 82 150/.4)}"
+    },
+    {
+      "name": "Product Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Elevated surface with soft lift on hover.",
+      "html": "<article class=\"ds-card\"><div class=\"ds-card-img\"></div><h3 class=\"ds-card-title\">Lavender Silk Scarf</h3><p class=\"ds-card-price\">LKR 6,500</p></article>",
+      "css": ".ds-card{width:220px;background:var(--card,#fff);color:var(--card-foreground,#1c1b1a);border:1px solid var(--border,#d8c8bd);border-radius:10px;padding:12px;box-shadow:0 1px 2px rgb(28 27 26/.06);transition:box-shadow 250ms cubic-bezier(0.2,0,0,1)}.ds-card:hover{box-shadow:0 4px 16px rgb(28 27 26/.08)}.ds-card-img{aspect-ratio:4/5;border-radius:6px;background:linear-gradient(160deg,#f3d8d6,#c8b6e2)}.ds-card-title{margin:12px 0 4px;font:600 18px/1.35 'Playfair Display',Georgia,serif}.ds-card-price{margin:0;font:500 14px Inter,system-ui,sans-serif;color:var(--muted-foreground,#5e524c)}"
+    },
+    {
+      "name": "Badges",
+      "kind": "chip",
+      "refersTo": "badge-rose",
+      "description": "Brand, romantic and premium labels.",
+      "html": "<span class=\"ds-badge ds-badge-lav\">New Arrival</span> <span class=\"ds-badge ds-badge-rose\">Gift Ready</span> <span class=\"ds-badge ds-badge-gold\">Limited Drop</span>",
+      "css": ".ds-badge{display:inline-flex;padding:2px 8px;border-radius:6px;font:500 12px/1.4 Inter,system-ui,sans-serif;color:#1c1b1a}.ds-badge-lav{background:var(--primary,#c8b6e2)}.ds-badge-rose{background:var(--secondary,#c98f94)}.ds-badge-gold{background:var(--gold,#c6a15b)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Cinematic Lavender Luxury",
+    "overview": "A fashion-editorial storefront that feels like a soft mood board brought to life: warm ivory light, lavender identity moments, blush sections and rare champagne-gold details. Premium comes from restraint: few colours, generous space, one serif voice for headings, quiet Inter for everything functional, and gentle motion that reveals rather than performs.",
+    "keyCharacteristics": [
+      "Warm ivory base with lavender, blush and gold as rationed accents.",
+      "Playfair Display headings over Inter UI text.",
+      "Medium-radius soft shapes; never pills, never sharp.",
+      "Quiet, warm-tinted shadows; depth stays soft.",
+      "Slow, eased reveals; nothing bounces."
+    ],
+    "rules": [
+      {
+        "name": "The Rationed Gold Rule",
+        "body": "Champagne Gold appears in at most one action or tag cluster per screen. Its rarity is what makes it premium.",
+        "section": "colors"
+      },
+      {
+        "name": "The Charcoal-On-Colour Rule",
+        "body": "Text on lavender, rose or gold fills is always Soft Charcoal; lavender or gold text on light surfaces uses the -text tokens.",
+        "section": "colors"
+      },
+      {
+        "name": "The Semantic Token Rule",
+        "body": "Use semantic tokens (bg-primary, text-gold-text), never literal hex or Tailwind palette colours.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Voices Rule",
+        "body": "Playfair for h1-h3 and editorial moments; Inter for prices, buttons, forms, navigation and data. Never set UI controls in the serif.",
+        "section": "typography"
+      },
+      {
+        "name": "The Soft Lift Rule",
+        "body": "Elevation rises one step on hover, never more, and never on static content.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use semantic tokens from app/globals.css and the constants in src/config/motion.ts.",
+      "Do keep text on lavender, rose and gold fills Soft Charcoal, and use primary-text / gold-text for coloured text.",
+      "Do reuse Reveal, Stagger and the src/components/ui primitives before writing new ones.",
+      "Do design every screen for mobile first and check both light and dark themes.",
+      "Do respect prefers-reduced-motion: remove movement, keep short fades."
+    ],
+    "donts": [
+      "Don't use pill buttons, bouncy springs, excessive parallax or many simultaneous animations.",
+      "Don't scale on hover beyond 1.03.",
+      "Don't spend gold on more than one cluster per screen.",
+      "Don't use heavy filled or cartoon icons.",
+      "Don't make it look like Amazon, Daraz, a Shopify template, a wedding invitation or a Valentine promotion."
+    ]
+  }
+}

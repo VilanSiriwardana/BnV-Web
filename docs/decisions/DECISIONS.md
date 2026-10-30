@@ -396,3 +396,19 @@ Each decision should include:
 - Related Documents:
   - [../references/Phase-1-Reconciled-Decisions.md](../references/Phase-1-Reconciled-Decisions.md) D-03, D-12
   - `.claude/blueprints/014-sprint-1h-admin.md`
+
+## ADR-0022 - Design Skills for UI Work
+
+- Status: Accepted
+- Date: 2026-10-30
+- Context: UI work should look premium and move well, not generic. Three Claude Code skill packs cover this, but they overlap.
+- Decision:
+  - Install Impeccable, Emil Kowalski skills and Taste Skill at user level in Claude Code.
+  - Impeccable is the main design workflow; Emil skills own motion and stress testing; Taste Skill is only for landing and marketing pages, on request.
+  - Roles and rules live in the Design Skills section of `docs/governance/AGENTS.md`. `PRODUCT.md` and `DESIGN.md` at the repo root hold Impeccable's context; Brand-Identity.md wins on conflict.
+- Consequences:
+  - The setup doc's jQuery/DataTables rules do not apply; React Emil skills are used, native-only ones are skipped.
+  - Taste runs are slow and costly and use open-licensed images that must be replaced before shipping.
+- Related Documents:
+  - [../references/Design_Skills_Setup.md](../references/Design_Skills_Setup.md)
+  - `.claude/blueprints/016-design-skills-setup.md`
