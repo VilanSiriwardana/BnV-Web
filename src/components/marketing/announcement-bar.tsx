@@ -1,26 +1,29 @@
-import Link from 'next/link';
+import { Heart } from 'lucide-react';
+import { Fragment } from 'react';
 
 type Props = {
   text: string;
-  link?: { label: string; href: string };
 };
 
-export function AnnouncementBar({ text, link }: Props) {
+export function AnnouncementBar({ text }: Props) {
+  const parts = text.split('·').map((part) => part.trim());
+
   return (
-    <div className="bg-primary text-primary-foreground">
-      <p className="text-small mx-auto max-w-[1440px] px-4 py-2 text-center md:px-8">
-        {text}
-        {link && (
-          <>
-            {' '}
-            <Link
-              href={link.href}
-              className="font-semibold underline underline-offset-4"
-            >
-              {link.label}
-            </Link>
-          </>
-        )}
+    <div className="bg-primary/25 dark:bg-surface text-foreground">
+      <p className="text-caption mx-auto flex max-w-[1440px] flex-wrap items-center justify-center gap-x-3 gap-y-1 px-4 py-2 text-center font-sans tracking-widest uppercase md:px-8">
+        {parts.map((part, i) => (
+          <Fragment key={part}>
+            {i > 0 && (
+              <Heart
+                aria-hidden
+                className="fill-gold text-gold hidden size-3 sm:inline-block"
+              />
+            )}
+            <span className={i > 0 ? 'hidden sm:inline' : undefined}>
+              {part}
+            </span>
+          </Fragment>
+        ))}
       </p>
     </div>
   );

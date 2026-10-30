@@ -11,8 +11,11 @@ export function FeaturedCategories() {
     >
       <SectionHeading
         id="featured-categories-title"
-        eyebrow="Explore"
-        title="Something for every moment"
+
+        title="Shop by Collection"
+        heart
+        align="center"
+        description="Curated pieces and gifts for every chapter of your story."
       />
       <Stagger className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         {featuredCategories.map((category) => (

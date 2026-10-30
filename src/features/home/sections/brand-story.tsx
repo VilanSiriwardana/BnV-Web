@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import { ArtDirectedImage } from '@/components/marketing/art-directed-image';
 import { Eyebrow } from '@/components/marketing/eyebrow';
+import { HeadingAccent } from '@/components/marketing/section-heading';
 import { Reveal } from '@/components/motion/reveal';
 import { buttonVariants } from '@/components/ui/button';
 import { story } from '@/data/home';
@@ -20,12 +21,13 @@ export function BrandStory() {
         />
       </Reveal>
       <Reveal delay={0.1} className="md:col-span-5">
-        <Eyebrow>{story.eyebrow}</Eyebrow>
+        <Eyebrow heart>{story.eyebrow}</Eyebrow>
         <h2
           id="brand-story-title"
           className="font-display text-h1 mt-4 font-semibold text-balance"
         >
           {story.title}
+          <HeadingAccent block>{story.accent}</HeadingAccent>
         </h2>
         <p className="text-body-lg text-muted-foreground mt-6 max-w-prose">
           {story.body}

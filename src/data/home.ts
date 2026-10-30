@@ -1,5 +1,4 @@
 // Static homepage copy and placeholder imagery (public/images/prototype/). No unconfirmed business claims (D-10).
-import { brand } from '@/config/brand';
 import { routes } from '@/config/routes';
 
 export type ArtDirectedImage = {
@@ -43,15 +42,17 @@ export const trust = [
 // Placeholder image (AI-generated) until the real Buwi and Vila shoot (D-10).
 export const story = {
   eyebrow: 'Our story',
-  title: 'Made by two, for every kind of love',
+  title: 'Made by two,',
+  accent: 'for every kind of love',
   body: 'B&V began with Buwi and Vila, a couple who wanted the pieces they gave each other to feel personal. Today we make fashion, jewelry and gifts for anyone marking a moment, whether it is for yourself, for someone you love, or for the two of you.',
   cta: { label: 'Read Our Story', href: routes.ourStory },
   image: banner('our-story', 'Buwi and Vila of B&V'),
 };
 
 export const hero = {
-  eyebrow: 'Fashion · Jewelry · Gifts',
-  title: brand.tagline,
+  eyebrow: 'Made for moments that last',
+  title: 'Style for you, gifts for them.',
+  accent: 'Moments for two.',
   subtitle:
     'Modern romantic pieces for you, thoughtful gifts for the people you love, and keepsakes for the moments you share.',
   primaryCta: { label: 'Shop New In', href: routes.newIn },
@@ -60,14 +61,45 @@ export const hero = {
 };
 
 export const featuredCategories = [
-  { label: 'Women', href: routes.women, banner: 'women' },
-  { label: 'Men', href: routes.men, banner: 'men' },
-  { label: 'Jewelry', href: routes.jewelry, banner: 'jewelry' },
-  { label: 'Gifts', href: routes.gifts, banner: 'gifts' },
-  { label: 'Couples', href: routes.couples, banner: 'couples' },
-  { label: 'Custom', href: routes.custom, banner: 'custom' },
-].map(({ label, href, banner: name }) => ({
+  {
+    label: 'For Women',
+    subtitle: 'Timeless & elegant',
+    href: routes.women,
+    banner: 'women',
+  },
+  {
+    label: 'For Men',
+    subtitle: 'Understated & refined',
+    href: routes.men,
+    banner: 'men',
+  },
+  {
+    label: 'Jewelry',
+    subtitle: 'Crafted with meaning',
+    href: routes.jewelry,
+    banner: 'jewelry',
+  },
+  {
+    label: 'Gifts',
+    subtitle: 'Beautifully wrapped',
+    href: routes.gifts,
+    banner: 'gifts',
+  },
+  {
+    label: 'For Couples',
+    subtitle: 'Celebrate your bond',
+    href: routes.couples,
+    banner: 'couples',
+  },
+  {
+    label: 'Custom & Personal',
+    subtitle: 'Made uniquely yours',
+    href: routes.custom,
+    banner: 'custom',
+  },
+].map(({ label, subtitle, href, banner: name }) => ({
   label,
+  subtitle,
   href,
   image: {
     light: `/images/prototype/banner-${name}-light-mobile.webp`,
@@ -129,3 +161,18 @@ export const comingSoon = [
   { label: 'Gift Box Builder', href: routes.gifts },
   { label: 'Visual Portfolio', href: routes.collaborate },
 ] as const;
+
+export const giftBanner = {
+  eyebrow: 'Make it unforgettable',
+  title: 'Build your',
+  accent: 'Gift Box',
+  description:
+    'Choose your favourite pieces and we will wrap them together, ready to surprise someone you love.',
+  cta: { label: 'Shop Gifts', href: routes.gifts },
+  features: [
+    'Handpicked with love',
+    'Luxury gift packaging',
+    'Add a personal touch',
+  ],
+  image: banner('gift-box', 'A B&V gift box with jewelry, a card and a mug'),
+};

@@ -166,7 +166,7 @@ A warm, powdery palette: ivory and charcoal carry the page, lavender carries the
 
 ### Named Rules
 
-**The Rationed Gold Rule.** Champagne Gold appears in at most one action or tag cluster per screen. Its rarity is what makes it premium.
+**The Rationed Gold Rule.** Champagne Gold appears only as the small heart beside section headings and eyebrows, on Limited Drop badges, on step numbers, and on one luxury action per screen. Never as a fill for large areas.
 
 **The Charcoal-On-Colour Rule.** Text on lavender, rose or gold fills is always Soft Charcoal; lavender or gold text on light surfaces uses the `-text` tokens.
 
@@ -245,6 +245,16 @@ Gently rounded throughout: small (6px) for inputs and badges, medium (10px) for 
 ### Navigation
 
 - Sticky site header with Inter labels; mobile navigation in a sheet (`mobile-nav`). The storefront header, footer and cart drawer are hidden under `/admin` (`storefront-chrome`).
+
+### Mockup system (PageImages contract, ADR-0025)
+
+- **Heading accent:** a Cinzel heading may end with a phrase in lavender Cormorant Garamond italic (`HeadingAccent`), for example "Style for you, gifts for them. _Moments for two._" One accent per heading.
+- **Gold heart:** a small filled gold heart follows section titles (`SectionHeading heart`) and hero eyebrows (`Eyebrow heart`).
+- **Split hero (default):** text and two CTAs (solid primary, outlined secondary) on a cream or plum surface; the image fills the right half and fades in from the left edge; on mobile the image sits above the text.
+- **Bordered cards:** product, category and feature cards are white (`bg-card`) with a 1px taupe border and `shadow-sm`, lifting to `shadow-md` on hover. Category cards: image, Cinzel title, Cormorant subtitle, "Shop now →".
+- **Primitives:** `IconRow` (round lavender icon chips), `Steps` (icon chip, gold number, dashed connector), `FeatureCard`, `CtaBand` (lavender closing band).
+- **Chrome:** pale lavender announcement bar with gold heart separators on every storefront page; footer with newsletter and a trust box of confirmed facts only. Social and contact items render only when set in `src/config/brand.ts`.
+- **No wishlist hearts** on cards or in the header.
 
 ### Homepage signatures
 

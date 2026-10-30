@@ -515,3 +515,25 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 ### Open
 
 - Browser QA not yet run: Emil review-animations and break-ui, `/impeccable polish` and `audit`, and re-critique.
+
+## 2026-10-30 - Mockup alignment: shared system and homepage
+
+### Summary
+
+- Compared all 10 PageImages mockups with the code (gap reports in the plan). Implemented `.claude/blueprints/019-mockup-alignment-system-and-home.md` (ADR-0025, Brand-Identity v1.6).
+- Added `HeadingAccent`, `GoldHeart`, a split `PageHero` (default), `IconRow`, `Steps`, `FeatureCard` and `CtaBand`, plus bordered product and category cards. The announcement bar now shows on every storefront page, and the footer has a newsletter and trust box.
+- Homepage: split hero, Shop by Collection cards, Featured Favorites carousel, Gift Box banner, and the closing row.
+
+### Deviations
+
+- `FeatureCard` uses its own markup with the `Card` styles rather than wrapping `Card`, whose padding and gap don't fit an image-top card.
+- Lucide v1 has no brand icons, so footer social icons are inline SVG paths.
+
+### Known Gotchas
+
+- `/our-story` and `/faq` still return 404 until blueprint 020.
+- The homepage shows two newsletter forms: the closing row and the footer.
+
+### Open
+
+- Blueprints 020 to 023. The owner still has to fill email, phone and social handles in `src/config/brand.ts`.

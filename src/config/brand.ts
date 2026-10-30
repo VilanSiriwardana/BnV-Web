@@ -7,7 +7,11 @@ type Brand = {
   country: 'LK';
   locale: 'en-LK';
   logo: { light: string | null; dark: string | null };
-  contact: { whatsapp: string | null; email: string | null };
+  contact: {
+    whatsapp: string | null;
+    email: string | null;
+    phone: string | null;
+  };
   social: {
     instagram: string | null;
     tiktok: string | null;
@@ -25,7 +29,7 @@ export const brand = {
   country: 'LK',
   locale: 'en-LK',
   logo: { light: null, dark: null },
-  contact: { whatsapp: '+94703802284', email: null },
+  contact: { whatsapp: '+94703802284', email: null, phone: null },
   social: { instagram: null, tiktok: null, facebook: null },
   delivery: { freeThresholdLkr: null },
   returnsWindowDays: null,

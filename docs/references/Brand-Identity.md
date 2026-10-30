@@ -2,7 +2,7 @@
 
 | Field               | Value                                                                                                              |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Version             | 1.5                                                                                                                |
+| Version             | 1.6                                                                                                                |
 | Status              | Approved (content changes in v1.2 are alignment edits; see change log)                                             |
 | Converted / updated | 2026-10-29                                                                                                         |
 | Based on            | Brand_Identity___Design_System_Reference_v1_1.pdf plus Business Strategy v1.2 and Phase Development Reference v1.1 |
@@ -19,6 +19,7 @@ This document defines the design direction, visual identity rules, color system,
 - **v1.1** — Added Section 41, Dark Mode Theme Design Decisions (Midnight Lavender Luxury).
 - **v1.2 (2026-10-28)** — Aligned positioning, audience, categories, homepage direction, naming status, and locked decisions with Business Strategy v1.2 and the Phase Development Reference v1.1. Repaired the corrupted Section 36. Added Section 42, Visual Portfolio imagery rules, and Section 43, Tailwind v4 implementation note. The color, typography, logo, UI, motion, and dark-mode rules are unchanged.
 - **v1.3 (2026-10-29)** — Gate B spec sync. Repaired the collapsed tables in Sections 13, 15, 19, 32.1 and 34. Updated the technology list in Section 7 (Sanity deferred, Vercel hosting, Motion). Added computed contrast results (Section 16.1), contrast-safe `primary-text` and `gold-text` tokens, a lighter `muted`, a darker `muted-foreground`, an `input` border token, accessible `secondary-foreground`, `destructive` and `success` values, and the shadcn token mapping (Section 32.1). The brand gold token is renamed `gold`; shadcn `accent` is now the neutral hover surface. Added type, spacing, radius, shadow, motion and container scales (Sections 19.1, 25.1, 34, 35). Buttons use the medium radius, not a pill. Made the sample copy solo-inclusive.
+- **v1.6 (2026-10-30)** — Aligned to the PageImages mockups (ADR-0025): Section 23 order, heading accent and gold heart, bordered cards, announcement bar on every page.
 - **v1.5 (2026-10-30)** — Homepage redesign (ADR-0024): new Section 23 order, fluid display and heading sizes, body 20px. Portfolio leaves the featured categories.
 - **v1.4 (2026-10-30)** — Fonts changed: Cinzel display, Cormorant Garamond copy, Inter UI, Noto Serif Sinhala fallback (ADR-0023). Updated Sections 18 (note), 19, 23, 33, 39 and 41.
 
@@ -779,22 +780,21 @@ The website should be an experience, not just a product catalog.
 
 ## 23. Homepage Direction
 
-Approved homepage order (v1.5, ADR-0024; supersedes the Phase Development Reference v1.1 list):
+Approved homepage order (v1.6, ADR-0025; hybrid of the PageImages Home mockup and the ADR-0024 redesign):
 
-1. Announcement bar (trust message: payment, WhatsApp confirmation, delivery)
+1. Announcement bar (every storefront page; trust message)
 2. Navbar (condenses on scroll)
-3. Hero — full height, copy over the image — "Style for you. Gifts for them. Moments for two."
+3. Split hero — "Style for you, gifts for them. _Moments for two._" — two CTAs
 4. Trust strip: cash on delivery or bank transfer, every order confirmed on WhatsApp, delivered across Sri Lanka
-5. Featured categories: Women, Men, Jewelry, Gifts, Couples, Custom
-6. New In, with Limited Drop pieces badged in gold
-7. B&V story (editorial split; real shoot replaces the placeholder)
-8. Collections rail with tabs: Fashion Edit, Jewelry Highlight, Couple Collection
-9. Made-for-you bento: Custom Orders (large), Love Websites, Gift Boxes
-10. Coming soon strip: Gift Box Builder, Visual Portfolio
-11. Social gallery (hidden until real handles exist)
-12. Testimonials / Memories (real content only)
-13. Newsletter
-14. Footer
+5. Shop by Collection: For Women, For Men, Jewelry, Gifts, For Couples, Custom & Personal (bordered cards with subtitles)
+6. Featured Favorites carousel (New In, Limited Drop badged in gold)
+7. Build your _Gift Box_ banner with three features
+8. B&V story (editorial split; real shoot replaces the placeholder)
+9. Collections rail with tabs: Fashion Edit, Jewelry Highlight, Couple Collection
+10. Made-for-you bento: Custom Orders, Love Websites
+11. Coming soon strip: Gift Box Builder, Visual Portfolio
+12. Closing row: Our Story polaroid · testimonial (real only) · newsletter
+13. Footer (newsletter, trust box, social icons when set)
 
 Hero imagery should mix solo fashion, jewelry close-ups, gift packaging, and a couple moment. It must not depend on one couple photo.
 

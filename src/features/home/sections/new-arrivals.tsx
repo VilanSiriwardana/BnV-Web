@@ -1,11 +1,11 @@
 import { routes } from '@/config/routes';
 
 import { getCollectionProducts, getNewestProducts } from '../queries';
-import { ProductSection } from './product-section';
+import { FeaturedCarousel } from './featured-carousel';
 
 export async function NewArrivals() {
   const [newest, limitedDrop] = await Promise.all([
-    getNewestProducts(8),
+    getNewestProducts(12),
     getCollectionProducts('limited-drop', 4),
   ]);
 
@@ -15,13 +15,13 @@ export async function NewArrivals() {
     ...newest,
   ]
     .filter((p) => !seen.has(p.id) && seen.add(p.id))
-    .slice(0, 8);
+    .slice(0, 12);
+
+  if (products.length === 0) return null;
 
   return (
-    <ProductSection
-      id="new-in-title"
-      eyebrow="Just arrived"
-      title="New In"
+    <FeaturedCarousel
+      title="Featured Favorites"
       href={routes.newIn}
       products={products}
     />

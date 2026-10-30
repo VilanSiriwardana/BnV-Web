@@ -11,11 +11,13 @@ import { CartProvider } from '@/components/cart/cart-provider';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
 import { StorefrontChrome } from '@/components/layout/storefront-chrome';
+import { AnnouncementBar } from '@/components/marketing/announcement-bar';
 import { Analytics } from '@/components/consent/analytics';
 import { CookieConsent } from '@/components/consent/cookie-consent';
 import { ThemeProvider } from '@/components/theme/theme-provider';
 import { brand } from '@/config/brand';
 import { siteConfig } from '@/config/seo';
+import { announcement } from '@/data/home';
 import { JsonLd, organizationJsonLd, websiteJsonLd } from '@/lib/seo/jsonld';
 
 import './globals.css';
@@ -83,6 +85,7 @@ export default function RootLayout({
         <ThemeProvider>
           <CartProvider>
             <StorefrontChrome>
+              <AnnouncementBar {...announcement} />
               <SiteHeader />
             </StorefrontChrome>
             <main className="flex-1">{children}</main>

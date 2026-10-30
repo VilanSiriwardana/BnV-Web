@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils';
 const tiles = [
   { ...teasers.custom, large: true },
   { ...teasers.loveWebsites, large: false },
-  { ...teasers.giftBox, large: false },
 ];
 
 export function TeaserBento() {
@@ -18,16 +17,16 @@ export function TeaserBento() {
       aria-label="Made for you"
       className="mx-auto max-w-[1440px] px-4 py-16 md:px-8 md:py-24"
     >
-      <ul className="grid gap-4 md:grid-cols-3 md:grid-rows-2">
+      <ul className="grid gap-4 md:grid-cols-5">
         {tiles.map((tile, i) => (
           <li
             key={tile.title}
-            className={cn(tile.large && 'md:col-span-2 md:row-span-2')}
+            className={cn(tile.large ? 'md:col-span-3' : 'md:col-span-2')}
           >
             <ClipReveal delay={i * 0.08} className="h-full">
               <Link
                 href={tile.cta.href}
-                className="group focus-visible:ring-offset-background relative isolate flex h-full min-h-80 items-end overflow-hidden rounded-lg outline-none focus-visible:ring-[3px] focus-visible:ring-white focus-visible:ring-offset-2 md:min-h-72"
+                className="group focus-visible:ring-offset-background relative isolate flex h-full min-h-96 items-end overflow-hidden rounded-lg outline-none focus-visible:ring-[3px] focus-visible:ring-white focus-visible:ring-offset-2 md:min-h-72"
               >
                 <ArtDirectedImage
                   image={{ ...tile.image, alt: '' }}

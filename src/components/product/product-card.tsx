@@ -22,9 +22,9 @@ export function ProductCard({ product }: { product: ProductCardData }) {
   return (
     <Link
       href={routes.product(product.slug)}
-      className="group focus-visible:ring-ring ease-standard block rounded-md transition-transform duration-150 outline-none focus-visible:ring-[3px] active:scale-[0.98]"
+      className="group focus-visible:ring-ring ease-standard bg-card border-border block h-full rounded-md border p-2 pb-3 shadow-sm transition-[transform,box-shadow] duration-150 outline-none hover:shadow-md focus-visible:ring-[3px] active:scale-[0.98]"
     >
-      <div className="bg-muted relative aspect-[4/5] overflow-hidden rounded-md">
+      <div className="bg-muted relative aspect-[4/5] overflow-hidden rounded-sm">
         {product.imageUrl && (
           <Image
             src={product.imageUrl}
@@ -45,10 +45,10 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           )
         )}
       </div>
-      <h3 className="text-small mt-3 line-clamp-2 font-sans leading-normal font-medium [overflow-wrap:anywhere]">
+      <h3 className="text-small mt-3 line-clamp-2 px-1 font-sans leading-normal font-medium [overflow-wrap:anywhere]">
         {product.name}
       </h3>
-      <p className="text-small text-muted-foreground mt-1 font-sans break-words tabular-nums">
+      <p className="text-small text-muted-foreground mt-1 px-1 font-sans break-words tabular-nums">
         From {formatLkr(product.priceLkr)}
       </p>
     </Link>

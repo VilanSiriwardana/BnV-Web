@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState, useEffect, useId, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { FieldError, FormMessage } from '@/components/ui/field-error';
@@ -15,6 +15,9 @@ import { newsletterSchema, type NewsletterState } from './schema';
 const initialState: NewsletterState = { status: 'idle' };
 
 export function NewsletterForm() {
+  const uid = useId();
+  const emailId = `newsletter-email-${uid}`;
+  const consentId = `newsletter-consent-${uid}`;
   const [state, formAction, pending] = useActionState(
     subscribeToNewsletter,
     initialState,
@@ -22,12 +25,12 @@ export function NewsletterForm() {
   const [dismissed, setDismissed] = useState<NewsletterState | null>(null);
 
   const email = useInput({
-    id: 'newsletter-email',
+    id: emailId,
     name: 'email',
     schema: newsletterSchema.shape.email,
   });
   const consent = useInput({
-    id: 'newsletter-consent',
+    id: consentId,
     name: 'consent',
     schema: newsletterSchema.shape.consent,
     type: 'checkbox',
@@ -72,7 +75,7 @@ export function NewsletterForm() {
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
         <div className="flex-1">
-          <label htmlFor="newsletter-email" className="sr-only">
+          <label htmlFor={emailId} className="sr-only">
             Email address
           </label>
           <Input
@@ -92,10 +95,7 @@ export function NewsletterForm() {
           {...consent.bind}
           className="accent-primary mt-1 size-4 shrink-0"
         />
-        <label
-          htmlFor="newsletter-consent"
-          className="text-small text-muted-foreground"
-        >
+        <label htmlFor={consentId} className="text-small text-muted-foreground">
           Send me new drops and offers. I have read the{' '}
           <Link
             href={routes.policy('privacy')}

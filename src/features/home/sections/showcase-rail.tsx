@@ -25,7 +25,9 @@ export async function ShowcaseRail() {
       <SectionHeading
         id="showcase-title"
         eyebrow="Collections"
-        title="Curated for the moment"
+        title="Curated for"
+        accent="the moment"
+        heart
       />
       <ShowcaseTabs tabs={tabs} />
     </section>

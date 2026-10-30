@@ -452,3 +452,23 @@ Each decision should include:
   - [../references/Brand-Identity.md](../references/Brand-Identity.md) Sections 19.1, 23
   - `.claude/blueprints/018-homepage-redesign.md`
   - `.impeccable/critique/2026-10-30T04-09-17Z__app-page-tsx.md`
+
+## ADR-0025 - Align the Storefront to the PageImages Mockups
+
+- Status: Accepted
+- Date: 2026-10-30
+- Context: The Figma Make mockups in `BnV Docs/Images/PageImages/` are the visual contract (Visual-Asset-Inventory §6). The ADR-0024 homepage and most other pages had drifted from them.
+- Decision:
+  - The homepage hero matches the mockup: a split layout with two CTAs.
+  - Headings stay Cinzel. A lavender Cormorant italic accent phrase and a gold heart after section titles reproduce the mockup's heading style.
+  - The homepage is a hybrid. From the mockup: bordered category cards, the Featured Favorites carousel, the Gift Box banner and the closing 3-card row. Kept from ADR-0024: the trust strip, collections rail, story and a two-tile bento.
+  - Shared primitives: `IconRow`, `Steps`, `FeatureCard`, `CtaBand`, `HeadingAccent`, `GoldHeart`. The announcement bar shows on every storefront page, and the footer carries a newsletter and a truthful trust box.
+  - No wishlist. Mockup placeholder content stays out (D-10).
+  - The owner supplies email, phone and social handles in `src/config/brand.ts` (a `phone` field was added); the UI renders only the values that are set.
+  - Rollout order: shared system and Home (019), then Our Story, FAQ and Contact (020), commerce pages (021), service pages (022), then QA (023).
+- Consequences:
+  - Product cards are bordered everywhere (shop, PDP related, rails).
+  - The newsletter form now generates unique field IDs, since it can appear twice on one page.
+- Related Documents:
+  - [../references/Brand-Identity.md](../references/Brand-Identity.md) Section 23
+  - `.claude/blueprints/019-mockup-alignment-system-and-home.md`
