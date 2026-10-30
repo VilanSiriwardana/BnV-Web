@@ -1,5 +1,10 @@
 import type { Metadata } from 'next';
-import { Inter, Playfair_Display } from 'next/font/google';
+import {
+  Cinzel,
+  Cormorant_Garamond,
+  Inter,
+  Noto_Serif_Sinhala,
+} from 'next/font/google';
 
 import { CartDrawer } from '@/components/cart/cart-drawer';
 import { CartProvider } from '@/components/cart/cart-provider';
@@ -21,11 +26,25 @@ const inter = Inter({
   display: 'swap',
 });
 
-const playfair = Playfair_Display({
-  variable: '--font-playfair',
+const cinzel = Cinzel({
+  variable: '--font-cinzel',
   subsets: ['latin'],
-  weight: ['600', '700'],
+  weight: ['400', '600', '700'],
+  display: 'swap',
+});
+
+const cormorant = Cormorant_Garamond({
+  variable: '--font-cormorant-garamond',
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
   style: ['normal', 'italic'],
+  display: 'swap',
+});
+
+const sinhala = Noto_Serif_Sinhala({
+  variable: '--font-sinhala',
+  subsets: ['sinhala'],
+  weight: ['400', '600'],
   display: 'swap',
 });
 
@@ -56,7 +75,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${playfair.variable} h-full`}
+      className={`${inter.variable} ${cinzel.variable} ${cormorant.variable} ${sinhala.variable} h-full`}
     >
       <body suppressHydrationWarning className="flex min-h-full flex-col">
         <JsonLd data={organizationJsonLd()} />

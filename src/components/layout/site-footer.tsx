@@ -46,7 +46,7 @@ export function SiteFooter() {
             <h2 className="text-caption font-sans font-semibold tracking-widest uppercase">
               {group.title}
             </h2>
-            <ul className="mt-4 flex flex-col gap-2">
+            <ul className="mt-4 flex flex-col gap-2 font-sans">
               {group.items.map((item) => (
                 <li key={item.href}>
                   <Link

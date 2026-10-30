@@ -147,7 +147,7 @@ export function CartContents({ initial, onNavigate, className }: Props) {
                     <Plus />
                   </Button>
                 </div>
-                <p className="text-small font-semibold tabular-nums">
+                <p className="text-small font-sans font-semibold tabular-nums">
                   {formatLkr(line.lineTotalLkr)}
                 </p>
               </div>
@@ -156,7 +156,7 @@ export function CartContents({ initial, onNavigate, className }: Props) {
         ))}
       </ul>
 
-      <dl className="text-small flex flex-col gap-2">
+      <dl className="text-small flex flex-col gap-2 font-sans">
         <div className="flex justify-between">
           <dt>Subtotal</dt>
           <dd className="font-semibold tabular-nums">

@@ -71,7 +71,7 @@ export function VariantSelector({
   return (
     <div className="flex flex-col gap-6">
       {variant && (
-        <p className="text-h3 font-semibold">
+        <p className="text-h3 font-sans font-semibold tabular-nums">
           {variant.salePriceLkr !== null ? (
             <>
               {formatLkr(variant.salePriceLkr)}{' '}

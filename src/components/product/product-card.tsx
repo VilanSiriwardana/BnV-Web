@@ -39,7 +39,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         )}
       </div>
       <h3 className="text-small mt-3 font-semibold">{product.name}</h3>
-      <p className="text-small text-muted-foreground mt-1">
+      <p className="text-small text-muted-foreground mt-1 font-sans tabular-nums">
         From {formatLkr(product.priceLkr)}
       </p>
     </Link>

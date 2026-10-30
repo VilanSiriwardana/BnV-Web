@@ -26,23 +26,23 @@ colors:
   moonlit-ivory: '#f7f1ea'
 typography:
   display:
-    fontFamily: 'Playfair Display, Georgia, serif'
-    fontSize: '2.5rem'
+    fontFamily: 'Cinzel, Noto Serif Sinhala, Georgia, serif'
+    fontSize: '2.25rem'
     fontWeight: 600
     lineHeight: 1.1
   headline:
-    fontFamily: 'Playfair Display, Georgia, serif'
-    fontSize: '2.125rem'
+    fontFamily: 'Cinzel, Noto Serif Sinhala, Georgia, serif'
+    fontSize: '1.875rem'
     fontWeight: 600
     lineHeight: 1.15
   title:
-    fontFamily: 'Playfair Display, Georgia, serif'
-    fontSize: '1.375rem'
+    fontFamily: 'Cinzel, Noto Serif Sinhala, Georgia, serif'
+    fontSize: '1.25rem'
     fontWeight: 600
     lineHeight: 1.25
   body:
-    fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif'
-    fontSize: '1rem'
+    fontFamily: 'Cormorant Garamond, Noto Serif Sinhala, Georgia, serif'
+    fontSize: '1.125rem'
     fontWeight: 400
     lineHeight: 1.6
   label:
@@ -121,14 +121,14 @@ Authority: [docs/references/Brand-Identity.md](docs/references/Brand-Identity.md
 
 A fashion-editorial storefront that feels like a soft mood board brought to life: warm ivory light, lavender identity moments, blush sections and rare champagne-gold details. It is an experience, not a catalog — large cinematic heroes, editorial collection blocks and emotional storytelling, set in spacious, mobile-first layouts.
 
-Premium comes from restraint: few colours on any screen, generous space, one serif voice for headings, quiet Inter for everything functional, and gentle motion that reveals rather than performs. Dark mode, "Midnight Lavender Luxury", keeps the same identity on deep plum surfaces.
+Premium comes from restraint: few colours on any screen, generous space, engraved Cinzel capitals for headings, literary Cormorant Garamond for copy, quiet Inter for everything functional, and gentle motion that reveals rather than performs. Dark mode, "Midnight Lavender Luxury", keeps the same identity on deep plum surfaces.
 
 It must not feel like Amazon, Daraz, a stock Shopify template, a wedding invitation, a Valentine promotion, a basic gift shop or a childish couple brand.
 
 **Key Characteristics:**
 
 - Warm ivory base with lavender, blush and gold as rationed accents.
-- Playfair Display headings over Inter UI text.
+- Cinzel headings, Cormorant Garamond copy, Inter for UI.
 - Medium-radius soft shapes; never pills, never sharp.
 - Quiet, warm-tinted shadows; depth stays soft.
 - Slow, eased reveals; nothing bounces.
@@ -174,23 +174,24 @@ A warm, powdery palette: ivory and charcoal carry the page, lavender carries the
 
 ## Typography
 
-**Display Font:** Playfair Display (with Georgia, serif)
-**Body Font:** Inter (with ui-sans-serif, system-ui)
+**Display Font:** Cinzel (with Noto Serif Sinhala, Georgia)
+**Body Font:** Cormorant Garamond (with Noto Serif Sinhala, Georgia)
+**UI Font:** Inter (with Noto Serif Sinhala, ui-sans-serif)
 
-**Character:** An editorial high-contrast serif for emotion and story, paired with a neutral, legible sans for everything the shopper acts on.
+**Character:** Cinzel's engraved Roman capitals give headings a monumental, couture-label presence; Cormorant Garamond carries story copy with literary warmth; Inter keeps every control, price and form crisp. Cormorant runs small, so body copy sits at 1.125rem.
 
 ### Hierarchy
 
-- **Display** (600, 2.5rem mobile, steps up at `md`, 1.1): hero headlines only.
-- **Headline** (600, 2.125rem → h2 1.75rem, 1.15–1.2): section titles (`h1`, `h2`).
-- **Title** (600, 1.375rem → h4 1.125rem, 1.25–1.35): card and block titles.
-- **Body** (400, 1rem / body-lg 1.125rem, 1.6): copy; keep lines to about 65–75ch.
-- **Label** (600, 0.875rem, 1.5): buttons, navigation, form labels.
-- **Caption** (500, 0.75rem, 1.4): badges, meta, fine print.
+- **Display** (Cinzel 600, 2.25rem mobile, steps up at `md`, 1.1): hero headlines only.
+- **Headline** (Cinzel 600, 1.875rem → h2 1.5rem, 1.15–1.2): section titles (`h1`, `h2`).
+- **Title** (Cinzel 600 for h3 1.25rem; h4 1.125rem, 1.25–1.35): card and block titles.
+- **Body** (Cormorant 400, 1.125rem / body-lg 1.25rem, 1.6): copy; keep lines to about 65–75ch.
+- **Label** (Inter 600, 0.875rem, 1.5): buttons, navigation, form labels.
+- **Caption** (Inter 500, 0.75rem, 1.4): badges, meta, fine print.
 
 ### Named Rules
 
-**The Two Voices Rule.** Playfair for `h1`–`h3` and editorial moments; Inter for prices, buttons, forms, navigation and data. Never set UI controls in the serif.
+**The Story-and-Interface Rule.** Cinzel and Cormorant Garamond tell the story (headings, editorial copy, quotes); Inter runs the interface (buttons, inputs, badges, navigation, prices, admin). Headings get slight positive tracking; never set Cinzel in long passages.
 
 ## Layout
 
@@ -219,7 +220,7 @@ Gently rounded throughout: small (6px) for inputs and badges, medium (10px) for 
 ### Buttons
 
 - **Shape:** medium radius (10px); heights 32 / 40 / 48px (`sm`, default, `lg`).
-- **Primary:** Signature Lavender fill, Soft Charcoal Inter Semibold label; hover to Lavender Glow.
+- **Primary:** Signature Lavender fill, Soft Charcoal Inter Semibold label (UI primitives pin `font-sans`); hover to Lavender Glow.
 - **Secondary / Outline / Ghost:** transparent or ivory with a taupe border; hover fills Linen.
 - **Luxury:** Champagne Gold with a small shadow, used rarely. **WhatsApp:** Sage fill for the confirmation action.
 - **Hover / Focus:** colour transition at 150ms with `ease-standard`; 3px focus ring in Deep Lavender with a 2px offset.

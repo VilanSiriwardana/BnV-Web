@@ -60,7 +60,7 @@ export default async function AdminLayout({
   );
 
   return (
-    <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 md:grid-cols-[13rem_1fr]">
+    <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 font-sans md:grid-cols-[13rem_1fr]">
       <aside className="flex flex-col gap-4">
         <p className="font-display text-h4">BnV Admin</p>
         <AdminNav items={items} />

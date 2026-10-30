@@ -32,7 +32,10 @@ export function MobileNav() {
         <SheetHeader>
           <SheetTitle className="font-display text-h3">{brand.name}</SheetTitle>
         </SheetHeader>
-        <nav aria-label="Mobile" className="flex flex-col gap-6 px-4 pb-8">
+        <nav
+          aria-label="Mobile"
+          className="flex flex-col gap-6 px-4 pb-8 font-sans"
+        >
           <ul className="flex flex-col">
             {mainNav.map((item) => (
               <li key={item.href}>

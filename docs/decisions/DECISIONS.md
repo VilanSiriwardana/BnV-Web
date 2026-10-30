@@ -412,3 +412,22 @@ Each decision should include:
 - Related Documents:
   - [../references/Design_Skills_Setup.md](../references/Design_Skills_Setup.md)
   - `.claude/blueprints/016-design-skills-setup.md`
+
+## ADR-0023 - Brand Fonts: Cinzel, Cormorant Garamond, Noto Serif Sinhala
+
+- Status: Accepted
+- Date: 2026-10-30
+- Context: The owner chose new brand fonts to make the storefront feel more premium. The site must also render Sinhala text.
+- Decision:
+  - Display (`--font-display`, h1–h3, wordmark): Cinzel.
+  - Copy (`--font-body`, `body` default): Cormorant Garamond. Fallback is Georgia, not Arial, so a serif falls back to a serif.
+  - UI (`--font-sans`): Inter, pinned with `font-sans` on `src/components/ui` primitives, navigation lists, prices and the admin panel.
+  - Sinhala: Noto Serif Sinhala as the second family in every stack.
+  - Type scale: body 18px (Cormorant runs small); display and h1–h3 about 10% smaller with positive tracking (Cinzel is all capitals).
+- Consequences:
+  - Any new UI control must use the `src/components/ui` primitives or add `font-sans` itself.
+  - More font weight on first load; weights are limited and use `display: swap`.
+  - Brand-Identity.md moves to v1.4; DESIGN.md and `.impeccable/design.json` follow.
+- Related Documents:
+  - [../references/Brand-Identity.md](../references/Brand-Identity.md) Sections 18, 19, 33, 39
+  - `.claude/blueprints/017-brand-fonts-cinzel-cormorant.md`

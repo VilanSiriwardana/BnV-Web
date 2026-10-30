@@ -33,7 +33,7 @@ export function SiteHeader() {
           {brand.name}
         </Link>
         <nav aria-label="Main" className="mx-auto hidden lg:block">
-          <ul className="flex items-center gap-6">
+          <ul className="flex items-center gap-6 font-sans">
             {mainNav.map((item) => (
               <li key={item.href}>
                 <Link

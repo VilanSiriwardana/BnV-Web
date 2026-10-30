@@ -2,7 +2,7 @@
 
 | Field               | Value                                                                                                              |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Version             | 1.3                                                                                                                |
+| Version             | 1.4                                                                                                                |
 | Status              | Approved (content changes in v1.2 are alignment edits; see change log)                                             |
 | Converted / updated | 2026-10-29                                                                                                         |
 | Based on            | Brand_Identity___Design_System_Reference_v1_1.pdf plus Business Strategy v1.2 and Phase Development Reference v1.1 |
@@ -19,6 +19,7 @@ This document defines the design direction, visual identity rules, color system,
 - **v1.1** — Added Section 41, Dark Mode Theme Design Decisions (Midnight Lavender Luxury).
 - **v1.2 (2026-10-28)** — Aligned positioning, audience, categories, homepage direction, naming status, and locked decisions with Business Strategy v1.2 and the Phase Development Reference v1.1. Repaired the corrupted Section 36. Added Section 42, Visual Portfolio imagery rules, and Section 43, Tailwind v4 implementation note. The color, typography, logo, UI, motion, and dark-mode rules are unchanged.
 - **v1.3 (2026-10-29)** — Gate B spec sync. Repaired the collapsed tables in Sections 13, 15, 19, 32.1 and 34. Updated the technology list in Section 7 (Sanity deferred, Vercel hosting, Motion). Added computed contrast results (Section 16.1), contrast-safe `primary-text` and `gold-text` tokens, a lighter `muted`, a darker `muted-foreground`, an `input` border token, accessible `secondary-foreground`, `destructive` and `success` values, and the shadcn token mapping (Section 32.1). The brand gold token is renamed `gold`; shadcn `accent` is now the neutral hover surface. Added type, spacing, radius, shadow, motion and container scales (Sections 19.1, 25.1, 34, 35). Buttons use the medium radius, not a pill. Made the sample copy solo-inclusive.
+- **v1.4 (2026-10-30)** — Fonts changed: Cinzel display, Cormorant Garamond copy, Inter UI, Noto Serif Sinhala fallback (ADR-0023). Updated Sections 18 (note), 19, 23, 33, 39 and 41.
 
 Use this document before:
 
@@ -608,6 +609,8 @@ This pairing balances emotional luxury with modern ecommerce usability.
 
 ## 18. Typography Roles
 
+> **v1.4 (2026-10-30):** Display font is now **Cinzel**, copy is **Cormorant Garamond**, Inter remains the UI font, and **Noto Serif Sinhala** is the Sinhala fallback in every stack (ADR-0023). Sections 18.1 and 20 describe the earlier Playfair choice; where they conflict, Section 19 and this note win.
+
 ### 18.1 Playfair Display
 
 Used for emotional and brand-led text. Best for:
@@ -659,39 +662,39 @@ Feeling:
 
 ## 19. Typography Hierarchy
 
-| Element          | Font                                   | Suggested Style       |
-| ---------------- | -------------------------------------- | --------------------- |
-| Logo / Wordmark  | Custom serif inspired by Playfair mood | Custom                |
-| Hero Heading     | Playfair Display                       | 600–700               |
-| Section Heading  | Playfair Display                       | 600                   |
-| Campaign Heading | Playfair Display                       | 600 / optional italic |
-| Story Quote      | Playfair Display                       | Italic                |
-| Product Name     | Inter                                  | 500–600               |
-| Body Text        | Inter                                  | 400                   |
-| Navigation       | Inter                                  | 500                   |
-| Button Text      | Inter                                  | 600                   |
-| Price Text       | Inter                                  | 600–700               |
-| Form Label       | Inter                                  | 500                   |
-| Small Text       | Inter                                  | 400–500               |
-| Admin UI         | Inter                                  | 400–600               |
+| Element          | Font                                 | Suggested Style       |
+| ---------------- | ------------------------------------ | --------------------- |
+| Logo / Wordmark  | Custom serif inspired by Cinzel mood | Custom                |
+| Hero Heading     | Cinzel                               | 600–700               |
+| Section Heading  | Cinzel                               | 600                   |
+| Campaign Heading | Cinzel                               | 600 / optional italic |
+| Story Quote      | Cormorant Garamond                   | Italic                |
+| Product Name     | Inter                                | 500–600               |
+| Body Text        | Cormorant Garamond                   | 400                   |
+| Navigation       | Inter                                | 500                   |
+| Button Text      | Inter                                | 600                   |
+| Price Text       | Inter                                | 600–700               |
+| Form Label       | Inter                                | 500                   |
+| Small Text       | Inter                                | 400–500               |
+| Admin UI         | Inter                                | 400–600               |
 
 ### 19.1 Type Scale (v1.3)
 
 Sizes are mobile → desktop (from the `md` breakpoint). Use `rem` in code; px is shown for reading.
 
-| Token   | Font             | Size (px) | Line height | Weight | Use                          |
-| ------- | ---------------- | --------- | ----------- | ------ | ---------------------------- |
-| display | Playfair Display | 40 → 64   | 1.1         | 600    | Hero headline                |
-| h1      | Playfair Display | 34 → 48   | 1.15        | 600    | Page title (one per page)    |
-| h2      | Playfair Display | 28 → 36   | 1.2         | 600    | Section heading              |
-| h3      | Playfair Display | 22 → 28   | 1.25        | 600    | Sub-section, featured card   |
-| h4      | Inter            | 18 → 20   | 1.35        | 600    | Card title, product name     |
-| h5      | Inter            | 16        | 1.4         | 600    | Group label                  |
-| h6      | Inter            | 14        | 1.4         | 600    | Eyebrow (uppercase, tracked) |
-| body-lg | Inter            | 18        | 1.6         | 400    | Intro paragraphs             |
-| body    | Inter            | 16        | 1.6         | 400    | Default text                 |
-| small   | Inter            | 14        | 1.5         | 400    | Meta, helper text            |
-| caption | Inter            | 12        | 1.4         | 500    | Badges, legal                |
+| Token   | Font      | Size (px) | Line height | Weight | Use                          |
+| ------- | --------- | --------- | ----------- | ------ | ---------------------------- |
+| display | Cinzel    | 36 → 56   | 1.1         | 600    | Hero headline                |
+| h1      | Cinzel    | 30 → 42   | 1.15        | 600    | Page title (one per page)    |
+| h2      | Cinzel    | 24 → 32   | 1.2         | 600    | Section heading              |
+| h3      | Cinzel    | 20 → 26   | 1.25        | 600    | Sub-section, featured card   |
+| h4      | Inter     | 18 → 20   | 1.35        | 600    | Card title, product name     |
+| h5      | Inter     | 16        | 1.4         | 600    | Group label                  |
+| h6      | Inter     | 14        | 1.4         | 600    | Eyebrow (uppercase, tracked) |
+| body-lg | Cormorant | 20        | 1.6         | 400    | Intro paragraphs             |
+| body    | Cormorant | 18        | 1.6         | 400    | Default text                 |
+| small   | Inter     | 14        | 1.5         | 400    | Meta, helper text            |
+| caption | Inter     | 12        | 1.4         | 500    | Badges, legal                |
 
 Body text never goes below 16px on mobile. Prices use `body` or `h4` at weight 600 with tabular numbers.
 
@@ -796,7 +799,7 @@ Approved homepage order (Phase Development Reference v1.1):
 
 Hero imagery should mix solo fashion, jewelry close-ups, gift packaging, and a couple moment. It must not depend on one couple photo.
 
-Visual mood: Warm Ivory base, soft lavender identity moments, blush sections, Champagne Gold premium details, Playfair headings, Inter UI text, spacious layout, gentle motion.
+Visual mood: Warm Ivory base, soft lavender identity moments, blush sections, Champagne Gold premium details, Cinzel headings, Cormorant Garamond copy, Inter UI text, spacious layout, gentle motion.
 
 ## 24. UI Component Style
 
@@ -1211,8 +1214,9 @@ Recommended conceptual direction:
 
 ```text
 :root {
-   --font-display: "Playfair Display", serif;
-   --font-sans: "Inter", sans-serif;
+   --font-display: var(--font-cinzel), var(--font-sinhala), Georgia, serif;
+   --font-sans: var(--font-inter), var(--font-sinhala), ui-sans-serif, sans-serif;
+   --font-body: var(--font-cormorant-garamond), var(--font-sinhala), Georgia, serif;
 }
 ```
 
@@ -1358,8 +1362,9 @@ Before adding any new design element, ask: 1. Does it feel modern romantic premi
 | Luxury accent                  | Champagne Gold #C6A15B (token `gold`; text uses `gold-text` #7A5C22)     |
 | Text                           | Soft Charcoal #1C1B1A                                                    |
 | Border                         | Warm Taupe #D8C8BD                                                       |
-| Display font                   | Playfair Display                                                         |
-| UI font                        | Inter                                                                    |
+| Display font                   | Cinzel                                                                   |
+| UI font                        | Inter (UI)                                                               |
+| Body font                      | Cormorant Garamond (copy); Sinhala fallback Noto Serif Sinhala           |
 | Icons                          | Lucide React, thin outline                                               |
 | Motion                         | Motion (`framer-motion`), subtle; respect reduced motion (Section 25.1)  |
 | Website direction              | Custom Next.js ecommerce brand experience                                |
@@ -1373,7 +1378,7 @@ Before adding any new design element, ask: 1. Does it feel modern romantic premi
 The design direction is now clear. We are building a soft luxury, lavender-led, romantic lifestyle brand that can support women's and men's fashion, jewelry, gifts, couple collections, custom products, love websites, the Visual Portfolio, and future digital experiences. The final name and logo will be selected later, but they must follow the rules defined in this document. The confirmed visual foundation is:
 
 - Lavender Luxury Romance color system
-- Playfair Display for emotional display typography
+- Cinzel for display typography, Cormorant Garamond for copy
 - Inter for clean ecommerce UI
 - elegant wordmark + monogram logo direction
 - premium, soft, cinematic visual style
@@ -1461,7 +1466,7 @@ Use translucent Deep Plum Surface with blur, a soft border, Moon Ivory text, and
 
 #### Hero Section
 
-Use dark plum backgrounds, soft lavender gradient glow, warm imagery, Playfair headings in Moon Ivory, and small Champagne/Candlelight Gold details. Avoid neon purple glows.
+Use dark plum backgrounds, soft lavender gradient glow, warm imagery, Cinzel headings in Moon Ivory, and small Champagne/Candlelight Gold details. Avoid neon purple glows.
 
 #### Product Cards
 

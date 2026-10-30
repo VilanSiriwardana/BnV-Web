@@ -480,3 +480,22 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 ### Open
 
 - User actions: `npx impeccable install`, Taste Skill `/plugin` install, restart, `/impeccable init` and `/impeccable document`.
+
+## 2026-10-30 - Impeccable context and brand fonts
+
+### Summary
+
+- `/impeccable init` and `document`: created `PRODUCT.md`, `DESIGN.md` and `.impeccable/design.json` from Brand-Identity v1.3 and the code.
+- Implemented `.claude/blueprints/017-brand-fonts-cinzel-cormorant.md`: Cinzel display, Cormorant Garamond copy, Inter UI, Noto Serif Sinhala fallback (ADR-0023). Brand-Identity v1.4.
+
+### Deviations
+
+- Body fallback is Georgia rather than the requested Arial.
+
+### Known Gotchas
+
+- New controls outside `src/components/ui` must add `font-sans`, or they inherit Cormorant.
+
+### Open
+
+- Phase B: skills-driven homepage pass (critique → plan → implement → review-animations → break-ui → polish → audit).
