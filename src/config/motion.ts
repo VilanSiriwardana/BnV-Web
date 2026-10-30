@@ -11,3 +11,4 @@ export const ease = {
 } as const;
 
 export const revealOffset = 16;
+export const hoverScale = 1.03;

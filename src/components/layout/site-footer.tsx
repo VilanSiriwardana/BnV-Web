@@ -40,11 +40,11 @@ export function SiteFooter() {
   });
 
   return (
-    <footer className="border-border bg-surface mt-16 border-t md:mt-24">
+    <footer className="bg-chrome text-chrome-foreground mt-16 md:mt-24">
       <div className="mx-auto grid max-w-[1440px] gap-10 px-4 py-12 md:grid-cols-2 md:px-8 lg:grid-cols-[1.3fr_repeat(3,1fr)_1.7fr]">
         <div>
           <p className="font-display text-h3 font-semibold">{brand.name}</p>
-          <p className="text-small text-muted-foreground mt-2 max-w-xs">
+          <p className="text-small text-chrome-foreground/85 mt-2 max-w-xs">
             {brand.tagline}
           </p>
           {socials.length > 0 && (
@@ -54,7 +54,7 @@ export function SiteFooter() {
                   <a
                     href={s.href}
                     aria-label={s.label}
-                    className="border-border hover:bg-accent hover:text-primary-text focus-visible:ring-ring grid size-10 place-items-center rounded-full border transition-colors duration-150 outline-none focus-visible:ring-[3px]"
+                    className="border-chrome-foreground/20 hover:bg-chrome-foreground/10 hover:text-primary focus-visible:ring-primary grid size-10 place-items-center rounded-full border transition-colors duration-150 outline-none focus-visible:ring-[3px]"
                   >
                     <svg
                       aria-hidden
@@ -79,7 +79,7 @@ export function SiteFooter() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="text-small text-muted-foreground hover:text-primary-text"
+                    className="text-small text-chrome-foreground/85 hover:text-primary"
                   >
                     {item.label}
                   </Link>
@@ -94,12 +94,14 @@ export function SiteFooter() {
               Join our love letters
               <GoldHeart className="size-3.5" />
             </h2>
-            <p className="text-small text-muted-foreground mt-1 mb-4">
+            <p className="text-small text-chrome-foreground/85 mt-1 mb-4">
               New pieces, gift ideas and the occasional offer.
             </p>
-            <NewsletterForm />
+            <div className="[&_.text-muted-foreground]:text-chrome-foreground/85 [&_.text-primary-text]:text-primary [&_input]:border-chrome-foreground/30 [&_input]:placeholder:text-chrome-foreground/50">
+              <NewsletterForm />
+            </div>
           </div>
-          <ul className="border-border bg-card flex flex-col gap-3 rounded-md border p-4 font-sans">
+          <ul className="border-chrome-foreground/15 bg-chrome-foreground/5 flex flex-col gap-3 rounded-md border p-4 font-sans">
             {trust.map(({ icon, title }) => {
               const Icon = trustIcons[icon];
               return (
@@ -107,7 +109,7 @@ export function SiteFooter() {
                   <Icon
                     aria-hidden
                     strokeWidth={1.5}
-                    className="text-primary-text size-5 shrink-0"
+                    className="text-primary size-5 shrink-0"
                   />
                   <span className="text-small">{title}</span>
                 </li>
@@ -116,7 +118,7 @@ export function SiteFooter() {
           </ul>
         </div>
       </div>
-      <div className="border-border text-caption text-muted-foreground border-t">
+      <div className="border-chrome-foreground/15 text-caption text-chrome-foreground/85 border-t">
         <div className="mx-auto flex max-w-[1440px] flex-col items-center justify-between gap-3 px-4 py-6 font-sans sm:flex-row md:px-8">
           <p>
             © {new Date().getFullYear()} {brand.name}
@@ -124,14 +126,11 @@ export function SiteFooter() {
           <p className="flex flex-wrap items-center gap-4">
             <Link
               href={routes.policy('privacy')}
-              className="hover:text-primary-text"
+              className="hover:text-primary"
             >
               Privacy Policy
             </Link>
-            <Link
-              href={routes.policy('terms')}
-              className="hover:text-primary-text"
-            >
+            <Link href={routes.policy('terms')} className="hover:text-primary">
               Terms of Service
             </Link>
             <CookieSettingsButton />

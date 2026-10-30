@@ -22,7 +22,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
   return (
     <Link
       href={routes.product(product.slug)}
-      className="group focus-visible:ring-ring ease-standard bg-card border-border block h-full rounded-md border p-2 pb-3 shadow-sm transition-[transform,box-shadow] duration-150 outline-none hover:shadow-md focus-visible:ring-[3px] active:scale-[0.98]"
+      className="group focus-visible:ring-ring ease-standard bg-card border-border hover:border-primary/60 hover:shadow-glow block h-full rounded-md border p-2 pb-3 shadow-sm transition-[transform,box-shadow,border-color] duration-250 outline-none hover:-translate-y-0.5 focus-visible:ring-[3px] active:scale-[0.98] motion-reduce:hover:translate-y-0"
     >
       <div className="bg-muted relative aspect-[4/5] overflow-hidden rounded-sm">
         {product.imageUrl && (

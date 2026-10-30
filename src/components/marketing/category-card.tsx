@@ -16,7 +16,7 @@ export function CategoryCard({ label, subtitle, href, image }: Props) {
   return (
     <Link
       href={href}
-      className="group focus-visible:ring-ring bg-card border-border ease-standard flex h-full flex-col overflow-hidden rounded-md border shadow-sm transition-[transform,box-shadow] duration-150 outline-none hover:shadow-md focus-visible:ring-[3px] active:scale-[0.98]"
+      className="group focus-visible:ring-ring bg-card border-border ease-standard hover:border-primary/60 hover:shadow-glow flex h-full flex-col overflow-hidden rounded-md border shadow-sm transition-[transform,box-shadow,border-color] duration-250 outline-none hover:-translate-y-0.5 focus-visible:ring-[3px] active:scale-[0.98] motion-reduce:hover:translate-y-0"
     >
       <div className="bg-muted relative aspect-[4/5] overflow-hidden">
         {[

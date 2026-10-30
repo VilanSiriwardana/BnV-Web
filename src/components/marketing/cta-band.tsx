@@ -26,7 +26,7 @@ export function CtaBand({
       aria-labelledby={id}
       className="mx-auto max-w-[1440px] px-4 py-12 md:px-8 md:py-16"
     >
-      <div className="bg-primary/25 dark:bg-surface-elevated rounded-lg px-6 py-12 md:py-16">
+      <div className="bg-gradient-brand border-primary/40 rounded-lg border px-6 py-12 shadow-md md:py-16">
         <SectionHeading
           id={id}
           title={title}

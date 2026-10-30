@@ -14,12 +14,12 @@ export function AdminTable({
     return <p className="text-muted-foreground py-8">{empty}</p>;
   }
   return (
-    <div className="border-border overflow-x-auto rounded-md border">
-      <table className="text-small w-full">
-        <thead className="bg-muted/50 text-left">
+    <div className="border-border bg-card overflow-x-auto rounded-md border shadow-sm">
+      <table className="text-small w-full font-sans">
+        <thead className="bg-primary-soft text-left">
           <tr>
             {headers.map((h) => (
-              <th key={h} className="px-3 py-2 font-medium">
+              <th key={h} scope="col" className="px-3 py-2.5 font-semibold">
                 {h}
               </th>
             ))}
@@ -29,14 +29,14 @@ export function AdminTable({
           {rows.map((row) => (
             <tr
               key={row.key}
-              className="border-border hover:bg-accent/40 border-t"
+              className="border-border hover:bg-accent border-t transition-colors duration-150"
             >
               {row.cells.map((cell, i) => (
                 <td key={i} className="px-3 py-2 align-top">
                   {i === 1 ? (
                     <Link
                       href={row.href}
-                      className="font-medium hover:underline"
+                      className="hover:text-primary-text font-medium underline-offset-4 hover:underline"
                     >
                       {cell}
                     </Link>

@@ -24,6 +24,9 @@ colors:
   midnight-elevated: '#2f243a'
   midnight-border: '#4a3a50'
   moonlit-ivory: '#f7f1ea'
+  lavender-soft: '#f1ebf9'
+  chrome-from: '#6a5296'
+  chrome-to: '#17121d'
 typography:
   display:
     fontFamily: 'Cinzel, Noto Serif Sinhala, Georgia, serif'
@@ -206,6 +209,13 @@ Soft and warm. Shadows are tinted with charcoal at low alpha in light mode and b
 - **sm** (`0 1px 2px rgb(var(--shadow-color) / var(--shadow-a-sm))`): cards and inputs at rest, luxury button.
 - **md** (`0 4px 16px …/ var(--shadow-a-md)`): hover lift, dropdowns, sticky header.
 - **lg** (`0 12px 40px …/ var(--shadow-a-lg)`): sheets, drawers and dialogs.
+- **glow** (`0 8px 28px` lavender at `--glow-a`): hover on interactive product/category cards, gradient button and slider thumb only.
+
+### Gradients
+
+Lavender must lead every screen, so the brand never depends on photography for colour. Tokens: `bg-gradient-brand` (lavender → surface), `bg-gradient-card` (white → `primary-soft`), `bg-chrome` (deep lavender → midnight plum), `border-gradient` (lavender/gold/rose hairline).
+
+**The Gradient Placement Rule.** Gradients are allowed on the footer chrome, the header hairline, the CTA band, at most one `gradient` button per screen, slider ranges and `Card variant="gradient"`. Never behind body copy or long text, and never on product imagery.
 
 ### Named Rules
 
@@ -244,7 +254,7 @@ Gently rounded throughout: small (6px) for inputs and badges, medium (10px) for 
 
 ### Navigation
 
-- Sticky site header with Inter labels; mobile navigation in a sheet (`mobile-nav`). The storefront header, footer and cart drawer are hidden under `/admin` (`storefront-chrome`).
+- Sticky site header in lavender-tinted glass (`bg-primary-soft/70` + blur) with a `bg-gradient-brand` hairline; footer is a `bg-chrome` band with `chrome-foreground` text in both themes. Inter labels; mobile navigation in a sheet (`mobile-nav`). The storefront header, footer and cart drawer are hidden under `/admin` (`storefront-chrome`).
 
 ### Mockup system (PageImages contract, ADR-0025)
 
@@ -253,7 +263,7 @@ Gently rounded throughout: small (6px) for inputs and badges, medium (10px) for 
 - **Split hero (default):** text and two CTAs (solid primary, outlined secondary) on a cream or plum surface; the image fills the right half and fades in from the left edge; on mobile the image sits above the text.
 - **Bordered cards:** product, category and feature cards are white (`bg-card`) with a 1px taupe border and `shadow-sm`, lifting to `shadow-md` on hover. Category cards: image, Cinzel title, Cormorant subtitle, "Shop now →".
 - **Primitives:** `IconRow` (round lavender icon chips), `Steps` (icon chip, gold number, dashed connector), `FeatureCard`, `CtaBand` (lavender closing band).
-- **Chrome:** pale lavender announcement bar with gold heart separators on every storefront page; footer with newsletter and a trust box of confirmed facts only. Social and contact items render only when set in `src/config/brand.ts`.
+- **Chrome:** lavender (`bg-primary/60`) announcement bar with gold heart separators on every storefront page; footer with newsletter and a trust box of confirmed facts only. Social and contact items render only when set in `src/config/brand.ts`.
 - **No wishlist hearts** on cards or in the header.
 
 ### Homepage signatures
@@ -276,6 +286,7 @@ Gently rounded throughout: small (6px) for inputs and badges, medium (10px) for 
 - **Do** use semantic tokens from `app/globals.css` and the constants in `src/config/motion.ts`.
 - **Do** keep text on lavender, rose and gold fills Soft Charcoal, and use `primary-text` / `gold-text` for coloured text.
 - **Do** reuse `Reveal`, `Stagger` and the `src/components/ui` primitives before writing new ones.
+- **Do** use the shared primitives: `Combobox` (single, multi, searchable), `CountrySelect`, `DatePicker`, `DateRangePicker`, `DataTable`, `Card` variants (`gradient`, `glass`, `interactive`, `outline-gradient`), `ImageFrame`, `Slider`, `Carousel`, `Popover`, `Tooltip`, `Dialog`, `Tabs`, `Checkbox`, `Switch`. Shared focus, lift and field classes live in `src/components/ui/styles.ts`.
 - **Do** design every screen for mobile first and check both light and dark themes.
 - **Do** respect `prefers-reduced-motion`: remove movement, keep short fades.
 

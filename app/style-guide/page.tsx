@@ -29,6 +29,8 @@ import {
 import { brand } from '@/config/brand';
 import { themeTokens } from '@/config/theme';
 
+import { ComponentsShowcase } from './components-showcase';
+
 export const metadata: Metadata = {
   title: 'Style Guide',
   robots: { index: false, follow: false },
@@ -142,6 +144,7 @@ export default function StyleGuidePage() {
             public pages until it is confirmed.
           </p>
         )}
+        <ComponentsShowcase section="buttons" />
         <div className="flex flex-wrap items-center gap-3">
           <Button size="sm">Small</Button>
           <Button>Default</Button>
@@ -197,6 +200,23 @@ export default function StyleGuidePage() {
             </p>
           </div>
         </div>
+        <ComponentsShowcase section="cards" />
+        <div className="bg-chrome text-chrome-foreground rounded-lg p-6">
+          <p className="text-h4 font-semibold">Chrome gradient</p>
+          <p className="text-small opacity-70">Footer band</p>
+        </div>
+      </Section>
+
+      <Section title="Selects, dates & controls">
+        <ComponentsShowcase section="inputs" />
+      </Section>
+
+      <Section title="Data table & carousel">
+        <ComponentsShowcase section="data" />
+      </Section>
+
+      <Section title="Dialog, tooltip & tabs">
+        <ComponentsShowcase section="overlays" />
       </Section>
 
       <Section title="Sheet & accordion">

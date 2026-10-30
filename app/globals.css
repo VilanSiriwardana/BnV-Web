@@ -39,6 +39,12 @@
   --shadow-a-sm: 0.06;
   --shadow-a-md: 0.08;
   --shadow-a-lg: 0.12;
+
+  --primary-soft: #f1ebf9;
+  --chrome-from: #6a5296;
+  --chrome-to: #17121d;
+  --chrome-foreground: #f7f1ea;
+  --glow-a: 0.22;
 }
 
 .dark {
@@ -71,6 +77,12 @@
   --shadow-a-sm: 0.3;
   --shadow-a-md: 0.4;
   --shadow-a-lg: 0.5;
+
+  --primary-soft: #2f243a;
+  --chrome-from: #3a2c4a;
+  --chrome-to: #110d16;
+  --chrome-foreground: #f7f1ea;
+  --glow-a: 0.35;
 }
 
 @theme inline {
@@ -102,6 +114,8 @@
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-chrome-foreground: var(--chrome-foreground);
 
   --font-sans:
     var(--font-inter), var(--font-sinhala), ui-sans-serif, system-ui, sans-serif;
@@ -138,6 +152,7 @@
   --shadow-sm: 0 1px 2px rgb(var(--shadow-color) / var(--shadow-a-sm));
   --shadow-md: 0 4px 16px rgb(var(--shadow-color) / var(--shadow-a-md));
   --shadow-lg: 0 12px 40px rgb(var(--shadow-color) / var(--shadow-a-lg));
+  --shadow-glow: 0 8px 28px rgb(106 82 150 / var(--glow-a));
 
   /* §25.1 motion */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
@@ -158,6 +173,43 @@
       transform: translateY(0.4em);
     }
   }
+}
+
+/* Gradients and heights (DESIGN.md "Gradients") */
+@utility bg-gradient-brand {
+  background-image: linear-gradient(135deg, var(--primary), var(--surface));
+}
+
+@utility bg-gradient-card {
+  background-image: linear-gradient(
+    180deg,
+    var(--surface-elevated),
+    var(--primary-soft)
+  );
+}
+
+@utility bg-chrome {
+  background-image: linear-gradient(
+    160deg,
+    var(--chrome-from),
+    var(--chrome-to)
+  );
+}
+
+@utility border-gradient {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--card), var(--card)) padding-box,
+    linear-gradient(135deg, var(--primary), var(--gold), var(--secondary))
+      border-box;
+}
+
+@utility h-hero {
+  height: calc(100svh - 6.5rem);
+}
+
+@utility min-h-section {
+  min-height: 70svh;
 }
 
 @layer base {

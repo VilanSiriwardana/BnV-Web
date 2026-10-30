@@ -5,7 +5,7 @@ import { Slot } from 'radix-ui';
 import { cn } from '@/lib/utils/cn';
 
 const buttonVariants = cva(
-  "font-sans inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-semibold whitespace-nowrap transition-[color,background-color,transform] duration-150 ease-standard active:scale-[0.98] outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "font-sans inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-semibold whitespace-nowrap transition-[color,background-color,box-shadow,transform] duration-150 ease-standard active:scale-[0.98] outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
@@ -20,6 +20,9 @@ const buttonVariants = cva(
         link: 'text-primary-text underline-offset-4 hover:underline',
         luxury: 'bg-gold text-gold-foreground shadow-sm hover:bg-gold/90',
         whatsapp: 'bg-success text-success-foreground hover:bg-success/90',
+        gradient:
+          'bg-gradient-brand text-primary-foreground shadow-sm transition-shadow hover:shadow-glow',
+        soft: 'bg-primary-soft text-primary-text hover:bg-primary/40',
       },
       size: {
         default: 'h-10 px-5 py-2 has-[>svg]:px-4',

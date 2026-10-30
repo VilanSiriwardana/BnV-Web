@@ -27,7 +27,7 @@ const utilities: Record<(typeof utilityNav)[number], React.ReactNode> = {
 
 export function SiteHeader() {
   return (
-    <HeaderShell className="border-border bg-surface/80 group/header sticky top-0 z-40 border-b backdrop-blur-md transition-shadow duration-250 data-[scrolled]:shadow-md">
+    <HeaderShell className="border-primary/40 bg-background/80 supports-[backdrop-filter]:bg-primary-soft/70 group/header after:bg-gradient-brand sticky top-0 z-40 border-b backdrop-blur-md transition-shadow duration-250 after:absolute after:inset-x-0 after:-bottom-px after:h-px data-[scrolled]:shadow-md">
       <div className="mx-auto flex h-16 max-w-[1440px] items-center gap-4 px-4 md:px-8">
         <MobileNav />
         <Link href={routes.home} className="font-display text-h3 font-semibold">
