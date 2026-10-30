@@ -15,6 +15,8 @@ type Props = {
   className?: string;
   loop?: boolean;
   showDots?: boolean;
+  startIndex?: number;
+  thumbnails?: React.ReactNode[];
 };
 
 export function Carousel({
@@ -24,8 +26,16 @@ export function Carousel({
   className,
   loop = false,
   showDots = true,
+  startIndex = 0,
+  thumbnails,
 }: Props) {
-  const [ref, api] = useEmblaCarousel({ loop, align: 'start' });
+  const [ref, api] = useEmblaCarousel({
+    loop,
+    align: 'start',
+    startIndex,
+    containScroll: 'trimSnaps',
+  });
+  const thumbsRef = React.useRef<HTMLDivElement>(null);
   const [index, setIndex] = React.useState(0);
   const [snaps, setSnaps] = React.useState<number[]>([]);
   const [canPrev, setCanPrev] = React.useState(false);
@@ -38,6 +48,9 @@ export function Carousel({
       setSnaps(api.scrollSnapList());
       setCanPrev(api.canScrollPrev());
       setCanNext(api.canScrollNext());
+      thumbsRef.current
+        ?.querySelector(`[data-index="${api.selectedScrollSnap()}"]`)
+        ?.scrollIntoView({ block: 'nearest', inline: 'center' });
     };
     sync();
     api.on('select', sync).on('reInit', sync);
@@ -64,7 +77,10 @@ export function Carousel({
               role="group"
               aria-roledescription="slide"
               aria-label={`${i + 1} of ${children.length}`}
-              className={cn('min-w-0 shrink-0 grow-0 pl-4', slideClassName)}
+              className={cn(
+                'min-w-0 shrink-0 grow-0 cursor-grab pl-4 active:cursor-grabbing',
+                slideClassName,
+              )}
             >
               {child}
             </div>
@@ -115,6 +131,30 @@ export function Carousel({
           </Button>
         </div>
       </div>
+      {thumbnails && thumbnails.length > 1 && (
+        <div
+          ref={thumbsRef}
+          className="mt-4 flex snap-x gap-2 overflow-x-auto pb-1"
+        >
+          {thumbnails.map((thumb, i) => (
+            <button
+              key={i}
+              type="button"
+              data-index={i}
+              aria-label={`Show slide ${i + 1}`}
+              aria-current={i === index || undefined}
+              onClick={() => api?.scrollTo(i)}
+              className={cn(
+                'relative size-16 shrink-0 cursor-pointer snap-start overflow-hidden rounded-sm opacity-60 transition-[opacity,box-shadow] duration-150 hover:opacity-100',
+                i === index && 'ring-primary opacity-100 ring-2',
+                focusRing,
+              )}
+            >
+              {thumb}
+            </button>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

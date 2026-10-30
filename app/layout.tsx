@@ -14,7 +14,9 @@ import { StorefrontChrome } from '@/components/layout/storefront-chrome';
 import { AnnouncementBar } from '@/components/marketing/announcement-bar';
 import { Analytics } from '@/components/consent/analytics';
 import { CookieConsent } from '@/components/consent/cookie-consent';
+import { SpotlightProvider } from '@/components/motion/spotlight-provider';
 import { ThemeProvider } from '@/components/theme/theme-provider';
+import { Toaster } from '@/components/ui/toaster';
 import { brand } from '@/config/brand';
 import { siteConfig } from '@/config/seo';
 import { announcement } from '@/data/home';
@@ -83,6 +85,8 @@ export default function RootLayout({
         <JsonLd data={organizationJsonLd()} />
         <JsonLd data={websiteJsonLd()} />
         <ThemeProvider>
+          <SpotlightProvider />
+          <Toaster />
           <CartProvider>
             <StorefrontChrome>
               <AnnouncementBar {...announcement} />

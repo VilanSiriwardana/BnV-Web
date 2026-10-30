@@ -107,7 +107,7 @@ export function ShootGallery({ media }: { media: ShootMedia[] }) {
           role="dialog"
           aria-modal="true"
           aria-label={current.alt}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+          className="bg-scrim/90 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md"
           onClick={() => setOpen(null)}
         >
           <Button

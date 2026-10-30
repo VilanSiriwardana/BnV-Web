@@ -6,6 +6,7 @@ import { ClosingRow } from '@/features/home/sections/closing-row';
 import { ComingSoonStrip } from '@/features/home/sections/coming-soon-strip';
 import { FeaturedCategories } from '@/features/home/sections/featured-categories';
 import { GiftBoxBanner } from '@/features/home/sections/gift-box-banner';
+import { Divider } from '@/components/marketing/divider';
 import { HeroSection } from '@/features/home/sections/hero-section';
 import { NewArrivals } from '@/features/home/sections/new-arrivals';
 import { ShowcaseRail } from '@/features/home/sections/showcase-rail';
@@ -29,6 +30,7 @@ export default function Home() {
       <FeaturedCategories />
       <NewArrivals />
       <GiftBoxBanner />
+      <Divider className="my-4" />
       <BrandStory />
       <ShowcaseRail />
       <TeaserBento />

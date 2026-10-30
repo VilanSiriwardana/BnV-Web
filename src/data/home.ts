@@ -5,13 +5,19 @@ export type ArtDirectedImage = {
   alt: string;
   light: { desktop: string; mobile: string };
   dark: { desktop: string; mobile: string };
+  objectPosition?: string;
 };
 
-const banner = (name: string, alt: string): ArtDirectedImage => {
+const banner = (
+  name: string,
+  alt: string,
+  objectPosition = 'right center',
+): ArtDirectedImage => {
   const src = (theme: string, size: string) =>
     `/images/prototype/banner-${name}-${theme}-${size}.webp`;
   return {
     alt,
+    objectPosition,
     light: { desktop: src('light', 'desktop'), mobile: src('light', 'mobile') },
     dark: { desktop: src('dark', 'desktop'), mobile: src('dark', 'mobile') },
   };

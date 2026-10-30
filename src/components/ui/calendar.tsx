@@ -41,7 +41,8 @@ function Calendar({
         range_end: 'bg-primary-soft rounded-r-md',
         range_middle:
           'bg-primary-soft [&>button]:bg-transparent! [&>button]:text-foreground! [&>button]:font-normal!',
-        today: '[&>button]:text-primary-text [&>button]:font-semibold',
+        today:
+          '[&>button]:text-primary-text [&>button]:font-semibold [&>button]:relative [&>button]:after:absolute [&>button]:after:bottom-1 [&>button]:after:size-1 [&>button]:after:rounded-full [&>button]:after:bg-gold',
         outside: 'text-muted-foreground/50',
         disabled: 'text-muted-foreground opacity-40',
         hidden: 'invisible',

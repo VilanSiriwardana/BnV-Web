@@ -169,7 +169,9 @@ A warm, powdery palette: ivory and charcoal carry the page, lavender carries the
 
 ### Named Rules
 
-**The Rationed Gold Rule.** Champagne Gold appears only as the small heart beside section headings and eyebrows, on Limited Drop badges, on step numbers, and on one luxury action per screen. Never as a fill for large areas.
+**The Rationed Gold Rule.** Champagne Gold stays under 3% of any screen: the small heart beside section headings and eyebrows, Limited Drop badges, step numbers, the calendar today dot, the ornament divider (`Divider`, one or two per page) and one luxury action per screen. Never as a fill for large areas.
+
+**The Rose-As-Spice Rule.** Dusty Rose appears only on badges (`Badge variant="rose"`) and hover accents, never as a surface.
 
 **The Charcoal-On-Colour Rule.** Text on lavender, rose or gold fills is always Soft Charcoal; lavender or gold text on light surfaces uses the `-text` tokens.
 
@@ -209,7 +211,16 @@ Soft and warm. Shadows are tinted with charcoal at low alpha in light mode and b
 - **sm** (`0 1px 2px rgb(var(--shadow-color) / var(--shadow-a-sm))`): cards and inputs at rest, luxury button.
 - **md** (`0 4px 16px …/ var(--shadow-a-md)`): hover lift, dropdowns, sticky header.
 - **lg** (`0 12px 40px …/ var(--shadow-a-lg)`): sheets, drawers and dialogs.
-- **glow** (`0 8px 28px` lavender at `--glow-a`): hover on interactive product/category cards, gradient button and slider thumb only.
+
+### Effects
+
+- **Glass** (`glass`): header, drawers, dialogs, popovers, dropdowns and toasts. Translucent popover surface with blur and a lavender border.
+- **Gradient border on hover** (`border-gradient-hover`): 1px lavender to gold, mask technique, for featured cards (`variant="gradient-border"`).
+- **Image treatment:** `ImageFrame` zooms to 1.04 over 700ms; `overlay` adds a plum gradient for text on images.
+- **Skeleton:** lavender tint with a soft shimmer (`skeleton-shimmer`).
+- All effects are removed under `prefers-reduced-motion`.
+
+- **glow** (`0 12px 40px -12px rgb(var(--primary-rgb) / var(--glow-a))`): hover on interactive cards, primary/gradient buttons, open dropdowns, dropzone drag-over and the slider thumb. Never a black shadow.
 
 ### Gradients
 
@@ -233,7 +244,7 @@ Gently rounded throughout: small (6px) for inputs and badges, medium (10px) for 
 - **Primary:** Signature Lavender fill, Soft Charcoal Inter Semibold label (UI primitives pin `font-sans`); hover to Lavender Glow.
 - **Secondary / Outline / Ghost:** transparent or ivory with a taupe border; hover fills Linen.
 - **Luxury:** Champagne Gold with a small shadow, used rarely. **WhatsApp:** Sage fill for the confirmation action.
-- **Hover / Focus:** colour transition at 150ms with `ease-standard`; 3px focus ring in Deep Lavender with a 2px offset.
+- **Hover / Focus:** colour transition at 150ms with `ease-standard`; 1px lift on hover, 0.98 press scale; primary and gradient buttons add a shimmer sweep (`shimmer`) and a cursor-follow lavender spotlight (`spotlight` + `data-spotlight`, fed by `SpotlightProvider`, off on touch and reduced motion). `loading` shows a spinner. Cursor is `pointer`, `not-allowed` when disabled. Focus uses the double ring `focus-ring` (2px background gap, then 3px Deep Lavender) so it shows on any surface.
 
 ### Cards / Containers
 
@@ -268,7 +279,8 @@ Gently rounded throughout: small (6px) for inputs and badges, medium (10px) for 
 
 ### Homepage signatures
 
-- **Cinematic hero:** full height (100svh minus chrome on mobile, 85vh desktop), image as background with a bottom charcoal scrim, white copy bottom-left, one primary button and a white text link. Image settles from scale 1.06 over 1.4s; headline words rise in sequence via CSS so the h1 paints immediately.
+- **Hero heights:** primary heroes are `100svh` minus header (`--header-h`) and announcement bar; secondary heroes `80svh`. Never `100vh`. Anchored sections get `scroll-margin-top` equal to the header. The split hero's image bleeds to the viewport's right edge and uses each image's `objectPosition` (default `right center`) so the subject is never cropped.
+- **Cinematic hero:** full height, image as background with a bottom plum scrim (`scrim` token), white copy bottom-left, one primary button and a white text link. Image settles from scale 1.06 over 1.4s; headline words rise in sequence via CSS so the h1 paints immediately.
 - **Trust strip:** three thin-icon items on Soft Blush directly under the hero.
 - **Collections rail:** tabs (44px targets, arrow-key navigation) switch a scroll-snap rail on mobile and a 4-up grid on desktop, crossfading at 250ms.
 - **Made-for-you bento:** one large and two small image tiles with scrims; tiles unmask from a soft inset clip as they enter view.
@@ -286,7 +298,7 @@ Gently rounded throughout: small (6px) for inputs and badges, medium (10px) for 
 - **Do** use semantic tokens from `app/globals.css` and the constants in `src/config/motion.ts`.
 - **Do** keep text on lavender, rose and gold fills Soft Charcoal, and use `primary-text` / `gold-text` for coloured text.
 - **Do** reuse `Reveal`, `Stagger` and the `src/components/ui` primitives before writing new ones.
-- **Do** use the shared primitives: `Combobox` (single, multi, searchable), `CountrySelect`, `DatePicker`, `DateRangePicker`, `DataTable`, `Card` variants (`gradient`, `glass`, `interactive`, `outline-gradient`), `ImageFrame`, `Slider`, `Carousel`, `Popover`, `Tooltip`, `Dialog`, `Tabs`, `Checkbox`, `Switch`. Shared focus, lift and field classes live in `src/components/ui/styles.ts`.
+- **Do** use the shared primitives: `Combobox` (single, multi, searchable), `CountrySelect`, `CurrencySelect`, `DatePicker`, `DateRangePicker`, `TimePicker`, `TagsInput`, `FileDropzone`, `DataTable` (TanStack Table v9: sorting, selection, pagination, skeleton, empty state), `Card` variants, `ImageFrame`, `Slider`, `Carousel` (drag, snap, thumbnails), `Lightbox`, `Popover`, `Tooltip`, `Dialog`, `Drawer`, `Tabs`, `Accordion`, `Checkbox`, `Switch`, `Skeleton`, `toast` (sonner). Card family in `src/components/cards/`: `ProductCard`, `FeatureCard`, `CollectionCard`, `TestimonialCard`, `StatCard`, each `variant`: `solid`, `glass`, `gradient-border`. Shared classes live in `src/components/ui/styles.ts`.
 - **Do** design every screen for mobile first and check both light and dark themes.
 - **Do** respect `prefers-reduced-motion`: remove movement, keep short fades.
 

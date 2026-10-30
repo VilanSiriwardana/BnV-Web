@@ -34,7 +34,7 @@ export function TeaserBento() {
                 />
                 <span
                   aria-hidden
-                  className="absolute inset-0 -z-10 bg-gradient-to-t from-black/80 via-black/45 to-black/5"
+                  className="from-scrim/80 via-scrim/45 absolute inset-0 -z-10 bg-linear-to-t to-transparent"
                 />
                 <div className="p-6 text-white md:p-8">
                   <Eyebrow className="text-white/90">{tile.eyebrow}</Eyebrow>

@@ -30,6 +30,7 @@ import { brand } from '@/config/brand';
 import { themeTokens } from '@/config/theme';
 
 import { ComponentsShowcase } from './components-showcase';
+import { PremiumShowcase } from './premium-showcase';
 
 export const metadata: Metadata = {
   title: 'Style Guide',
@@ -145,6 +146,7 @@ export default function StyleGuidePage() {
           </p>
         )}
         <ComponentsShowcase section="buttons" />
+        <PremiumShowcase section="buttons" />
         <div className="flex flex-wrap items-center gap-3">
           <Button size="sm">Small</Button>
           <Button>Default</Button>
@@ -211,8 +213,28 @@ export default function StyleGuidePage() {
         <ComponentsShowcase section="inputs" />
       </Section>
 
-      <Section title="Data table & carousel">
+      <Section title="More inputs">
+        <PremiumShowcase section="inputs" />
+      </Section>
+
+      <Section title="Data table (TanStack): pagination, selection, skeleton, empty">
+        <PremiumShowcase section="table" />
+      </Section>
+
+      <Section title="Carousel">
         <ComponentsShowcase section="data" />
+      </Section>
+
+      <Section title="Toast, drawer, skeleton & divider">
+        <PremiumShowcase section="feedback" />
+      </Section>
+
+      <Section title="Images & lightbox">
+        <PremiumShowcase section="media" />
+      </Section>
+
+      <Section title="Card family">
+        <PremiumShowcase section="cards" />
       </Section>
 
       <Section title="Dialog, tooltip & tabs">

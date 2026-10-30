@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 
+import { Lightbox } from '@/components/ui/lightbox';
 import { imageQuality, imageSizes } from '@/config/images';
 import { cn } from '@/lib/utils';
 import { blurFor } from '@/lib/utils/image';
@@ -13,11 +14,18 @@ type Props = { images: GalleryImage[]; name: string };
 
 export function ProductGallery({ images, name }: Props) {
   const [active, setActive] = useState(0);
+  const [zoomed, setZoomed] = useState(false);
   const current = images[active];
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="bg-muted relative aspect-[4/5] overflow-hidden rounded-md">
+      <button
+        type="button"
+        onClick={() => setZoomed(true)}
+        aria-label="Open full-screen image viewer"
+        disabled={!current}
+        className="group bg-muted focus-ring relative block aspect-[4/5] cursor-zoom-in overflow-hidden rounded-md"
+      >
         {current && (
           <Image
             src={current.imageUrl}
@@ -28,10 +36,20 @@ export function ProductGallery({ images, name }: Props) {
             quality={imageQuality.hero}
             sizes={imageSizes.gallery}
             {...blurFor(current.imageUrl)}
-            className="object-cover"
+            className="ease-standard object-cover transition-transform duration-700 group-hover:scale-[1.04] motion-reduce:group-hover:scale-100"
           />
         )}
-      </div>
+      </button>
+      <Lightbox
+        open={zoomed}
+        onOpenChange={setZoomed}
+        startIndex={active}
+        label={name}
+        images={images.map((img) => ({
+          src: img.imageUrl,
+          alt: img.altText ?? name,
+        }))}
+      />
       {images.length > 1 && (
         <ul className="grid grid-cols-5 gap-2">
           {images.map((image, i) => (
@@ -42,7 +60,7 @@ export function ProductGallery({ images, name }: Props) {
                 aria-label={`Show image ${i + 1} of ${images.length}`}
                 aria-pressed={i === active}
                 className={cn(
-                  'bg-muted focus-visible:ring-ring relative block aspect-[4/5] w-full overflow-hidden rounded-sm outline-none focus-visible:ring-[3px]',
+                  'bg-muted focus-ring relative block aspect-[4/5] w-full cursor-pointer overflow-hidden rounded-sm opacity-80 transition-opacity hover:opacity-100',
                   i === active && 'ring-primary ring-2',
                 )}
               >

@@ -56,7 +56,11 @@ export function ArtDirectedImage({ image, eager, className }: Props) {
               sizes={imageSizes.hero}
             />
             {/* eslint-disable-next-line jsx-a11y/alt-text -- props come from getImageProps */}
-            <img {...props} className="object-cover" />
+            <img
+              {...props}
+              className="object-cover"
+              style={{ objectPosition: image.objectPosition ?? 'right center' }}
+            />
           </picture>
         );
       })}

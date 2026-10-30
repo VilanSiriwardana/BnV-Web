@@ -10,7 +10,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { fieldTrigger } from '@/components/ui/styles';
+import { fieldTrigger, optionRow } from '@/components/ui/styles';
 import { cn } from '@/lib/utils/cn';
 
 export type ComboboxOption = {
@@ -96,7 +96,7 @@ export function Combobox(props: ComboboxProps) {
           aria-controls={listId}
           aria-invalid={props['aria-invalid']}
           data-placeholder={empty || undefined}
-          className={cn(fieldTrigger, 'h-auto min-h-11', className)}
+          className={cn(fieldTrigger, 'group/combo h-auto min-h-11', className)}
         >
           <span className="flex min-w-0 flex-1 flex-wrap items-center gap-1 py-1">
             {empty && placeholder}
@@ -107,13 +107,17 @@ export function Combobox(props: ComboboxProps) {
               </span>
             )}
             {selected.map((v) => (
-              <Badge key={v} variant="default" className="gap-1 pr-1">
+              <Badge
+                key={v}
+                variant="default"
+                className="animate-in fade-in-0 zoom-in-95 gap-1 pr-1 duration-150"
+              >
                 {byValue.get(v)?.label ?? v}
                 <span
                   role="button"
                   tabIndex={-1}
                   aria-label={`Remove ${byValue.get(v)?.label ?? v}`}
-                  className="hover:bg-foreground/10 rounded-xs"
+                  className="hover:bg-foreground/10 cursor-pointer rounded-xs transition-colors"
                   onPointerDown={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -125,7 +129,7 @@ export function Combobox(props: ComboboxProps) {
               </Badge>
             ))}
           </span>
-          <ChevronsUpDownIcon className="text-muted-foreground size-4 shrink-0" />
+          <ChevronsUpDownIcon className="text-muted-foreground group-data-[state=open]/combo:text-primary-text size-4 shrink-0 transition-colors" />
         </button>
       </PopoverTrigger>
       <PopoverContent
@@ -146,13 +150,16 @@ export function Combobox(props: ComboboxProps) {
             <Command.Empty className="text-muted-foreground py-6 text-center text-sm">
               {emptyText}
             </Command.Empty>
-            {options.map((o) => (
+            {options.map((o, i) => (
               <Command.Item
                 key={o.value}
                 value={`${o.label} ${o.value}`}
                 keywords={o.keywords}
                 onSelect={() => toggle(o.value)}
-                className="data-[selected=true]:bg-primary-soft data-[selected=true]:text-primary-text flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm transition-colors duration-150"
+                data-spotlight
+                data-checked={isSelected(o.value)}
+                style={{ animationDelay: `${Math.min(i, 10) * 20}ms` }}
+                className={optionRow}
               >
                 {o.icon}
                 <span className="flex-1 truncate">{o.label}</span>
