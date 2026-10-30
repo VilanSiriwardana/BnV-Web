@@ -1,6 +1,8 @@
 import { Heart } from 'lucide-react';
 import Link from 'next/link';
 
+import { CtaArrow } from '@/components/marketing/cta-arrow';
+
 import { cn } from '@/lib/utils';
 
 import { Eyebrow } from './eyebrow';
@@ -91,9 +93,10 @@ export function SectionHeading({
       {link && (
         <Link
           href={link.href}
-          className="text-small text-primary-text inline-flex min-h-11 shrink-0 items-center font-sans font-semibold underline underline-offset-4"
+          className="text-small text-primary-text group inline-flex min-h-11 shrink-0 items-center gap-1.5 font-sans font-semibold underline underline-offset-4"
         >
           {link.label}
+          <CtaArrow />
         </Link>
       )}
     </div>

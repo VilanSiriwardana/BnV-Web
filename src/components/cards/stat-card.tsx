@@ -33,7 +33,7 @@ export function StatCard({
           {label}
         </span>
         {Icon && (
-          <span className="bg-primary-soft text-primary-text grid size-9 place-items-center rounded-full">
+          <span className="bg-primary-soft text-icon grid size-9 place-items-center rounded-full">
             <Icon aria-hidden strokeWidth={1.5} className="size-4" />
           </span>
         )}

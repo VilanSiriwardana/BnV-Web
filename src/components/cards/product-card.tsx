@@ -1,3 +1,4 @@
+import { Crown, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
 import { Badge } from '@/components/ui/badge';
@@ -45,11 +46,15 @@ export function ProductCard({
         )}
         {product.badge ? (
           <Badge variant="gold" className="absolute top-3 left-3">
+            <Crown aria-hidden />
             {product.badge}
           </Badge>
         ) : (
           product.isNew && (
-            <Badge className="absolute top-3 left-3">New Arrival</Badge>
+            <Badge className="absolute top-3 left-3">
+              <Sparkles aria-hidden />
+              New Arrival
+            </Badge>
           )
         )}
       </div>

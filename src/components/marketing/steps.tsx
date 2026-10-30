@@ -30,7 +30,7 @@ export function Steps({
             />
           )}
           <span className="relative shrink-0">
-            <span className="bg-primary/20 text-primary-text grid size-12 place-items-center rounded-full">
+            <span className="bg-primary/20 text-icon grid size-12 place-items-center rounded-full">
               <Icon aria-hidden strokeWidth={1.5} className="size-5" />
             </span>
             <span className="bg-gold text-gold-foreground text-caption absolute -top-1 -right-1 grid size-6 place-items-center rounded-full font-sans font-semibold">

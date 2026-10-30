@@ -35,7 +35,7 @@ export function IconRow({
         >
           <span
             className={cn(
-              'bg-primary/20 text-primary-text grid shrink-0 place-items-center rounded-full',
+              'bg-primary/20 text-icon grid shrink-0 place-items-center rounded-full',
               inline ? 'size-9' : 'size-12',
             )}
           >

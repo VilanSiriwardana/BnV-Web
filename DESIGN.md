@@ -172,6 +172,7 @@ A warm, powdery palette: ivory and charcoal carry the page, lavender carries the
 **The Rationed Gold Rule.** Champagne Gold stays under 3% of any screen: the small heart beside section headings and eyebrows, Limited Drop badges, step numbers, the calendar today dot, the ornament divider (`Divider`, one or two per page) and one luxury action per screen. Never as a fill for large areas.
 
 **The Rose-As-Spice Rule.** Dusty Rose appears only on badges (`Badge variant="rose"`) and hover accents, never as a surface.
+**The Icon Tone Rule.** Icons use the `icon` token (`text-icon`): Deep Lavender in light mode, soft gold in dark mode. Gold icons in dark mode are an explicit exception to the Rationed Gold Rule. `icon-accent` (gold in both themes) is for a rare single highlight. Icons are Lucide at stroke 1.5, chosen by role from `src/config/icons.ts` so one idea always uses one icon. On the lavender footer, icons switch to `chrome-foreground`.
 
 **The Charcoal-On-Colour Rule.** Text on lavender, rose or gold fills is always Soft Charcoal; lavender or gold text on light surfaces uses the `-text` tokens.
 
@@ -200,7 +201,7 @@ A warm, powdery palette: ivory and charcoal carry the page, lavender carries the
 
 ## Layout
 
-Mobile-first. The type scale is defined at mobile sizes and components step up at the `md` breakpoint (Tailwind defaults: `sm` 640, `md` 768, `lg` 1024, `xl` 1280). Spacing follows the Tailwind 4px scale with generous section padding. Homepage order and section roles are fixed by Brand-Identity §23: a cinematic hero, then editorial category, product and story blocks. Layouts must not overlap or overflow at any width.
+Mobile-first. The type scale is defined at mobile sizes and components step up at the `md` breakpoint (Tailwind defaults: `sm` 640, `md` 768, `lg` 1024, `xl` 1280). Spacing follows the Tailwind 4px scale. Homepage sections share one rhythm, `section-y` (40px mobile, 56px desktop, top and bottom), so neighbouring sections never stack into large empty bands; dividers use `my-6 md:my-8`. Homepage order and section roles are fixed by Brand-Identity §23: a cinematic hero, then editorial category, product and story blocks. Layouts must not overlap or overflow at any width.
 
 ## Elevation & Depth
 
@@ -211,6 +212,11 @@ Soft, warm and visible. Every shadow has two layers: a small charcoal contact sh
 - **sm** (contact + `0 4px 12px -4px` lavender at `--tint-a-sm`): cards, inputs and controls at rest.
 - **md** (contact + `0 14px 32px -10px` lavender at `--tint-a-md`): hover lift, sticky header, polaroid frames.
 - **lg** (contact + `0 28px 60px -14px` lavender at `--tint-a-lg`): sheets, drawers and dialogs.
+
+### Scroll
+
+- Thin lavender scrollbar (`scrollbar-color` and `::-webkit-scrollbar`), thumb Deep Lavender on hover, transparent track, in both themes. Anchor scrolling is smooth except under reduced motion.
+- A 2px lavender-to-gold progress line (`scroll-progress`) runs along the bottom of the sticky header, driven by CSS scroll timelines; browsers without support simply don't show it.
 
 ### Effects
 
@@ -265,7 +271,7 @@ Gently rounded throughout: small (6px) for inputs and badges, medium (10px) for 
 
 ### Navigation
 
-- Sticky site header in lavender-tinted glass (`bg-primary-soft/70` + blur) with a `bg-gradient-brand` hairline; footer is a `bg-chrome` band with `chrome-foreground` text in both themes. Inter labels; mobile navigation in a sheet (`mobile-nav`). The storefront header, footer and cart drawer are hidden under `/admin` (`storefront-chrome`).
+- Sticky site header in lavender-tinted glass (`bg-primary-soft/70` + blur) with a `bg-gradient-brand` hairline and the scroll-progress line; footer is a `bg-chrome` band with `chrome-foreground` text. Light mode uses a deep-lavender gradient (#6e5899 → #4a3866, contrast-checked for ivory text); dark mode keeps the plum-to-midnight gradient. Inter labels; mobile navigation in a sheet (`mobile-nav`). The storefront header, footer and cart drawer are hidden under `/admin` (`storefront-chrome`).
 
 ### Mockup system (PageImages contract, ADR-0025)
 
@@ -283,7 +289,7 @@ Gently rounded throughout: small (6px) for inputs and badges, medium (10px) for 
 - **Cinematic hero:** full height, image as background with a bottom plum scrim (`scrim` token), white copy bottom-left, one primary button and a white text link. Image settles from scale 1.06 over 1.4s; headline words rise in sequence via CSS so the h1 paints immediately.
 - **Trust strip:** three thin-icon items on the soft lavender tint (`bg-primary-soft`) directly under the hero; the split hero panel uses the same tint so lavender, not blush, leads the first screen.
 - **Collections rail:** tabs (44px targets, arrow-key navigation) switch a scroll-snap rail on mobile and a 4-up grid on desktop, crossfading at 250ms.
-- **Made-for-you bento:** one large and two small image tiles with scrims; tiles unmask from a soft inset clip as they enter view.
+- **Made-for-you bento:** one large and two small image tiles with scrims; tiles unmask from a soft inset clip as they enter view.- **Featured Favorites carousel:** Embla with `embla-carousel-auto-scroll`: a continuous slow glide (no snap jumps, so no flicker) that loops, pauses on hover, keyboard focus and drag, and resumes at the same speed. A Pause/Play button is always visible (WCAG 2.2.2) and a manual pause persists. It never autoplays under reduced motion.- **Section motion:** every homepage heading and grid reveals once in view (`Reveal`, `Stagger` at 60ms); the gift-box and story images drift up to 24px with scroll (`Parallax`); text CTAs end in an arrow (`CtaArrow`) that nudges right on hover.
 - **Header:** condenses from 64px to 56px with a medium shadow once the page scrolls.
 
 ### Motion (signature)

@@ -1,5 +1,6 @@
 import { Banknote, MessageCircle, Truck } from 'lucide-react';
 
+import { Stagger, StaggerItem } from '@/components/motion/stagger';
 import { trust } from '@/data/home';
 
 const icons = {
@@ -11,15 +12,15 @@ const icons = {
 export function TrustStrip() {
   return (
     <section aria-label="How ordering works" className="bg-primary-soft">
-      <ul className="mx-auto grid max-w-[1440px] gap-6 px-4 py-8 font-sans md:grid-cols-3 md:gap-8 md:px-8">
+      <Stagger className="mx-auto grid max-w-[1440px] gap-6 px-4 py-8 font-sans md:grid-cols-3 md:gap-8 md:px-8">
         {trust.map(({ icon, title, text }) => {
           const Icon = icons[icon];
           return (
-            <li key={title} className="flex items-start gap-3">
+            <StaggerItem key={title} className="flex items-start gap-3">
               <Icon
                 aria-hidden
                 strokeWidth={1.5}
-                className="text-primary-text mt-0.5 size-6 shrink-0"
+                className="text-icon mt-0.5 size-6 shrink-0"
               />
               <div>
                 <p className="text-small font-semibold">{title}</p>
@@ -27,10 +28,10 @@ export function TrustStrip() {
                   {text}
                 </p>
               </div>
-            </li>
+            </StaggerItem>
           );
         })}
-      </ul>
+      </Stagger>
     </section>
   );
 }

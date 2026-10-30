@@ -5,7 +5,7 @@ import { NewsletterForm } from '@/features/newsletter/newsletter-form';
 export function NewsletterSection() {
   return (
     <section aria-labelledby="newsletter-title" className="bg-surface">
-      <Reveal className="mx-auto max-w-[1440px] px-4 py-12 text-center md:px-8 md:py-16">
+      <Reveal className="section-y mx-auto max-w-[1440px] px-4 text-center md:px-8">
         <Eyebrow>Stay close</Eyebrow>
         <h2
           id="newsletter-title"

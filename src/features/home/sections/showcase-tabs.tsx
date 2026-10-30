@@ -2,6 +2,8 @@
 
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import Link from 'next/link';
+
+import { CtaArrow } from '@/components/marketing/cta-arrow';
 import { useId, useRef, useState } from 'react';
 
 import {
@@ -107,9 +109,10 @@ export function ShowcaseTabs({ tabs }: { tabs: Tab[] }) {
             </ul>
             <Link
               href={tab.href}
-              className="text-primary-text mt-6 inline-flex min-h-11 items-center font-sans text-sm font-semibold break-words underline underline-offset-4"
+              className="text-primary-text group mt-6 inline-flex min-h-11 items-center gap-1.5 font-sans text-sm font-semibold break-words underline underline-offset-4"
             >
               Shop {tab.title}
+              <CtaArrow />
             </Link>
           </motion.div>
         </AnimatePresence>

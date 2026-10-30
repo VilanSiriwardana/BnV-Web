@@ -45,9 +45,11 @@
   --edge: 0 0 #0000;
 
   --primary-soft: #f1ebf9;
-  --chrome-from: #6a5296;
-  --chrome-to: #17121d;
-  --chrome-foreground: #f7f1ea;
+  --chrome-from: #6e5899;
+  --chrome-to: #4a3866;
+  --chrome-foreground: #fbf8f3;
+  --icon: var(--primary-text);
+  --icon-accent: var(--gold);
   --glow-a: 0.55;
   --primary-rgb: 200 182 226;
   --scrim: #17121d;
@@ -94,6 +96,8 @@
   --chrome-from: #3a2c4a;
   --chrome-to: #110d16;
   --chrome-foreground: #f7f1ea;
+  --icon: var(--gold-text);
+  --icon-accent: var(--gold);
   --glow-a: 0.45;
   --primary-rgb: 200 182 226;
   --scrim: #0b0810;
@@ -132,6 +136,8 @@
   --color-primary-soft: var(--primary-soft);
   --color-chrome-foreground: var(--chrome-foreground);
   --color-scrim: var(--scrim);
+  --color-icon: var(--icon);
+  --color-icon-accent: var(--icon-accent);
 
   --font-sans:
     var(--font-inter), var(--font-sinhala), ui-sans-serif, system-ui, sans-serif;
@@ -416,6 +422,38 @@
   }
 }
 
+@utility section-y {
+  padding-block: 2.5rem;
+  @media (width >= 48rem) {
+    padding-block: 3.5rem;
+  }
+}
+
+@utility scroll-progress {
+  pointer-events: none;
+  height: 2px;
+  transform-origin: left;
+  transform: scaleX(0);
+  background: linear-gradient(
+    90deg,
+    var(--primary-text),
+    var(--primary),
+    var(--gold)
+  );
+  display: none;
+  @supports (animation-timeline: scroll()) {
+    display: block;
+    animation: scroll-progress linear both;
+    animation-timeline: scroll(root);
+  }
+}
+
+@keyframes scroll-progress {
+  to {
+    transform: scaleX(1);
+  }
+}
+
 @keyframes shimmer {
   to {
     transform: translateX(120%);
@@ -423,6 +461,31 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border: 2px solid var(--background);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-text);
+  }
+
   [id] {
     scroll-margin-top: calc(var(--header-h) + 1rem);
   }
@@ -459,6 +522,10 @@
   }
 
   .spotlight::after {
+    display: none;
+  }
+
+  .scroll-progress {
     display: none;
   }
 

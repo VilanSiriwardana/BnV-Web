@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import { CtaArrow } from '@/components/marketing/cta-arrow';
+
 import {
   GoldHeart,
   SectionHeading,
@@ -21,7 +23,7 @@ export function ClosingRow() {
   return (
     <section
       aria-label="How ordering works and staying in touch"
-      className="mx-auto grid max-w-[1440px] gap-4 px-4 py-12 md:grid-cols-3 md:px-8 md:py-16"
+      className="section-y mx-auto grid max-w-[1440px] gap-4 px-4 md:grid-cols-3 md:px-8"
     >
       <Reveal className={cn(!quote && 'md:col-span-2')}>
         <div className={card}>
@@ -48,9 +50,9 @@ export function ClosingRow() {
           </ol>
           <Link
             href={routes.contact}
-            className="text-caption text-primary-text mt-4 inline-flex min-h-11 items-center gap-1 font-sans font-semibold tracking-widest uppercase"
+            className="text-caption text-primary-text group mt-4 inline-flex min-h-11 items-center gap-1 font-sans font-semibold tracking-widest uppercase"
           >
-            Contact us <span aria-hidden>→</span>
+            Contact us <CtaArrow />
           </Link>
         </div>
       </Reveal>

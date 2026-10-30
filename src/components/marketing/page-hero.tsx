@@ -1,3 +1,4 @@
+import { Gift, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
 
 import { buttonVariants } from '@/components/ui/button';
@@ -85,6 +86,7 @@ export function PageHero({
     >
       {primaryCta && (
         <Link href={primaryCta.href} className={buttonVariants({ size: 'lg' })}>
+          <ShoppingBag aria-hidden strokeWidth={1.5} />
           {primaryCta.label}
         </Link>
       )}
@@ -100,6 +102,7 @@ export function PageHero({
               : buttonVariants({ variant: 'secondary', size: 'lg' })
           }
         >
+          <Gift aria-hidden strokeWidth={1.5} className="text-icon" />
           {secondaryCta.label}
         </Link>
       )}

@@ -1,7 +1,16 @@
-import { Banknote, MessageCircle, Truck } from 'lucide-react';
+import {
+  Banknote,
+  Compass,
+  LifeBuoy,
+  Mail,
+  MessageCircle,
+  ShoppingBag,
+  Truck,
+} from 'lucide-react';
 import Link from 'next/link';
 
 import { CookieSettingsButton } from '@/components/consent/cookie-consent';
+import { Reveal } from '@/components/motion/reveal';
 import { GoldHeart } from '@/components/marketing/section-heading';
 import { brand } from '@/config/brand';
 import { footerNav } from '@/config/navigation';
@@ -25,6 +34,23 @@ const socialIcons = {
   },
 } as const;
 
+const groupIcons: Record<string, typeof Compass> = {
+  Shop: ShoppingBag,
+  Explore: Compass,
+  Help: LifeBuoy,
+};
+
+function GroupIcon({ title }: { title: string }) {
+  const Icon = groupIcons[title];
+  return Icon ? (
+    <Icon
+      aria-hidden
+      strokeWidth={1.5}
+      className="text-chrome-foreground/90 size-4"
+    />
+  ) : null;
+}
+
 const trustIcons = {
   banknote: Banknote,
   'message-circle': MessageCircle,
@@ -40,8 +66,8 @@ export function SiteFooter() {
   });
 
   return (
-    <footer className="bg-chrome text-chrome-foreground mt-16 md:mt-24">
-      <div className="mx-auto grid max-w-[1440px] gap-10 px-4 py-12 md:grid-cols-2 md:px-8 lg:grid-cols-[1.3fr_repeat(3,1fr)_1.7fr]">
+    <footer className="bg-chrome text-chrome-foreground mt-12 md:mt-16">
+      <Reveal className="mx-auto grid max-w-[1440px] gap-10 px-4 py-12 md:grid-cols-2 md:px-8 lg:grid-cols-[1.3fr_repeat(3,1fr)_1.7fr]">
         <div>
           <p className="font-display text-h3 font-semibold">{brand.name}</p>
           <p className="text-small text-chrome-foreground/85 mt-2 max-w-xs">
@@ -71,7 +97,8 @@ export function SiteFooter() {
         </div>
         {footerNav.map((group) => (
           <nav key={group.title} aria-label={group.title}>
-            <h2 className="text-caption font-sans font-semibold tracking-widest uppercase">
+            <h2 className="text-caption flex items-center gap-2 font-sans font-semibold tracking-widest uppercase">
+              <GroupIcon title={group.title} />
               {group.title}
             </h2>
             <ul className="mt-4 flex flex-col gap-2 font-sans">
@@ -91,13 +118,18 @@ export function SiteFooter() {
         <div className="flex flex-col gap-6 md:col-span-2 lg:col-span-1">
           <div>
             <h2 className="font-display text-h4 font-semibold">
+              <Mail
+                aria-hidden
+                strokeWidth={1.5}
+                className="text-chrome-foreground/90 mr-2 inline size-4 align-[-0.1em]"
+              />
               Join our love letters
               <GoldHeart className="size-3.5" />
             </h2>
             <p className="text-small text-chrome-foreground/85 mt-1 mb-4">
               New pieces, gift ideas and the occasional offer.
             </p>
-            <div className="[&_.text-muted-foreground]:text-chrome-foreground/85 [&_.text-primary-text]:text-primary [&_input]:border-chrome-foreground/30 [&_input]:placeholder:text-chrome-foreground/50">
+            <div className="[&_.text-icon]:text-chrome-foreground/85 [&_.text-muted-foreground]:text-chrome-foreground/85 [&_.text-primary-text]:text-primary [&_input]:border-chrome-foreground/30 [&_input]:placeholder:text-chrome-foreground/50">
               <NewsletterForm />
             </div>
           </div>
@@ -117,7 +149,7 @@ export function SiteFooter() {
             })}
           </ul>
         </div>
-      </div>
+      </Reveal>
       <div className="border-chrome-foreground/15 text-caption text-chrome-foreground/85 border-t">
         <div className="mx-auto flex max-w-[1440px] flex-col items-center justify-between gap-3 px-4 py-6 font-sans sm:flex-row md:px-8">
           <p>

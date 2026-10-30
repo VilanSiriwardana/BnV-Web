@@ -1,3 +1,5 @@
+import { Stagger, StaggerItem } from '@/components/motion/stagger';
+import { Reveal } from '@/components/motion/reveal';
 import { SectionHeading } from '@/components/marketing/section-heading';
 import { testimonials } from '@/data/testimonials';
 
@@ -8,16 +10,18 @@ export function Testimonials() {
   return (
     <section
       aria-labelledby="memories-title"
-      className="mx-auto max-w-[1440px] px-4 py-12 md:px-8 md:py-16"
+      className="section-y mx-auto max-w-[1440px] px-4 md:px-8"
     >
-      <SectionHeading
-        id="memories-title"
-        eyebrow="Memories"
-        title="Moments shared with us"
-      />
-      <ul className="mt-8 grid gap-6 md:grid-cols-3">
+      <Reveal>
+        <SectionHeading
+          id="memories-title"
+          eyebrow="Memories"
+          title="Moments shared with us"
+        />
+      </Reveal>
+      <Stagger className="mt-8 grid gap-6 md:grid-cols-3">
         {testimonials.map((t, i) => (
-          <li key={`${t.name}-${i}`}>
+          <StaggerItem key={`${t.name}-${i}`}>
             <figure className="bg-card rounded-md p-6 shadow-sm">
               <blockquote className="font-body text-h3 leading-normal break-words italic md:line-clamp-6">
                 “{t.quote}”
@@ -27,9 +31,9 @@ export function Testimonials() {
                 {t.context && ` · ${t.context}`}
               </figcaption>
             </figure>
-          </li>
+          </StaggerItem>
         ))}
-      </ul>
+      </Stagger>
     </section>
   );
 }

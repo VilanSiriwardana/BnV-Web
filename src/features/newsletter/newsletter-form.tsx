@@ -1,5 +1,6 @@
 'use client';
 
+import { Mail } from 'lucide-react';
 import Link from 'next/link';
 import { useActionState, useEffect, useId, useState } from 'react';
 
@@ -78,12 +79,20 @@ export function NewsletterForm() {
           <label htmlFor={emailId} className="sr-only">
             Email address
           </label>
-          <Input
-            {...email.bind}
-            type="email"
-            autoComplete="email"
-            placeholder="Your email address"
-          />
+          <div className="relative">
+            <Mail
+              aria-hidden
+              strokeWidth={1.5}
+              className="text-icon pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
+            />
+            <Input
+              {...email.bind}
+              type="email"
+              autoComplete="email"
+              placeholder="Your email address"
+              className="pl-9"
+            />
+          </div>
           <FieldError id={email.errorId} message={email.error} />
         </div>
         <Button type="submit" size="lg" className="h-11" disabled={pending}>

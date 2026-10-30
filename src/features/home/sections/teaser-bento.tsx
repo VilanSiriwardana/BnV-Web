@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import { CtaArrow } from '@/components/marketing/cta-arrow';
+
 import { ArtDirectedImage } from '@/components/marketing/art-directed-image';
 import { Eyebrow } from '@/components/marketing/eyebrow';
 import { ClipReveal } from '@/components/motion/clip-reveal';
@@ -15,7 +17,7 @@ export function TeaserBento() {
   return (
     <section
       aria-label="Made for you"
-      className="mx-auto max-w-[1440px] px-4 py-16 md:px-8 md:py-24"
+      className="section-y mx-auto max-w-[1440px] px-4 md:px-8"
     >
       <ul className="grid gap-4 md:grid-cols-5">
         {tiles.map((tile, i) => (
@@ -54,8 +56,9 @@ export function TeaserBento() {
                   >
                     {tile.description}
                   </span>
-                  <span className="mt-5 inline-flex min-h-11 items-center font-sans text-sm font-semibold underline underline-offset-4">
+                  <span className="mt-5 inline-flex min-h-11 items-center gap-1.5 font-sans text-sm font-semibold underline underline-offset-4">
                     {tile.cta.label}
+                    <CtaArrow />
                   </span>
                 </div>
               </Link>

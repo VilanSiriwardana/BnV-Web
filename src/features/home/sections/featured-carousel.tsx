@@ -1,10 +1,13 @@
 'use client';
 
+import AutoScroll from 'embla-carousel-auto-scroll';
+import useEmblaCarousel from 'embla-carousel-react';
 import { useReducedMotion } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { SectionHeading } from '@/components/marketing/section-heading';
+import { Reveal } from '@/components/motion/reveal';
 import {
   ProductCard,
   type ProductCardData,
@@ -17,48 +20,68 @@ type Props = {
   products: ProductCardData[];
 };
 
+// Continuous glide that pauses on hover, focus or the Pause button and resumes at the same speed.
 export function FeaturedCarousel({ title, href, products }: Props) {
-  const rail = useRef<HTMLUListElement>(null);
   const reduce = useReducedMotion();
-  const [edges, setEdges] = useState({ start: true, end: false });
+  const [ref, api] = useEmblaCarousel(
+    { loop: true, dragFree: true, align: 'start' },
+    [
+      AutoScroll({
+        speed: 0.8,
+        startDelay: 600,
+        playOnInit: false,
+        stopOnMouseEnter: true,
+        stopOnFocusIn: true,
+        stopOnInteraction: false,
+      }),
+    ],
+  );
+  const [userPaused, setUserPaused] = useState(false);
+  const paused = userPaused || !!reduce;
+  const pausedRef = useRef(paused);
 
-  const update = useCallback(() => {
-    const el = rail.current;
-    if (!el) return;
-    setEdges({
-      start: el.scrollLeft <= 4,
-      end: el.scrollLeft + el.clientWidth >= el.scrollWidth - 4,
-    });
-  }, []);
+  const auto = useCallback(() => api?.plugins().autoScroll, [api]);
 
   useEffect(() => {
-    const el = rail.current;
-    if (!el) return;
-    update();
-    el.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
-    return () => {
-      el.removeEventListener('scroll', update);
-      window.removeEventListener('resize', update);
-    };
-  }, [update]);
+    pausedRef.current = paused;
+    if (!api) return;
+    if (paused) auto()?.stop();
+    else auto()?.play();
+  }, [api, auto, paused]);
 
-  const scroll = (direction: 1 | -1) => {
-    const el = rail.current;
-    const card = el?.querySelector('li');
-    if (!el || !card) return;
-    el.scrollBy({
-      left: direction * (card.clientWidth + 16),
-      behavior: reduce ? 'auto' : 'smooth',
-    });
+  // The plugin resumes itself after hover/drag; honour a manual pause.
+  useEffect(() => {
+    if (!api) return;
+    const keepPaused = () => {
+      if (pausedRef.current) auto()?.stop();
+    };
+    api.on('autoScroll:play', keepPaused);
+    return () => {
+      api.off('autoScroll:play', keepPaused);
+    };
+  }, [api, auto]);
+
+  const toggle = () => setUserPaused(!paused);
+
+  const step = (direction: 1 | -1) => {
+    if (!api) return;
+    auto()?.stop();
+    if (direction > 0) api.scrollNext();
+    else api.scrollPrev();
+    const resume = () => {
+      api.off('settle', resume);
+      if (!pausedRef.current) auto()?.play();
+    };
+    api.on('settle', resume);
   };
 
   return (
     <section
       aria-labelledby="featured-title"
-      className="mx-auto max-w-[1440px] px-4 py-12 md:px-8 md:py-16"
+      aria-roledescription="carousel"
+      className="section-y mx-auto max-w-[1440px] px-4 md:px-8"
     >
-      <div className="flex items-end justify-between gap-4">
+      <Reveal className="flex items-end justify-between gap-4">
         <SectionHeading
           id="featured-title"
           title={title}
@@ -66,42 +89,59 @@ export function FeaturedCarousel({ title, href, products }: Props) {
           link={{ label: 'View all', href }}
           className="flex-1"
         />
-        <div className="hidden gap-2 md:flex">
+        <div className="flex gap-2">
           <Button
             variant="outline"
             size="icon"
             className="rounded-full"
+            aria-pressed={paused}
+            aria-label={paused ? 'Play carousel' : 'Pause carousel'}
+            onClick={toggle}
+          >
+            {paused ? (
+              <Play className="text-icon" />
+            ) : (
+              <Pause className="text-icon" />
+            )}
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="hidden rounded-full md:inline-flex"
             aria-label="Previous products"
-            disabled={edges.start}
-            onClick={() => scroll(-1)}
+            onClick={() => step(-1)}
           >
             <ChevronLeft />
           </Button>
           <Button
             variant="outline"
             size="icon"
-            className="rounded-full"
+            className="hidden rounded-full md:inline-flex"
             aria-label="Next products"
-            disabled={edges.end}
-            onClick={() => scroll(1)}
+            onClick={() => step(1)}
           >
             <ChevronRight />
           </Button>
         </div>
-      </div>
-      <ul
-        ref={rail}
-        className="-mx-4 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:px-0"
+      </Reveal>
+      <div
+        ref={ref}
+        className="-mx-4 mt-8 cursor-grab overflow-hidden px-4 pb-2 active:cursor-grabbing md:mx-0 md:px-0"
       >
-        {products.map((product) => (
-          <li
-            key={product.id}
-            className="w-[72%] shrink-0 snap-start sm:w-[40%] md:w-[calc((100%-3rem)/4)] lg:w-[calc((100%-5rem)/6)]"
-          >
-            <ProductCard product={product} />
-          </li>
-        ))}
-      </ul>
+        <ul className="-ml-4 flex touch-pan-y" aria-live="off">
+          {products.map((product, i) => (
+            <li
+              key={product.id}
+              role="group"
+              aria-roledescription="slide"
+              aria-label={`${i + 1} of ${products.length}`}
+              className="w-[72%] shrink-0 pl-4 sm:w-[40%] md:w-[calc(25%)] lg:w-[calc(100%/6)]"
+            >
+              <ProductCard product={product} />
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   );
 }

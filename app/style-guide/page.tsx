@@ -27,6 +27,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { brand } from '@/config/brand';
+import { icons } from '@/config/icons';
 import { themeTokens } from '@/config/theme';
 
 import { ComponentsShowcase } from './components-showcase';
@@ -152,6 +153,24 @@ export default function StyleGuidePage() {
           <Button>Default</Button>
           <Button size="lg">Large</Button>
         </div>
+      </Section>
+
+      <Section title="Icons (text-icon: lavender in light, gold in dark)">
+        <ul className="grid grid-cols-3 gap-4 sm:grid-cols-5 lg:grid-cols-8">
+          {Object.entries(icons).map(([role, Icon]) => (
+            <li
+              key={role}
+              className="bg-card flex flex-col items-center gap-2 rounded-md border p-4 shadow-sm"
+            >
+              <Icon
+                aria-hidden
+                strokeWidth={1.5}
+                className="text-icon size-6"
+              />
+              <code className="text-caption">{role}</code>
+            </li>
+          ))}
+        </ul>
       </Section>
 
       <Section title="Badges">

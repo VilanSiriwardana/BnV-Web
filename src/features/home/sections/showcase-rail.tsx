@@ -1,3 +1,4 @@
+import { Reveal } from '@/components/motion/reveal';
 import { SectionHeading } from '@/components/marketing/section-heading';
 import { showcases } from '@/data/home';
 
@@ -20,16 +21,18 @@ export async function ShowcaseRail() {
   return (
     <section
       aria-labelledby="showcase-title"
-      className="mx-auto max-w-[1440px] px-4 py-12 md:px-8 md:py-16"
+      className="section-y mx-auto max-w-[1440px] px-4 md:px-8"
     >
-      <SectionHeading
-        id="showcase-title"
-        eyebrow="Collections"
-        title="Curated for"
-        accent="the moment"
-        heart
-      />
-      <ShowcaseTabs tabs={tabs} />
+      <Reveal>
+        <SectionHeading
+          id="showcase-title"
+          eyebrow="Collections"
+          title="Curated for"
+          accent="the moment"
+          heart
+        />
+        <ShowcaseTabs tabs={tabs} />
+      </Reveal>
     </section>
   );
 }

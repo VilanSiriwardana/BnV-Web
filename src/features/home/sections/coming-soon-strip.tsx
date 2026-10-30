@@ -1,3 +1,4 @@
+import { Reveal } from '@/components/motion/reveal';
 import { Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
@@ -6,7 +7,7 @@ import { comingSoon } from '@/data/home';
 export function ComingSoonStrip() {
   return (
     <section aria-label="Coming soon" className="px-4 md:px-8">
-      <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-center gap-3 py-6 font-sans text-sm">
+      <Reveal className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-center gap-3 py-2 font-sans text-sm">
         <span className="text-caption text-muted-foreground font-semibold tracking-widest uppercase">
           Coming soon
         </span>
@@ -21,7 +22,7 @@ export function ComingSoonStrip() {
             {item.label}
           </Link>
         ))}
-      </div>
+      </Reveal>
     </section>
   );
 }

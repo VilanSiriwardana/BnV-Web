@@ -1,6 +1,9 @@
 import { Gift, HeartHandshake, PenLine } from 'lucide-react';
 import Link from 'next/link';
 
+import { CtaArrow } from '@/components/marketing/cta-arrow';
+
+import { Parallax } from '@/components/motion/parallax';
 import { ArtDirectedImage } from '@/components/marketing/art-directed-image';
 import { Eyebrow } from '@/components/marketing/eyebrow';
 import { IconRow } from '@/components/marketing/icon-row';
@@ -20,7 +23,7 @@ export function GiftBoxBanner() {
   return (
     <section
       aria-labelledby="gift-box-title"
-      className="mx-auto max-w-[1440px] px-4 py-12 md:px-8 md:py-16"
+      className="section-y mx-auto max-w-[1440px] px-4 md:px-8"
     >
       <ClipReveal>
         <div className="bg-primary/20 dark:bg-surface-elevated grid overflow-hidden rounded-lg md:grid-cols-[2fr_3fr]">
@@ -40,19 +43,21 @@ export function GiftBoxBanner() {
               href={giftBanner.cta.href}
               className={buttonVariants({
                 size: 'lg',
-                className: 'mt-8 self-start',
+                className: 'group mt-8 self-start',
               })}
             >
+              <Gift aria-hidden strokeWidth={1.5} />
               {giftBanner.cta.label}
+              <CtaArrow />
             </Link>
             <IconRow items={features} layout="inline" className="mt-8" />
           </div>
-          <div className="relative min-h-64 md:min-h-full">
+          <Parallax className="relative min-h-64 overflow-hidden md:min-h-full">
             <ArtDirectedImage
               image={giftBanner.image}
               className="absolute inset-0 aspect-auto h-full md:aspect-auto"
             />
-          </div>
+          </Parallax>
         </div>
       </ClipReveal>
     </section>

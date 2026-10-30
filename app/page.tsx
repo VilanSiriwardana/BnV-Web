@@ -33,7 +33,7 @@ export default function Home() {
       <BrandStory />
       <ShowcaseRail />
       <TeaserBento />
-      <Divider className="my-12 md:my-16" />
+      <Divider className="my-6 md:my-8" />
       <ComingSoonStrip />
       <ClosingRow />
     </>

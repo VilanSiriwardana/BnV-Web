@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { icons, type IconRole } from '@/config/icons';
 import { imageSizes } from '@/config/images';
 import { cn } from '@/lib/utils/cn';
 import { blurFor } from '@/lib/utils/image';
@@ -13,6 +14,7 @@ export type CollectionCardProps = {
   href: string;
   image: { light: string; dark: string };
   cta?: string;
+  icon?: IconRole;
   variant?: CardStyle;
 };
 
@@ -22,8 +24,11 @@ export function CollectionCard({
   href,
   image,
   cta = 'Shop now',
+  icon,
   variant = 'solid',
 }: CollectionCardProps) {
+  const Icon = icon ? icons[icon] : null;
+  const Arrow = icons.arrow;
   return (
     <Link
       href={href}
@@ -49,7 +54,12 @@ export function CollectionCard({
           />
         ))}
       </div>
-      <div className="flex flex-1 flex-col items-center px-3 pt-4 pb-5 text-center">
+      <div className="relative flex flex-1 flex-col items-center px-3 pt-4 pb-5 text-center">
+        {Icon && (
+          <span className="bg-card text-icon ring-primary-soft group-hover:bg-primary-soft -mt-9 mb-2 grid size-10 place-items-center rounded-full shadow-sm ring-4 transition-colors duration-250">
+            <Icon aria-hidden strokeWidth={1.5} className="size-5" />
+          </span>
+        )}
         <span className="font-display text-h4 group-hover:text-primary-text font-semibold transition-colors md:text-[1.25rem]">
           {label}
         </span>
@@ -58,12 +68,11 @@ export function CollectionCard({
         )}
         <span className="text-caption text-primary-text mt-3 inline-flex items-center gap-1 font-sans font-semibold tracking-widest uppercase">
           {cta}
-          <span
+          <Arrow
             aria-hidden
-            className="ease-standard transition-transform duration-150 group-hover:translate-x-0.5"
-          >
-            →
-          </span>
+            strokeWidth={1.5}
+            className="ease-standard size-3.5 transition-transform duration-150 group-hover:translate-x-0.5"
+          />
         </span>
       </div>
     </Link>

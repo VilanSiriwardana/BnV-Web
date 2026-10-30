@@ -31,10 +31,7 @@ export function ProductSection({
   return (
     <section
       aria-labelledby={id}
-      className={cn(
-        'mx-auto max-w-[1440px] px-4 py-12 md:px-8 md:py-16',
-        className,
-      )}
+      className={cn('section-y mx-auto max-w-[1440px] px-4 md:px-8', className)}
     >
       <Reveal>
         <SectionHeading

@@ -1,6 +1,8 @@
 import type { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 
+import { CtaArrow } from '@/components/marketing/cta-arrow';
+
 import { ImageFrame } from '@/components/ui/image-frame';
 import { cn } from '@/lib/utils/cn';
 
@@ -46,7 +48,7 @@ export function FeatureCard({
       )}
       <div className="flex flex-1 flex-col gap-2 p-5">
         {Icon && (
-          <span className="bg-primary-soft text-primary-text group-hover:bg-primary group-hover:text-primary-foreground grid size-10 place-items-center rounded-full transition-colors duration-250">
+          <span className="bg-primary-soft text-icon group-hover:bg-primary group-hover:text-primary-foreground grid size-10 place-items-center rounded-full transition-colors duration-250">
             <Icon aria-hidden strokeWidth={1.5} className="size-5" />
           </span>
         )}
@@ -58,12 +60,7 @@ export function FeatureCard({
             className="text-caption text-primary-text mt-auto inline-flex min-h-11 items-center gap-1 pt-2 font-sans font-semibold tracking-widest uppercase outline-none after:absolute after:inset-0"
           >
             {link.label}
-            <span
-              aria-hidden
-              className="ease-standard transition-transform duration-150 group-hover:translate-x-0.5"
-            >
-              →
-            </span>
+            <CtaArrow className="size-3.5" />
           </Link>
         )}
       </div>
