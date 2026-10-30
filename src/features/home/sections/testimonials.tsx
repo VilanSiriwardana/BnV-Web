@@ -16,13 +16,13 @@ export function Testimonials() {
         title="Moments shared with us"
       />
       <ul className="mt-8 grid gap-6 md:grid-cols-3">
-        {testimonials.map((t) => (
-          <li key={t.name}>
+        {testimonials.map((t, i) => (
+          <li key={`${t.name}-${i}`}>
             <figure className="bg-card rounded-md p-6 shadow-sm">
-              <blockquote className="font-display text-h4">
+              <blockquote className="font-body text-h3 leading-normal break-words italic md:line-clamp-6">
                 “{t.quote}”
               </blockquote>
-              <figcaption className="text-small text-muted-foreground mt-4">
+              <figcaption className="text-small text-muted-foreground mt-4 font-sans break-words">
                 {t.name}
                 {t.context && ` · ${t.context}`}
               </figcaption>

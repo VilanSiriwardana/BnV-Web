@@ -1,7 +1,11 @@
 import { Reveal } from '@/components/motion/reveal';
 import { SectionHeading } from '@/components/marketing/section-heading';
-import { ProductGrid } from '@/components/product/product-grid';
-import type { ProductCardData } from '@/components/product/product-card';
+import { cn } from '@/lib/utils';
+import { Stagger, StaggerItem } from '@/components/motion/stagger';
+import {
+  ProductCard,
+  type ProductCardData,
+} from '@/components/product/product-card';
 
 type Props = {
   id: string;
@@ -25,8 +29,14 @@ export function ProductSection({
   if (products.length === 0) return null;
 
   return (
-    <section aria-labelledby={id} className={className}>
-      <Reveal className="mx-auto max-w-[1440px] px-4 py-12 md:px-8 md:py-16">
+    <section
+      aria-labelledby={id}
+      className={cn(
+        'mx-auto max-w-[1440px] px-4 py-12 md:px-8 md:py-16',
+        className,
+      )}
+    >
+      <Reveal>
         <SectionHeading
           id={id}
           eyebrow={eyebrow}
@@ -34,10 +44,14 @@ export function ProductSection({
           description={description}
           link={{ label: 'View all', href }}
         />
-        <div className="mt-8">
-          <ProductGrid products={products} />
-        </div>
       </Reveal>
+      <Stagger className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
+        {products.map((product) => (
+          <StaggerItem key={product.id}>
+            <ProductCard product={product} />
+          </StaggerItem>
+        ))}
+      </Stagger>
     </section>
   );
 }

@@ -110,19 +110,19 @@
     var(--font-cormorant-garamond), var(--font-sinhala), Georgia, serif;
 
   /* §19.1 type scale (mobile sizes; components step up at md) */
-  --text-display: 2.25rem;
+  --text-display: clamp(2.5rem, 7vw, 5rem);
   --text-display--line-height: 1.1;
-  --text-h1: 1.875rem;
+  --text-h1: clamp(2rem, 4.5vw, 3.25rem);
   --text-h1--line-height: 1.15;
-  --text-h2: 1.5rem;
+  --text-h2: clamp(1.625rem, 3.2vw, 2.375rem);
   --text-h2--line-height: 1.2;
-  --text-h3: 1.25rem;
+  --text-h3: 1.375rem;
   --text-h3--line-height: 1.25;
   --text-h4: 1.125rem;
   --text-h4--line-height: 1.35;
-  --text-body-lg: 1.25rem;
+  --text-body-lg: 1.375rem;
   --text-body-lg--line-height: 1.6;
-  --text-body: 1.125rem;
+  --text-body: 1.25rem;
   --text-body--line-height: 1.6;
   --text-small: 0.875rem;
   --text-small--line-height: 1.5;
@@ -142,6 +142,22 @@
   /* §25.1 motion */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  --animate-hero-zoom: hero-zoom 1.2s var(--ease-standard) both;
+  --animate-word-rise: word-rise 0.4s var(--ease-standard) both;
+
+  @keyframes hero-zoom {
+    from {
+      transform: scale(1.06);
+    }
+  }
+
+  @keyframes word-rise {
+    from {
+      opacity: 0.001;
+      transform: translateY(0.4em);
+    }
+  }
 }
 
 @layer base {
@@ -168,5 +184,19 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .animate-hero-zoom {
+    animation: none;
+  }
+
+  .animate-word-rise {
+    animation-name: fade-in;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
   }
 }

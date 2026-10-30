@@ -1,3 +1,4 @@
+import { Eyebrow } from '@/components/marketing/eyebrow';
 import { Reveal } from '@/components/motion/reveal';
 import { NewsletterForm } from '@/features/newsletter/newsletter-form';
 
@@ -5,9 +6,7 @@ export function NewsletterSection() {
   return (
     <section aria-labelledby="newsletter-title" className="bg-surface">
       <Reveal className="mx-auto max-w-[1440px] px-4 py-12 text-center md:px-8 md:py-16">
-        <p className="text-caption text-primary-text font-semibold tracking-widest uppercase">
-          Stay close
-        </p>
+        <Eyebrow>Stay close</Eyebrow>
         <h2
           id="newsletter-title"
           className="font-display text-h2 mt-2 font-semibold"

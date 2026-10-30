@@ -2,6 +2,7 @@ import { Search } from 'lucide-react';
 import Link from 'next/link';
 
 import { CartButton } from '@/components/cart/cart-button';
+import { HeaderShell } from '@/components/layout/header-shell';
 import { MobileNav } from '@/components/layout/mobile-nav';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 import { Button } from '@/components/ui/button';
@@ -26,7 +27,7 @@ const utilities: Record<(typeof utilityNav)[number], React.ReactNode> = {
 
 export function SiteHeader() {
   return (
-    <header className="border-border bg-surface/80 sticky top-0 z-40 border-b backdrop-blur-md">
+    <HeaderShell className="border-border bg-surface/80 group/header sticky top-0 z-40 border-b backdrop-blur-md transition-shadow duration-250 data-[scrolled]:shadow-md">
       <div className="mx-auto flex h-16 max-w-[1440px] items-center gap-4 px-4 md:px-8">
         <MobileNav />
         <Link href={routes.home} className="font-display text-h3 font-semibold">
@@ -52,6 +53,6 @@ export function SiteHeader() {
           ))}
         </div>
       </div>
-    </header>
+    </HeaderShell>
   );
 }

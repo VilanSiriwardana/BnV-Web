@@ -27,22 +27,22 @@ colors:
 typography:
   display:
     fontFamily: 'Cinzel, Noto Serif Sinhala, Georgia, serif'
-    fontSize: '2.25rem'
+    fontSize: 'clamp(2.5rem, 7vw, 5rem)'
     fontWeight: 600
     lineHeight: 1.1
   headline:
     fontFamily: 'Cinzel, Noto Serif Sinhala, Georgia, serif'
-    fontSize: '1.875rem'
+    fontSize: 'clamp(2rem, 4.5vw, 3.25rem)'
     fontWeight: 600
     lineHeight: 1.15
   title:
     fontFamily: 'Cinzel, Noto Serif Sinhala, Georgia, serif'
-    fontSize: '1.25rem'
+    fontSize: '1.375rem'
     fontWeight: 600
     lineHeight: 1.25
   body:
     fontFamily: 'Cormorant Garamond, Noto Serif Sinhala, Georgia, serif'
-    fontSize: '1.125rem'
+    fontSize: '1.25rem'
     fontWeight: 400
     lineHeight: 1.6
   label:
@@ -245,6 +245,14 @@ Gently rounded throughout: small (6px) for inputs and badges, medium (10px) for 
 ### Navigation
 
 - Sticky site header with Inter labels; mobile navigation in a sheet (`mobile-nav`). The storefront header, footer and cart drawer are hidden under `/admin` (`storefront-chrome`).
+
+### Homepage signatures
+
+- **Cinematic hero:** full height (100svh minus chrome on mobile, 85vh desktop), image as background with a bottom charcoal scrim, white copy bottom-left, one primary button and a white text link. Image settles from scale 1.06 over 1.4s; headline words rise in sequence via CSS so the h1 paints immediately.
+- **Trust strip:** three thin-icon items on Soft Blush directly under the hero.
+- **Collections rail:** tabs (44px targets, arrow-key navigation) switch a scroll-snap rail on mobile and a 4-up grid on desktop, crossfading at 250ms.
+- **Made-for-you bento:** one large and two small image tiles with scrims; tiles unmask from a soft inset clip as they enter view.
+- **Header:** condenses from 64px to 56px with a medium shadow once the page scrolls.
 
 ### Motion (signature)
 

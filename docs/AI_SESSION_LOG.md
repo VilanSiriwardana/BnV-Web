@@ -499,3 +499,19 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 ### Open
 
 - Phase B: skills-driven homepage pass (critique → plan → implement → review-animations → break-ui → polish → audit).
+
+## 2026-10-30 - Homepage redesign
+
+### Summary
+
+- Ran the `/impeccable critique` of the homepage (23/32, detector clean) and implemented `.claude/blueprints/018-homepage-redesign.md` (ADR-0024, Brand-Identity v1.5).
+- New sections: trust strip, brand story, showcase rail with tabs, teaser bento, coming-soon strip. Rebuilt the hero; New In carries Limited Drop badges; the header condenses on scroll.
+
+### Deviations
+
+- Product names use the documented `text-small` step (Inter) instead of 15px, because the Impeccable detector flagged an off-ramp size.
+- Eyebrows were kept and extracted into `Eyebrow`, although Impeccable's craft floor bans them. Pending an owner decision.
+
+### Open
+
+- Browser QA not yet run: Emil review-animations and break-ui, `/impeccable polish` and `audit`, and re-critique.

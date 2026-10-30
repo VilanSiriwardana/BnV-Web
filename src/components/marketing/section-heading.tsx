@@ -2,6 +2,8 @@ import Link from 'next/link';
 
 import { cn } from '@/lib/utils';
 
+import { Eyebrow } from './eyebrow';
+
 type Props = {
   id?: string;
   eyebrow?: string;
@@ -27,11 +29,7 @@ export function SectionHeading({
       )}
     >
       <div className="max-w-2xl">
-        {eyebrow && (
-          <p className="text-caption text-primary-text font-semibold tracking-widest uppercase">
-            {eyebrow}
-          </p>
-        )}
+        {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
         <h2 id={id} className="font-display text-h2 mt-2 font-semibold">
           {title}
         </h2>
@@ -42,7 +40,7 @@ export function SectionHeading({
       {link && (
         <Link
           href={link.href}
-          className="text-small text-primary-text font-semibold underline-offset-4 hover:underline"
+          className="text-small text-primary-text inline-flex min-h-11 shrink-0 items-center font-sans font-semibold underline underline-offset-4"
         >
           {link.label}
         </Link>

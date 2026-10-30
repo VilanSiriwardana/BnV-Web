@@ -431,3 +431,24 @@ Each decision should include:
 - Related Documents:
   - [../references/Brand-Identity.md](../references/Brand-Identity.md) Sections 18, 19, 33, 39
   - `.claude/blueprints/017-brand-fonts-cinzel-cormorant.md`
+
+## ADR-0024 - Homepage Redesign
+
+- Status: Accepted
+- Date: 2026-10-30
+- Context: The Impeccable critique of the homepage scored 23/32. It found a hero with the copy below the image, five identical product rows, five identical image bands, a type hierarchy weakened by the new fonts, uniform motion, and no trust information.
+- Decision:
+  - New Section 23 order (Brand-Identity v1.5): hero, trust strip, categories, New In, B&V story, collections rail, made-for-you bento, coming-soon strip, testimonials, newsletter.
+  - Limited Drop merges into New In as a gold badge (`ProductCardData.badge`). The three showcase rows become one tabbed rail.
+  - The four teaser bands become a bento of three tiles plus one coming-soon strip. Portfolio leaves the featured categories.
+  - Fluid display and heading sizes; body 20px.
+  - Motion: CSS hero zoom and word rise (LCP-safe), staggered product grids, clip reveals on the bento, press feedback on cards and buttons, and a header that condenses on scroll site-wide.
+  - Trust copy states only confirmed facts: cash on delivery or bank transfer, WhatsApp confirmation, delivery across Sri Lanka.
+- Consequences:
+  - `TeaserBand`, `CollectionShowcase` and `teasers.tsx` were removed.
+  - The story image is an AI placeholder until the real shoot.
+  - The header is a client wrapper (`HeaderShell`) around server-rendered content.
+- Related Documents:
+  - [../references/Brand-Identity.md](../references/Brand-Identity.md) Sections 19.1, 23
+  - `.claude/blueprints/018-homepage-redesign.md`
+  - `.impeccable/critique/2026-10-30T04-09-17Z__app-page-tsx.md`

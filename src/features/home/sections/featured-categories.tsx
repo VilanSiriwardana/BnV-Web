@@ -14,7 +14,7 @@ export function FeaturedCategories() {
         eyebrow="Explore"
         title="Something for every moment"
       />
-      <Stagger className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
+      <Stagger className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         {featuredCategories.map((category) => (
           <StaggerItem key={category.href}>
             <CategoryCard {...category} />

@@ -9,23 +9,21 @@ export async function NewArrivals() {
     getCollectionProducts('limited-drop', 4),
   ]);
 
+  const seen = new Set<string>();
+  const products = [
+    ...limitedDrop.map((p) => ({ ...p, badge: 'Limited Drop' })),
+    ...newest,
+  ]
+    .filter((p) => !seen.has(p.id) && seen.add(p.id))
+    .slice(0, 8);
+
   return (
-    <>
-      <ProductSection
-        id="new-in-title"
-        eyebrow="Just arrived"
-        title="New In"
-        href={routes.newIn}
-        products={newest}
-      />
-      <ProductSection
-        id="limited-drop-title"
-        eyebrow="While they last"
-        title="Limited Drop"
-        href={routes.collection('limited-drop')}
-        products={limitedDrop}
-        className="bg-surface"
-      />
-    </>
+    <ProductSection
+      id="new-in-title"
+      eyebrow="Just arrived"
+      title="New In"
+      href={routes.newIn}
+      products={products}
+    />
   );
 }

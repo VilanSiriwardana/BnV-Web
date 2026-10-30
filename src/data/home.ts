@@ -19,8 +19,34 @@ const banner = (name: string, alt: string): ArtDirectedImage => {
 };
 
 export const announcement = {
-  text: 'New pieces arrive regularly. Custom orders are always welcome.',
-  link: { label: 'Start a custom order', href: routes.custom },
+  text: 'Cash on delivery or bank transfer · Every order confirmed on WhatsApp · Delivered across Sri Lanka',
+};
+
+export const trust = [
+  {
+    icon: 'banknote',
+    title: 'Cash on delivery or bank transfer',
+    text: 'Pay the way that suits you, in LKR.',
+  },
+  {
+    icon: 'message-circle',
+    title: 'Every order confirmed on WhatsApp',
+    text: 'We check the details with you before we dispatch.',
+  },
+  {
+    icon: 'truck',
+    title: 'Delivered across Sri Lanka',
+    text: 'Wrapped with care and sent to your door.',
+  },
+] as const;
+
+// Placeholder image (AI-generated) until the real Buwi and Vila shoot (D-10).
+export const story = {
+  eyebrow: 'Our story',
+  title: 'Made by two, for every kind of love',
+  body: 'B&V began with Buwi and Vila, a couple who wanted the pieces they gave each other to feel personal. Today we make fashion, jewelry and gifts for anyone marking a moment, whether it is for yourself, for someone you love, or for the two of you.',
+  cta: { label: 'Read Our Story', href: routes.ourStory },
+  image: banner('our-story', 'Buwi and Vila of B&V'),
 };
 
 export const hero = {
@@ -40,7 +66,6 @@ export const featuredCategories = [
   { label: 'Gifts', href: routes.gifts, banner: 'gifts' },
   { label: 'Couples', href: routes.couples, banner: 'couples' },
   { label: 'Custom', href: routes.custom, banner: 'custom' },
-  { label: 'Portfolio', href: routes.portfolio, banner: 'portfolio' },
 ].map(({ label, href, banner: name }) => ({
   label,
   href,
@@ -74,10 +99,10 @@ export const showcases = [
 
 export const teasers = {
   giftBox: {
-    eyebrow: 'Coming soon',
-    title: 'Build Your Gift Box',
+    eyebrow: 'Gift boxes',
+    title: 'Ready-to-give gift boxes',
     description:
-      'Choose the pieces, the wrapping and the note. Until the builder opens, our ready-made gift boxes are waiting.',
+      'Pieces, wrapping and a handwritten note, put together for you.',
     cta: { label: 'Shop Gifts', href: routes.gifts },
     image: banner('gift-box', ''),
   },
@@ -98,12 +123,9 @@ export const teasers = {
     cta: { label: 'Explore Love Websites', href: routes.loveWebsites },
     image: banner('love-websites', ''),
   },
-  portfolio: {
-    eyebrow: 'Visual Portfolio',
-    title: 'Our first shoots are coming soon',
-    description:
-      'Fashion, jewelry and romantic visual stories by Buwi and Vila. Brands and event organisers can already work with us.',
-    cta: { label: 'Work With Us', href: routes.collaborate },
-    image: banner('portfolio', ''),
-  },
 };
+
+export const comingSoon = [
+  { label: 'Gift Box Builder', href: routes.gifts },
+  { label: 'Visual Portfolio', href: routes.collaborate },
+] as const;
