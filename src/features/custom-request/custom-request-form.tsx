@@ -3,6 +3,7 @@
 import { useActionState } from 'react';
 
 import {
+  DateField,
   ConsentField,
   FormShell,
   FormSuccess,
@@ -63,6 +64,7 @@ export function CustomRequestForm({
           <input type="hidden" name="requestType" value={presetType} />
         ) : (
           <SelectField
+            placeholder="Choose a type"
             name="requestType"
             label="What would you like made?"
             schema={f.requestType}
@@ -71,6 +73,7 @@ export function CustomRequestForm({
           />
         )}
         <SelectField
+          placeholder="Choose an occasion"
           name="occasion"
           label="Occasion"
           schema={f.occasion}
@@ -102,11 +105,13 @@ export function CustomRequestForm({
         {!isLoveWebsite && (
           <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
             <TextField
+              placeholder="e.g. Blush pink"
               name="preferredColor"
               label="Preferred colour"
               schema={f.preferredColor}
             />
             <TextField
+              placeholder="e.g. Sterling silver"
               name="preferredMaterial"
               label="Preferred material"
               schema={f.preferredMaterial}
@@ -115,22 +120,26 @@ export function CustomRequestForm({
         )}
         <div className="grid gap-2 sm:grid-cols-3 sm:gap-4">
           <TextField
+            placeholder="e.g. 10,000"
             name="budgetMin"
             label="Budget from (LKR)"
             schema={f.budgetMin}
             type="number"
           />
           <TextField
+            placeholder="e.g. 25,000"
             name="budgetMax"
             label="Budget up to (LKR)"
             schema={f.budgetMax}
             type="number"
           />
-          <TextField
+          <DateField
+            placeholder="Pick a date"
+            hint="Tell us your deadline"
             name="requiredDate"
             label="Needed by"
             schema={f.requiredDate}
-            type="date"
+            min={new Date()}
           />
         </div>
         {UPLOADS_ENABLED && (
@@ -154,6 +163,7 @@ export function CustomRequestForm({
       <fieldset className="mt-6 flex flex-col gap-2">
         <legend className="font-display text-h4 mb-4">Your details</legend>
         <TextField
+          placeholder="e.g. Dilini Perera"
           name="name"
           label="Full name"
           schema={f.name}
@@ -171,6 +181,7 @@ export function CustomRequestForm({
             placeholder="077 123 4567"
           />
           <TextField
+            placeholder="you@example.com"
             name="email"
             label="Email"
             schema={f.email}

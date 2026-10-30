@@ -32,6 +32,7 @@ export function LoginForm() {
       pendingLabel="Signing in…"
     >
       <TextField
+        placeholder="you@example.com"
         name="email"
         label="Email"
         schema={f.email}

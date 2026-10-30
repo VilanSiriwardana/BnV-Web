@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Combobox } from '@/components/ui/combobox';
 import { formatStatus } from '@/lib/utils/format';
 
 // Plain GET form so filters live in the URL and work without JavaScript.
@@ -23,14 +23,13 @@ export function FilterBar({
       </label>
       <label className="w-full sm:w-48">
         <span className="sr-only">Status</span>
-        <Select name="status" defaultValue={status ?? ''}>
-          <option value="">All statuses</option>
-          {statuses.map((s) => (
-            <option key={s} value={s}>
-              {formatStatus(s)}
-            </option>
-          ))}
-        </Select>
+        <Combobox
+          name="status"
+          defaultValue={status ?? null}
+          placeholder="All statuses"
+          searchable={false}
+          options={statuses.map((s) => ({ value: s, label: formatStatus(s) }))}
+        />
       </label>
       <Button type="submit" variant="secondary">
         Filter

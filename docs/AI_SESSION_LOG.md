@@ -571,3 +571,24 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 ### Open
 
 - Browser QA at 375/768/1440, then run `/impeccable critique` again (baseline 22/32). Verify the Sinhala font fallback and the showcase-tab keyboard motion on a device.
+
+## 2026-10-30 - UI refinement: status colours, forms, nav, gallery
+
+### Summary
+
+- Implemented `.claude/blueprints/026-ui-refinement-forms-status-nav-gallery.md` (ADR-0026).
+- Status tokens: destructive, success, warning and info, each with soft and text variants (saturated in light, softened in dark, all AA). New `text-label` and `text-micro` steps. Badges are smaller, and the form and PDP text is larger.
+- Form kit: `SelectField` now renders `Combobox`, and a new `DateField` wraps `DatePicker`. Both post through hidden inputs. All native selects and date inputs were replaced (forms, checkout district, admin filters and status). Placeholders and hints were added to 61 fields. `useInput` gained `change()`, and Combobox and DatePicker accept `ref` and aria props.
+- Nav: `NavPill` and `useHoverIndex` (`components/motion/nav-pill.tsx`), the `navItem` style, `HeaderNav` with a gliding underline, and the admin and mobile navs with gliding pills.
+- PDP gallery: sticky and viewport-high on `lg`, a vertical thumbnail strip, a 2x hover lens and a blur crossfade; a swipe carousel on mobile. The lightbox zooms 1x–4x (buttons, wheel, pinch, double-click, keys) and pans by dragging.
+
+### Deviations
+
+- The light warning colour was darkened from #b26b00 to #9a5c00 so white text passes AA (5.38:1).
+- The shop filters are a top bar, not a sidebar. They got the richer field and option hover through `fieldTrigger` and `optionRow` instead of `navItem`.
+- The gallery's desktop layout starts at `lg`, matching the PDP's two-column grid.
+- The lightbox wheel zoom scales around the centre, not the cursor.
+
+### Open
+
+- Browser QA: form submissions, nav motion, and gallery zoom on desktop and a phone.

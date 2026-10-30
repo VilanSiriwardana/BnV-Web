@@ -16,15 +16,17 @@ import type { ZodType } from 'zod';
 import { Button } from '@/components/ui/button';
 import { FieldError, FormMessage } from '@/components/ui/field-error';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Combobox } from '@/components/ui/combobox';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Textarea } from '@/components/ui/textarea';
 import { routes } from '@/config/routes';
 import { HONEYPOT_FIELD } from '@/lib/forms/fields';
 import type { FormState } from '@/lib/forms/types';
 import { useInput, type Validatable } from '@/lib/forms/use-input';
 import { cn } from '@/lib/utils/cn';
+import { format } from 'date-fns';
 
-const labelClass = 'text-small mb-1 block font-medium';
+const labelClass = 'text-label mb-1.5 block font-medium';
 
 type Ctx = {
   formId: string;
@@ -111,7 +113,11 @@ export function FormShell({
 }
 
 function useField<
-  E extends HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement,
+  E extends
+    | HTMLInputElement
+    | HTMLTextAreaElement
+    | HTMLSelectElement
+    | HTMLButtonElement,
 >(name: string, schema: ZodType, type: 'text' | 'checkbox' = 'text') {
   const { formId, state, register } = useFormCtx();
   const input = useInput<E>({
@@ -160,7 +166,7 @@ function Label({
         <span className="text-muted-foreground font-normal"> (optional)</span>
       )}
       {hint && (
-        <span className="text-caption text-muted-foreground block font-normal">
+        <span className="text-small text-muted-foreground block font-normal">
           {hint}
         </span>
       )}
@@ -216,19 +222,63 @@ export function SelectField({
   placeholder = 'Choose one',
   ...props
 }: BaseProps & { options: readonly Option[]; placeholder?: string }) {
-  const input = useField<HTMLSelectElement>(props.name, props.schema);
+  const { ref, bind, value, change, error, errorId } =
+    useField<HTMLButtonElement>(props.name, props.schema);
   return (
     <div className={props.className}>
-      <Label htmlFor={input.bind.id} {...props} />
-      <Select {...input.bind}>
-        <option value="">{placeholder}</option>
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </Select>
-      <FieldError id={input.errorId} message={input.error} />
+      <Label htmlFor={bind.id} {...props} />
+      <Combobox
+        id={bind.id}
+        name={props.name}
+        ref={ref}
+        options={[...options]}
+        placeholder={placeholder}
+        searchable={options.length > 7}
+        value={value || null}
+        onValueChange={(v) => change(v ?? '')}
+        aria-invalid={bind['aria-invalid']}
+        aria-describedby={errorId}
+      />
+      <FieldError id={errorId} message={error} />
+    </div>
+  );
+}
+
+const toIso = (d: Date) => format(d, 'yyyy-MM-dd');
+const fromIso = (s: string) => {
+  const [y, m, d] = s.split('-').map(Number);
+  return y && m && d ? new Date(y, m - 1, d) : undefined;
+};
+
+// Posts yyyy-MM-dd, the same value a native date input submits.
+export function DateField({
+  min,
+  max,
+  placeholder = 'Pick a date',
+  ...props
+}: BaseProps & { min?: Date; max?: Date; placeholder?: string }) {
+  const { ref, bind, value, change, error, errorId } =
+    useField<HTMLButtonElement>(props.name, props.schema);
+  const disabled = [
+    ...(min ? [{ before: min }] : []),
+    ...(max ? [{ after: max }] : []),
+  ];
+  return (
+    <div className={props.className}>
+      <Label htmlFor={bind.id} {...props} />
+      <input type="hidden" name={props.name} value={value} />
+      <DatePicker
+        id={bind.id}
+        ref={ref}
+        value={fromIso(value)}
+        onValueChange={(d) => change(d ? toIso(d) : '')}
+        placeholder={placeholder}
+        disabled={disabled}
+        className="w-full"
+        aria-invalid={bind['aria-invalid']}
+        aria-describedby={errorId}
+      />
+      <FieldError id={errorId} message={error} />
     </div>
   );
 }

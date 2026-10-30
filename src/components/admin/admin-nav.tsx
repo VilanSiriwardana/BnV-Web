@@ -3,32 +3,47 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { NavPill, useHoverIndex } from '@/components/motion/nav-pill';
+import { navItem } from '@/components/ui/styles';
 import { cn } from '@/lib/utils/cn';
 
 export type AdminNavItem = { href: string; label: string };
 
 export function AdminNav({ items }: { items: AdminNavItem[] }) {
   const pathname = usePathname();
+  const { hovered, list, item } = useHoverIndex();
   return (
-    <nav aria-label="Admin" className="flex flex-wrap gap-1 md:flex-col">
-      {items.map((item) => {
+    <nav
+      aria-label="Admin"
+      className="flex flex-wrap gap-1 md:flex-col"
+      {...list}
+    >
+      {items.map((navLink, i) => {
         const active =
-          item.href === '/admin'
-            ? pathname === item.href
-            : pathname.startsWith(item.href);
+          navLink.href === '/admin'
+            ? pathname === navLink.href
+            : pathname.startsWith(navLink.href);
         return (
           <Link
-            key={item.href}
-            href={item.href}
+            key={navLink.href}
+            href={navLink.href}
             aria-current={active ? 'page' : undefined}
-            className={cn(
-              'text-small rounded-sm px-3 py-2 font-medium transition-colors',
-              active
-                ? 'bg-accent text-accent-foreground'
-                : 'hover:bg-accent/60',
-            )}
+            className={cn(navItem, 'text-small')}
+            {...item(i)}
           >
-            {item.label}
+            {active && (
+              <NavPill
+                layoutId="admin-nav-active"
+                className="bg-primary-soft inset-0 rounded-md"
+              />
+            )}
+            {hovered === i && !active && (
+              <NavPill
+                layoutId="admin-nav-hover"
+                className="bg-primary-soft/50 inset-0 rounded-md"
+              />
+            )}
+            {navLink.label}
           </Link>
         );
       })}

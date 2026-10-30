@@ -34,6 +34,8 @@ type BaseProps = {
   name?: string;
   /** Submits the surrounding form after each change. */
   autoSubmit?: boolean;
+  ref?: React.Ref<HTMLButtonElement>;
+  'aria-describedby'?: string;
 };
 
 type SingleProps = BaseProps & {
@@ -115,13 +117,18 @@ export function Combobox(props: ComboboxProps) {
         ))}
       <PopoverTrigger asChild disabled={disabled}>
         <button
-          ref={triggerRef}
+          ref={(el) => {
+            triggerRef.current = el;
+            if (typeof props.ref === 'function') props.ref(el);
+            else if (props.ref) props.ref.current = el;
+          }}
           type="button"
           id={id}
           role="combobox"
           aria-expanded={open}
           aria-controls={listId}
           aria-invalid={props['aria-invalid']}
+          aria-describedby={props['aria-describedby']}
           data-placeholder={empty || undefined}
           className={cn(fieldTrigger, 'group/combo h-auto min-h-11', className)}
         >

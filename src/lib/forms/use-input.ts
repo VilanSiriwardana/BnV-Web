@@ -10,7 +10,11 @@ import {
 } from 'react';
 import type { ZodType } from 'zod';
 
-type FieldElement = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+type FieldElement =
+  | HTMLInputElement
+  | HTMLTextAreaElement
+  | HTMLSelectElement
+  | HTMLButtonElement;
 
 type Options = {
   id: string;
@@ -56,6 +60,13 @@ export function useInput<E extends FieldElement = HTMLInputElement>({
     if (touched || type === 'checkbox') validate(next);
   };
 
+  // For custom controls (combobox, date picker) that report a value rather than an event.
+  const change = (next: string) => {
+    setValue(next);
+    setTouched(true);
+    validate(next);
+  };
+
   const onBlur = () => {
     setTouched(true);
     validate();
@@ -84,6 +95,7 @@ export function useInput<E extends FieldElement = HTMLInputElement>({
     ref,
     validate,
     reset,
+    change,
     setServerError: setError,
     bind:
       type === 'checkbox'

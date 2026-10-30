@@ -92,7 +92,7 @@ export function VariantSelector({
           ];
           return (
             <fieldset key={axis}>
-              <legend className="text-small font-semibold">
+              <legend className="text-label font-semibold">
                 {axis}:{' '}
                 <span className="font-normal">{selected[axisIndex]}</span>
               </legend>
@@ -132,9 +132,11 @@ export function VariantSelector({
         {soldOut ? (
           <Badge variant="destructive">Sold out</Badge>
         ) : variant?.available === 0 ? (
-          <p className="text-small text-destructive">Sold out in this option</p>
+          <p className="text-label text-destructive-text">
+            Sold out in this option
+          </p>
         ) : variant?.lowStock ? (
-          <p className="text-small text-primary-text font-semibold">
+          <p className="text-label text-primary-text font-semibold">
             Only a few left
           </p>
         ) : null}
@@ -142,7 +144,7 @@ export function VariantSelector({
 
       {!soldOut && (
         <div className="flex items-center gap-3">
-          <span className="text-small font-semibold">Quantity</span>
+          <span className="text-label font-semibold">Quantity</span>
           <div className="border-input flex items-center rounded-sm border">
             <Button
               type="button"

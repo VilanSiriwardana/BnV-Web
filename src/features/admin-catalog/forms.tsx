@@ -3,6 +3,7 @@
 import { useActionState, useState } from 'react';
 
 import {
+  DateField,
   FormShell,
   SelectField,
   TextareaField,
@@ -81,7 +82,13 @@ export function CategoryForm({
       submitLabel="Save category"
       pendingLabel="Saving…"
     >
-      <TextField name="name" label="Name" schema={f.name} required />
+      <TextField
+        placeholder="Shown on the storefront"
+        name="name"
+        label="Name"
+        schema={f.name}
+        required
+      />
       <TextField
         name="slug"
         label="Slug"
@@ -89,6 +96,7 @@ export function CategoryForm({
         hint="Leave empty to build it from the name."
       />
       <TextareaField
+        placeholder="A few sentences shoppers will read"
         name="description"
         label="Description"
         schema={f.description}
@@ -103,12 +111,15 @@ export function CategoryForm({
           placeholder="None (top level)"
         />
         <TextField
+          placeholder="0"
+          hint="Lower numbers appear first"
           name="sortOrder"
           label="Sort order"
           schema={f.sortOrder}
           type="number"
         />
         <SelectField
+          placeholder="Choose a status"
           name="status"
           label="Status"
           schema={f.status}
@@ -157,7 +168,13 @@ export function CollectionForm({
       submitLabel="Save collection"
       pendingLabel="Saving…"
     >
-      <TextField name="name" label="Name" schema={f.name} required />
+      <TextField
+        placeholder="Shown on the storefront"
+        name="name"
+        label="Name"
+        schema={f.name}
+        required
+      />
       <TextField
         name="slug"
         label="Slug"
@@ -165,6 +182,7 @@ export function CollectionForm({
         hint="Leave empty to build it from the name."
       />
       <TextareaField
+        placeholder="A few sentences shoppers will read"
         name="description"
         label="Description"
         schema={f.description}
@@ -172,19 +190,25 @@ export function CollectionForm({
       />
       <div className="grid gap-2 sm:grid-cols-3 sm:gap-4">
         <SelectField
+          placeholder="Choose a status"
           name="status"
           label="Status"
           schema={f.status}
           options={statusOptions}
           required
         />
-        <TextField
+        <DateField
+          placeholder="Pick a start date"
           name="startDate"
           label="Starts"
           schema={f.startDate}
-          type="date"
         />
-        <TextField name="endDate" label="Ends" schema={f.endDate} type="date" />
+        <DateField
+          placeholder="Pick an end date"
+          name="endDate"
+          label="Ends"
+          schema={f.endDate}
+        />
       </div>
       <ImageUploader
         name="bannerImageUrl"
@@ -248,7 +272,13 @@ export function ProductForm({
       submitLabel="Save product"
       pendingLabel="Saving…"
     >
-      <TextField name="name" label="Name" schema={f.name} required />
+      <TextField
+        placeholder="Shown on the storefront"
+        name="name"
+        label="Name"
+        schema={f.name}
+        required
+      />
       <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
         <TextField
           name="slug"
@@ -256,15 +286,23 @@ export function ProductForm({
           schema={f.slug}
           hint="Leave empty to build it from the name."
         />
-        <TextField name="sku" label="Product SKU" schema={f.sku} required />
+        <TextField
+          placeholder="e.g. BNV-NCK-001"
+          name="sku"
+          label="Product SKU"
+          schema={f.sku}
+          required
+        />
       </div>
       <TextareaField
+        placeholder="One line for product cards"
         name="shortDescription"
         label="Short description"
         schema={f.shortDescription}
         rows={2}
       />
       <TextareaField
+        placeholder="A few sentences shoppers will read"
         name="description"
         label="Description"
         schema={f.description}
@@ -272,6 +310,7 @@ export function ProductForm({
       />
       <div className="grid gap-2 sm:grid-cols-3 sm:gap-4">
         <SelectField
+          placeholder="Choose a category"
           name="categoryId"
           label="Category"
           schema={f.categoryId}
@@ -279,6 +318,7 @@ export function ProductForm({
           required
         />
         <SelectField
+          placeholder="Choose a brand"
           name="brandId"
           label="Brand"
           schema={f.brandId}
@@ -286,6 +326,7 @@ export function ProductForm({
           required
         />
         <SelectField
+          placeholder="Choose a status"
           name="status"
           label="Status"
           schema={f.status}
@@ -331,9 +372,22 @@ export function VariantForm({
       pendingLabel="Saving…"
     >
       <div className="grid gap-2 sm:grid-cols-3 sm:gap-4">
-        <TextField name="name" label="Variant name" schema={f.name} required />
-        <TextField name="sku" label="SKU" schema={f.sku} required />
+        <TextField
+          placeholder="e.g. Rose gold / Small"
+          name="name"
+          label="Variant name"
+          schema={f.name}
+          required
+        />
+        <TextField
+          placeholder="e.g. BNV-NCK-001"
+          name="sku"
+          label="SKU"
+          schema={f.sku}
+          required
+        />
         <SelectField
+          placeholder="Choose a status"
           name="status"
           label="Status"
           schema={f.status}
@@ -341,6 +395,7 @@ export function VariantForm({
           required
         />
         <TextField
+          placeholder="e.g. 4500"
           name="price"
           label="Price (LKR)"
           schema={f.price}
@@ -348,12 +403,14 @@ export function VariantForm({
           required
         />
         <TextField
+          placeholder="Leave empty if not on sale"
           name="salePrice"
           label="Sale price (LKR)"
           schema={f.salePrice}
           type="number"
         />
         <TextField
+          placeholder="e.g. 10"
           name="quantity"
           label="In stock"
           schema={f.quantity}

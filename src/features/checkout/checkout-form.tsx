@@ -5,6 +5,7 @@ import { useActionState, useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Combobox } from '@/components/ui/combobox';
 import { FieldError, FormMessage } from '@/components/ui/field-error';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -151,7 +152,12 @@ export function CheckoutForm() {
     >
       <fieldset className="flex flex-col gap-2">
         <legend className="font-display text-h4 mb-4">Contact</legend>
-        <TextField input={name} label="Full name" autoComplete="name" />
+        <TextField
+          placeholder="e.g. Dilini Perera"
+          input={name}
+          label="Full name"
+          autoComplete="name"
+        />
         <TextField
           input={phone}
           label="Mobile number"
@@ -161,6 +167,7 @@ export function CheckoutForm() {
           placeholder="077 123 4567"
         />
         <TextField
+          placeholder="you@example.com"
           input={email}
           label="Email"
           type="email"
@@ -186,11 +193,13 @@ export function CheckoutForm() {
       <fieldset className="flex flex-col gap-2">
         <legend className="font-display text-h4 mb-4">Delivery</legend>
         <TextField
+          placeholder="No. 12, Ward Place"
           input={address1}
           label="Address line 1"
           autoComplete="address-line1"
         />
         <TextField
+          placeholder="Apartment, floor or landmark"
           input={address2}
           label="Address line 2"
           optional
@@ -201,24 +210,17 @@ export function CheckoutForm() {
             <label htmlFor="checkout-district" className={labelClass}>
               District
             </label>
-            <select
+            <Combobox
               id="checkout-district"
               name="district"
-              value={district}
-              onChange={(e) => setDistrict(e.target.value)}
+              value={district || null}
+              onValueChange={(v) => setDistrict(v ?? '')}
+              placeholder="Choose a district"
+              searchPlaceholder="Search districts…"
               aria-invalid={errorFor('district') ? true : undefined}
               aria-describedby="checkout-district-error"
-              className={selectClass}
-            >
-              <option value="" disabled>
-                Choose a district
-              </option>
-              {districts.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
+              options={districts.map((d) => ({ value: d, label: d }))}
+            />
             <FieldError
               id="checkout-district-error"
               message={errorFor('district')}
@@ -238,11 +240,13 @@ export function CheckoutForm() {
         </div>
         <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
           <TextField
+            placeholder="e.g. Colombo 07"
             input={city}
             label="City / town"
             autoComplete="address-level2"
           />
           <TextField
+            placeholder="e.g. 00700"
             input={postalCode}
             label="Postal code"
             optional

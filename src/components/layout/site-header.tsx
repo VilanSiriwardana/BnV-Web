@@ -1,11 +1,12 @@
 import Link from 'next/link';
 
 import { CartButton } from '@/components/cart/cart-button';
+import { HeaderNav } from '@/components/layout/header-nav';
 import { HeaderShell } from '@/components/layout/header-shell';
 import { MobileNav } from '@/components/layout/mobile-nav';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 import { brand } from '@/config/brand';
-import { mainNav, utilityNav } from '@/config/navigation';
+import { utilityNav } from '@/config/navigation';
 import { routes } from '@/config/routes';
 
 const utilities: Record<(typeof utilityNav)[number], React.ReactNode> = {
@@ -21,20 +22,7 @@ export function SiteHeader() {
         <Link href={routes.home} className="font-display text-h3 font-semibold">
           {brand.name}
         </Link>
-        <nav aria-label="Main" className="mx-auto hidden lg:block">
-          <ul className="flex items-center gap-6 font-sans">
-            {mainNav.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className="text-small hover:text-primary-text font-medium transition-colors"
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <HeaderNav />
         <div className="ml-auto flex items-center gap-1 lg:ml-0">
           {utilityNav.map((key) => (
             <span key={key}>{utilities[key]}</span>

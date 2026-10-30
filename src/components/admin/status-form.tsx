@@ -4,7 +4,7 @@ import { useActionState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { FormMessage } from '@/components/ui/field-error';
-import { Select } from '@/components/ui/select';
+import { Combobox } from '@/components/ui/combobox';
 import type { FormState } from '@/lib/forms/types';
 import { formatStatus } from '@/lib/utils/format';
 
@@ -32,13 +32,13 @@ export function StatusForm({
       <div className="flex flex-wrap items-center gap-2">
         <label className="w-full sm:w-56">
           <span className="sr-only">Status</span>
-          <Select name="status" defaultValue={current} key={current}>
-            {options.map((s) => (
-              <option key={s} value={s}>
-                {formatStatus(s)}
-              </option>
-            ))}
-          </Select>
+          <Combobox
+            key={current}
+            name="status"
+            defaultValue={current}
+            searchable={false}
+            options={options.map((s) => ({ value: s, label: formatStatus(s) }))}
+          />
         </label>
         <Button type="submit" disabled={pending || options.length < 2}>
           {pending ? 'Saving…' : 'Update status'}

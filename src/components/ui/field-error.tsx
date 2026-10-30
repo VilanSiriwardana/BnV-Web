@@ -15,7 +15,7 @@ function FieldError({
       id={id}
       aria-live="polite"
       className={cn(
-        'text-caption text-destructive mt-1 line-clamp-1 min-h-5 text-left',
+        'text-small text-destructive-text mt-1 line-clamp-1 min-h-5 text-left',
         className,
       )}
     >
@@ -38,7 +38,7 @@ function FormMessage({
       role={status === 'error' ? 'alert' : 'status'}
       className={cn(
         'text-small mt-2 line-clamp-2 min-h-5',
-        status === 'error' ? 'text-destructive' : 'text-primary-text',
+        status === 'error' ? 'text-destructive-text' : 'text-info-text',
         className,
       )}
     >

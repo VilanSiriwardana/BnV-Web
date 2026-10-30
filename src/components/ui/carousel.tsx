@@ -17,6 +17,9 @@ type Props = {
   showDots?: boolean;
   startIndex?: number;
   thumbnails?: React.ReactNode[];
+  /** Turn off swipe dragging, e.g. while a slide is zoomed. */
+  draggable?: boolean;
+  onIndexChange?: (index: number) => void;
 };
 
 export function Carousel({
@@ -28,13 +31,20 @@ export function Carousel({
   showDots = true,
   startIndex = 0,
   thumbnails,
+  draggable = true,
+  onIndexChange,
 }: Props) {
   const [ref, api] = useEmblaCarousel({
     loop,
     align: 'start',
     startIndex,
     containScroll: 'trimSnaps',
+    watchDrag: draggable,
   });
+  const onIndexChangeRef = React.useRef(onIndexChange);
+  React.useEffect(() => {
+    onIndexChangeRef.current = onIndexChange;
+  }, [onIndexChange]);
   const thumbsRef = React.useRef<HTMLDivElement>(null);
   const [index, setIndex] = React.useState(0);
   const [snaps, setSnaps] = React.useState<number[]>([]);
@@ -45,6 +55,7 @@ export function Carousel({
     if (!api) return;
     const sync = () => {
       setIndex(api.selectedScrollSnap());
+      onIndexChangeRef.current?.(api.selectedScrollSnap());
       setSnaps(api.scrollSnapList());
       setCanPrev(api.canScrollPrev());
       setCanNext(api.canScrollNext());

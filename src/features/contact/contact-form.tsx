@@ -34,6 +34,7 @@ export function ContactForm() {
       submitLabel="Send message"
     >
       <TextField
+        placeholder="e.g. Dilini Perera"
         name="name"
         label="Full name"
         schema={f.name}
@@ -42,6 +43,7 @@ export function ContactForm() {
       />
       <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
         <TextField
+          placeholder="you@example.com"
           name="email"
           label="Email"
           schema={f.email}
@@ -60,8 +62,14 @@ export function ContactForm() {
       <p className="text-caption text-muted-foreground -mt-1 mb-2">
         Please share at least one so we can reply.
       </p>
-      <TextField name="subject" label="Subject" schema={f.subject} />
+      <TextField
+        placeholder="e.g. Question about an order"
+        name="subject"
+        label="Subject"
+        schema={f.subject}
+      />
       <TextareaField
+        placeholder="Tell us what you have in mind"
         name="message"
         label="Message"
         schema={f.message}

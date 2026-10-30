@@ -164,7 +164,7 @@ A warm, powdery palette: ivory and charcoal carry the page, lavender carries the
 - **Linen** (`linen-hover`): neutral hover surface (shadcn `accent`).
 - **Warm Taupe** (`warm-taupe`): borders and dividers. **Taupe Input** (`taupe-input`): input and secondary-button borders.
 - **Oat** (`oat-muted`) and **Cocoa** (`cocoa-muted-text`): muted surfaces and secondary text.
-- **Garnet** (`garnet`) for errors; **Sage** (`sage`) for success and the WhatsApp action.
+- **Status set** (ADR-0026): `destructive`, `success`, `warning` and `info`, each with a fill, a `-soft` background and a `-text` tone. Light mode is saturated (destructive #b42335, success #2f7a45, warning #9a5c00, info #2f62b8); dark mode is softened (destructive #e29aa5, success #9cc4a6, warning #e0bd7f, info #9fb8e3) with 14% soft tints. Every pair is AA: the light fills carry white at 5.3:1 or better, and each `-text` reaches 5.6:1 or better on its soft background and on the page in both themes. Error messages use `text-destructive-text`.
 - Dark mode: **Midnight Plum** background, **Midnight Surface** / **Midnight Elevated** panels, **Midnight Border**, **Moonlit Ivory** text; lavender stays the brand colour.
 
 ### Named Rules
@@ -192,8 +192,9 @@ A warm, powdery palette: ivory and charcoal carry the page, lavender carries the
 - **Headline** (Cinzel 600, 1.875rem → h2 1.5rem, 1.15–1.2): section titles (`h1`, `h2`).
 - **Title** (Cinzel 600 for h3 1.25rem; h4 1.125rem, 1.25–1.35): card and block titles.
 - **Body** (Cormorant 400, 1.125rem / body-lg 1.25rem, 1.6): copy; keep lines to about 65–75ch.
-- **Label** (Inter 600, 0.875rem, 1.5): buttons, navigation, form labels.
-- **Caption** (Inter 500, 0.75rem, 1.4): badges, meta, fine print.
+- **Label** (Inter 500–600, `text-label` 0.9375rem, 1.5): form labels, option labels, sidebar items. Hints and field errors use `text-small` (0.875rem); inputs, selects and textareas are 1rem at every width.
+- **Caption** (Inter 500, 0.75rem, 1.4): meta and fine print.
+- **Micro** (Inter 600, `text-micro` 0.6875rem, 1.2, wide tracking): badges and chips only.
 
 ### Named Rules
 
@@ -216,7 +217,6 @@ Soft, warm and visible. Every shadow has two layers: a small charcoal contact sh
 ### Scroll
 
 - Thin lavender scrollbar (`scrollbar-color` and `::-webkit-scrollbar`), thumb Deep Lavender on hover, transparent track, in both themes. Anchor scrolling is smooth except under reduced motion.
-- A 2px lavender-to-gold progress line (`scroll-progress`) runs along the bottom of the sticky header, driven by CSS scroll timelines; browsers without support simply don't show it.
 
 ### Effects
 
@@ -263,15 +263,22 @@ Gently rounded throughout: small (6px) for inputs and badges, medium (10px) for 
 
 - **Style:** 44px tall, small radius (6px), Taupe Input border, transparent fill (Oat in dark), small shadow.
 - **Focus:** border shifts to the ring colour with a 3px soft lavender ring.
-- **Error / Disabled:** Garnet border and ring with an inline message (`field-error`); disabled at 50% opacity.
+- **Error / Disabled:** destructive border and ring with an inline `text-destructive-text` message (`field-error`); disabled at 50% opacity.
+- **One dropdown, one date control:** every select is `Combobox` (search when there are more than 7 options) and every date is `DatePicker`, both posting through hidden inputs (`SelectField`, `DateField` in the form kit). Native `<select>` and `type="date"` are not used.
+- **Placeholders and hints:** every field shows a concrete, local example (`077 123 4567`, `No. 12, Ward Place`) that never repeats the label, plus a hint wherever the format matters.
 
 ### Chips / Badges
 
-- **Style:** small radius, caption type. Lavender for brand labels, Dusty Rose for romantic labels (Couple Favorite, Gift Ready), Champagne Gold for premium (Limited Drop, Premium Box), outline for neutral.
+- **Style:** extra-small radius, `text-micro` semibold with wide tracking, `px-1.5 py-px`, 10px icons. Status variants `success`, `warning`, `info` and `danger` use the soft and text pairs. Lavender for brand labels, Dusty Rose for romantic labels (Couple Favorite, Gift Ready), Champagne Gold for premium (Limited Drop, Premium Box), outline for neutral.
 
 ### Navigation
 
-- Sticky site header in lavender-tinted glass (`bg-primary-soft/70` + blur) with a `bg-gradient-brand` hairline and the scroll-progress line; footer is a `bg-chrome` band with `chrome-foreground` text. Light mode uses a deep-lavender gradient (#6e5899 → #4a3866, contrast-checked for ivory text); dark mode keeps the plum-to-midnight gradient. Inter labels; mobile navigation in a sheet (`mobile-nav`). The storefront header, footer and cart drawer are hidden under `/admin` (`storefront-chrome`).
+- Sticky site header in lavender-tinted glass (`bg-primary-soft/70` + blur) with a `bg-gradient-brand` hairline. Header links get a hover tint that glides between items and a lavender-gold underline that follows hover and rests on the current section (`HeaderNav`). Sidebar and drawer links (admin, mobile menu) use `navItem`: an accent bar grows in on hover, and a spring pill (`NavPill`, `layoutId`) glides between items, falling back to an instant switch under reduced motion; footer is a `bg-chrome` band with `chrome-foreground` text. Light mode uses a deep-lavender gradient (#6e5899 → #4a3866, contrast-checked for ivory text); dark mode keeps the plum-to-midnight gradient. Inter labels; mobile navigation in a sheet (`mobile-nav`). The storefront header, footer and cart drawer are hidden under `/admin` (`storefront-chrome`).
+
+### Product gallery
+
+- On `lg` and up, the main image is sticky and fills the viewport height (capped at 56rem), with a vertical thumbnail strip beside it. Below `lg` it is a swipe carousel with thumbnails.
+- On pointer devices the image zooms 2x around the cursor. Clicking opens the lightbox, which zooms 1x–4x through buttons, the wheel, a pinch, a double-click or `+`/`-`/`0`, and pans by dragging while zoomed. Image changes crossfade with a short blur.
 
 ### Mockup system (PageImages contract, ADR-0025)
 

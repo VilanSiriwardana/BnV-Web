@@ -25,10 +25,23 @@
   --ring: #6a5296;
   --muted: #efe7e0;
   --muted-foreground: #5e524c;
-  --destructive: #983a46;
+  /* Status: saturated in light, softened in dark (ADR-0026) */
+  --destructive: #b42335;
   --destructive-foreground: #ffffff;
-  --success: #45614a;
+  --destructive-soft: #fde8eb;
+  --destructive-text: #9b1c2c;
+  --success: #2f7a45;
   --success-foreground: #ffffff;
+  --success-soft: #e5f4e9;
+  --success-text: #24613a;
+  --warning: #9a5c00;
+  --warning-foreground: #ffffff;
+  --warning-soft: #fff1d6;
+  --warning-text: #8a5300;
+  --info: #2f62b8;
+  --info-foreground: #ffffff;
+  --info-soft: #e5edfb;
+  --info-text: #244f96;
 
   --card: var(--surface-elevated);
   --card-foreground: var(--foreground);
@@ -77,10 +90,22 @@
   --ring: #c8b6e2;
   --muted: #2a2133;
   --muted-foreground: #b8aabd;
-  --destructive: #d07886;
+  --destructive: #e29aa5;
   --destructive-foreground: #17121d;
-  --success: #9eb8a0;
+  --destructive-soft: rgb(226 154 165 / 0.14);
+  --destructive-text: #eab0b8;
+  --success: #9cc4a6;
   --success-foreground: #17121d;
+  --success-soft: rgb(156 196 166 / 0.14);
+  --success-text: #b3d3ba;
+  --warning: #e0bd7f;
+  --warning-foreground: #17121d;
+  --warning-soft: rgb(224 189 127 / 0.14);
+  --warning-text: #e9cd9b;
+  --info: #9fb8e3;
+  --info-foreground: #17121d;
+  --info-soft: rgb(159 184 227 / 0.14);
+  --info-text: #b6c9ea;
 
   --shadow-color: 0 0 0;
   --shadow-a-sm: 0.3;
@@ -129,6 +154,18 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-destructive-text: var(--destructive-text);
+  --color-success-soft: var(--success-soft);
+  --color-success-text: var(--success-text);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-text: var(--warning-text);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-soft: var(--info-soft);
+  --color-info-text: var(--info-text);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -160,10 +197,14 @@
   --text-body-lg--line-height: 1.6;
   --text-body: 1.25rem;
   --text-body--line-height: 1.6;
+  --text-label: 0.9375rem;
+  --text-label--line-height: 1.5;
   --text-small: 0.875rem;
   --text-small--line-height: 1.5;
   --text-caption: 0.75rem;
   --text-caption--line-height: 1.4;
+  --text-micro: 0.6875rem;
+  --text-micro--line-height: 1.2;
 
   /* §34 radius */
   --radius-sm: 6px;

@@ -3,6 +3,7 @@
 import { useActionState, useState } from 'react';
 
 import {
+  DateField,
   ConsentField,
   FormShell,
   FormSuccess,
@@ -140,6 +141,7 @@ function ContactDetails({
     <>
       <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
         <TextField
+          placeholder="e.g. Dilini Perera"
           name="name"
           label="Your name"
           schema={f.name}
@@ -147,6 +149,7 @@ function ContactDetails({
           autoComplete="name"
         />
         <TextField
+          placeholder="e.g. Café Kandy"
           name="brandName"
           label={brandRequired ? 'Organiser or brand' : 'Brand or business'}
           schema={f.brandName}
@@ -156,6 +159,7 @@ function ContactDetails({
       </div>
       <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
         <TextField
+          placeholder="you@example.com"
           name="email"
           label="Email"
           schema={f.email}
@@ -181,6 +185,7 @@ function Closing({ f }: { f: Shape }) {
   return (
     <>
       <TextareaField
+        placeholder="Tell us what you have in mind"
         name="message"
         label="Tell us about it"
         schema={f.message}
@@ -205,6 +210,7 @@ function CollaborationFields() {
       <ContactDetails f={f} />
       <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
         <SelectField
+          placeholder="Choose a project type"
           name="projectType"
           label="Project type"
           schema={f.projectType}
@@ -212,6 +218,7 @@ function CollaborationFields() {
           required
         />
         <SelectField
+          placeholder="Choose who you need"
           name="requiredPeople"
           label="Who would you like?"
           schema={f.requiredPeople}
@@ -220,14 +227,23 @@ function CollaborationFields() {
         />
       </div>
       <div className="grid gap-2 sm:grid-cols-3 sm:gap-4">
-        <TextField
+        <DateField
+          placeholder="Pick a date"
+          hint="We will confirm availability with you"
           name="preferredDate"
           label="Preferred date"
           schema={f.preferredDate}
-          type="date"
+          min={new Date()}
         />
-        <TextField name="location" label="Location" schema={f.location} />
+        <TextField
+          placeholder="e.g. Galle Face, Colombo"
+          name="location"
+          label="Location"
+          schema={f.location}
+        />
         <SelectField
+          placeholder="Choose a range"
+          hint="In LKR"
           name="budgetRange"
           label="Budget range"
           schema={f.budgetRange}
@@ -245,18 +261,21 @@ function ConsultationFields() {
     <>
       <ContactDetails f={f} />
       <SelectField
+        placeholder="Choose a project type"
         name="projectType"
         label="What is it about?"
         schema={f.projectType}
         options={projectTypeOptions}
       />
       <div className="grid gap-2 sm:grid-cols-3 sm:gap-4">
-        <TextField
+        <DateField
+          placeholder="Pick a date"
+          hint="We will confirm availability with you"
           name="preferredDate"
           label="Preferred date"
           schema={f.preferredDate}
           required
-          type="date"
+          min={new Date()}
         />
         <TextField
           name="preferredTime"
@@ -266,6 +285,7 @@ function ConsultationFields() {
           placeholder="e.g. 4–6 pm"
         />
         <SelectField
+          placeholder="In person or online"
           name="meetingMode"
           label="Meeting"
           schema={f.meetingMode}
@@ -274,6 +294,7 @@ function ConsultationFields() {
         />
       </div>
       <TextField
+        placeholder="e.g. Galle Face, Colombo"
         name="location"
         label="Meeting place"
         schema={f.location}
@@ -291,6 +312,7 @@ function EventInvitationFields() {
       <ContactDetails f={f} brandRequired />
       <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
         <SelectField
+          placeholder="Choose who you need"
           name="requiredPeople"
           label="Who would you like to invite?"
           schema={f.requiredPeople}
@@ -298,6 +320,7 @@ function EventInvitationFields() {
           required
         />
         <SelectField
+          placeholder="Choose a role"
           name="requestedRole"
           label="Role"
           schema={f.requestedRole}
@@ -306,21 +329,36 @@ function EventInvitationFields() {
         />
       </div>
       <div className="grid gap-2 sm:grid-cols-3 sm:gap-4">
-        <TextField
+        <DateField
+          placeholder="Pick your event date"
+          hint="Pick the day of your event"
           name="preferredDate"
           label="Event date"
           schema={f.preferredDate}
           required
-          type="date"
+          min={new Date()}
         />
-        <TextField name="preferredTime" label="Time" schema={f.preferredTime} />
         <TextField
+          placeholder="e.g. 6:30 PM"
+          name="preferredTime"
+          label="Time"
+          schema={f.preferredTime}
+        />
+        <TextField
+          placeholder="e.g. 150 guests"
+          hint="A rough number is fine"
           name="expectedAudience"
           label="Expected audience"
           schema={f.expectedAudience}
         />
       </div>
-      <TextField name="location" label="Venue" schema={f.location} required />
+      <TextField
+        placeholder="Venue name and city"
+        name="location"
+        label="Venue"
+        schema={f.location}
+        required
+      />
       <Closing f={f} />
     </>
   );

@@ -20,9 +20,13 @@ function Toaster() {
             'bg-primary text-primary-foreground ml-auto cursor-pointer rounded-sm px-3 py-1 text-xs font-semibold',
           cancelButton:
             'bg-muted cursor-pointer rounded-sm px-3 py-1 text-xs font-semibold',
-          success: '[&_[data-icon]]:text-success',
-          error: '[&_[data-icon]]:text-destructive',
-          info: '[&_[data-icon]]:text-primary-text',
+          success:
+            'bg-success-soft border-success/40 [&_[data-icon]]:text-success-text',
+          error:
+            'bg-destructive-soft border-destructive/40 [&_[data-icon]]:text-destructive-text',
+          warning:
+            'bg-warning-soft border-warning/40 [&_[data-icon]]:text-warning-text',
+          info: 'bg-info-soft border-info/40 [&_[data-icon]]:text-info-text',
         },
       }}
     />

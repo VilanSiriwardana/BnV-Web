@@ -472,3 +472,18 @@ Each decision should include:
 - Related Documents:
   - [../references/Brand-Identity.md](../references/Brand-Identity.md) Section 23
   - `.claude/blueprints/019-mockup-alignment-system-and-home.md`
+
+## ADR-0026 - Status Colour System and UI Refinement
+
+- Status: Accepted
+- Date: 2026-10-30
+- Context: Errors used a muted garnet that read weak in light mode and harsh in dark mode, and there were no warning or info colours. Badges were heavy, form text was small, and forms mixed native selects and date inputs with the custom Combobox and DatePicker.
+- Decision:
+  - Status colours are saturated in light mode and lower-chroma and lighter in dark mode. Each one has a fill, a `-soft` background and a `-text` tone, and every pair meets WCAG AA.
+  - Two new type steps: `text-label` (15px) for form and option labels, and `text-micro` (11px) for badges.
+  - `Combobox` and `DatePicker` are the only dropdown and date controls. They submit through hidden inputs, so server actions and schemas are unchanged.
+  - Navigation uses a shared `navItem` style and a spring `NavPill` indicator.
+  - The PDP gallery is sticky and viewport-high, with a hover lens and a zoomable lightbox.
+- Consequences: `ui/select.tsx` was removed. Admin status filters now need JavaScript.
+- Related Documents:
+  - `.claude/blueprints/026-ui-refinement-forms-status-nav-gallery.md`

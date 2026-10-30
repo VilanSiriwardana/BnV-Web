@@ -34,7 +34,7 @@ export function CatalogFilters({
       action={routes.shop}
       className="border-border mt-8 grid grid-cols-2 gap-4 border-y py-6 md:grid-cols-3 lg:grid-cols-6 lg:items-end"
     >
-      <div className="text-small flex flex-col gap-1.5 font-medium">
+      <div className="text-label flex flex-col gap-1.5 font-medium">
         <label htmlFor="filter-category">Category</label>
         <Combobox
           id="filter-category"
@@ -49,7 +49,7 @@ export function CatalogFilters({
           autoSubmit
         />
       </div>
-      <div className="text-small flex flex-col gap-1.5 font-medium">
+      <div className="text-label flex flex-col gap-1.5 font-medium">
         <label htmlFor="filter-collection">Collection</label>
         <Combobox
           id="filter-collection"
@@ -64,7 +64,7 @@ export function CatalogFilters({
           autoSubmit
         />
       </div>
-      <label className="text-small flex flex-col gap-1.5 font-medium">
+      <label className="text-label flex flex-col gap-1.5 font-medium">
         Min price (LKR)
         <Input
           name="minPrice"
@@ -74,7 +74,7 @@ export function CatalogFilters({
           defaultValue={params.minPrice}
         />
       </label>
-      <label className="text-small flex flex-col gap-1.5 font-medium">
+      <label className="text-label flex flex-col gap-1.5 font-medium">
         Max price (LKR)
         <Input
           name="maxPrice"
@@ -84,7 +84,7 @@ export function CatalogFilters({
           defaultValue={params.maxPrice}
         />
       </label>
-      <div className="text-small flex flex-col gap-1.5 font-medium">
+      <div className="text-label flex flex-col gap-1.5 font-medium">
         <label htmlFor="filter-sort">Sort</label>
         <Combobox
           id="filter-sort"
@@ -98,7 +98,7 @@ export function CatalogFilters({
           autoSubmit
         />
       </div>
-      <label className="text-small flex h-11 cursor-pointer items-center gap-2 font-medium">
+      <label className="text-label hover:text-primary-text flex h-11 cursor-pointer items-center gap-2 font-medium transition-colors">
         <Checkbox name="inStock" value="1" defaultChecked={params.inStock} />
         In stock only
       </label>

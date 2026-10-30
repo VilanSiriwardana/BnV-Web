@@ -118,7 +118,7 @@ export default async function ProductPage({ params }: Props) {
                 {product.shortDescription}
               </p>
             )}
-            <p className="text-caption text-muted-foreground mt-2">
+            <p className="text-small text-muted-foreground mt-2">
               SKU {product.sku}
             </p>
           </header>

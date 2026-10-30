@@ -2,7 +2,9 @@
 
 import { Menu } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
+import { NavPill, useHoverIndex } from '@/components/motion/nav-pill';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -12,8 +14,57 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { navItem } from '@/components/ui/styles';
 import { brand } from '@/config/brand';
 import { mainNav, shopMenu } from '@/config/navigation';
+import { cn } from '@/lib/utils/cn';
+
+type NavLink = { href: string; label: string };
+
+function NavList({
+  links,
+  id,
+  bold,
+}: {
+  links: readonly NavLink[];
+  id: string;
+  bold?: boolean;
+}) {
+  const pathname = usePathname();
+  const { hovered, list, item } = useHoverIndex();
+  return (
+    <ul className="flex flex-col gap-0.5" {...list}>
+      {links.map((link, i) => {
+        const active =
+          link.href === '/' ? pathname === '/' : pathname === link.href;
+        return (
+          <li key={link.href}>
+            <SheetClose asChild>
+              <Link
+                href={link.href}
+                aria-current={active ? 'page' : undefined}
+                className={cn(
+                  navItem,
+                  'text-body py-3',
+                  !bold && 'font-normal',
+                )}
+                {...item(i)}
+              >
+                {(hovered === i || (hovered === null && active)) && (
+                  <NavPill
+                    layoutId={`${id}-pill`}
+                    className="bg-primary-soft inset-0 rounded-md"
+                  />
+                )}
+                {link.label}
+              </Link>
+            </SheetClose>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
 
 export function MobileNav() {
   return (
@@ -36,38 +87,14 @@ export function MobileNav() {
           aria-label="Mobile"
           className="flex flex-col gap-6 px-4 pb-8 font-sans"
         >
-          <ul className="flex flex-col">
-            {mainNav.map((item) => (
-              <li key={item.href}>
-                <SheetClose asChild>
-                  <Link
-                    href={item.href}
-                    className="text-body hover:bg-accent block rounded-sm px-2 py-3 font-medium"
-                  >
-                    {item.label}
-                  </Link>
-                </SheetClose>
-              </li>
-            ))}
-          </ul>
+          <NavList links={mainNav} id="mobile-main" bold />
           <div>
-            <p className="text-caption text-muted-foreground px-2 font-semibold tracking-widest uppercase">
+            <p className="text-caption text-muted-foreground px-3 font-semibold tracking-widest uppercase">
               Featured
             </p>
-            <ul className="mt-2 flex flex-col">
-              {shopMenu.featured.map((item) => (
-                <li key={item.href}>
-                  <SheetClose asChild>
-                    <Link
-                      href={item.href}
-                      className="text-body hover:bg-accent block rounded-sm px-2 py-3"
-                    >
-                      {item.label}
-                    </Link>
-                  </SheetClose>
-                </li>
-              ))}
-            </ul>
+            <div className="mt-2">
+              <NavList links={shopMenu.featured} id="mobile-featured" />
+            </div>
           </div>
         </nav>
       </SheetContent>

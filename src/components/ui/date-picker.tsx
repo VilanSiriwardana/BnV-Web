@@ -21,6 +21,9 @@ type Common = {
   disabled?: Matcher | Matcher[];
   className?: string;
   id?: string;
+  ref?: React.Ref<HTMLButtonElement>;
+  'aria-invalid'?: boolean;
+  'aria-describedby'?: string;
 };
 
 function Trigger({
@@ -28,7 +31,8 @@ function Trigger({
   className,
   empty,
   children,
-}: {
+  ...aria
+}: Pick<Common, 'ref' | 'aria-invalid' | 'aria-describedby'> & {
   id?: string;
   className?: string;
   empty: boolean;
@@ -37,6 +41,7 @@ function Trigger({
   return (
     <PopoverTrigger asChild>
       <button
+        {...aria}
         type="button"
         id={id}
         data-placeholder={empty || undefined}
@@ -56,6 +61,7 @@ export function DatePicker({
   disabled,
   className,
   id,
+  ...aria
 }: Common & {
   value: Date | undefined;
   onValueChange: (value: Date | undefined) => void;
@@ -63,7 +69,7 @@ export function DatePicker({
   const [open, setOpen] = React.useState(false);
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <Trigger id={id} className={className} empty={!value}>
+      <Trigger {...aria} id={id} className={className} empty={!value}>
         {value ? fmt(value) : placeholder}
       </Trigger>
       <PopoverContent className="w-auto p-3">
