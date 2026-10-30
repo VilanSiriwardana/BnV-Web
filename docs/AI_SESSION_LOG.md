@@ -537,3 +537,37 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 ### Open
 
 - Blueprints 020 to 023. The owner still has to fill email, phone and social handles in `src/config/brand.ts`.
+
+## 2026-10-30 - Design skills audit pass (Emil + Impeccable)
+
+### Summary
+
+- Implemented `.claude/blueprints/024-emil-skills-audit-pass.md`. This was a read-only pass, and no source files changed. Findings are in `.claude/plans/024-audit-findings.md`.
+- First Emil runs: improve-animations (the motion system is sound; the sheet uses the default easing), break-ui as a report only (card badge and label overflow, LKR 0 price), mobile-native (no tap-highlight reset, no themeColor).
+- Impeccable re-critique (dual-agent, source only): 22/32, down from 23. The detector found 1 advisory issue. P1 items: the gift-box builder promise contradicts its "coming soon" label, and trust content is duplicated in the closing row.
+
+### Deviations
+
+- Taste deferred (rebuild conflicts with approved mockups).
+- `/impeccable audit` not run separately; overlaps the detector and Emil checks. Run before shipping.
+- break-ui ran without its demo toggle so no code changed.
+
+### Open
+
+- Owner decisions: the gift-box builder roadmap, story-first vs shop-first order. Next: `/plan` the fixes as blueprint 025.
+
+## 2026-10-30 - Audit fixes: homepage polish
+
+### Summary
+
+- Implemented `.claude/blueprints/025-audit-fixes-homepage-polish.md`. It fixes all P1–P3 findings from `.claude/plans/024-audit-findings.md`.
+- The gift banner now reads "Ready-to-give gift boxes" (the builder is not in launch scope). The closing row's duplicated ordering steps are replaced by a Shop New In / Find a Gift card. The page stays shop-first.
+- Two mid-page headings (gift banner, large bento tile) drop from h1 to h2 size. Hearts stay only on the hero, the brand story and the closing row. "Featured Favorites" is renamed "New In".
+- Sheets use `ease-standard` (300ms open, 200ms close). Carousel dots no longer use `transition-all`.
+- Cards: product badges truncate, collection names clamp to two lines, and a price of 0 shows "Price on request".
+- Mobile: the tap-highlight colour is reset, `viewport.themeColor` is set, and scrollers use `overscroll-x-contain`.
+- Removed the disabled search icon (and `search` from `utilityNav`), the header scroll-progress bar with its CSS, and the spotlight on the Coming-soon pills. Image hover zooms all run at 700ms. The testimonial quote mark uses `text-h1`.
+
+### Open
+
+- Browser QA at 375/768/1440, then run `/impeccable critique` again (baseline 22/32). Verify the Sinhala font fallback and the showcase-tab keyboard motion on a device.

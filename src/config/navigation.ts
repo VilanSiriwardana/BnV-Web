@@ -28,7 +28,7 @@ export const shopMenu = {
   collections: { label: 'Couples', href: routes.couples } satisfies NavItem,
 };
 
-export const utilityNav = ['search', 'theme', 'cart'] as const;
+export const utilityNav = ['theme', 'cart'] as const;
 
 export const footerNav: { title: string; items: NavItem[] }[] = [
   {

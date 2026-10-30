@@ -13,7 +13,6 @@ export function FeaturedCategories() {
         id="featured-categories-title"
 
         title="Shop by Collection"
-        heart
         align="center"
         description="Curated pieces and gifts for every chapter of your story."
       />

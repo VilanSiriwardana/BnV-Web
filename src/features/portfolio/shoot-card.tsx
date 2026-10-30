@@ -20,7 +20,7 @@ export function ShootCard({ shoot }: { shoot: Shoot }) {
           fill
           sizes={imageSizes.portfolioCover}
           quality={imageQuality.default}
-          className="ease-standard object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+          className="ease-standard object-cover transition-transform duration-700 motion-safe:group-hover:scale-[1.03]"
         />
       </div>
       <p className="text-caption text-primary-text mt-3">

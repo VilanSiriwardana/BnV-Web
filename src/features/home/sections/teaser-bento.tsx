@@ -32,7 +32,7 @@ export function TeaserBento() {
               >
                 <ArtDirectedImage
                   image={{ ...tile.image, alt: '' }}
-                  className="ease-standard absolute inset-0 -z-10 aspect-auto h-full transition-transform duration-400 motion-safe:group-hover:scale-[1.03] md:aspect-auto"
+                  className="ease-standard absolute inset-0 -z-10 aspect-auto h-full transition-transform duration-700 motion-safe:group-hover:scale-[1.03] md:aspect-auto"
                 />
                 <span
                   aria-hidden
@@ -43,7 +43,7 @@ export function TeaserBento() {
                   <h3
                     className={cn(
                       'font-display mt-3 block font-semibold text-balance',
-                      tile.large ? 'text-h1' : 'text-h3',
+                      tile.large ? 'text-h2' : 'text-h3',
                     )}
                   >
                     {tile.title}

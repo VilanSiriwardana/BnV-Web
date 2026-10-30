@@ -27,7 +27,7 @@ export function TestimonialCard({
     >
       <span
         aria-hidden
-        className="font-display text-primary text-[3rem] leading-none"
+        className="font-display text-primary text-h1 leading-none"
       >
         “
       </span>

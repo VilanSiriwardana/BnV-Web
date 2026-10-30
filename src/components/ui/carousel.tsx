@@ -98,7 +98,7 @@ export function Carousel({
                 aria-current={i === index || undefined}
                 onClick={() => api?.scrollTo(i)}
                 className={cn(
-                  'ease-standard h-1.5 rounded-full transition-all duration-250',
+                  'ease-standard h-1.5 rounded-full transition-[width,background-color] duration-250',
                   i === index
                     ? 'bg-primary-text w-6'
                     : 'bg-primary/50 hover:bg-primary w-1.5',
@@ -134,7 +134,7 @@ export function Carousel({
       {thumbnails && thumbnails.length > 1 && (
         <div
           ref={thumbsRef}
-          className="mt-4 flex snap-x gap-2 overflow-x-auto pb-1"
+          className="mt-4 flex snap-x gap-2 overflow-x-auto overscroll-x-contain pb-1"
         >
           {thumbnails.map((thumb, i) => (
             <button

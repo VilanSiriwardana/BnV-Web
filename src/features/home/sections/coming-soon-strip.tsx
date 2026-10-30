@@ -15,8 +15,7 @@ export function ComingSoonStrip() {
           <Link
             key={item.label}
             href={item.href}
-            data-spotlight
-            className="spotlight focus-ring border-primary/40 bg-primary-soft text-primary-text hover:border-primary hover:shadow-glow inline-flex min-h-11 items-center gap-2 rounded-full border px-4 font-semibold transition-[border-color,box-shadow] duration-150"
+            className="focus-ring border-primary/40 bg-primary-soft text-primary-text hover:border-primary hover:shadow-glow inline-flex min-h-11 items-center gap-2 rounded-full border px-4 font-semibold transition-[border-color,box-shadow] duration-150"
           >
             <Sparkles aria-hidden strokeWidth={1.5} className="size-4" />
             {item.label}

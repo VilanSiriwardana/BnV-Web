@@ -177,10 +177,10 @@ export const comingSoon = [
 
 export const giftBanner = {
   eyebrow: 'Make it unforgettable',
-  title: 'Build your',
-  accent: 'Gift Box',
+  title: 'Ready-to-give',
+  accent: 'gift boxes',
   description:
-    'Choose your favourite pieces and we will wrap them together, ready to surprise someone you love.',
+    'Pieces, wrapping and a handwritten note, put together for you, ready to surprise someone you love.',
   cta: { label: 'Shop Gifts', href: routes.gifts },
   features: [
     'Handpicked with love',

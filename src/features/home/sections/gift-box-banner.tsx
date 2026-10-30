@@ -28,10 +28,10 @@ export function GiftBoxBanner() {
       <ClipReveal>
         <div className="bg-primary/20 dark:bg-surface-elevated grid overflow-hidden rounded-lg md:grid-cols-[2fr_3fr]">
           <div className="flex flex-col justify-center px-6 py-10 md:px-10 md:py-14">
-            <Eyebrow heart>{giftBanner.eyebrow}</Eyebrow>
+            <Eyebrow>{giftBanner.eyebrow}</Eyebrow>
             <h2
               id="gift-box-title"
-              className="font-display text-h1 mt-4 font-semibold"
+              className="font-display text-h2 mt-4 font-semibold"
             >
               {giftBanner.title}{' '}
               <HeadingAccent>{giftBanner.accent}</HeadingAccent>

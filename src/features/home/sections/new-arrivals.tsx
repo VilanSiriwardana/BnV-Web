@@ -23,10 +23,6 @@ export async function NewArrivals() {
   if (products.length === 0) return null;
 
   return (
-    <FeaturedCarousel
-      title="Featured Favorites"
-      href={routes.newIn}
-      products={products}
-    />
+    <FeaturedCarousel title="New In" href={routes.newIn} products={products} />
   );
 }

@@ -45,13 +45,16 @@ export function ProductCard({
           <div className="bg-primary-soft aspect-[4/5] rounded-sm" />
         )}
         {product.badge ? (
-          <Badge variant="gold" className="absolute top-3 left-3">
+          <Badge
+            variant="gold"
+            className="absolute top-3 left-3 max-w-[calc(100%-1.5rem)] truncate"
+          >
             <Crown aria-hidden />
             {product.badge}
           </Badge>
         ) : (
           product.isNew && (
-            <Badge className="absolute top-3 left-3">
+            <Badge className="absolute top-3 left-3 max-w-[calc(100%-1.5rem)] truncate">
               <Sparkles aria-hidden />
               New Arrival
             </Badge>
@@ -62,7 +65,9 @@ export function ProductCard({
         {product.name}
       </h3>
       <p className="text-small text-muted-foreground mt-1 px-1 font-sans break-words tabular-nums">
-        From {formatLkr(product.priceLkr)}
+        {product.priceLkr > 0
+          ? `From ${formatLkr(product.priceLkr)}`
+          : 'Price on request'}
       </p>
     </Link>
   );

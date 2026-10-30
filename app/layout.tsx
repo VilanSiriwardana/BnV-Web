@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import {
   Cinzel,
   Cormorant_Garamond,
@@ -51,6 +51,13 @@ const sinhala = Noto_Serif_Sinhala({
   weight: ['400', '600'],
   display: 'swap',
 });
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#faf7f2' },
+    { media: '(prefers-color-scheme: dark)', color: '#17121d' },
+  ],
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.siteUrl),

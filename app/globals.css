@@ -429,31 +429,6 @@
   }
 }
 
-@utility scroll-progress {
-  pointer-events: none;
-  height: 2px;
-  transform-origin: left;
-  transform: scaleX(0);
-  background: linear-gradient(
-    90deg,
-    var(--primary-text),
-    var(--primary),
-    var(--gold)
-  );
-  display: none;
-  @supports (animation-timeline: scroll()) {
-    display: block;
-    animation: scroll-progress linear both;
-    animation-timeline: scroll(root);
-  }
-}
-
-@keyframes scroll-progress {
-  to {
-    transform: scaleX(1);
-  }
-}
-
 @keyframes shimmer {
   to {
     transform: translateX(120%);
@@ -465,6 +440,7 @@
     scroll-behavior: smooth;
     scrollbar-width: thin;
     scrollbar-color: var(--primary) transparent;
+    -webkit-tap-highlight-color: transparent;
   }
 
   ::-webkit-scrollbar {
@@ -522,10 +498,6 @@
   }
 
   .spotlight::after {
-    display: none;
-  }
-
-  .scroll-progress {
     display: none;
   }
 

@@ -97,7 +97,7 @@ export function ShowcaseTabs({ tabs }: { tabs: Tab[] }) {
             transition={{ duration: duration.base, ease: ease.standard }}
           >
             <p className="text-muted-foreground max-w-2xl">{tab.description}</p>
-            <ul className="-mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-4 pb-2 md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0">
+            <ul className="-mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain scroll-smooth px-4 pb-2 md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0">
               {tab.products.map((product) => (
                 <li
                   key={product.id}

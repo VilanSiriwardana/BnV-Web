@@ -60,7 +60,7 @@ export function CollectionCard({
             <Icon aria-hidden strokeWidth={1.5} className="size-5" />
           </span>
         )}
-        <span className="font-display text-h4 group-hover:text-primary-text font-semibold transition-colors md:text-[1.25rem]">
+        <span className="font-display text-h4 group-hover:text-primary-text line-clamp-2 font-semibold [overflow-wrap:anywhere] transition-colors md:text-[1.25rem]">
           {label}
         </span>
         {subtitle && (

@@ -85,7 +85,6 @@ export function FeaturedCarousel({ title, href, products }: Props) {
         <SectionHeading
           id="featured-title"
           title={title}
-          heart
           link={{ label: 'View all', href }}
           className="flex-1"
         />

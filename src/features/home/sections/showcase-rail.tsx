@@ -29,7 +29,6 @@ export async function ShowcaseRail() {
           eyebrow="Collections"
           title="Curated for"
           accent="the moment"
-          heart
         />
         <ShowcaseTabs tabs={tabs} />
       </Reveal>
