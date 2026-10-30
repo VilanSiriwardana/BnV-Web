@@ -59,7 +59,10 @@ export function ArtDirectedImage({ image, eager, className }: Props) {
             <img
               {...props}
               className="object-cover"
-              style={{ objectPosition: image.objectPosition ?? 'right center' }}
+              style={{
+                ...props.style,
+                objectPosition: image.objectPosition ?? 'right center',
+              }}
             />
           </picture>
         );

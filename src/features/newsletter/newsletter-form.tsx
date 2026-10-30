@@ -91,10 +91,7 @@ export function NewsletterForm() {
         </Button>
       </div>
       <div className="mt-2 flex items-start gap-2 text-left">
-        <input
-          {...consent.bind}
-          className="accent-primary mt-1 size-4 shrink-0"
-        />
+        <input {...consent.bind} className="checkbox-native mt-0.5" />
         <label htmlFor={consentId} className="text-small text-muted-foreground">
           Send me new drops and offers. I have read the{' '}
           <Link

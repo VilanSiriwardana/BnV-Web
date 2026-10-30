@@ -30,21 +30,30 @@ type BaseProps = {
   className?: string;
   id?: string;
   'aria-invalid'?: boolean;
+  /** Renders hidden inputs so the value submits with a surrounding form. */
+  name?: string;
+  /** Submits the surrounding form after each change. */
+  autoSubmit?: boolean;
 };
 
 type SingleProps = BaseProps & {
   mode?: 'single';
-  value: string | null;
-  onValueChange: (value: string | null) => void;
+  value?: string | null;
+  defaultValue?: string | null;
+  onValueChange?: (value: string | null) => void;
 };
 
 type MultiProps = BaseProps & {
   mode: 'multi';
-  value: string[];
-  onValueChange: (value: string[]) => void;
+  value?: string[];
+  defaultValue?: string[];
+  onValueChange?: (value: string[]) => void;
 };
 
 export type ComboboxProps = SingleProps | MultiProps;
+
+const toList = (v: string | string[] | null | undefined) =>
+  Array.isArray(v) ? v : v ? [v] : [];
 
 export function Combobox(props: ComboboxProps) {
   const {
@@ -56,39 +65,57 @@ export function Combobox(props: ComboboxProps) {
     disabled,
     className,
     id,
+    name,
+    autoSubmit,
   } = props;
+  const multi = props.mode === 'multi';
   const [open, setOpen] = React.useState(false);
+  const [inner, setInner] = React.useState(() => toList(props.defaultValue));
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
   const listId = React.useId();
   const byValue = React.useMemo(
     () => new Map(options.map((o) => [o.value, o])),
     [options],
   );
 
-  const selected = props.mode === 'multi' ? props.value : [];
-  const isSelected = (v: string) =>
-    props.mode === 'multi' ? props.value.includes(v) : props.value === v;
+  const values = props.value !== undefined ? toList(props.value) : inner;
+  const selected = multi ? values : [];
+  const isSelected = (v: string) => values.includes(v);
+
+  const commit = (next: string[]) => {
+    setInner(next);
+    if (props.mode === 'multi') props.onValueChange?.(next);
+    else props.onValueChange?.(next[0] ?? null);
+    if (autoSubmit) {
+      queueMicrotask(() => triggerRef.current?.form?.requestSubmit());
+    }
+  };
 
   const toggle = (v: string) => {
-    if (props.mode === 'multi') {
-      props.onValueChange(
-        props.value.includes(v)
-          ? props.value.filter((x) => x !== v)
-          : [...props.value, v],
-      );
+    if (multi) {
+      commit(isSelected(v) ? values.filter((x) => x !== v) : [...values, v]);
     } else {
-      props.onValueChange(props.value === v ? null : v);
+      commit(isSelected(v) ? [] : [v]);
       setOpen(false);
     }
   };
 
-  const single =
-    props.mode !== 'multi' && props.value ? byValue.get(props.value) : null;
-  const empty = props.mode === 'multi' ? selected.length === 0 : !single;
+  const single = !multi && values[0] ? byValue.get(values[0]) : null;
+  const empty = values.length === 0;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
+      {name &&
+        (multi ? (
+          values.map((v) => (
+            <input key={v} type="hidden" name={name} value={v} />
+          ))
+        ) : (
+          <input type="hidden" name={name} value={values[0] ?? ''} />
+        ))}
       <PopoverTrigger asChild disabled={disabled}>
         <button
+          ref={triggerRef}
           type="button"
           id={id}
           role="combobox"

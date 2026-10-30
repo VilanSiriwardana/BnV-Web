@@ -30,10 +30,10 @@ export default function Home() {
       <FeaturedCategories />
       <NewArrivals />
       <GiftBoxBanner />
-      <Divider className="my-4" />
       <BrandStory />
       <ShowcaseRail />
       <TeaserBento />
+      <Divider className="my-12 md:my-16" />
       <ComingSoonStrip />
       <ClosingRow />
     </>

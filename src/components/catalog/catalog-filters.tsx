@@ -1,6 +1,8 @@
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Combobox } from '@/components/ui/combobox';
 import { Input } from '@/components/ui/input';
 import { routes } from '@/config/routes';
 import type { ShopParams } from '@/features/catalog/schema';
@@ -14,16 +16,13 @@ type Props = {
   total: number;
 };
 
-const selectClass =
-  'border-input dark:bg-muted focus-visible:border-ring focus-visible:ring-ring/40 h-11 w-full rounded-sm border bg-transparent px-3 text-base shadow-sm outline-none focus-visible:ring-[3px]';
-
 const sortLabels = {
   newest: 'Newest',
   'price-asc': 'Price: low to high',
   'price-desc': 'Price: high to low',
 } as const;
 
-// A plain GET form keeps filter state in the URL and works without JavaScript.
+// A GET form keeps filter state in the URL; the comboboxes submit through hidden inputs.
 export function CatalogFilters({
   params,
   categories,
@@ -35,36 +34,36 @@ export function CatalogFilters({
       action={routes.shop}
       className="border-border mt-8 grid grid-cols-2 gap-4 border-y py-6 md:grid-cols-3 lg:grid-cols-6 lg:items-end"
     >
-      <label className="text-small flex flex-col gap-1.5 font-medium">
-        Category
-        <select
+      <div className="text-small flex flex-col gap-1.5 font-medium">
+        <label htmlFor="filter-category">Category</label>
+        <Combobox
+          id="filter-category"
           name="category"
-          defaultValue={params.category ?? ''}
-          className={selectClass}
-        >
-          <option value="">All</option>
-          {categories.map((c) => (
-            <option key={c.slug} value={c.slug}>
-              {c.name}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="text-small flex flex-col gap-1.5 font-medium">
-        Collection
-        <select
+          defaultValue={params.category ?? null}
+          options={[
+            { value: '', label: 'All' },
+            ...categories.map((c) => ({ value: c.slug, label: c.name })),
+          ]}
+          searchable={categories.length > 6}
+          placeholder="All"
+          autoSubmit
+        />
+      </div>
+      <div className="text-small flex flex-col gap-1.5 font-medium">
+        <label htmlFor="filter-collection">Collection</label>
+        <Combobox
+          id="filter-collection"
           name="collection"
-          defaultValue={params.collection ?? ''}
-          className={selectClass}
-        >
-          <option value="">All</option>
-          {collections.map((c) => (
-            <option key={c.slug} value={c.slug}>
-              {c.name}
-            </option>
-          ))}
-        </select>
-      </label>
+          defaultValue={params.collection ?? null}
+          options={[
+            { value: '', label: 'All' },
+            ...collections.map((c) => ({ value: c.slug, label: c.name })),
+          ]}
+          searchable={collections.length > 6}
+          placeholder="All"
+          autoSubmit
+        />
+      </div>
       <label className="text-small flex flex-col gap-1.5 font-medium">
         Min price (LKR)
         <Input
@@ -85,24 +84,22 @@ export function CatalogFilters({
           defaultValue={params.maxPrice}
         />
       </label>
-      <label className="text-small flex flex-col gap-1.5 font-medium">
-        Sort
-        <select name="sort" defaultValue={params.sort} className={selectClass}>
-          {Object.entries(sortLabels).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="text-small flex h-11 items-center gap-2 font-medium">
-        <input
-          type="checkbox"
-          name="inStock"
-          value="1"
-          defaultChecked={params.inStock}
-          className="accent-primary size-4"
+      <div className="text-small flex flex-col gap-1.5 font-medium">
+        <label htmlFor="filter-sort">Sort</label>
+        <Combobox
+          id="filter-sort"
+          name="sort"
+          defaultValue={params.sort ?? 'newest'}
+          options={Object.entries(sortLabels).map(([value, label]) => ({
+            value,
+            label,
+          }))}
+          searchable={false}
+          autoSubmit
         />
+      </div>
+      <label className="text-small flex h-11 cursor-pointer items-center gap-2 font-medium">
+        <Checkbox name="inStock" value="1" defaultChecked={params.inStock} />
         In stock only
       </label>
       <div className="col-span-2 flex items-center justify-between gap-4 md:col-span-3 lg:col-span-6">

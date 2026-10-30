@@ -204,13 +204,13 @@ Mobile-first. The type scale is defined at mobile sizes and components step up a
 
 ## Elevation & Depth
 
-Soft and warm. Shadows are tinted with charcoal at low alpha in light mode and black at higher alpha in dark mode, so depth reads as ambient light, not hard edges. Tonal layering (ivory → blush → white) does most of the work; shadows confirm it.
+Soft, warm and visible. Every shadow has two layers: a small charcoal contact shadow and a wider lavender-tinted ambient shadow (`--tint-a-*`), so cards visibly lift off ivory and blush. Dark mode keeps a deeper black ambient, lowers the lavender tint, steps surfaces (background → card → popover) and adds a 1px top inner highlight (`--edge`) so panels read as raised.
 
 ### Shadow Vocabulary
 
-- **sm** (`0 1px 2px rgb(var(--shadow-color) / var(--shadow-a-sm))`): cards and inputs at rest, luxury button.
-- **md** (`0 4px 16px …/ var(--shadow-a-md)`): hover lift, dropdowns, sticky header.
-- **lg** (`0 12px 40px …/ var(--shadow-a-lg)`): sheets, drawers and dialogs.
+- **sm** (contact + `0 4px 12px -4px` lavender at `--tint-a-sm`): cards, inputs and controls at rest.
+- **md** (contact + `0 14px 32px -10px` lavender at `--tint-a-md`): hover lift, sticky header, polaroid frames.
+- **lg** (contact + `0 28px 60px -14px` lavender at `--tint-a-lg`): sheets, drawers and dialogs.
 
 ### Effects
 
@@ -281,7 +281,7 @@ Gently rounded throughout: small (6px) for inputs and badges, medium (10px) for 
 
 - **Hero heights:** primary heroes are `100svh` minus header (`--header-h`) and announcement bar; secondary heroes `80svh`. Never `100vh`. Anchored sections get `scroll-margin-top` equal to the header. The split hero's image bleeds to the viewport's right edge and uses each image's `objectPosition` (default `right center`) so the subject is never cropped.
 - **Cinematic hero:** full height, image as background with a bottom plum scrim (`scrim` token), white copy bottom-left, one primary button and a white text link. Image settles from scale 1.06 over 1.4s; headline words rise in sequence via CSS so the h1 paints immediately.
-- **Trust strip:** three thin-icon items on Soft Blush directly under the hero.
+- **Trust strip:** three thin-icon items on the soft lavender tint (`bg-primary-soft`) directly under the hero; the split hero panel uses the same tint so lavender, not blush, leads the first screen.
 - **Collections rail:** tabs (44px targets, arrow-key navigation) switch a scroll-snap rail on mobile and a 4-up grid on desktop, crossfading at 250ms.
 - **Made-for-you bento:** one large and two small image tiles with scrims; tiles unmask from a soft inset clip as they enter view.
 - **Header:** condenses from 64px to 56px with a medium shadow once the page scrolls.
@@ -298,7 +298,7 @@ Gently rounded throughout: small (6px) for inputs and badges, medium (10px) for 
 - **Do** use semantic tokens from `app/globals.css` and the constants in `src/config/motion.ts`.
 - **Do** keep text on lavender, rose and gold fills Soft Charcoal, and use `primary-text` / `gold-text` for coloured text.
 - **Do** reuse `Reveal`, `Stagger` and the `src/components/ui` primitives before writing new ones.
-- **Do** use the shared primitives: `Combobox` (single, multi, searchable), `CountrySelect`, `CurrencySelect`, `DatePicker`, `DateRangePicker`, `TimePicker`, `TagsInput`, `FileDropzone`, `DataTable` (TanStack Table v9: sorting, selection, pagination, skeleton, empty state), `Card` variants, `ImageFrame`, `Slider`, `Carousel` (drag, snap, thumbnails), `Lightbox`, `Popover`, `Tooltip`, `Dialog`, `Drawer`, `Tabs`, `Accordion`, `Checkbox`, `Switch`, `Skeleton`, `toast` (sonner). Card family in `src/components/cards/`: `ProductCard`, `FeatureCard`, `CollectionCard`, `TestimonialCard`, `StatCard`, each `variant`: `solid`, `glass`, `gradient-border`. Shared classes live in `src/components/ui/styles.ts`.
+- **Do** use the shared primitives: `Combobox` (single, multi, searchable), `CountrySelect`, `CurrencySelect`, `DatePicker`, `DateRangePicker`, `TimePicker`, `TagsInput`, `FileDropzone`, `DataTable` (TanStack Table v9: sorting, selection, pagination, skeleton, empty state), `Card` variants, `ImageFrame`, `Slider`, `Carousel` (drag, snap, thumbnails), `Lightbox`, `Popover`, `Tooltip`, `Dialog`, `Drawer`, `Tabs`, `Accordion`, `Checkbox`, `RadioGroup` (card-style options), `Switch`, `Skeleton`, `toast` (sonner). `Combobox` takes `name` (hidden inputs, so it submits in GET/POST forms), `defaultValue` and `autoSubmit`. Native controls that must stay native (admin, validated consent boxes) use `select-chevron` and `checkbox-native`. Card family in `src/components/cards/`: `ProductCard`, `FeatureCard`, `CollectionCard`, `TestimonialCard`, `StatCard`, each `variant`: `solid`, `glass`, `gradient-border`. Shared classes live in `src/components/ui/styles.ts`.
 - **Do** design every screen for mobile first and check both light and dark themes.
 - **Do** respect `prefers-reduced-motion`: remove movement, keep short fades.
 

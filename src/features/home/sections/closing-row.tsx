@@ -1,12 +1,12 @@
 import Link from 'next/link';
 
-import { ArtDirectedImage } from '@/components/marketing/art-directed-image';
 import {
   GoldHeart,
   SectionHeading,
 } from '@/components/marketing/section-heading';
 import { Reveal } from '@/components/motion/reveal';
-import { story } from '@/data/home';
+import { routes } from '@/config/routes';
+import { trust } from '@/data/home';
 import { testimonials } from '@/data/testimonials';
 import { NewsletterForm } from '@/features/newsletter/newsletter-form';
 import { cn } from '@/lib/utils';
@@ -14,38 +14,44 @@ import { cn } from '@/lib/utils';
 const card =
   'bg-card text-card-foreground border-border h-full rounded-md border p-6 shadow-sm md:p-8';
 
-// Our Story polaroid · testimonial (real only, D-23) · newsletter, as in the Home mockup.
+// How ordering works · testimonial (real only, D-23) · newsletter.
 export function ClosingRow() {
   const quote = testimonials[0];
 
   return (
     <section
-      aria-label="Our story and staying in touch"
+      aria-label="How ordering works and staying in touch"
       className="mx-auto grid max-w-[1440px] gap-4 px-4 py-12 md:grid-cols-3 md:px-8 md:py-16"
     >
       <Reveal className={cn(!quote && 'md:col-span-2')}>
-        <div className={cn(card, 'grid items-center gap-6 sm:grid-cols-2')}>
-          <div>
-            <h2 className="font-display text-h3 font-semibold">
-              Our Story
-              <GoldHeart />
-            </h2>
-            <p className="text-muted-foreground mt-3 line-clamp-5">
-              {story.body}
-            </p>
-            <Link
-              href={story.cta.href}
-              className="text-caption text-primary-text mt-4 inline-flex min-h-11 items-center gap-1 font-sans font-semibold tracking-widest uppercase"
-            >
-              {story.cta.label} <span aria-hidden>→</span>
-            </Link>
-          </div>
-          <div className="mx-auto w-full max-w-60 -rotate-2 rounded-sm bg-white p-2 pb-8 shadow-md">
-            <ArtDirectedImage
-              image={story.image}
-              className="aspect-square md:aspect-square"
-            />
-          </div>
+        <div className={card}>
+          <h2 className="font-display text-h3 font-semibold">
+            How ordering works
+            <GoldHeart />
+          </h2>
+          <ol className="mt-5 flex flex-col gap-4 font-sans">
+            {trust.map(({ title, text }, i) => (
+              <li key={title} className="flex items-start gap-3">
+                <span className="bg-primary-soft text-gold-text grid size-8 shrink-0 place-items-center rounded-full text-sm font-semibold tabular-nums">
+                  {i + 1}
+                </span>
+                <span>
+                  <span className="text-small block font-semibold">
+                    {title}
+                  </span>
+                  <span className="text-small text-muted-foreground">
+                    {text}
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ol>
+          <Link
+            href={routes.contact}
+            className="text-caption text-primary-text mt-4 inline-flex min-h-11 items-center gap-1 font-sans font-semibold tracking-widest uppercase"
+          >
+            Contact us <span aria-hidden>→</span>
+          </Link>
         </div>
       </Reveal>
       {quote && (

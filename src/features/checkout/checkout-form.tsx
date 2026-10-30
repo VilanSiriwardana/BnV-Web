@@ -4,8 +4,10 @@ import Link from 'next/link';
 import { useActionState, useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { FieldError, FormMessage } from '@/components/ui/field-error';
 import { Input } from '@/components/ui/input';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { routes } from '@/config/routes';
 import {
   districts,
@@ -166,26 +168,18 @@ export function CheckoutForm() {
         />
         <div>
           <span className={labelClass}>How should we contact you?</span>
-          <div className="flex gap-6">
-            {(
-              [
-                ['whatsapp', 'WhatsApp'],
-                ['phone', 'Phone call'],
-              ] as const
-            ).map(([value, label]) => (
-              <label key={value} className="text-small flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="preferredContact"
-                  value={value}
-                  checked={preferredContact === value}
-                  onChange={() => setPreferredContact(value)}
-                  className="accent-primary size-4"
-                />
-                {label}
-              </label>
-            ))}
-          </div>
+          <RadioGroup
+            name="preferredContact"
+            value={preferredContact}
+            onValueChange={(v) =>
+              setPreferredContact(v as typeof preferredContact)
+            }
+            aria-label="How should we contact you?"
+            className="grid-cols-2"
+          >
+            <RadioGroupItem value="whatsapp">WhatsApp</RadioGroupItem>
+            <RadioGroupItem value="phone">Phone call</RadioGroupItem>
+          </RadioGroup>
         </div>
       </fieldset>
 
@@ -279,35 +273,29 @@ export function CheckoutForm() {
 
       <fieldset className="flex flex-col gap-3">
         <legend className="font-display text-h4 mb-4">Gift</legend>
-        <label className="text-small flex items-center gap-2">
-          <input
-            type="checkbox"
+        <label className="text-small flex cursor-pointer items-center gap-2">
+          <Checkbox
             name="isGift"
             checked={isGift}
-            onChange={(e) => setIsGift(e.target.checked)}
-            className="accent-primary size-4"
+            onCheckedChange={(v) => setIsGift(v === true)}
           />
           This is a gift
         </label>
         {isGift && (
           <div className="flex flex-col gap-3 pl-6">
-            <label className="text-small flex items-center gap-2">
-              <input
-                type="checkbox"
+            <label className="text-small flex cursor-pointer items-center gap-2">
+              <Checkbox
                 name="giftWrap"
                 checked={giftWrap}
-                onChange={(e) => setGiftWrap(e.target.checked)}
-                className="accent-primary size-4"
+                onCheckedChange={(v) => setGiftWrap(v === true)}
               />
               Gift wrap
             </label>
-            <label className="text-small flex items-center gap-2">
-              <input
-                type="checkbox"
+            <label className="text-small flex cursor-pointer items-center gap-2">
+              <Checkbox
                 name="hidePrices"
                 checked={hidePrices}
-                onChange={(e) => setHidePrices(e.target.checked)}
-                className="accent-primary size-4"
+                onCheckedChange={(v) => setHidePrices(v === true)}
               />
               Hide prices in the package
             </label>
@@ -335,32 +323,23 @@ export function CheckoutForm() {
 
       <fieldset className="flex flex-col gap-3">
         <legend className="font-display text-h4 mb-4">Payment</legend>
-        {paymentOptions.map((option) => (
-          <label
-            key={option.value}
-            className={cn(
-              'border-border flex cursor-pointer items-start gap-3 rounded-md border p-4',
-              paymentMethod === option.value && 'border-primary',
-            )}
-          >
-            <input
-              type="radio"
-              name="paymentMethod"
+        <RadioGroup
+          name="paymentMethod"
+          value={paymentMethod}
+          onValueChange={(v) => setPaymentMethod(v as typeof paymentMethod)}
+          aria-label="Payment method"
+        >
+          {paymentOptions.map((option) => (
+            <RadioGroupItem
+              key={option.value}
               value={option.value}
-              checked={paymentMethod === option.value}
-              onChange={() => setPaymentMethod(option.value)}
-              className="accent-primary mt-1 size-4"
-            />
-            <span>
-              <span className="text-small block font-semibold">
-                {option.label}
-              </span>
-              <span className="text-caption text-muted-foreground">
-                {option.hint}
-              </span>
-            </span>
-          </label>
-        ))}
+              description={option.hint}
+              className="p-4"
+            >
+              {option.label}
+            </RadioGroupItem>
+          ))}
+        </RadioGroup>
         <FieldError
           id="checkout-payment-error"
           message={errorFor('paymentMethod')}
@@ -369,10 +348,7 @@ export function CheckoutForm() {
 
       <div className="flex flex-col gap-1">
         <div className="flex items-start gap-2">
-          <input
-            {...consent.bind}
-            className="accent-primary mt-1 size-4 shrink-0"
-          />
+          <input {...consent.bind} className="checkbox-native mt-0.5" />
           <label htmlFor="checkout-consent" className="text-small">
             I agree to the{' '}
             <Link
@@ -392,13 +368,11 @@ export function CheckoutForm() {
           </label>
         </div>
         <FieldError id={consent.errorId} message={consent.error} />
-        <label className="text-small text-muted-foreground flex items-start gap-2">
-          <input
-            type="checkbox"
+        <label className="text-small text-muted-foreground flex cursor-pointer items-start gap-2">
+          <Checkbox
             name="marketing"
             checked={marketing}
-            onChange={(e) => setMarketing(e.target.checked)}
-            className="accent-primary mt-1 size-4 shrink-0"
+            onCheckedChange={(v) => setMarketing(v === true)}
           />
           Send me new drops and offers
         </label>

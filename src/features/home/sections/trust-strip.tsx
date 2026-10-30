@@ -10,7 +10,7 @@ const icons = {
 
 export function TrustStrip() {
   return (
-    <section aria-label="How ordering works" className="bg-surface">
+    <section aria-label="How ordering works" className="bg-primary-soft">
       <ul className="mx-auto grid max-w-[1440px] gap-6 px-4 py-8 font-sans md:grid-cols-3 md:gap-8 md:px-8">
         {trust.map(({ icon, title, text }) => {
           const Icon = icons[icon];

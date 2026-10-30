@@ -53,7 +53,7 @@ function Checkbox({
         type="checkbox"
         name={name}
         defaultChecked={defaultChecked}
-        className="accent-primary size-4"
+        className="checkbox-native"
       />
       {label}
     </label>
@@ -216,7 +216,7 @@ export function CollectionForm({
                 name="productIds"
                 value={p.value}
                 defaultChecked={chosen.has(p.value)}
-                className="accent-primary size-4"
+                className="checkbox-native"
               />
               {p.label}
             </label>

@@ -11,7 +11,10 @@ export async function NewArrivals() {
 
   const seen = new Set<string>();
   const products = [
-    ...limitedDrop.map((p) => ({ ...p, badge: 'Limited Drop' })),
+    ...limitedDrop.map((p, i) => ({
+      ...p,
+      badge: i === 0 ? 'Limited Drop' : undefined,
+    })),
     ...newest,
   ]
     .filter((p) => !seen.has(p.id) && seen.add(p.id))

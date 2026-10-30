@@ -25,6 +25,7 @@ import {
 import { FileDropzone } from '@/components/ui/file-dropzone';
 import { ImageFrame } from '@/components/ui/image-frame';
 import { Lightbox } from '@/components/ui/lightbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
 import { TagsInput } from '@/components/ui/tags-input';
@@ -133,6 +134,16 @@ export function PremiumShowcase({
         </Field>
         <Field label="Delivery time" htmlFor="sg-time">
           <TimePicker id="sg-time" value={time} onValueChange={setTime} />
+        </Field>
+        <Field label="Payment (RadioGroup)">
+          <RadioGroup name="sg-pay" defaultValue="cod">
+            <RadioGroupItem value="cod" description="Pay when it arrives">
+              Cash on delivery
+            </RadioGroupItem>
+            <RadioGroupItem value="bank" description="Confirmed on WhatsApp">
+              Bank transfer
+            </RadioGroupItem>
+          </RadioGroup>
         </Field>
         <Field label="Tags" htmlFor="sg-tags">
           <TagsInput
@@ -253,6 +264,13 @@ export function PremiumShowcase({
   const styles: CardStyle[] = ['solid', 'glass', 'gradient-border'];
   return (
     <div className="flex flex-col gap-10">
+      <div className="bg-surface grid gap-6 rounded-lg p-6 sm:grid-cols-3">
+        {(['shadow-sm', 'shadow-md', 'shadow-lg'] as const).map((s) => (
+          <div key={s} className={`bg-card rounded-md p-6 font-sans text-sm`}>
+            {s}
+          </div>
+        ))}
+      </div>
       <div className="grid gap-6 sm:grid-cols-3">
         {styles.map((v) => (
           <ProductCard
@@ -300,9 +318,9 @@ export function PremiumShowcase({
           <TestimonialCard
             key={v}
             variant={v}
-            quote="The gift box made our anniversary feel like a film scene."
-            name="Nethmi"
-            detail="Colombo"
+            quote="Sample quote for layout only."
+            name="Sample name"
+            detail="Placeholder"
           />
         ))}
       </div>

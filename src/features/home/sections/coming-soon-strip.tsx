@@ -1,22 +1,27 @@
+import { Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
 import { comingSoon } from '@/data/home';
 
 export function ComingSoonStrip() {
   return (
-    <section aria-label="Coming soon" className="border-border border-y">
-      <p className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-center gap-x-6 gap-y-1 px-4 py-4 text-center font-sans text-sm md:px-8">
-        <span className="text-muted-foreground">Coming soon</span>
+    <section aria-label="Coming soon" className="px-4 md:px-8">
+      <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-center gap-3 py-6 font-sans text-sm">
+        <span className="text-caption text-muted-foreground font-semibold tracking-widest uppercase">
+          Coming soon
+        </span>
         {comingSoon.map((item) => (
           <Link
             key={item.label}
             href={item.href}
-            className="hover:text-primary-text inline-flex min-h-11 items-center font-semibold underline-offset-4 hover:underline"
+            data-spotlight
+            className="spotlight focus-ring border-primary/40 bg-primary-soft text-primary-text hover:border-primary hover:shadow-glow inline-flex min-h-11 items-center gap-2 rounded-full border px-4 font-semibold transition-[border-color,box-shadow] duration-150"
           >
+            <Sparkles aria-hidden strokeWidth={1.5} className="size-4" />
             {item.label}
           </Link>
         ))}
-      </p>
+      </div>
     </section>
   );
 }

@@ -147,7 +147,7 @@ export function PageHero({
   return (
     <section
       aria-labelledby="page-hero-title"
-      className="bg-surface/40 dark:bg-surface relative overflow-hidden md:min-h-[calc(100svh-var(--header-h)-2.25rem)]"
+      className="bg-primary-soft/60 dark:bg-surface relative overflow-hidden md:min-h-[calc(100svh-var(--header-h)-2.25rem)]"
     >
       <div className="relative h-72 overflow-hidden sm:h-96 md:absolute md:inset-y-0 md:right-0 md:h-auto md:w-1/2">
         <div className="animate-hero-zoom absolute inset-0 md:[mask-image:linear-gradient(to_right,transparent,black_25%)]">
