@@ -641,3 +641,25 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 - Re-run `npm run build` once Postgres is healthy.
 - Browser checks: Tab to the skip link, 375 px layout, contrast. Then `/impeccable critique` and `break-ui` (phase Step 10).
 - Commits not made (not requested).
+
+## 2026-11-12 - Love Site Phase 2: scroll engine, theme and 3D smoke test
+
+### Summary
+
+- Branch `feat/love-phase-2`, 7 commits (blueprint `.claude/blueprints/028-…`). Packages installed with `--save-exact` at the ADR-0027 versions; GSAP agent skills copied to `.claude/skills/gsap-*` (gitignored, local only).
+- Lenis 1.3.27 facts (VERIFIED in the installed `.d.ts`): RAF off is `options.autoRaf: false` (the `autoRaf` prop is deprecated); CSS is `lenis/dist/lenis.css`; `useLenis()` returns the instance.
+- `engine/motion-prefs.ts` + `motion-prefs-provider.tsx`: `useSyncExternalStore` for reduced motion, Save-Data and the `sessionStorage` Calm flag (`love:calm`); server snapshot = motion, so no hydration mismatch.
+- `engine/scroll-engine.tsx`: `ReactLenis root` driven by `gsap.ticker`, `lagSmoothing(0)`, `ignoreMobileResize`; not mounted in Calm. `useLoveScroll()` falls back to native scroll.
+- Repo fix: the Phase 1 per-section `[data-dawn]` rules would override a scrubbed root `--dawn`. They are now scoped to `[data-love-root]:not([data-love-motion])` (Calm/static only, with a 300 ms colour transition).
+- `StickyStage` + `LoveSection stage` prop. Deviation from the guide: the stage is `min-height: 100svh` without `overflow: hidden`, because the Phase 1 static content of Memories, Timeline and Letter is taller than a screen and would be clipped. Switch to `height: 100svh; overflow: hidden` when Phases 3–5 replace that content.
+- `engine/story.ts` (`gsap.matchMedia`, section stubs, `applyStaticStory`), `theme-timeline.ts` (`--dawn` over Dawn, `--depth` over Memories/Timeline), `--progress` trigger, `ui/progress-heart.tsx`, `ui/calm-mode-toggle.tsx`.
+- `engine/tiers.ts` (+ Vitest), `tier-provider.tsx`, `heart-state.ts`, `canvas/token-colors.ts` (reads the hex `--night-*`/`--day-*` aliases; derived roles are `color-mix()` strings that three cannot parse) (+ Vitest), `canvas/love-canvas.tsx` (test sphere, `PerformanceMonitor`, one Bloom, off on `low`), `dev/heart-debug-panel.tsx`.
+
+### Verification
+
+- `tsc --noEmit`, ESLint on `src/features/love` and `app`, and Vitest (12 tests) pass.
+- NOT verified: `npm run build` and the browser checks. The machine had ~1.5 GB free RAM with ~800 orphaned `node.exe` processes; builds failed with out-of-memory, local Postgres went into recovery mode, and the Turbopack dev server panicked. Environment problem, not `/love` code.
+
+### Open
+
+- Clean up the orphaned node processes (or reboot), then: `npm run build` (check three/R3F only in `/love` chunks), browser pass on desktop + phone width, Calm/reduced-motion toggling, `?debug` tier switching, 4× CPU step-down, Safari/Firefox, production `?debug` absent.
