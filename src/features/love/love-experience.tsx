@@ -2,6 +2,7 @@
 
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import dynamic from 'next/dynamic';
 import { useRef } from 'react';
 
 import type { LoveSiteConfig } from './config';
@@ -23,6 +24,11 @@ import { Wish } from './sections/wish';
 import { CalmModeToggle } from './ui/calm-mode-toggle';
 import { ProgressHeart } from './ui/progress-heart';
 
+// Client-only 3D chunk (Tech Stack §5.1): never in shop bundles, never server-rendered.
+const LoveCanvas = dynamic(() => import('./canvas/love-canvas'), {
+  ssr: false,
+});
+
 export function LoveExperience({ site }: { site: LoveSiteConfig }) {
   return (
     <MotionPrefsProvider>
@@ -37,7 +43,8 @@ export function LoveExperience({ site }: { site: LoveSiteConfig }) {
 
 function LoveStory({ site }: { site: LoveSiteConfig }) {
   const { calm } = useMotionPrefs();
-  const { tier } = useTier();
+  const { tier, stepDown, stepUp } = useTier();
+  const showCanvas = !calm && tier !== 'static';
   const rootRef = useRef<HTMLDivElement>(null);
   const name = site.recipient.name;
 
@@ -63,6 +70,9 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
       >
         Skip to the letter
       </a>
+      {showCanvas && (
+        <LoveCanvas tier={tier} onDecline={stepDown} onIncline={stepUp} />
+      )}
       <main>
         <Gate name={name} />
         <Hero name={name} sub={site.copy.heroSub} />
