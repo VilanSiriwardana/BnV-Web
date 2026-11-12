@@ -1,6 +1,8 @@
 'use client';
 
 import type { LoveSiteConfig } from './config';
+import { useMotionPrefs } from './engine/motion-prefs';
+import { MotionPrefsProvider } from './engine/motion-prefs-provider';
 import { Bloom } from './sections/bloom';
 import { Dawn } from './sections/dawn';
 import { Finale } from './sections/finale';
@@ -13,9 +15,22 @@ import { Timeline } from './sections/timeline';
 import { Wish } from './sections/wish';
 
 export function LoveExperience({ site }: { site: LoveSiteConfig }) {
+  return (
+    <MotionPrefsProvider>
+      <LoveStory site={site} />
+    </MotionPrefsProvider>
+  );
+}
+
+function LoveStory({ site }: { site: LoveSiteConfig }) {
+  const { calm } = useMotionPrefs();
   const name = site.recipient.name;
   return (
-    <div data-love-root className="bg-background text-foreground min-h-svh">
+    <div
+      data-love-root
+      data-love-motion={calm ? undefined : ''}
+      className="bg-background text-foreground min-h-svh"
+    >
       <a
         href="#letter"
         className="bg-primary text-label text-primary-foreground focus-ring sr-only rounded-md px-4 py-2 font-sans focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50"
