@@ -3,7 +3,7 @@
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import dynamic from 'next/dynamic';
-import { useRef } from 'react';
+import { useRef, useSyncExternalStore } from 'react';
 
 import type { LoveSiteConfig } from './config';
 import { useMotionPrefs } from './engine/motion-prefs';
@@ -29,6 +29,17 @@ const LoveCanvas = dynamic(() => import('./canvas/love-canvas'), {
   ssr: false,
 });
 
+// Dev-only panel: the import is dead code in production builds, so the chunk is never emitted.
+const HeartDebugPanel =
+  process.env.NODE_ENV !== 'production'
+    ? dynamic(() => import('./dev/heart-debug-panel'), { ssr: false })
+    : null;
+
+const noSubscribe = () => () => {};
+const readDebug = () =>
+  new URLSearchParams(window.location.search).has('debug');
+const serverFalse = () => false;
+
 export function LoveExperience({ site }: { site: LoveSiteConfig }) {
   return (
     <MotionPrefsProvider>
@@ -45,6 +56,9 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
   const { calm } = useMotionPrefs();
   const { tier, stepDown, stepUp } = useTier();
   const showCanvas = !calm && tier !== 'static';
+  const debug =
+    useSyncExternalStore(noSubscribe, readDebug, serverFalse) &&
+    HeartDebugPanel !== null;
   const rootRef = useRef<HTMLDivElement>(null);
   const name = site.recipient.name;
 
@@ -71,8 +85,14 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
         Skip to the letter
       </a>
       {showCanvas && (
-        <LoveCanvas tier={tier} onDecline={stepDown} onIncline={stepUp} />
+        <LoveCanvas
+          tier={tier}
+          onDecline={stepDown}
+          onIncline={stepUp}
+          debug={debug}
+        />
       )}
+      {debug && HeartDebugPanel && <HeartDebugPanel />}
       <main>
         <Gate name={name} />
         <Hero name={name} sub={site.copy.heroSub} />
