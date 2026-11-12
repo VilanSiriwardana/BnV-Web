@@ -12,6 +12,8 @@ Documents for the private, scroll-driven 3D birthday page (`/love/[slug]`), buil
 | 4   | [Scroll-3D-Guide-Complete.md](Scroll-3D-Guide-Complete.md)               | Background research on the scroll-3D toolset (optional)                                                                            |
 | 5   | [Scroll-3D-Guide-Overview.md](Scroll-3D-Guide-Overview.md)               | Shorter version of the background research (optional)                                                                              |
 
+**Per-phase build guides:** [phases/README.md](phases/README.md) (one detailed, step-by-step guide for each of the six phases).
+
 ## Precedence
 
 1. Current source code and configuration.

@@ -36,7 +36,7 @@ A private, scroll-driven 3D page built inside this repo as a separate route. It 
 2. [docs/references/love-site/Love-Site-Experience-Guidebook.md](docs/references/love-site/Love-Site-Experience-Guidebook.md): section-by-section behaviour.
 3. [docs/references/love-site/Love-Site-Tech-Stack-and-Tools.md](docs/references/love-site/Love-Site-Tech-Stack-and-Tools.md): packages, architecture, performance, governance.
 
-Index: [docs/references/love-site/README.md](docs/references/love-site/README.md).
+Index: [docs/references/love-site/README.md](docs/references/love-site/README.md). When building a phase, follow its step-by-step guide in [docs/references/love-site/phases/](docs/references/love-site/phases/README.md).
 
 | Area                    | Path (planned unless it already exists)                                                                        |
 | ----------------------- | -------------------------------------------------------------------------------------------------------------- |

@@ -2,7 +2,7 @@
 
 | Field              | Value                                                                                                                                                                                                                     |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Version            | 1.0                                                                                                                                                                                                                       |
+| Version            | 1.1                                                                                                                                                                                                                       |
 | Status             | **Proposed.** Phase 1 starts once the owner approves this plan and the Phase 1 approvals below                                                                                                                            |
 | Created            | 2026-11-12                                                                                                                                                                                                                |
 | Audience           | Claude Code (builder) and the developer (reviewer)                                                                                                                                                                        |
@@ -60,6 +60,8 @@ These were checked in the code on 2026-11-12. Where a guidebook disagrees, **thi
 ---
 
 ## 3. Phase overview
+
+**Detailed, step-by-step guide per phase:** [phases/README.md](phases/README.md) — [Phase 1](phases/Phase-1-Foundations-and-Static-Skeleton.md) · [Phase 2](phases/Phase-2-Scroll-Engine-Theme-and-3D-Smoke-Test.md) · [Phase 3](phases/Phase-3-The-Heart.md) · [Phase 4](phases/Phase-4-Night-Story-Memories-and-Timeline.md) · [Phase 5](phases/Phase-5-Day-Story-Dawn-to-Finale.md) · [Phase 6](phases/Phase-6-Fallbacks-QA-Content-and-Launch.md). This file stays the summary; the phase guides hold the build steps.
 
 | Phase | Name                                               | Milestones        | Main result                                                                                                                         |
 | ----- | -------------------------------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
@@ -471,3 +473,4 @@ Full risk table: Tech Stack §13.
 | Date       | Version | Change                                                                |
 | ---------- | ------- | --------------------------------------------------------------------- |
 | 2026-11-12 | 1.0     | First version: six phases, repo corrections R1–R8, file map, cut line |
+| 2026-11-12 | 1.1     | Added detailed per-phase guides in `phases/`                          |

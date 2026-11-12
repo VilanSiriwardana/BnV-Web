@@ -608,3 +608,11 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 - Owner approval of the phase plan and the Phase 1 approvals (dependencies, route and chrome exception, motion exception, GSAP skills, music).
 - Birthday date (decides whether to follow the full plan or the cut line in §11).
 - `SpotlightProvider` behaviour on `/love` (R8, UNCERTAIN).
+
+## 2026-11-12 - Love Site: detailed per-phase guides
+
+### Summary
+
+- Added `docs/references/love-site/phases/` with six step-by-step phase guides (Phase 1 to 6) and an index. Each guide has: context, what you will see, a read-first list, the tech used, numbered steps with "you should see" checks and reduced-motion versions, contracts, tests, skills, an exit checklist, risks, doc updates, a commit plan and the handoff to the next phase.
+- Linked them from the overview (now v1.1), `love-site/README.md` and the root `AGENTS.md`.
+- Documentation only; no application code, configuration or package changes.
