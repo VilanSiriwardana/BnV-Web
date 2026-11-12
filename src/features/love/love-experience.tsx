@@ -20,6 +20,8 @@ import { Letter } from './sections/letter';
 import { Memories } from './sections/memories';
 import { Timeline } from './sections/timeline';
 import { Wish } from './sections/wish';
+import { CalmModeToggle } from './ui/calm-mode-toggle';
+import { ProgressHeart } from './ui/progress-heart';
 
 export function LoveExperience({ site }: { site: LoveSiteConfig }) {
   return (
@@ -73,6 +75,8 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
         <Letter title={site.copy.letterTitle} letter={site.letter} />
         <Finale name={name} message={site.copy.finaleMessage} />
       </main>
+      <ProgressHeart />
+      <CalmModeToggle />
     </div>
   );
 }
