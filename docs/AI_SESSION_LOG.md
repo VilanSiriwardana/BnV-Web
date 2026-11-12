@@ -592,3 +592,19 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 ### Open
 
 - Browser QA: form submissions, nav motion, and gallery zoom on desktop and a phone.
+
+## 2026-11-12 - Love Site: docs moved in and six-phase plan written
+
+### Summary
+
+- Moved the four birthday Love Site docs from the notes folder into `docs/references/love-site/`. Renamed the two general scroll-3D guides to `Scroll-3D-Guide-Overview.md` and `Scroll-3D-Guide-Complete.md` (no spaces in file names).
+- Wrote `docs/references/love-site/Love-Site-Implementation-Phases.md`: six phases covering milestones M0 to M16, with exit criteria, a file map and a deadline cut line. Added the folder index `love-site/README.md`.
+- Recorded the repo corrections to the guidebooks (R1 to R8). The main ones: the root layout's `StorefrontChrome` only hides the shop chrome on `/admin`, so `/love` must be added there. Component files are kebab-case. The `[data-love-root]` token aliases must include `gold-text`, `ring`, `border`, `muted-foreground`, `secondary` and `surface-elevated`. `/love` stays out of `robots.ts`.
+- Linked the Love Site from the root `AGENTS.md`, `CLAUDE.md`, `docs/references/README.md` and the handbook's routing list (`docs/governance/AGENTS.md`).
+- No application code, configuration or package files were changed.
+
+### Open
+
+- Owner approval of the phase plan and the Phase 1 approvals (dependencies, route and chrome exception, motion exception, GSAP skills, music).
+- Birthday date (decides whether to follow the full plan or the cut line in §11).
+- `SpotlightProvider` behaviour on `/love` (R8, UNCERTAIN).

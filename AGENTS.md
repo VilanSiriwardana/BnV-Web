@@ -28,6 +28,27 @@ Use the reference library only when the task needs that domain context:
 - [docs/architecture/](docs/architecture/)
 - [docs/decisions/](docs/decisions/)
 
+## Love Site (private birthday page)
+
+A private, scroll-driven 3D page built inside this repo as a separate route. It is not part of the shop navigation. For any Love Site task, read these first, in this order:
+
+1. [docs/references/love-site/Love-Site-Implementation-Phases.md](docs/references/love-site/Love-Site-Implementation-Phases.md): six build phases, exit criteria, file map, and repo corrections that override the guidebooks.
+2. [docs/references/love-site/Love-Site-Experience-Guidebook.md](docs/references/love-site/Love-Site-Experience-Guidebook.md): section-by-section behaviour.
+3. [docs/references/love-site/Love-Site-Tech-Stack-and-Tools.md](docs/references/love-site/Love-Site-Tech-Stack-and-Tools.md): packages, architecture, performance, governance.
+
+Index: [docs/references/love-site/README.md](docs/references/love-site/README.md).
+
+| Area                    | Path (planned unless it already exists)                                                                        |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Route                   | `app/love/[slug]/page.tsx` (Server Component, `noindex`)                                                       |
+| Feature code            | `src/features/love/` (`config/`, `engine/`, `canvas/`, `sections/`, `ui/`, `hooks/`, `dev/`; kebab-case files) |
+| Shop chrome exclusion   | `src/components/layout/storefront-chrome.tsx` (exists; hides chrome for `/admin`, to be extended to `/love`)   |
+| Night/day token aliases | `[data-love-root]` block in `app/globals.css`                                                                  |
+| Images                  | `public/images/prototype/love-*.webp`, produced by `scripts/prepare-love-images.mjs`                           |
+| Audio                   | `public/audio/` (rights-cleared only)                                                                          |
+
+Love Site rules: no new dependency beyond the approved list in the Tech Stack guide; no analytics or third-party scripts on `/love`; every animation has a reduced-motion variant; build one phase at a time.
+
 ## Rules for AI Agents
 
 - Treat [docs/governance/AGENTS.md](docs/governance/AGENTS.md) as the authoritative engineering handbook.

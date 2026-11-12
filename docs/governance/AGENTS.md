@@ -339,6 +339,7 @@ Then read only the specific reference document needed for the task:
 - SEO/routing/metadata work: [../references/SEO-Guide.md](../references/SEO-Guide.md)
 - Checkout, customer flows, marketing, PDPA, or porting from the prototype: [../references/Research_and_Prototype.md](../references/Research_and_Prototype.md)
 - Authentication, OAuth, sessions, or account linking: [../references/Authentication.md](../references/Authentication.md)
+- Love Site (`/love/[slug]`, 3D/scroll birthday page): [../references/love-site/README.md](../references/love-site/README.md), starting with `Love-Site-Implementation-Phases.md`
 - Hosting, deployment, backups, or environments: [../references/Hosting_Deployment.md](../references/Hosting_Deployment.md) (the B&V platform choice is OPEN and conflicts with D-01; ask before assuming Vercel or a VPS)
 - Architecture notes: [../architecture/README.md](../architecture/README.md)
 - ADR conventions: [../decisions/DECISIONS.md](../decisions/DECISIONS.md)

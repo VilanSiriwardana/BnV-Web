@@ -25,6 +25,7 @@ Last refreshed: 2026-10-29 (Gate B spec sync).
 | [Research_and_Prototype.md](Research_and_Prototype.md)             | 1.1              | Ecommerce research, Sri Lanka market/PDPA context, Figma Make prototype and image audit, build points                           |
 | [Authentication.md](Authentication.md)                             | 1.0              | Google OAuth + centralized auth review: canonical `users.id`, account linking, Auth.js spike, gaps                              |
 | [Hosting_Deployment.md](Hosting_Deployment.md)                     | 1.0              | Hosting options and the self-hosting path. Phase 1 hosting is decided by ADR-0011 (Vercel)                                      |
+| [love-site/README.md](love-site/README.md)                         | 1.0 (PROPOSED)   | Private birthday Love Site (`/love/[slug]`): six-phase plan, experience guidebook, 3D/scroll tech stack                         |
 
 ## Precedence When References Conflict
 
