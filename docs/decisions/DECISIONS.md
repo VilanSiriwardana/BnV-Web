@@ -487,3 +487,75 @@ Each decision should include:
 - Consequences: `ui/select.tsx` was removed. Admin status filters now need JavaScript.
 - Related Documents:
   - `.claude/blueprints/026-ui-refinement-forms-status-nav-gallery.md`
+
+## ADR-0027 - Love Site 3D, Scroll and Motion Dependencies
+
+- Status: Accepted (owner approval 2026-11-12; packages are installed in Love Site Phase 2)
+- Date: 2026-11-12
+- Context: The private Love Site (`/love/[slug]`) needs a WebGL heart, scroll-scrubbed timelines and smooth scrolling. The shop has none of these. Versions were checked with read-only `npm view` on 2026-11-12. Each chosen version had been published for at least 14 days, and its peer ranges accept React 19.2.4.
+- Decision: Install these exact versions (`--save-exact`). Import them only from `src/features/love/`, so the shop bundles are unaffected.
+
+  | Package                       | Version | Published  | Peer ranges                                                                 |
+  | ----------------------------- | ------- | ---------- | --------------------------------------------------------------------------- |
+  | `three`                       | 0.186.1 | 2026-09-24 | –                                                                           |
+  | `@types/three` (dev)          | 0.186.0 | 2026-09-11 | –                                                                           |
+  | `@react-three/fiber`          | 9.8.2   | 2026-10-14 | react/react-dom `>=19 <19.4`, three `>=0.156`                               |
+  | `@react-three/drei`           | 10.7.9  | 2026-09-25 | react `^19`, fiber `^9.0.0`, three `>=0.159`                                |
+  | `@react-three/postprocessing` | 3.2.2   | 2026-10-21 | react `^19.0.0`, fiber `>=9.7.0`, postprocessing `^6.36.0`, three `>=0.156` |
+  | `postprocessing`              | 6.39.5  | 2026-09-09 | three `>=0.168 <0.188` (6.39.6 skipped: under 14 days old)                  |
+  | `gsap`                        | 3.15.0  | 2026-04-13 | – (3.15.1 skipped: under 14 days old; all plugins free)                     |
+  | `@gsap/react`                 | 2.1.2   | 2025-01-15 | gsap `^3.12.5`, react `>=17`                                                |
+  | `lenis`                       | 1.3.27  | 2026-10-15 | react `>=17`                                                                |
+
+- Alternatives: Spline or GLB models (rejected in the Tech Stack guide §1), CSS-only motion, Motion (framer) alone.
+- Consequences:
+  - `three` 0.187.0 was too new; 0.186.1 also satisfies the `postprocessing` peer.
+  - The 3D chunk loads only on `/love` through `next/dynamic` with `ssr: false`, and the Phase 2 build must show this.
+  - The `greensock/gsap-skills` agent skills may be installed (approved 2026-11-12).
+- Related Documents:
+  - [../references/love-site/Love-Site-Tech-Stack-and-Tools.md](../references/love-site/Love-Site-Tech-Stack-and-Tools.md)
+  - [../references/love-site/Love-Site-Implementation-Phases.md](../references/love-site/Love-Site-Implementation-Phases.md)
+
+## ADR-0028 - Love Site Private Route and Chrome Exception
+
+- Status: Accepted
+- Date: 2026-11-12
+- Context: The Love Site is a private gift page inside BnV-Web. The root layout always renders the shop chrome, cookie consent and analytics inside `StorefrontChrome`.
+- Decision:
+  - The route is `app/love/[slug]/page.tsx`, a Server Component. An unknown slug calls `notFound()`.
+  - `StorefrontChrome` returns `null` for `/love` and `/love/*`, using an exact segment match so `/love-websites` keeps its chrome. This removes the header, footer, cart, cookie banner and analytics from the page.
+  - The page metadata sets `robots: { index: false, follow: false }` and a neutral title, with no names in Open Graph. The route is not added to `robots.ts`, the sitemap or the navigation.
+  - Each slug is random and at least 24 characters long.
+  - `SpotlightProvider` stays mounted. It only reacts to `[data-spotlight]` elements and does not conflict with the page (correction R8).
+- Alternatives: a separate app; a nested layout (it cannot remove chrome rendered by the root layout); a `robots.ts` disallow entry (it would advertise the path).
+- Consequences: Privacy rests on the unguessable slug, not on authentication.
+- Related Documents:
+  - [../references/love-site/Love-Site-Implementation-Phases.md](../references/love-site/Love-Site-Implementation-Phases.md)
+
+## ADR-0029 - Love Site Motion Exceptions and Quality Tiers
+
+- Status: Accepted
+- Date: 2026-11-12
+- Context: The brand motion token caps UI transitions at about 400 ms. The Love Site's 3D heart events and its letter opening are signature moments that need 1–2 s or longer.
+- Decision:
+  - 3D heart events may run 1–2 s or longer (ribbon weave 3.2 s, arrow strike about 5.2 s). The letter opening sequence is also exempt.
+  - Rendering uses the quality tiers `high`, `mid`, `low` and `static`. The first tier comes from a heuristic, and drei `PerformanceMonitor` steps it down.
+  - Every animation has a reduced-motion or Calm variant. The `static` tier and Calm mode use the DOM-only path.
+- Alternatives: Hold everything to the 400 ms token.
+- Consequences: The exceptions apply only to `/love`. `Brand-Identity.md` gets a note in Phase 6.
+- Related Documents:
+  - [../references/love-site/Love-Site-Experience-Guidebook.md](../references/love-site/Love-Site-Experience-Guidebook.md)
+
+## ADR-0030 - Love Site Audio Policy
+
+- Status: Proposed (music track and licence still open; due in Phase 6)
+- Date: 2026-11-12
+- Context: The site reacts to music, but browsers block autoplay and the music must be legal to use.
+- Decision:
+  - Audio starts only after the gate tap (a user gesture). It fades in, loops, and pauses when the tab is hidden.
+  - Only rights-cleared music is used, with a credit shown on the page. Files live in `public/audio/`.
+  - A synthetic 72 bpm heartbeat drives the visuals when the file is missing or fails to load.
+- Alternatives: No audio; autoplay.
+- Consequences: Becomes Accepted once the track and licence are confirmed.
+- Related Documents:
+  - [../references/love-site/Love-Site-Experience-Guidebook.md](../references/love-site/Love-Site-Experience-Guidebook.md)

@@ -616,3 +616,28 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 - Added `docs/references/love-site/phases/` with six step-by-step phase guides (Phase 1 to 6) and an index. Each guide has: context, what you will see, a read-first list, the tech used, numbered steps with "you should see" checks and reduced-motion versions, contracts, tests, skills, an exit checklist, risks, doc updates, a commit plan and the handoff to the next phase.
 - Linked them from the overview (now v1.1), `love-site/README.md` and the root `AGENTS.md`.
 - Documentation only; no application code, configuration or package changes.
+
+## 2026-11-12 - Love Site Phase 1: foundations and static skeleton
+
+### Summary
+
+- Version research with read-only `npm view`. Chose versions at least 14 days old: three 0.186.1, @types/three 0.186.0, @react-three/fiber 9.8.2, drei 10.7.9, @react-three/postprocessing 3.2.2, postprocessing 6.39.5, gsap 3.15.0, @gsap/react 2.1.2, lenis 1.3.27. Nothing installed.
+- Added ADR-0027 (dependencies), ADR-0028 (route and chrome exception) and ADR-0029 (motion exceptions and tiers) as Accepted; the owner approved all Phase 1 items on 2026-11-12, GSAP skills included. ADR-0030 (audio) is Proposed until the music is chosen.
+- `scripts/prepare-love-images.mjs` uses Next's own `sharp` 0.34.5 (owner choice). It produced 25 `love-*.webp` placeholders plus 8 orb squares from couple, gift-box and jewellery prototypes. The sources are 960–1122 px, so outputs are not enlarged.
+- `StorefrontChrome` now also hides on `/love` and `/love/*` (an exact segment check, so `/love-websites` is unchanged). R8 resolved: `SpotlightProvider` only reacts to `[data-spotlight]` elements and needs no exclusion.
+- Typed config in `src/features/love/config/` with placeholder names, English only and a 28-character random slug, plus a Vitest shape test.
+- `app/love/[slug]/page.tsx`: noindex/nofollow, neutral title, `notFound()` for unknown slugs.
+- `[data-love-root]` night/day alias block in `app/globals.css`. The derived tokens are redeclared on every `[data-dawn]` element, because `var()` resolves where a token is declared. Phase 2 drives `--dawn` on the root only.
+- Client root `love-experience.tsx` and ten static sections with a shared `LoveSection` shell and `LovePhoto` (`next/image` with blur).
+
+### Verification
+
+- `typecheck` passes. `lint` has 0 errors (all warnings are in existing skill scripts). The Vitest config test passes.
+- Dev server: the slug renders all ten sections, one `h1`, no header, `noindex, nofollow` and the title "A little something". A wrong slug renders the 404 page; the HTTP status is 200 because the root `loading.tsx` streams first, and `noindex` is still added.
+- `npm run build` compiled, then failed collecting `/products/[slug]` data: local Postgres was "in recovery mode" after a worker out-of-memory crash. This is an environment problem, unrelated to `/love`.
+
+### Open
+
+- Re-run `npm run build` once Postgres is healthy.
+- Browser checks: Tab to the skip link, 375 px layout, contrast. Then `/impeccable critique` and `break-ui` (phase Step 10).
+- Commits not made (not requested).
