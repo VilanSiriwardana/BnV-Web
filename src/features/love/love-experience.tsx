@@ -3,6 +3,7 @@
 import type { LoveSiteConfig } from './config';
 import { useMotionPrefs } from './engine/motion-prefs';
 import { MotionPrefsProvider } from './engine/motion-prefs-provider';
+import { ScrollEngine } from './engine/scroll-engine';
 import { Bloom } from './sections/bloom';
 import { Dawn } from './sections/dawn';
 import { Finale } from './sections/finale';
@@ -17,7 +18,9 @@ import { Wish } from './sections/wish';
 export function LoveExperience({ site }: { site: LoveSiteConfig }) {
   return (
     <MotionPrefsProvider>
-      <LoveStory site={site} />
+      <ScrollEngine>
+        <LoveStory site={site} />
+      </ScrollEngine>
     </MotionPrefsProvider>
   );
 }
