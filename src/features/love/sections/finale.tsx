@@ -6,7 +6,12 @@ import { LoveSection, proseColumn, sectionTitle } from './love-section';
 
 export function Finale({ name, message }: { name: string; message: string }) {
   return (
-    <LoveSection id="finale" dawn={1} className="flex min-h-svh items-center">
+    <LoveSection
+      id="finale"
+      dawn={1}
+      stage="100vh"
+      className="flex min-h-svh items-center"
+    >
       <h2 id="finale-title" className={sectionTitle}>
         Happy birthday, <span className="text-gold-text">{name}</span>.
       </h2>

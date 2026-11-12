@@ -6,7 +6,7 @@ type Props = { hint: string; memories: LoveSiteConfig['memories'] };
 
 export function Memories({ hint, memories }: Props) {
   return (
-    <LoveSection id="memories" dawn={0}>
+    <LoveSection id="memories" dawn={0} stage="400vh">
       <h2 id="memories-title" className={sectionTitle}>
         Memories
       </h2>

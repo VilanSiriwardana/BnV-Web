@@ -1,9 +1,15 @@
 'use client';
 
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useRef } from 'react';
+
 import type { LoveSiteConfig } from './config';
 import { useMotionPrefs } from './engine/motion-prefs';
 import { MotionPrefsProvider } from './engine/motion-prefs-provider';
 import { ScrollEngine } from './engine/scroll-engine';
+import { buildStory } from './engine/story';
+import { TierProvider, useTier } from './engine/tier-provider';
 import { Bloom } from './sections/bloom';
 import { Dawn } from './sections/dawn';
 import { Finale } from './sections/finale';
@@ -18,18 +24,33 @@ import { Wish } from './sections/wish';
 export function LoveExperience({ site }: { site: LoveSiteConfig }) {
   return (
     <MotionPrefsProvider>
-      <ScrollEngine>
-        <LoveStory site={site} />
-      </ScrollEngine>
+      <TierProvider>
+        <ScrollEngine>
+          <LoveStory site={site} />
+        </ScrollEngine>
+      </TierProvider>
     </MotionPrefsProvider>
   );
 }
 
 function LoveStory({ site }: { site: LoveSiteConfig }) {
   const { calm } = useMotionPrefs();
+  const { tier } = useTier();
+  const rootRef = useRef<HTMLDivElement>(null);
   const name = site.recipient.name;
+
+  useGSAP(
+    () => {
+      const cleanup = buildStory(rootRef.current!, { calm, tier });
+      document.fonts.ready.then(() => ScrollTrigger.refresh());
+      return cleanup;
+    },
+    { scope: rootRef, dependencies: [calm, tier] },
+  );
+
   return (
     <div
+      ref={rootRef}
       data-love-root
       data-love-motion={calm ? undefined : ''}
       className="bg-background text-foreground min-h-svh"

@@ -5,7 +5,7 @@ type Props = { title: string; letter: LoveSiteConfig['letter'] };
 
 export function Letter({ title, letter }: Props) {
   return (
-    <LoveSection id="letter" dawn={1}>
+    <LoveSection id="letter" dawn={1} stage="200vh">
       <h2 id="letter-title" className={sectionTitle}>
         {title}
       </h2>

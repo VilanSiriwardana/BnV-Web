@@ -178,17 +178,25 @@
   --day-muted-foreground: #5e524c;
 }
 
-[data-dawn='0'] {
+/* Calm/static path: each section carries its own night/day value. With motion on
+   ([data-love-motion]), GSAP scrubs --dawn/--depth on the root and sections inherit it. */
+[data-love-root]:not([data-love-motion]) [data-dawn='0'] {
   --dawn: 0;
 }
 
-[data-dawn='1'] {
+[data-love-root]:not([data-love-motion]) [data-dawn='1'] {
   --dawn: 1;
+}
+
+[data-love-root]:not([data-love-motion]) [data-dawn] {
+  transition:
+    background-color 300ms var(--ease-standard),
+    color 300ms var(--ease-standard);
 }
 
 /* Derived roles: redeclared wherever --dawn changes so var() resolves against the local value. */
 [data-love-root],
-[data-love-root] [data-dawn] {
+[data-love-root]:not([data-love-motion]) [data-dawn] {
   --night-depth-background: color-mix(
     in oklab,
     var(--night-surface-elevated) calc(var(--depth) * 100%),
@@ -329,6 +337,50 @@
 
 [data-love-root] [data-dawn='1'] {
   color-scheme: light;
+}
+
+/* Sticky stages (Experience §4.1): track length from --stage-h, ~85 % on phones. Calm = natural flow. */
+[data-love-motion] [data-stage] {
+  min-height: var(--stage-h);
+}
+
+[data-love-motion] [data-stage-inner] {
+  position: sticky;
+  top: 0;
+  min-height: 100svh;
+}
+
+@media (max-width: 767px) {
+  [data-love-motion] [data-stage] {
+    min-height: calc(var(--stage-h) * 0.85);
+  }
+}
+
+/* Layers (Tech Stack §7.2): sections let clicks through to the canvas; real UI stays interactive. */
+[data-love-root] main {
+  position: relative;
+  z-index: 10;
+  pointer-events: none;
+}
+
+[data-love-root]
+  main
+  :is(
+    a,
+    button,
+    input,
+    textarea,
+    select,
+    label,
+    [role='button'],
+    [tabindex],
+    h1,
+    h2,
+    h3,
+    p,
+    article
+  ) {
+  pointer-events: auto;
 }
 
 @theme inline {

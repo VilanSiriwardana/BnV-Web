@@ -8,7 +8,7 @@ type Props = { title: string; items: LoveSiteConfig['timeline'] };
 
 export function Timeline({ title, items }: Props) {
   return (
-    <LoveSection id="timeline" dawn={0}>
+    <LoveSection id="timeline" dawn={0} stage="400vh">
       <h2 id="timeline-title" className={sectionTitle}>
         {title}
       </h2>
