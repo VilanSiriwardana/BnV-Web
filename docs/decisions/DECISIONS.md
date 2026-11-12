@@ -490,7 +490,7 @@ Each decision should include:
 
 ## ADR-0027 - Love Site 3D, Scroll and Motion Dependencies
 
-- Status: Accepted (owner approval 2026-11-12; packages are installed in Love Site Phase 2)
+- Status: Accepted (owner approval 2026-11-12; installed 2026-11-12 in Love Site Phase 2, resolved versions match the table)
 - Date: 2026-11-12
 - Context: The private Love Site (`/love/[slug]`) needs a WebGL heart, scroll-scrubbed timelines and smooth scrolling. The shop has none of these. Versions were checked with read-only `npm view` on 2026-11-12. Each chosen version had been published for at least 14 days, and its peer ranges accept React 19.2.4.
 - Decision: Install these exact versions (`--save-exact`). Import them only from `src/features/love/`, so the shop bundles are unaffected.
