@@ -690,3 +690,7 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 
 - `CartProvider` no longer calls `getCartSnapshot()` on `/love` paths (reuses the now-exported `isLovePath` from `storefront-chrome.tsx`); it loads once on the first non-Love path. Blueprint `030`.
 - `THREE.Clock` deprecation warning left as is: it comes from `@react-three/fiber` 9.8.2's own store under three 0.186, not our code. Harmless.
+
+## 2026-11-13 - Love Site: heart canvas hidden behind sections
+
+- Cause: `[data-love-root] main` (z-index 10) sits above the fixed canvas (z-index 0) and every `LoveSection` had an opaque `bg-background`, so the heart (and Phase 2's test sphere) was never visible. Fix: `[data-love-motion] main [data-dawn] { background-color: transparent; }` in `app/globals.css`; Calm keeps solid sections. Blueprint `031`.

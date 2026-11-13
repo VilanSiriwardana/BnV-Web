@@ -830,3 +830,8 @@
     animation: love-seed-pulse 833ms ease-out infinite;
   }
 }
+
+/* Motion on: sections are see-through so the fixed heart canvas shows; the root paints the page colour. */
+[data-love-motion] main [data-dawn] {
+  background-color: transparent;
+}
