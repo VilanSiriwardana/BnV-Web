@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils/cn';
 import { director } from '../engine/heart-director';
 import { WISH_REST, WISH_TOP } from '../engine/heart-path';
 import { heart } from '../engine/heart-state';
-import { useMotionPrefs } from '../engine/motion-prefs';
+import { useQuiet } from '../engine/use-quiet';
 import { onSessionReset, session } from '../engine/session';
 import { useHold } from '../hooks/use-hold';
 import { LoveSection, sectionTitle } from './love-section';
@@ -23,8 +23,7 @@ type Phase = 'idle' | 'merging' | 'done';
 type Props = { name: string; prompt: string; done: string };
 
 export function Wish({ name, prompt, done }: Props) {
-  const { calm } = useMotionPrefs();
-  const quiet = calm;
+  const quiet = useQuiet();
   const ring = useRef<SVGCircleElement>(null);
   const timer = useRef<gsap.core.Tween | null>(null);
   const [phase, setPhase] = useState<Phase>('idle');

@@ -16,7 +16,8 @@ import {
   setFocusedOrb,
 } from '../engine/memories-state';
 import { orbRailProgress } from '../engine/memory-layout';
-import { useMotionPrefs } from '../engine/motion-prefs';
+import { useQuiet } from '../engine/use-quiet';
+import { QuietHeart } from '../ui/static-heart';
 import { useLoveScroll } from '../engine/scroll-engine';
 import { onSessionReset } from '../engine/session';
 import { useTier } from '../engine/tier-provider';
@@ -35,9 +36,8 @@ const DONE_HINT = "That's all of them. For now.";
 const RAIL_FROM = 0.12;
 
 export function Memories({ hint, memories }: Props) {
-  const { calm } = useMotionPrefs();
   const { tier } = useTier();
-  const motion = !calm && tier !== 'static';
+  const motion = !useQuiet();
   const items = useMemo(
     () => (motion ? memories.slice(0, TIERS[tier].orbs) : memories),
     [motion, memories, tier],
@@ -123,6 +123,7 @@ export function Memories({ hint, memories }: Props) {
 
   return (
     <LoveSection id="memories" dawn={0} stage="400vh">
+      <QuietHeart className="mb-4 size-10" />
       <h2 id="memories-title" className={sectionTitle}>
         Memories
       </h2>
@@ -130,7 +131,7 @@ export function Memories({ hint, memories }: Props) {
         {hintText}
       </p>
       {openedCount > 0 && !done && (
-        <p className={`${labelText} mt-2`}>
+        <p className={`${labelText} mt-2`} aria-live="polite">
           {openedCount} of {count} opened
         </p>
       )}

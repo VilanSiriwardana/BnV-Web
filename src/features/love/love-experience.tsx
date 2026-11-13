@@ -6,7 +6,6 @@ import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 import type { LoveSiteConfig } from './config';
-import { useMotionPrefs } from './engine/motion-prefs';
 import { MotionPrefsProvider } from './engine/motion-prefs-provider';
 import { ScrollEngine, useLoveScroll } from './engine/scroll-engine';
 import { director } from './engine/heart-director';
@@ -14,6 +13,7 @@ import { resetSession } from './engine/session';
 import { killHeroIntro, playHeroIntro, tapHeart } from './engine/hero-intro';
 import { buildStory } from './engine/story';
 import { TierProvider, useTier } from './engine/tier-provider';
+import { useQuiet } from './engine/use-quiet';
 import { Bloom } from './sections/bloom';
 import { Dawn } from './sections/dawn';
 import { Finale } from './sections/finale';
@@ -57,9 +57,9 @@ export function LoveExperience({ site }: { site: LoveSiteConfig }) {
 }
 
 function LoveStory({ site }: { site: LoveSiteConfig }) {
-  const { calm } = useMotionPrefs();
+  const quiet = useQuiet();
   const { tier, stepDown, stepUp } = useTier();
-  const showCanvas = !calm && tier !== 'static';
+  const showCanvas = !quiet;
   const debug =
     useSyncExternalStore(noSubscribe, readDebug, serverFalse) &&
     HeartDebugPanel !== null;
@@ -76,23 +76,23 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
     resetSession();
     director.settle();
     ScrollTrigger.refresh();
-    scrollTo(0, calm ? { immediate: true } : { duration: 2.6 });
+    scrollTo(0, quiet ? { immediate: true } : { duration: 2.6 });
   };
 
   useGSAP(
     () => {
-      const cleanup = buildStory(rootRef.current!, { calm, tier });
+      const cleanup = buildStory(rootRef.current!, { quiet, tier });
       document.fonts.ready.then(() => ScrollTrigger.refresh());
       return cleanup;
     },
-    { scope: rootRef, dependencies: [calm, tier] },
+    { scope: rootRef, dependencies: [quiet, tier] },
   );
 
   return (
     <div
       ref={rootRef}
       data-love-root
-      data-love-motion={calm ? undefined : ''}
+      data-love-motion={quiet ? undefined : ''}
       className="bg-background text-foreground min-h-svh"
     >
       <a
@@ -129,6 +129,7 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
         <Finale
           name={name}
           message={site.copy.finaleMessage}
+          credit={site.music.credit}
           onReplay={replay}
         />
       </main>
@@ -138,7 +139,7 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
         sceneReady={canvasReady || !showCanvas}
         onEnter={(seed) => {
           setEntered(true);
-          playHeroIntro(rootRef.current!, { from: seed, calm });
+          playHeroIntro(rootRef.current!, { from: seed, calm: quiet });
         }}
       />
       {entered && <MusicToggle />}

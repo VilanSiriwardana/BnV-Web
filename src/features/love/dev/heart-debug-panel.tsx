@@ -7,6 +7,7 @@ import { HEART_EVENTS } from '../engine/heart-director-core';
 import { heart } from '../engine/heart-state';
 import { useMotionPrefs } from '../engine/motion-prefs';
 import { useLoveScroll } from '../engine/scroll-engine';
+import { renderStats } from '../engine/render-stats';
 import { resetSession } from '../engine/session';
 import { useTier } from '../engine/tier-provider';
 import { TIER_ORDER } from '../engine/tiers';
@@ -35,7 +36,10 @@ export default function HeartDebugPanel() {
 
   useEffect(() => {
     const id = window.setInterval(
-      () => setSnapshot(JSON.stringify(heart, null, 1)),
+      () =>
+        setSnapshot(
+          JSON.stringify({ ...heart, gl: { ...renderStats } }, null, 1),
+        ),
       250,
     );
     return () => window.clearInterval(id);

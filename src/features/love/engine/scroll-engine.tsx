@@ -7,7 +7,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ReactLenis, useLenis } from 'lenis/react';
 import { type ReactNode, useCallback, useEffect, useMemo } from 'react';
 
-import { useMotionPrefs } from './motion-prefs';
+import { useQuiet } from './use-quiet';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -34,8 +34,8 @@ function LenisClock() {
 }
 
 export function ScrollEngine({ children }: { children: ReactNode }) {
-  const { calm } = useMotionPrefs();
-  if (calm) return children;
+  const quiet = useQuiet();
+  if (quiet) return children;
 
   return (
     <ReactLenis root options={{ autoRaf: false, syncTouch: false }}>

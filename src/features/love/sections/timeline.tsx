@@ -6,9 +6,9 @@ import { focusRing } from '@/components/ui/styles';
 import { cn } from '@/lib/utils/cn';
 
 import type { LoveSiteConfig } from '../config';
-import { useMotionPrefs } from '../engine/motion-prefs';
+import { useQuiet } from '../engine/use-quiet';
+import { QuietHeart } from '../ui/static-heart';
 import { useLoveScroll } from '../engine/scroll-engine';
-import { useTier } from '../engine/tier-provider';
 import {
   NODE_FRACTIONS,
   nodeSectionProgress,
@@ -25,12 +25,11 @@ const MOBILE_PATH = 'M 9 10 C 14 22, 4 34, 9 46 S 13 56, 9 60';
 const MOBILE_QUERY = '(max-width: 767px)';
 
 export function Timeline({ title, items }: Props) {
-  const { calm } = useMotionPrefs();
-  const { tier } = useTier();
-  const motion = !calm && tier !== 'static';
+  const motion = !useQuiet();
 
   return (
     <LoveSection id="timeline" dawn={0} stage="400vh">
+      <QuietHeart className="mb-4 size-10" />
       <h2 id="timeline-title" className={sectionTitle}>
         {title}
       </h2>

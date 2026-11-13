@@ -295,5 +295,6 @@ export const site: LoveSiteConfig = {
     ],
     signoff: 'Always yours,',
   },
-  music: { src: '', credit: '' },
+  // TODO(owner): credit text required before release (ADR-0030).
+  music: { src: '/audio/wedding-background.mp3', credit: '' },
 };

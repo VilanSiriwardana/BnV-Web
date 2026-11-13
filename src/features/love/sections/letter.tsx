@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils/cn';
 
 import type { LoveSiteConfig } from '../config';
 import { director } from '../engine/heart-director';
-import { useMotionPrefs } from '../engine/motion-prefs';
+import { useQuiet } from '../engine/use-quiet';
 import { useHold } from '../hooks/use-hold';
 import { labelText, LoveSection, sectionTitle } from './love-section';
 
@@ -28,8 +28,7 @@ const sealHole = (at: string, r: number) => {
 // Experience §13. GSAP only on these elements (no Motion). The 3D heart docks onto [data-seal]
 // (story.ts buildLetter), so the seal *is* the heart.
 export function Letter({ title, letter }: Props) {
-  const { calm } = useMotionPrefs();
-  const quiet = calm;
+  const quiet = useQuiet();
   const root = useRef<HTMLDivElement>(null);
   const opened = useRef(false);
   const [open, setOpen] = useState(false);

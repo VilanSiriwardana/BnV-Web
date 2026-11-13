@@ -3,13 +3,24 @@
 import { Button } from '@/components/ui/button';
 
 import { useMusicToggle } from '../ui/music-toggle';
-import { LoveSection, proseColumn, sectionTitle } from './love-section';
+import { QuietHeart } from '../ui/static-heart';
+import {
+  LoveSection,
+  labelText,
+  proseColumn,
+  sectionTitle,
+} from './love-section';
 
-type Props = { name: string; message: string; onReplay: () => void };
+type Props = {
+  name: string;
+  message: string;
+  credit: string;
+  onReplay: () => void;
+};
 
 // Experience §14. The heart, finaleBurst and the Replay reset are driven from story.ts and
 // love-experience.tsx; this is the DOM only.
-export function Finale({ name, message, onReplay }: Props) {
+export function Finale({ name, message, credit, onReplay }: Props) {
   const { muted, toggle } = useMusicToggle();
   return (
     <LoveSection
@@ -18,6 +29,7 @@ export function Finale({ name, message, onReplay }: Props) {
       stage="100vh"
       className="flex min-h-svh items-center"
     >
+      <QuietHeart glow className="mb-10 size-40 md:size-52" />
       <h2 id="finale-title" className={sectionTitle}>
         Happy birthday, <span className="text-gold-text">{name}</span>.
       </h2>
@@ -36,6 +48,7 @@ export function Finale({ name, message, onReplay }: Props) {
           {muted ? 'Music on' : 'Music off'}
         </Button>
       </div>
+      {credit && <p className={`${labelText} mt-8`}>Music: {credit}</p>}
     </LoveSection>
   );
 }

@@ -562,7 +562,7 @@ export function applyStaticStory(root: HTMLElement) {
 // Experience §4.3. Returns a cleanup that reverts every trigger and tween it made.
 export function buildStory(
   root: HTMLElement,
-  ctx: { calm: boolean; tier: Tier },
+  ctx: { quiet: boolean; tier: Tier },
 ) {
   const mm = gsap.matchMedia();
   mm.add(
@@ -575,7 +575,7 @@ export function buildStory(
         motion: boolean;
         mobile: boolean;
       };
-      if (!motion || ctx.calm) {
+      if (!motion || ctx.quiet) {
         applyStaticStory(root);
         return;
       }

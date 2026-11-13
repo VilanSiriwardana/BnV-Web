@@ -18,6 +18,7 @@ import { Petals } from './petals';
 import { ShockRing } from './shock-ring';
 import { Sparks } from './sparks';
 import { WishStar } from './wish-star';
+import { renderStats } from '../engine/render-stats';
 
 type Props = {
   tier: Tier;
@@ -82,6 +83,7 @@ export default function LoveCanvas({
         </EffectComposer>
       )}
       {debug && <Stats />}
+      {debug && <RenderStatsProbe />}
     </Canvas>
   );
 }
@@ -96,4 +98,14 @@ function DayBloom({ base }: { base: number }) {
   return (
     <Bloom ref={ref} mipmapBlur luminanceThreshold={0.6} intensity={base} />
   );
+}
+
+function RenderStatsProbe() {
+  useFrame(({ gl }) => {
+    renderStats.calls = gl.info.render.calls;
+    renderStats.triangles = gl.info.render.triangles;
+    renderStats.textures = gl.info.memory.textures;
+    renderStats.geometries = gl.info.memory.geometries;
+  });
+  return null;
 }

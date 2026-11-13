@@ -1,12 +1,15 @@
 // Prepares Love Site images. Uses sharp from Next's dependency tree (ADR-0027 notes; pin it if this import ever fails).
-// Usage: node scripts/prepare-love-images.mjs  → writes public/images/prototype/love-*.webp and prints a JSON of sizes + blur.
+// Usage: node scripts/prepare-love-images.mjs [sourceDir]  → writes public/images/prototype/love-*.webp and prints a JSON of sizes + blur.
+// With sourceDir (e.g. private/love-photos, git-ignored), files are picked by prefix memory-*, timeline-*, gallery-* (jpg/jpeg/png/webp), sorted by name.
+import { readdirSync } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 
 const dir = path.join(process.cwd(), 'public', 'images', 'prototype');
+const sourceDir = process.argv[2] ? path.resolve(process.argv[2]) : null;
 
-// Prototype placeholders (AI-generated). Replace with real photos in Phase 6.
-const sources = {
+// Prototype placeholders (AI-generated), used when no sourceDir is given.
+const prototypeSources = {
   memory: [
     'product-couple-outfit-01',
     'product-couple-outfit-02',
@@ -40,6 +43,18 @@ const sources = {
   ],
 };
 
+const imageExt = /\.(jpe?g|png|webp)$/i;
+const sources = sourceDir
+  ? Object.fromEntries(
+      ['memory', 'timeline', 'gallery'].map((kind) => [
+        kind,
+        readdirSync(sourceDir)
+          .filter((f) => f.startsWith(`${kind}-`) && imageExt.test(f))
+          .sort(),
+      ]),
+    )
+  : prototypeSources;
+
 const widths = { memory: 1600, timeline: 1200, gallery: 1200 };
 const result = {};
 
@@ -54,7 +69,9 @@ async function blurOf(input) {
 for (const [kind, list] of Object.entries(sources)) {
   for (const [i, name] of list.entries()) {
     const nn = String(i + 1).padStart(2, '0');
-    const input = path.join(dir, `${name}.webp`);
+    const input = sourceDir
+      ? path.join(sourceDir, name)
+      : path.join(dir, `${name}.webp`);
     const file = `love-${kind}-${nn}.webp`;
     const info = await sharp(input)
       .resize({ width: widths[kind], withoutEnlargement: true })
