@@ -1,7 +1,7 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
-import { useEffect, useMemo, useRef } from 'react';
+import { type ReactNode, useEffect, useMemo, useRef } from 'react';
 import {
   AdditiveBlending,
   BufferAttribute,
@@ -23,9 +23,9 @@ const MAX_PARTICLES = TIERS.high.particles;
 const { damp } = MathUtils;
 const depthPoint = new Vector3();
 
-type Props = { tier: Tier; onTap?: () => void };
+type Props = { tier: Tier; onTap?: () => void; children?: ReactNode };
 
-export function Heart({ tier, onTap }: Props) {
+export function Heart({ tier, onTap, children }: Props) {
   const group = useRef<Group>(null);
 
   const geometry = useMemo(() => {
@@ -115,6 +115,7 @@ export function Heart({ tier, onTap }: Props) {
   return (
     <group ref={group}>
       <points geometry={geometry} material={material} frustumCulled={false} />
+      {children}
       {onTap && (
         <mesh onClick={onTap}>
           <circleGeometry args={[0.95, 24]} />
