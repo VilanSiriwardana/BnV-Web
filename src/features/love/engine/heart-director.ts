@@ -15,6 +15,7 @@ export type { HeartEvent, PlayOptions };
 
 let section: SectionId = 'hero';
 let baselineTween: gsap.core.Tween | null = null;
+let glowTween: gsap.core.Tween | null = null;
 // Timeline only: the heart stays brighter after the arrow strike ("stronger").
 const STRIKE_BOOST = 0.15;
 let boost = 0;
@@ -211,6 +212,14 @@ function wishMerge(tl: gsap.core.Timeline) {
 
 function toBaseline() {
   baselineTween?.kill();
+  glowTween?.kill();
+  // Glow eases on its own, slowly, so an event ending never steps the brightness.
+  glowTween = gsap.to(heart, {
+    glow: baseGlow(),
+    duration: 1.2,
+    ease: 'sine.inOut',
+    overwrite: 'auto',
+  });
   baselineTween = gsap.to(heart, {
     burst: 0,
     form: 1,
@@ -221,7 +230,6 @@ function toBaseline() {
     shine: 0,
     starHold: 0,
     gold: HEART_PATH[section].gold,
-    glow: baseGlow(),
     duration: 0.3,
     ease: 'power2.out',
     overwrite: 'auto',
@@ -233,6 +241,7 @@ const core = createDirectorCore({
   toBaseline,
   run(event, opts, done) {
     baselineTween?.kill();
+    glowTween?.kill();
     const tl = gsap.timeline({ paused: true, onComplete: done });
     build(event, opts, tl);
     tl.play();

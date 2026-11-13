@@ -6,7 +6,7 @@ export const heart = {
   scale: 1,
   form: 0, // 0 = ribbons, 1 = heart
   burst: 0, // 0 = whole, 1 = fully scattered into small hearts
-  glow: 0.6, // base glow; also drives bloom intensity
+  glow: 0.4, // base glow; also drives bloom intensity
   shine: 0, // 0..1 highlight sweep progress
   gold: 0, // 0..1 extra gold in the particle colours (rises section by section)
   beat: 0, // audio pulse, written by the audio engine

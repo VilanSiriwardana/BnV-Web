@@ -379,9 +379,60 @@ export const KEYFRAMES: FrameSpec[] = [
     waist: 'back',
     free: 'shoulder',
   },
+  // Dip in three gentle steps: lunge, half-dip, dip. They never pass through each other.
   {
     him: {
-      x: 0.05,
+      x: -0.18,
+      drop: 0.1,
+      lean: 0.3,
+      tilt: 0.12,
+      front: [0.7, 0],
+      back: [-0.35, -0.6],
+    },
+    her: {
+      x: 0.22,
+      y: 0.85,
+      lean: 0.2,
+      tilt: -0.1,
+      hair: 0.05,
+      hem: [0, -0.8],
+      flare: 0.33,
+      legUp: 0.2,
+    },
+    hisHand: 'joined',
+    herHand: 'joined',
+    joined: [0.3, 1.3],
+    waist: [0.25, 1.6],
+    free: [0.5, 0.9],
+  },
+  {
+    him: {
+      x: -0.12,
+      drop: 0.18,
+      lean: 0.4,
+      tilt: 0.14,
+      front: [0.95, 0.1],
+      back: [-0.45, -0.75],
+    },
+    her: {
+      x: 0.15,
+      y: 0.8,
+      lean: 0.7,
+      tilt: 0,
+      hair: 0.05,
+      hem: [-0.15, -0.7],
+      flare: 0.35,
+      legUp: 0.6,
+    },
+    hisHand: 'joined',
+    herHand: 'joined',
+    joined: [0.05, 0.9],
+    waist: [0.45, 1.85],
+    free: [0.2, 0.45],
+  },
+  {
+    him: {
+      x: -0.08,
       drop: 0.22,
       lean: 0.45,
       tilt: 0.15,
@@ -389,9 +440,9 @@ export const KEYFRAMES: FrameSpec[] = [
       back: [-0.5, -0.85],
     },
     her: {
-      x: -0.05,
+      x: 0.08,
       y: 0.75,
-      lean: 2,
+      lean: 1.2,
       tilt: 0.05,
       hair: 0.05,
       hem: [-0.3, -0.55],
@@ -400,9 +451,9 @@ export const KEYFRAMES: FrameSpec[] = [
     },
     hisHand: 'joined',
     herHand: 'joined',
-    joined: [-0.36, 0.4],
+    joined: [-0.15, 0.55],
     waist: [0.6, 2.0],
-    free: [-0.55, 0.12],
+    free: [-0.1, 0.12],
   },
 ];
 
@@ -473,6 +524,6 @@ export function buildFrames(n = 32): Frame[] {
   });
 }
 
-export const DANCE_FRAMES: Frame[] = buildFrames(32);
+export const DANCE_FRAMES: Frame[] = buildFrames(48);
 export const FRAME_COUNT = DANCE_FRAMES.length;
-export const DIP_FRAME = 31;
+export const DIP_FRAME = FRAME_COUNT - 1;

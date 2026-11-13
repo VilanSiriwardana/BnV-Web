@@ -897,13 +897,14 @@ Build guide: [phases/Phase-7-Refinements-Letter-and-Dance.md](phases/Phase-7-Ref
 ### 19.1 Gate (replaces the §5 button)
 
 - Centre: a glowing heart that **is** the button (`aria-label` "Begin", Enter/Space work, `autoFocus`). It is also the seed for the 3D heart's entrance.
-- Beside it: script text **"Tap this"** with a hand-drawn gold arrow that draws in and points at the heart.
-- Premium frame: double gold border, canvas grain, slow breathing halo. While loading, a thin ring circles the heart and the label reads "Getting ready…".
+- Above it: the title "For {name}"; below it one line, "A story waiting to unfold." No other copy.
+- Beside it: script text **"Tap this"** with a hand-drawn gold arrow that draws in and points at the heart (top-left on phones, right of the heart on desktop so it never meets the title).
+- Premium frame: double gold border, canvas grain, slow breathing halo. While loading, a thin ring circles the heart; "Getting ready…" is announced to screen readers only.
 - Reduced motion: no breathing, arrow shown already drawn.
 
 ### 19.2 Hero (amends §6)
 
-- **Glow:** after the intro the heart keeps the glow it had during the intro (resting glow 0.6). No shine sweep at the end of the intro. Formed particles use 60% of their ribbon alpha, and the hero music beat is damped to 40% so overlap does not spike.
+- **Glow:** after the intro the heart keeps the glow it had during the intro (resting glow 0.4, bloom 0.7). Returning to rest eases glow over 1.2 s and the beat strength is damped, so nothing steps up when the intro ends. No shine sweep at the end of the intro. Formed particles use 60% of their ribbon alpha, and the hero music beat is damped to 40% so overlap does not spike.
 - **Float-up:** the weave ends a little below the hero pose; as the "Happy birthday" title types in (3.4 s) the heart floats slowly up into place (~2.6 s, `sine.inOut`).
 
 ### 19.3 Timeline (amends §9)
@@ -917,7 +918,7 @@ Build guide: [phases/Phase-7-Refinements-Letter-and-Dance.md](phases/Phase-7-Ref
 - **Look:** aged parchment with paper grain, gold double stripes, corner curls, a ribbon band, small gold hearts and a drop cap; Cormorant body, Cinzel heading.
 - **Background:** a canvas-grain wash with three depth layers of tiny gold hearts drifting at different speeds, behind all letter UI.
 - **Opening:** the seal (the docked heart) breaks, two scroll rods part and the parchment unrolls (~1.6 s), then paragraphs fade in one by one.
-- **Scroll to open:** without a passphrase, the letter opens at 35% of its sticky pin range; a fast fling scrolls back once so the unroll remains visible.
+- **Scroll to open:** without a passphrase, the letter opens when the seal's centre scrolls above the viewport centre (end of a 200vh pin); a fast fling scrolls back to the pin end. The hint text hides the moment opening starts.
 - Calm / reduced motion: the letter is shown open, no unroll.
 
 ### 19.5 Ambient hearts (new)
@@ -927,7 +928,7 @@ Twelve independent gold, lavender and rose hearts twinkle around the frame with 
 ### 19.6 Section 6b — Dance ("You and me, dancing") (new)
 
 - Placed after Gallery. A pinned stage (~250 vh) with the couple as **one glowing particle silhouette built like the heart** (him lavender, her gold; 14k / 7k particles on high / mid).
-- Ten key poses sampled into 32 frames, each particle staying on the same body part so the figures flow rather than scatter: walk-in → hands join → his hand on her waist, hers on his shoulder → under-arm turn (2 poses) → embrace → lean → **romantic dip**. Hair and skirt sway. Arms use 2-bone IK so hands always meet. Scroll eases between key poses with a short hold on each. A float DataTexture stores the frame positions for GPU blending. The heart rests above and pulses on the dip.
+- Twelve key poses sampled into 48 frames, each particle staying on the same body part so the figures flow rather than scatter: walk-in → hands join → his hand on her waist, hers on his shoulder → under-arm turn (2 poses) → embrace → lean → lunge → half-dip → **romantic dip** (she leans back gradually and never passes through him). Hair and skirt sway. Arms use 2-bone IK so hands always meet. Scroll eases between key poses with a short hold on each. A float DataTexture stores the frame positions for GPU blending. The heart rests above and pulses on the dip.
 - Files: `canvas/dance-silhouettes.ts` (skeleton poses), `canvas/dance-geometry.ts` (sampling), `canvas/dance-shaders.ts`, `canvas/dance-duo.tsx`, `engine/dance-state.ts` (`frameAt`).
 - Copy: a short line appreciating her as a dance partner.
 - Low / static tier and reduced motion: an SVG silhouette pair in the dip pose with a soft fade.

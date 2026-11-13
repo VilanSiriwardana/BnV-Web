@@ -95,7 +95,12 @@ export function Heart({ tier, onTap, children }: Props) {
     u.uShine.value = heart.shine;
     u.uGlow.value = damp(u.uGlow.value, heart.glow + heart.idleGlow, 8, delta);
     u.uBeat.value = heart.beat;
-    u.uBeatScale.value = director.baseline() === 'hero' ? 0.4 : 1;
+    u.uBeatScale.value = damp(
+      u.uBeatScale.value,
+      director.baseline() === 'hero' ? 0.4 : 1,
+      2,
+      delta,
+    );
     // All-night theme: the heart turns more golden section by section and on the letter seal.
     u.uGold.value = damp(
       u.uGold.value,

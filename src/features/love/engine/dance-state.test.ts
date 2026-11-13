@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { DANCE_FRAMES } from '../canvas/dance-silhouettes';
-import { DANCE_FRAME_COUNT, frameAt } from './dance-state';
+import { DANCE_FRAMES, KEYFRAMES } from '../canvas/dance-silhouettes';
+import { DANCE_FRAME_COUNT, frameAt, KEYFRAME_COUNT } from './dance-state';
 
 describe('frameAt', () => {
   it('maps the ends to the first pose and the dip', () => {
@@ -22,5 +22,6 @@ describe('frameAt', () => {
 
   it('matches the number of silhouette frames', () => {
     expect(DANCE_FRAME_COUNT).toBe(DANCE_FRAMES.length);
+    expect(KEYFRAME_COUNT).toBe(KEYFRAMES.length);
   });
 });

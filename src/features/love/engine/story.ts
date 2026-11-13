@@ -523,14 +523,24 @@ const buildLetter: SectionBuilder = (root) => {
     const r = seal.getBoundingClientRect();
     heart.ndc.x = ((r.left + r.width / 2) / window.innerWidth) * 2 - 1;
     heart.ndc.y = -(((r.top + r.height / 2) / window.innerHeight) * 2 - 1);
+    // §19.4: scrolling the seal past the viewport centre opens the letter (never with a passphrase).
+    if (r.top + r.height / 2 < window.innerHeight / 2) fire();
+  };
+  const autoOpens = !el.querySelector('[data-letter-locked]');
+  let fired = false;
+  const fire = () => {
+    if (fired || !autoOpens) return;
+    fired = true;
+    el.dispatchEvent(new Event(LETTER_OPEN_EVENT));
   };
   ScrollTrigger.create({
     trigger: el,
     start: 'top center',
     end: 'bottom center',
-    onToggle: ({ isActive }) => {
+    onToggle: ({ isActive, direction }) => {
       gsap.ticker.remove(follow);
       if (!isActive) {
+        if (direction === 1) fire();
         gsap.to(heart, { sealRim: 0, duration: 0.4, overwrite: 'auto' });
         return;
       }
@@ -541,15 +551,6 @@ const buildLetter: SectionBuilder = (root) => {
       });
     },
   });
-  // §19.4: scrolling on without holding the seal opens the letter (never with a passphrase).
-  if (!el.querySelector('[data-letter-locked]'))
-    ScrollTrigger.create({
-      trigger: el,
-      start: () => `top+=${(el.offsetHeight - window.innerHeight) * 0.35} top`,
-      invalidateOnRefresh: true,
-      once: true,
-      onEnter: () => el.dispatchEvent(new Event(LETTER_OPEN_EVENT)),
-    });
   gsap.utils
     .toArray<HTMLElement>('[data-letter-layer]', el)
     .forEach((layer, i) =>

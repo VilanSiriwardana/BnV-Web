@@ -32,7 +32,7 @@ export const HEART_PATH: Record<SectionId, PathEntry> = {
     mobile: { x: 0, y: 0.25, scale: 0.9 },
     gold: 0,
     // Matches the intro glow (heart-state) so nothing brightens once the intro settles.
-    glow: 0.6,
+    glow: 0.4,
   },
   bloom: {
     desktop: { x: 0.55, y: 0.1, scale: 0.55 },

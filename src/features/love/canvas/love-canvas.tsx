@@ -79,7 +79,7 @@ export default function LoveCanvas({
       <Confetti tier={tier} />
       {config.bloom !== 'off' && (
         <EffectComposer multisampling={0}>
-          <NightBloom base={config.bloom === 'on' ? 0.9 : 0.5} />
+          <NightBloom base={config.bloom === 'on' ? 0.7 : 0.4} />
         </EffectComposer>
       )}
       {debug && <Stats />}

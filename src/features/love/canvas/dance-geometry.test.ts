@@ -38,6 +38,22 @@ describe('dance frames', () => {
     }
   });
 
+  it('never jumps between adjacent frames', () => {
+    for (let i = 1; i < DANCE_FRAMES.length; i++)
+      for (const p of DANCE_PARTS)
+        DANCE_FRAMES[i][p.id].forEach((s, j) => {
+          const prev = DANCE_FRAMES[i - 1][p.id][j];
+          expect(
+            dist(pointOn(s, 0.5, 0.5), pointOn(prev, 0.5, 0.5)),
+          ).toBeLessThan(0.35);
+        });
+  });
+
+  it('keeps her on his right through the dip', () => {
+    for (const k of KEYFRAMES.slice(-3))
+      expect(k.her.x).toBeGreaterThan(k.him.x);
+  });
+
   it('stays above the floor', () => {
     for (const frame of DANCE_FRAMES)
       for (const shapes of Object.values(frame))
@@ -47,10 +63,10 @@ describe('dance frames', () => {
 });
 
 describe('buildDanceAttributes', () => {
-  it('is deterministic and packs 32 frames in texture rows', () => {
+  it('is deterministic and packs 48 frames in texture rows', () => {
     const a = buildDanceAttributes(500, 3);
     const b = buildDanceAttributes(500, 3);
-    expect(FRAME_COUNT).toBe(32);
+    expect(FRAME_COUNT).toBe(48);
     expect(a.height).toBe(a.rowsPerFrame * FRAME_COUNT);
     expect(Array.from(a.positions.slice(0, 8))).toEqual(
       Array.from(b.positions.slice(0, 8)),

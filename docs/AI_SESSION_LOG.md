@@ -784,3 +784,11 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 - Adjusted formed-heart alpha and hero beat, moved letter auto-open into the sticky pin range, widened the mobile timeline, and replaced ambient clusters with independent edge hearts.
 - Expanded the dance to 10 key poses and 32 sampled frames with an added leg; positions are read from a float DataTexture.
 - Verification: TypeScript and focused dance tests passed. TypeScript, Love Site ESLint and Vitest (92 tests) passed. The production build could not fetch Google Fonts. Browser appearance and frame rate remain unverified because browser access was unavailable.
+
+## 2026-11-13 - Love Site fixes (blueprint 043)
+
+- Letter auto-opens when the seal centre crosses the viewport centre (checked in `buildLetter`'s `follow()` ticker, plus a forward-leave fallback); stage 200vh; hint hides as soon as opening starts.
+- Hero glow lowered to 0.4 with bloom 0.7/0.4; `toBaseline` eases glow over 1.2 s and `uBeatScale` is damped, removing the post-intro brightening.
+- Dance dip split into lunge, half-dip and dip keyframes (12 keyframes, 48 frames); new tests cap per-frame movement and keep her on his right.
+- Gate reduced to title, heart button with "Tap this" scribble (right of the heart on desktop), and one line.
+- Verification: tsc, Love Site ESLint and Vitest (57 tests) pass. Browser look not verified in this session.

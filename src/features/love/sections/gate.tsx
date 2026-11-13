@@ -107,19 +107,25 @@ export function Gate({ name, musicSrc, sceneReady, onEnter }: Props) {
             aria-hidden
             className="love-gate-halo pointer-events-none absolute top-[12%] left-1/2 size-[min(90vw,34rem)] -translate-x-1/2 rounded-full"
           />
-          <p className="text-gold relative z-10 mt-[max(2.5rem,7svh)] font-sans text-[0.65rem] font-semibold tracking-[0.38em] uppercase sm:text-xs">
-            A moment made for you
-          </p>
           <div className="relative z-10 my-auto flex w-full max-w-xl flex-col items-center py-6">
+            <h2
+              id="gate-title"
+              className="font-display text-gold-text mb-10 text-[clamp(2.6rem,8vw,4.2rem)] leading-tight"
+            >
+              For {name}
+            </h2>
             <div className="relative">
               <div
                 aria-hidden
-                className="text-gold-text absolute right-[calc(100%-2.5rem)] bottom-[calc(100%-1.75rem)] flex w-32 flex-col items-start sm:w-40"
+                className="text-gold-text absolute right-[calc(100%-2.5rem)] bottom-[calc(100%-1.75rem)] flex w-32 flex-col items-start sm:w-40 md:top-1/2 md:right-auto md:bottom-auto md:left-[calc(100%+0.5rem)] md:-translate-y-1/2"
               >
                 <span className="font-body -rotate-6 text-[clamp(1.4rem,5vw,1.8rem)] italic">
                   Tap this
                 </span>
-                <svg viewBox="0 0 120 70" className="-mt-1 ml-6 w-24 sm:w-28">
+                <svg
+                  viewBox="0 0 120 70"
+                  className="-mt-1 ml-6 w-24 sm:w-28 md:ml-0 md:-scale-x-100"
+                >
                   <motion.path
                     d="M 8 6 C 30 40, 62 58, 104 56"
                     fill="none"
@@ -209,32 +215,12 @@ export function Gate({ name, musicSrc, sceneReady, onEnter }: Props) {
                 </svg>
               </motion.button>
             </div>
-            <p
-              aria-live="polite"
-              className="text-gold-text mt-4 font-sans text-[0.65rem] font-semibold tracking-[0.32em] uppercase sm:text-xs"
-            >
-              {ready ? 'Open your story' : 'Getting ready…'}
+            <p aria-live="polite" className="sr-only">
+              {ready ? '' : 'Getting ready…'}
             </p>
-            <p className="text-primary mt-8 font-sans text-[0.65rem] font-semibold tracking-[0.32em] uppercase sm:text-xs">
-              To my favourite person
+            <p className="font-body text-foreground/80 mt-6 text-[clamp(1.1rem,4vw,1.4rem)] italic">
+              A story waiting to unfold.
             </p>
-            <h2
-              id="gate-title"
-              className="font-display text-gold-text mt-3 text-[clamp(2.6rem,11vw,4.6rem)] leading-tight"
-            >
-              For {name}
-            </h2>
-            <p className="font-body text-foreground/90 mt-3 max-w-[30ch] text-[clamp(1.3rem,5vw,1.7rem)] leading-snug italic">
-              A little something for you. A story waiting to unfold.
-            </p>
-            <div
-              aria-hidden
-              className="text-gold/70 mt-6 flex items-center gap-3"
-            >
-              <span className="h-px w-12 bg-current" />
-              <span className="text-lg">✦</span>
-              <span className="h-px w-12 bg-current" />
-            </div>
           </div>
         </motion.div>
       )}

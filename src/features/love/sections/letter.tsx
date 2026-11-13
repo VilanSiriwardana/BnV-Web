@@ -50,6 +50,7 @@ export function Letter({ title, letter }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const opened = useRef(false);
   const [open, setOpen] = useState(false);
+  const [opening, setOpening] = useState(false);
   const [wrong, setWrong] = useState(false);
   const passId = useId();
   const showOpen = open || quiet;
@@ -83,6 +84,7 @@ export function Letter({ title, letter }: Props) {
   const unlock = useCallback(() => {
     if (opened.current) return;
     opened.current = true;
+    setOpening(true);
     if (quiet) {
       setOpen(true);
       return;
@@ -134,11 +136,12 @@ export function Letter({ title, letter }: Props) {
     if (!section || letter.passphrase) return;
     const autoOpen = () => {
       unlock();
-      if (section.getBoundingClientRect().bottom < window.innerHeight * 1.2) {
-        const sectionTop = section.getBoundingClientRect().top + window.scrollY;
-        const pin = section.offsetHeight - window.innerHeight;
-        scrollTo(sectionTop + pin * 0.35);
-      }
+      const pinEnd =
+        section.getBoundingClientRect().top +
+        window.scrollY +
+        section.offsetHeight -
+        window.innerHeight;
+      if (window.scrollY > pinEnd) scrollTo(pinEnd);
     };
     section.addEventListener(LETTER_OPEN_EVENT, autoOpen);
     return () => section.removeEventListener(LETTER_OPEN_EVENT, autoOpen);
@@ -168,7 +171,7 @@ export function Letter({ title, letter }: Props) {
   const [first, ...rest] = letter.paragraphs;
 
   return (
-    <LoveSection id="letter" depth={1} stage="300vh">
+    <LoveSection id="letter" depth={1} stage="200vh">
       <div
         ref={root}
         data-letter-locked={letter.passphrase ? '' : undefined}
@@ -185,7 +188,7 @@ export function Letter({ title, letter }: Props) {
             'z-10 mx-auto flex w-full max-w-2xl flex-col',
             quiet
               ? 'relative mt-12'
-              : 'absolute inset-x-4 top-[56%] h-[min(68svh,46rem)] w-auto -translate-y-1/2',
+              : 'absolute inset-x-4 top-1/2 h-[min(68svh,46rem)] w-auto -translate-y-1/2',
           )}
         >
           {!quiet && (
@@ -278,8 +281,8 @@ export function Letter({ title, letter }: Props) {
           )}
         </div>
 
-        {!showOpen && (
-          <div className="absolute inset-x-4 top-[calc(56%+6rem)] z-10 mx-auto flex max-w-sm flex-col items-center">
+        {!showOpen && !opening && (
+          <div className="absolute inset-x-4 top-[calc(50%+6rem)] z-10 mx-auto flex max-w-sm flex-col items-center">
             {!letter.passphrase && (
               <p id={`${passId}-hint`} className={labelText}>
                 Hold the seal, or keep scrolling.
