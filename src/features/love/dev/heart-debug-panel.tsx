@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
+import { director } from '../engine/heart-director';
+import { HEART_EVENTS } from '../engine/heart-director-core';
 import { heart } from '../engine/heart-state';
 import { useMotionPrefs } from '../engine/motion-prefs';
 import { useLoveScroll } from '../engine/scroll-engine';
@@ -88,6 +90,39 @@ export default function HeartDebugPanel() {
           </button>
         ))}
       </div>
+      <p className="mb-1 font-semibold">
+        Events (baseline: {director.baseline()})
+      </p>
+      <div className="mb-3 flex flex-wrap gap-1">
+        {HEART_EVENTS.map((e) => (
+          <button
+            key={e}
+            type="button"
+            className={button}
+            onClick={() => director.play(e)}
+          >
+            {e}
+          </button>
+        ))}
+        <button
+          type="button"
+          className={button}
+          onClick={() => director.settle()}
+        >
+          settle
+        </button>
+      </div>
+      <label className="mb-3 flex items-center gap-2">
+        form
+        <input
+          type="range"
+          min={0}
+          max={1}
+          step={0.01}
+          defaultValue={heart.form}
+          onChange={(e) => (heart.form = Number(e.target.value))}
+        />
+      </label>
       <p className="mb-1 font-semibold">heart</p>
       <pre className="whitespace-pre-wrap">{snapshot}</pre>
     </aside>

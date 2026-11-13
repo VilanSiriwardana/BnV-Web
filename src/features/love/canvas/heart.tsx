@@ -106,7 +106,7 @@ export function Heart({ tier, onTap }: Props) {
     g.position.x = damp(g.position.x, w.x, 6, delta);
     g.position.y = damp(g.position.y, w.y, 6, delta);
     g.position.z = heart.depth;
-    const s = heart.scale * (1 + heart.idleScale);
+    const s = heart.scale * (1 + heart.idleScale + heart.flinch);
     g.scale.setScalar(damp(g.scale.x, s, 8, delta));
     g.rotation.y = damp(g.rotation.y, heart.yaw, 4, delta);
     g.rotation.z = heart.roll;
