@@ -82,8 +82,8 @@ void main() {
     gl_FragColor = vec4(min(outCol, vec3(0.9)), alpha * 0.55 * (1.0 - uSkin));
   } else {
     // Pearl, normal blend: finer satin sparkles that read on Ivory (Experience §3.3).
-    vec3 pearl = mix(col, uColorIvory, 0.35) + vec3(0.2) * shine;
-    gl_FragColor = vec4(pearl, alpha * alpha * 0.8 * uSkin);
+    vec3 pearl = mix(col, uColorLav, 0.4) + vec3(0.15) * shine;
+    gl_FragColor = vec4(pearl, alpha * 0.9 * uSkin);
   }
 }
 `;

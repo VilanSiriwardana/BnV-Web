@@ -382,11 +382,15 @@ const buildGallery: SectionBuilder = (root, mobile, tier) => {
     ? {
         y: 24,
         autoAlpha: 0,
-        clipPath: 'inset(12% 8% 12% 8% round var(--radius))',
+        clipPath: 'inset(12% 8% 12% 8% round var(--radius-lg))',
       }
     : { y: 24, autoAlpha: 0 };
   const shown = clip
-    ? { y: 0, autoAlpha: 1, clipPath: 'inset(0% 0% 0% 0% round var(--radius))' }
+    ? {
+        y: 0,
+        autoAlpha: 1,
+        clipPath: 'inset(0% 0% 0% 0% round var(--radius-lg))',
+      }
     : { y: 0, autoAlpha: 1 };
   gsap.set(tiles, hidden);
   ScrollTrigger.batch(tiles, {

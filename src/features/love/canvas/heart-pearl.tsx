@@ -35,7 +35,7 @@ uniform float uOpacity;
 varying vec3 vNormal;
 varying vec3 vView;
 void main() {
-  float f = pow(1.0 - abs(dot(vNormal, vView)), 2.5);
+  float f = pow(1.0 - abs(dot(vNormal, vView)), 2.0);
   gl_FragColor = vec4(uGold, f * uOpacity);
 }
 `;
@@ -45,7 +45,7 @@ uniform vec3 uTint;
 varying vec2 vUv;
 void main() {
   float d = length((vUv - 0.5) * vec2(1.0, 2.6));
-  gl_FragColor = vec4(uTint, smoothstep(0.5, 0.0, d) * 0.22 * uOpacity);
+  gl_FragColor = vec4(uTint, smoothstep(0.5, 0.0, d) * 0.35 * uOpacity);
 }
 `;
 const uvVertex = /* glsl */ `
@@ -62,7 +62,8 @@ export function HeartPearl({ tier }: { tier: Tier }) {
     const root = document.querySelector<HTMLElement>('[data-love-root]');
     const c = root ? readTokenColors(root) : null;
     const body = (c?.primary.day ?? new Color()).clone();
-    if (c) body.lerp(c.background.day, 0.45);
+    if (c) body.lerp(c['primary-hover'].day, 0.25);
+    const lilac = c?.['primary-hover'].day ?? new Color();
     const gold = c?.gold.day ?? new Color();
 
     const geometry = new ExtrudeGeometry(heartShape(64), {
@@ -80,12 +81,13 @@ export function HeartPearl({ tier }: { tier: Tier }) {
       tier === 'high'
         ? new MeshPhysicalMaterial({
             color: body,
-            roughness: 0.35,
-            clearcoat: 0.6,
+            roughness: 0.3,
+            clearcoat: 0.8,
             clearcoatRoughness: 0.3,
             sheen: 1,
-            sheenColor: gold,
+            sheenColor: lilac,
             transparent: true,
+            toneMapped: false,
             opacity: 0,
           })
         : new MeshStandardMaterial({
@@ -93,6 +95,7 @@ export function HeartPearl({ tier }: { tier: Tier }) {
             roughness: 0.4,
             metalness: 0.05,
             transparent: true,
+            toneMapped: false,
             opacity: 0,
           });
 
@@ -100,6 +103,7 @@ export function HeartPearl({ tier }: { tier: Tier }) {
       vertexShader: rimVertex,
       fragmentShader: rimFragment,
       transparent: true,
+      toneMapped: false,
       depthWrite: false,
       side: BackSide,
       uniforms: { uGold: { value: gold }, uOpacity: { value: 0 } },
@@ -108,10 +112,11 @@ export function HeartPearl({ tier }: { tier: Tier }) {
       vertexShader: uvVertex,
       fragmentShader: shadowFragment,
       transparent: true,
+      toneMapped: false,
       depthWrite: false,
       uniforms: {
         uOpacity: { value: 0 },
-        uTint: { value: c?.foreground.day ?? new Color() },
+        uTint: { value: body.clone().multiplyScalar(0.5) },
       },
     });
     return {
@@ -146,7 +151,7 @@ export function HeartPearl({ tier }: { tier: Tier }) {
     if (!g.visible) return;
     const p = partsRef.current;
     p.surface.opacity = s;
-    p.rim.uniforms.uOpacity.value = s * (0.8 + heart.pearlRim * 0.6);
+    p.rim.uniforms.uOpacity.value = s * (1 + heart.pearlRim * 0.6);
     p.shadow.uniforms.uOpacity.value = s * (1 - heart.burst);
     // Dissolves with the particles during a burst.
     g.scale.setScalar(1 - heart.burst * 0.9);

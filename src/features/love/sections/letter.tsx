@@ -19,6 +19,12 @@ type Props = { title: string; letter: LoveSiteConfig['letter'] };
 
 const normalise = (s: string) => s.trim().toLowerCase();
 
+// The 3D heart docks behind the envelope; a round hole at the seal lets it show as the seal.
+const sealHole = (at: string, r: number) => {
+  const mask = `radial-gradient(circle ${r}px at ${at}, transparent 97%, black 100%)`;
+  return { maskImage: mask, WebkitMaskImage: mask };
+};
+
 // Experience §13. GSAP only on these elements (no Motion). The 3D heart docks onto [data-seal]
 // (story.ts buildLetter), so the seal *is* the heart.
 export function Letter({ title, letter }: Props) {
@@ -30,6 +36,7 @@ export function Letter({ title, letter }: Props) {
   const [wrong, setWrong] = useState(false);
   const passId = useId();
   const showOpen = open || quiet;
+  const sealR = letter.passphrase ? 40 : 46;
 
   // Gentle float while sealed (paused in Calm / reduced motion).
   useGSAP(
@@ -130,10 +137,22 @@ export function Letter({ title, letter }: Props) {
             data-envelope
             className="relative mt-12 aspect-[3/2] w-[80vw] max-w-md [perspective:900px]"
           >
-            <div className="border-border bg-surface absolute inset-0 rounded-lg border shadow-sm" />
+            <div
+              className="border-border bg-surface absolute inset-0 rounded-lg border shadow-sm"
+              style={
+                quiet
+                  ? undefined
+                  : sealHole(letter.passphrase ? '50% 50%' : '50% 60%', sealR)
+              }
+            />
             <div
               data-flap
               aria-hidden
+              style={
+                quiet || letter.passphrase
+                  ? undefined
+                  : sealHole('50% 100%', sealR)
+              }
               className="bg-surface-elevated border-border absolute inset-x-0 top-0 h-3/5 origin-top border [backface-visibility:hidden] [clip-path:polygon(0_0,100%_0,50%_100%)]"
             />
             {letter.passphrase ? (
@@ -152,12 +171,12 @@ export function Letter({ title, letter }: Props) {
                   <span
                     data-seal-half="left"
                     aria-hidden
-                    className="border-gold/60 absolute inset-0 rounded-full border-2 [clip-path:inset(0_50%_0_0)]"
+                    className="border-gold absolute inset-0 rounded-full border-3 [clip-path:inset(0_50%_0_0)]"
                   />
                   <span
                     data-seal-half="right"
                     aria-hidden
-                    className="border-gold/60 absolute inset-0 rounded-full border-2 [clip-path:inset(0_0_0_50%)]"
+                    className="border-gold absolute inset-0 rounded-full border-3 [clip-path:inset(0_0_0_50%)]"
                   />
                   <span className="sr-only">Open the letter</span>
                 </button>

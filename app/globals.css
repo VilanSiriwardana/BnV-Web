@@ -832,6 +832,6 @@
 }
 
 /* Motion on: sections are see-through so the fixed heart canvas shows; the root paints the page colour. */
-[data-love-motion] main [data-dawn] {
+[data-love-motion] main :is([data-dawn], [data-stage-inner]) {
   background-color: transparent;
 }

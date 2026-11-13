@@ -91,6 +91,18 @@ export function Wish({ name, prompt, done }: Props) {
           aria-describedby={`${fieldId}-hint`}
           className="focus-ring pointer-events-auto relative grid size-24 touch-none place-items-center rounded-full select-none disabled:cursor-default"
         >
+          {!quiet && (
+            <>
+              <span
+                aria-hidden
+                className="pointer-events-none absolute top-1/2 left-1/2 -z-10 size-[min(80vw,28rem)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,var(--color-secondary)_0%,transparent_65%)] opacity-40"
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute top-1/2 left-1/2 -z-10 size-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,var(--color-gold)_0%,transparent_65%)] opacity-30"
+              />
+            </>
+          )}
           <svg
             aria-hidden
             viewBox="0 0 100 100"
@@ -102,7 +114,7 @@ export function Wish({ name, prompt, done }: Props) {
               r={RING_R}
               fill="none"
               className="stroke-border"
-              strokeWidth="2"
+              strokeWidth="3"
             />
             <circle
               ref={ring}
@@ -111,7 +123,7 @@ export function Wish({ name, prompt, done }: Props) {
               r={RING_R}
               fill="none"
               className="stroke-gold"
-              strokeWidth="3"
+              strokeWidth="5"
               strokeLinecap="round"
               strokeDasharray={RING_C}
               strokeDashoffset={RING_C}

@@ -733,4 +733,5 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 ### Verification
 
 - `tsc --noEmit`, ESLint (0 problems in love), Vitest 81/81 (new: use-hold 5, session 2), `npm run build` pass.
+- Follow-up (blueprint 036, owner: "day doesn't look like much, heart should be lavender, wish is weak"). Causes: `[data-stage-inner]` kept opaque backgrounds (Wish `bg-surface`) over the canvas; the opaque envelope hid the docked heart; Pearl body was lavender lerped 45 % to Ivory and tone-mapped to near white, Pearl particles ≈ alpha⁴; gallery clip used undefined `--radius`. Fixes: transparency rule now covers stage inners (motion only), radial mask hole at the seal, Pearl body `primary` → `primary-hover` with `toneMapped: false`, lilac sheen, stronger rim/shadow, particle alpha × 0.9; Wish Blush/gold glow, larger star, thicker ring, heart rest y −0.45; `--radius-lg`.
 - NOT verified (UNCERTAIN): all browser behaviour: Pearl look and no pop, Dawn text window, gallery CLS and lightbox keys/swipe, wish hold feel and confetti, seal docking scale (`sealScale` from a formula only), letter sequence, finale burst, Replay, fast-scroll stress.

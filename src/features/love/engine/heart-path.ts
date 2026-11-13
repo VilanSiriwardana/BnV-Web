@@ -89,7 +89,7 @@ export function poseFor(section: SectionId, mobile: boolean): HeartPose {
 // Wish (Experience §12): the star sits centred; the DOM hold button sits over it.
 export const WISH_STAR_NDC = { x: 0, y: 0 };
 // The heart rests below the star and rises to it as she holds.
-export const WISH_REST = { y: -0.6, scale: 0.35 };
+export const WISH_REST = { y: -0.45, scale: 0.35 };
 export const WISH_TOP = { y: -0.05, scale: 0.5 };
 
 // Live viewport (world units at the heart's depth) → world position.

@@ -33,9 +33,9 @@ void main() {
   float ax = abs(p.x), ay = abs(p.y);
   float star = max(0.0, 1.0 - (ax * ay * 60.0 + r * 1.6));
   star = pow(star, 1.6);
-  float halo = smoothstep(1.0, 0.0, r) * mix(0.2, 1.0, uHold) * 0.45;
+  float halo = smoothstep(1.0, 0.0, r) * mix(0.2, 1.0, uHold) * 0.7;
   float twinkle = 0.9 + 0.1 * sin(uTime * 3.0);
-  vec3 col = mix(uGold, uIvory, star * 0.6);
+  vec3 col = mix(uGold, uIvory, star * 0.35);
   float a = clamp(star * (0.7 + 0.5 * uHold) * twinkle + halo, 0.0, 1.0);
   gl_FragColor = vec4(col, a * uVisible);
 }
@@ -90,7 +90,7 @@ export function WishStar() {
     );
     const w = ndcToWorld(WISH_STAR_NDC, vp);
     mesh.position.set(w.x, w.y, 0.1);
-    mesh.scale.setScalar(0.9 * (1 + 0.6 * heart.starHold));
+    mesh.scale.setScalar(1.3 * (1 + 0.6 * heart.starHold));
   });
 
   return (
