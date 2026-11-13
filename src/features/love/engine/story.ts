@@ -2,7 +2,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import { director } from './heart-director';
-import type { SectionId } from './heart-path';
+import { poseFor, type SectionId } from './heart-path';
 import { heart } from './heart-state';
 import { buildTheme, clearTheme } from './theme-timeline';
 import type { Tier } from './tiers';
@@ -48,7 +48,59 @@ const buildHero: SectionBuilder = (root) => {
       gsap.to(cue, { opacity: 0, duration: 0.4, overwrite: 'auto' }),
   });
 };
-const buildBloom: SectionBuilder = () => {};
+// Experience §7: path scrubbed (heart drifts right and shrinks, camera dollies), burst triggered.
+const buildBloom: SectionBuilder = (root, mobile) => {
+  const bloom = root.querySelector<HTMLElement>('#bloom');
+  if (!bloom) return;
+  baselineOn(bloom, 'bloom');
+  const from = poseFor('hero', mobile);
+  const to = poseFor('bloom', mobile);
+  const scrub = { immediateRender: false, ease: 'none', duration: 1 };
+  gsap
+    .timeline({
+      scrollTrigger: {
+        trigger: bloom,
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: 0.8,
+      },
+    })
+    .fromTo(
+      heart.ndc,
+      { x: from.x, y: from.y },
+      { x: to.x, y: to.y, ...scrub },
+      0,
+    )
+    .fromTo(heart, { scale: from.scale }, { scale: to.scale, ...scrub }, 0)
+    .fromTo(
+      heart,
+      { cameraZ: 6 },
+      { cameraZ: 4.2, ...scrub, duration: 0.5, ease: 'sine.inOut' },
+      0,
+    )
+    .to(heart, { cameraZ: 6, duration: 0.5, ease: 'sine.inOut' }, 0.5);
+
+  ScrollTrigger.create({
+    trigger: bloom,
+    start: 'top 60%',
+    onEnter: () => director.play('burstReform', { petals: true }),
+    onEnterBack: () => director.settle(),
+  });
+
+  const line = bloom.querySelector('[data-bloom-line]');
+  if (line)
+    gsap.from(line, {
+      y: 16,
+      autoAlpha: 0,
+      duration: 0.4,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: bloom,
+        start: 'top 70%',
+        toggleActions: 'play none none reverse',
+      },
+    });
+};
 const buildMemories: SectionBuilder = () => {};
 const buildTimeline: SectionBuilder = () => {};
 const buildDawn: SectionBuilder = () => {};

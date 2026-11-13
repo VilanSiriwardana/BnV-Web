@@ -7,6 +7,7 @@ import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import { TIERS, type Tier } from '../engine/tiers';
 import { Heart } from './heart';
 import { MiniHearts } from './mini-hearts';
+import { Petals } from './petals';
 
 type Props = {
   tier: Tier;
@@ -53,6 +54,7 @@ export default function LoveCanvas({
       <Heart tier={tier} onTap={onHeartTap}>
         <MiniHearts tier={tier} />
       </Heart>
+      <Petals tier={tier} />
       {config.bloom !== 'off' && (
         <EffectComposer multisampling={0}>
           <Bloom

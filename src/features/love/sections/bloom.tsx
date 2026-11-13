@@ -6,7 +6,9 @@ export function Bloom({ line }: { line: string }) {
       <h2 id="bloom-title" className="sr-only">
         Bloom
       </h2>
-      <p className={`${proseColumn} text-body-lg italic`}>{line}</p>
+      <p data-bloom-line className={`${proseColumn} text-body-lg italic`}>
+        {line}
+      </p>
     </LoveSection>
   );
 }

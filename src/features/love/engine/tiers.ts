@@ -11,6 +11,7 @@ export const TIERS = {
     orbs: 8,
     confetti: 300,
     miniHearts: 40,
+    petals: 120,
   },
   mid: {
     particles: 8000,
@@ -19,6 +20,7 @@ export const TIERS = {
     orbs: 8,
     confetti: 160,
     miniHearts: 28,
+    petals: 70,
   },
   low: {
     particles: 3000,
@@ -27,6 +29,7 @@ export const TIERS = {
     orbs: 6,
     confetti: 80,
     miniHearts: 18,
+    petals: 40,
   },
   static: {
     particles: 0,
@@ -35,6 +38,7 @@ export const TIERS = {
     orbs: 0,
     confetti: 0,
     miniHearts: 0,
+    petals: 0,
   },
 } as const satisfies Record<
   Tier,
@@ -45,6 +49,7 @@ export const TIERS = {
     orbs: number;
     confetti: number;
     miniHearts: number;
+    petals: number;
   }
 >;
 
