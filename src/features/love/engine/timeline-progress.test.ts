@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import {
   activeNode,
+  LAST_NODE,
+  pastLastNode,
   nodeSectionProgress,
   threadProgress,
 } from './timeline-progress';
@@ -28,5 +30,14 @@ describe('activeNode', () => {
     for (let i = 0; i < 5; i++) {
       expect(activeNode(threadProgress(nodeSectionProgress(i)) + 1e-9)).toBe(i);
     }
+  });
+});
+
+describe('pastLastNode', () => {
+  it('is false on and before the last node and true just after it', () => {
+    expect(pastLastNode(0.5)).toBe(false);
+    expect(pastLastNode(LAST_NODE)).toBe(false);
+    expect(pastLastNode(LAST_NODE + 0.05)).toBe(true);
+    expect(pastLastNode(1)).toBe(true);
   });
 });

@@ -5,6 +5,9 @@ export const session = {
   replayArmed: false, // true after Replay until the hero weave has played again
 };
 
+// Dispatched on #letter by story.ts buildLetter when she scrolls on without opening it.
+export const LETTER_OPEN_EVENT = 'love:letter-open';
+
 const listeners = new Set<() => void>();
 
 export function onSessionReset(fn: () => void) {

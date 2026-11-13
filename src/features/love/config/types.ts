@@ -18,6 +18,8 @@ export type LoveSiteConfig = {
     timelineTitle: string;
     starlightLine: string;
     galleryTitle: string;
+    danceTitle: string;
+    danceLine: string;
     wishPrompt: string;
     wishDone: string;
     letterTitle: string;
@@ -41,6 +43,11 @@ export type LoveSiteConfig = {
     featured?: boolean;
   }[];
   gallery: PhotoRef[];
-  letter: { paragraphs: string[]; signoff: string; passphrase?: string };
+  letter: {
+    salutation?: string;
+    paragraphs: string[];
+    signoff: string;
+    passphrase?: string;
+  };
   music: { src: string; credit: string };
 };

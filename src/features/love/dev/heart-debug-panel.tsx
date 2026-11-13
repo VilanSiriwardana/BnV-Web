@@ -19,6 +19,7 @@ const SECTIONS = [
   'timeline',
   'starlight',
   'gallery',
+  'dance',
   'wish',
   'letter',
   'finale',

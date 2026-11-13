@@ -3,8 +3,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 
-import { Button } from '@/components/ui/button';
-
 import { audio } from '../engine/audio-engine';
 import { useMotionPrefs } from '../engine/motion-prefs';
 import { useLoveScroll } from '../engine/scroll-engine';
@@ -99,55 +97,134 @@ export function Gate({ name, musicSrc, sceneReady, onEnter }: Props) {
           />
           <div
             aria-hidden
+            className="love-gate-frame-inner pointer-events-none absolute inset-6 rounded-[1.25rem] sm:inset-10"
+          />
+          <div
+            aria-hidden
+            className="love-grain pointer-events-none absolute inset-0"
+          />
+          <div
+            aria-hidden
             className="love-gate-halo pointer-events-none absolute top-[12%] left-1/2 size-[min(90vw,34rem)] -translate-x-1/2 rounded-full"
           />
           <p className="text-gold relative z-10 mt-[max(2.5rem,7svh)] font-sans text-[0.65rem] font-semibold tracking-[0.38em] uppercase sm:text-xs">
             A moment made for you
           </p>
-          <div className="relative z-10 mt-auto flex w-full max-w-xl flex-col items-center pb-6">
-            <div className="relative grid size-36 place-items-center sm:size-44">
-              <span
-                aria-hidden
-                className="border-gold/30 absolute inset-3 rotate-45 rounded-[2.4rem] border"
-              />
-              <span
-                aria-hidden
-                className="border-primary/15 absolute inset-0 rounded-full border"
-              />
-              <svg
-                aria-hidden
-                viewBox="0 0 120 120"
-                className={`absolute inset-0 size-full -rotate-90 ${ready || calm ? '' : '[animation-duration:2.4s] motion-safe:animate-spin'}`}
-              >
-                <circle
-                  cx="60"
-                  cy="60"
-                  r={RING_R}
-                  fill="none"
-                  strokeWidth="1"
-                  className="stroke-primary transition-[stroke-dashoffset,opacity] duration-500"
-                  strokeDasharray={RING_C}
-                  strokeDashoffset={RING_C * (1 - shown / 100)}
-                  opacity={ready ? 0 : 0.6}
-                />
-              </svg>
+          <div className="relative z-10 my-auto flex w-full max-w-xl flex-col items-center py-6">
+            <div className="relative">
               <div
-                ref={seedRef}
                 aria-hidden
-                data-love-seed={calm ? undefined : ''}
-                className="size-24 rounded-full bg-[radial-gradient(circle,var(--gold)_0%,var(--primary)_18%,color-mix(in_oklab,var(--secondary)_55%,transparent)_44%,transparent_72%)]"
-              />
+                className="text-gold-text absolute right-[calc(100%-2.5rem)] bottom-[calc(100%-1.75rem)] flex w-32 flex-col items-start sm:w-40"
+              >
+                <span className="font-body -rotate-6 text-[clamp(1.4rem,5vw,1.8rem)] italic">
+                  Tap this
+                </span>
+                <svg viewBox="0 0 120 70" className="-mt-1 ml-6 w-24 sm:w-28">
+                  <motion.path
+                    d="M 8 6 C 30 40, 62 58, 104 56"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    initial={{ pathLength: calm ? 1 : 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{
+                      duration: 1.2,
+                      delay: 0.4,
+                      ease: 'easeInOut',
+                    }}
+                  />
+                  <motion.path
+                    d="M 94 47 L 106 56 L 93 64"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    initial={{ opacity: calm ? 1 : 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3, delay: 1.5 }}
+                  />
+                </svg>
+              </div>
+              <motion.button
+                type="button"
+                autoFocus
+                aria-label={ready ? 'Begin' : 'Getting ready'}
+                aria-disabled={!ready}
+                onClick={enter}
+                animate={calm || !ready ? undefined : { scale: [1, 1.04, 1] }}
+                transition={{
+                  duration: 2.4,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+                className="focus-ring relative grid size-40 cursor-pointer place-items-center rounded-full sm:size-48"
+              >
+                <span
+                  aria-hidden
+                  className="border-gold/30 absolute inset-2 rounded-full border"
+                />
+                <svg
+                  aria-hidden
+                  viewBox="0 0 120 120"
+                  className={`absolute inset-0 size-full -rotate-90 ${ready || calm ? '' : '[animation-duration:2.4s] motion-safe:animate-spin'}`}
+                >
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r={RING_R}
+                    fill="none"
+                    strokeWidth="1"
+                    className="stroke-primary transition-[stroke-dashoffset,opacity] duration-500"
+                    strokeDasharray={RING_C}
+                    strokeDashoffset={RING_C * (1 - shown / 100)}
+                    opacity={ready ? 0 : 0.6}
+                  />
+                </svg>
+                <div
+                  ref={seedRef}
+                  aria-hidden
+                  data-love-seed={calm ? undefined : ''}
+                  className="absolute size-28 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--gold)_55%,transparent)_0%,color-mix(in_oklab,var(--primary)_35%,transparent)_40%,transparent_72%)] blur-md"
+                />
+                <svg
+                  aria-hidden
+                  viewBox="0 0 100 92"
+                  className="relative w-20 drop-shadow-[0_0_18px_var(--gold)] sm:w-24"
+                >
+                  <defs>
+                    <radialGradient id="gate-heart" cx="40%" cy="35%" r="75%">
+                      <stop offset="0%" stopColor="var(--gold)" />
+                      <stop offset="45%" stopColor="var(--primary)" />
+                      <stop offset="100%" stopColor="var(--secondary)" />
+                    </radialGradient>
+                  </defs>
+                  <path
+                    d="M50 88 C 20 66, 4 48, 4 28 C 4 13, 15 4, 28 4 C 38 4, 46 10, 50 19 C 54 10, 62 4, 72 4 C 85 4, 96 13, 96 28 C 96 48, 80 66, 50 88 Z"
+                    fill="url(#gate-heart)"
+                    stroke="var(--gold)"
+                    strokeWidth="2"
+                  />
+                </svg>
+              </motion.button>
             </div>
-            <p className="text-primary mt-7 font-sans text-[0.65rem] font-semibold tracking-[0.32em] uppercase sm:text-xs">
+            <p
+              aria-live="polite"
+              className="text-gold-text mt-4 font-sans text-[0.65rem] font-semibold tracking-[0.32em] uppercase sm:text-xs"
+            >
+              {ready ? 'Open your story' : 'Getting ready…'}
+            </p>
+            <p className="text-primary mt-8 font-sans text-[0.65rem] font-semibold tracking-[0.32em] uppercase sm:text-xs">
               To my favourite person
             </p>
             <h2
               id="gate-title"
-              className="font-display text-gold-text mt-3 text-[clamp(2.8rem,12vw,5rem)] leading-tight"
+              className="font-display text-gold-text mt-3 text-[clamp(2.6rem,11vw,4.6rem)] leading-tight"
             >
               For {name}
             </h2>
-            <p className="font-body text-foreground/90 mt-3 max-w-[30ch] text-[clamp(1.35rem,5vw,1.75rem)] leading-snug italic">
+            <p className="font-body text-foreground/90 mt-3 max-w-[30ch] text-[clamp(1.3rem,5vw,1.7rem)] leading-snug italic">
               A little something for you. A story waiting to unfold.
             </p>
             <div
@@ -159,16 +236,6 @@ export function Gate({ name, musicSrc, sceneReady, onEnter }: Props) {
               <span className="h-px w-12 bg-current" />
             </div>
           </div>
-          <Button
-            size="lg"
-            autoFocus
-            type="button"
-            aria-disabled={!ready}
-            onClick={enter}
-            className="bg-primary hover:bg-primary-hover relative z-10 mb-[max(3.5rem,10svh)] min-h-14 min-w-48 rounded-full border border-white/20 px-8 text-base shadow-[0_12px_42px_color-mix(in_oklab,var(--primary)_25%,transparent)] sm:mb-[12svh]"
-          >
-            {ready ? 'Tap to begin' : 'Getting ready…'}
-          </Button>
         </motion.div>
       )}
     </AnimatePresence>

@@ -17,6 +17,7 @@ import { useQuiet } from './engine/use-quiet';
 import { Bloom } from './sections/bloom';
 import { Starlight } from './sections/starlight';
 import { Finale } from './sections/finale';
+import { Dance } from './sections/dance';
 import { Gallery } from './sections/gallery';
 import { Gate } from './sections/gate';
 import { Hero } from './sections/hero';
@@ -120,6 +121,7 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
         <Timeline title={site.copy.timelineTitle} items={site.timeline} />
         <Starlight line={site.copy.starlightLine} />
         <Gallery title={site.copy.galleryTitle} photos={site.gallery} />
+        <Dance title={site.copy.danceTitle} line={site.copy.danceLine} />
         <Wish
           name={name}
           prompt={site.copy.wishPrompt}

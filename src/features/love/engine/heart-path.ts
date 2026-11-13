@@ -9,6 +9,7 @@ export const SECTION_IDS = [
   'timeline',
   'starlight',
   'gallery',
+  'dance',
   'wish',
   'letter',
   'finale',
@@ -30,7 +31,8 @@ export const HEART_PATH: Record<SectionId, PathEntry> = {
     desktop: { x: 0, y: 0.05, scale: 1 },
     mobile: { x: 0, y: 0.25, scale: 0.9 },
     gold: 0,
-    glow: 0.7,
+    // Matches the intro glow (heart-state) so nothing brightens once the intro settles.
+    glow: 0.6,
   },
   bloom: {
     desktop: { x: 0.55, y: 0.1, scale: 0.55 },
@@ -62,6 +64,12 @@ export const HEART_PATH: Record<SectionId, PathEntry> = {
     gold: 0.4,
     glow: 0.35,
   },
+  dance: {
+    desktop: { x: 0, y: 0.55, scale: 0.18 },
+    mobile: { x: 0, y: 0.62, scale: 0.16 },
+    gold: 0.45,
+    glow: 0.45,
+  },
   wish: {
     desktop: { x: 0, y: 0, scale: 0.5 },
     mobile: { x: 0, y: 0, scale: 0.5 },
@@ -88,6 +96,9 @@ export function poseFor(section: SectionId, mobile: boolean): HeartPose {
 }
 
 // Wish (Experience §12): the star sits centred; the DOM hold button sits over it.
+// Hero intro: the weave ends this far below the pose, then floats up with the title.
+export const HERO_RISE = 0.14;
+
 export const WISH_STAR_NDC = { x: 0, y: 0 };
 // The heart rests below the star and rises to it as she holds.
 export const WISH_REST = { y: -0.45, scale: 0.35 };

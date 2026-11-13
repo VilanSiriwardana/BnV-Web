@@ -12,6 +12,7 @@ export const TIERS = {
     confetti: 300,
     miniHearts: 40,
     petals: 120,
+    danceParticles: 14000,
   },
   mid: {
     particles: 8000,
@@ -21,6 +22,7 @@ export const TIERS = {
     confetti: 160,
     miniHearts: 28,
     petals: 70,
+    danceParticles: 7000,
   },
   low: {
     particles: 3000,
@@ -30,6 +32,7 @@ export const TIERS = {
     confetti: 80,
     miniHearts: 18,
     petals: 40,
+    danceParticles: 0,
   },
   static: {
     particles: 0,
@@ -39,6 +42,7 @@ export const TIERS = {
     confetti: 0,
     miniHearts: 0,
     petals: 0,
+    danceParticles: 0,
   },
 } as const satisfies Record<
   Tier,
@@ -50,6 +54,7 @@ export const TIERS = {
     confetti: number;
     miniHearts: number;
     petals: number;
+    danceParticles: number;
   }
 >;
 

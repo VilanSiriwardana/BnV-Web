@@ -2,7 +2,14 @@
 
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import { type FormEvent, useCallback, useId, useRef, useState } from 'react';
+import {
+  type FormEvent,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,8 +17,15 @@ import { cn } from '@/lib/utils/cn';
 
 import type { LoveSiteConfig } from '../config';
 import { director } from '../engine/heart-director';
+import { LETTER_OPEN_EVENT } from '../engine/session';
+import { useLoveScroll } from '../engine/scroll-engine';
 import { useQuiet } from '../engine/use-quiet';
 import { useHold } from '../hooks/use-hold';
+import {
+  HeartDivider,
+  LetterBackdrop,
+  ParchmentFrame,
+} from './letter-ornaments';
 import { labelText, LoveSection, sectionTitle } from './love-section';
 
 const HOLD_MS = 1200;
@@ -19,16 +33,20 @@ type Props = { title: string; letter: LoveSiteConfig['letter'] };
 
 const normalise = (s: string) => s.trim().toLowerCase();
 
-// The 3D heart docks behind the envelope; a round hole at the seal lets it show as the seal.
+// The 3D heart docks behind the rolled scroll; a round hole at the seal lets it show as the seal.
 const sealHole = (at: string, r: number) => {
   const mask = `radial-gradient(circle ${r}px at ${at}, transparent 97%, black 100%)`;
   return { maskImage: mask, WebkitMaskImage: mask };
 };
 
-// Experience §13. GSAP only on these elements (no Motion). The 3D heart docks onto [data-seal]
-// (story.ts buildLetter), so the seal *is* the heart.
+const rod =
+  'relative z-10 h-6 rounded-full bg-[linear-gradient(180deg,color-mix(in_oklab,var(--gold)_70%,white),var(--gold)_45%,color-mix(in_oklab,var(--gold)_55%,black))] shadow-[0_6px_18px_-6px_color-mix(in_oklab,var(--gold)_70%,transparent)] before:absolute before:top-1/2 before:-left-3 before:size-5 before:-translate-y-1/2 before:rounded-full before:bg-[var(--gold)] after:absolute after:top-1/2 after:-right-3 after:size-5 after:-translate-y-1/2 after:rounded-full after:bg-[var(--gold)]';
+
+// Experience §13 + §19.4. GSAP only on these elements (no Motion). The 3D heart docks onto
+// [data-seal] (story.ts buildLetter), so the seal *is* the heart. Scrolling on opens it too.
 export function Letter({ title, letter }: Props) {
   const quiet = useQuiet();
+  const { scrollTo } = useLoveScroll();
   const root = useRef<HTMLDivElement>(null);
   const opened = useRef(false);
   const [open, setOpen] = useState(false);
@@ -37,11 +55,19 @@ export function Letter({ title, letter }: Props) {
   const showOpen = open || quiet;
   const sealR = letter.passphrase ? 40 : 46;
 
-  // Gentle float while sealed (paused in Calm / reduced motion).
+  // Rolled: rods meet at the centre and the parchment is clipped shut.
   useGSAP(
     () => {
-      if (quiet) return;
-      gsap.to('[data-envelope]', {
+      if (quiet || opened.current) return;
+      const half = () =>
+        (root.current?.querySelector<HTMLElement>('[data-scroll]')
+          ?.offsetHeight ?? 0) /
+          2 -
+        12;
+      gsap.set('[data-rod="top"]', { y: half });
+      gsap.set('[data-rod="bottom"]', { y: () => -half() });
+      gsap.set('[data-letter-card]', { clipPath: 'inset(50% 0% 50% 0%)' });
+      gsap.to('[data-scroll]', {
         y: -6,
         duration: 3,
         ease: 'sine.inOut',
@@ -62,46 +88,61 @@ export function Letter({ title, letter }: Props) {
       return;
     }
     contextSafe(() => {
-      gsap.killTweensOf('[data-envelope]');
+      gsap.killTweensOf('[data-scroll]');
       gsap
         .timeline({ onComplete: () => setOpen(true) })
         .to(
           '[data-seal-half="left"]',
-          { x: -10, rotate: -12, autoAlpha: 0, duration: 0.3 },
+          { x: -12, rotate: -14, autoAlpha: 0, duration: 0.35 },
           0,
         )
         .to(
           '[data-seal-half="right"]',
-          { x: 10, rotate: 12, autoAlpha: 0, duration: 0.3 },
+          { x: 12, rotate: 14, autoAlpha: 0, duration: 0.35 },
           0,
         )
         .call(() => void director.play('sealBreak'), [], 0)
+        .set('[data-letter-card]', { autoAlpha: 1 }, 0.3)
+        .to('[data-rod]', { y: 0, duration: 1.6, ease: 'power2.inOut' }, 0.35)
         .to(
-          '[data-flap]',
-          { rotateX: -180, duration: 0.7, ease: 'power2.inOut' },
-          0.2,
-        )
-        .fromTo(
           '[data-letter-card]',
-          { autoAlpha: 0, y: 60, scale: 0.6 },
-          { autoAlpha: 1, y: 0, scale: 1, duration: 0.7, ease: 'power3.out' },
-          0.7,
+          {
+            clipPath: 'inset(0% 0% 0% 0%)',
+            duration: 1.6,
+            ease: 'power2.inOut',
+          },
+          0.35,
         )
-        .to('[data-envelope]', { autoAlpha: 0, duration: 0.5 }, 0.9)
         .fromTo(
           '[data-letter-p]',
-          { autoAlpha: 0, y: 16 },
+          { autoAlpha: 0, y: 12 },
           {
             autoAlpha: 1,
             y: 0,
-            duration: 0.5,
-            stagger: 0.4,
+            duration: 0.6,
+            stagger: 0.35,
             ease: 'power2.out',
           },
-          1.4,
+          1.6,
         );
     })();
   }, [quiet, contextSafe]);
+
+  // story.ts buildLetter dispatches this once she scrolls on without opening (no passphrase).
+  useEffect(() => {
+    const section = root.current?.closest('section');
+    if (!section || letter.passphrase) return;
+    const autoOpen = () => {
+      unlock();
+      if (section.getBoundingClientRect().bottom < window.innerHeight * 1.2) {
+        const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+        const pin = section.offsetHeight - window.innerHeight;
+        scrollTo(sectionTop + pin * 0.35);
+      }
+    };
+    section.addEventListener(LETTER_OPEN_EVENT, autoOpen);
+    return () => section.removeEventListener(LETTER_OPEN_EVENT, autoOpen);
+  }, [unlock, letter.passphrase, scrollTo]);
 
   const { handlers } = useHold({
     duration: HOLD_MS,
@@ -124,42 +165,95 @@ export function Letter({ title, letter }: Props) {
     } else setWrong(true);
   };
 
+  const [first, ...rest] = letter.paragraphs;
+
   return (
-    <LoveSection id="letter" depth={1} stage="200vh">
-      <div ref={root} className="flex w-full flex-col items-center">
-        <h2 id="letter-title" className={sectionTitle}>
+    <LoveSection id="letter" depth={1} stage="300vh">
+      <div
+        ref={root}
+        data-letter-locked={letter.passphrase ? '' : undefined}
+        className="relative flex w-full flex-col items-center"
+      >
+        {!quiet && <LetterBackdrop />}
+        <h2 id="letter-title" className={cn(sectionTitle, 'relative z-10')}>
           {title}
         </h2>
 
-        {!showOpen && (
-          <div
-            data-envelope
-            className="relative mt-12 aspect-[3/2] w-[80vw] max-w-md [perspective:900px]"
-          >
+        <div
+          data-scroll
+          className={cn(
+            'z-10 mx-auto flex w-full max-w-2xl flex-col',
+            quiet
+              ? 'relative mt-12'
+              : 'absolute inset-x-4 top-[56%] h-[min(68svh,46rem)] w-auto -translate-y-1/2',
+          )}
+        >
+          {!quiet && (
             <div
-              className="border-gold/40 bg-surface absolute inset-0 rounded-lg border"
-              style={
-                quiet
-                  ? undefined
-                  : sealHole(letter.passphrase ? '50% 50%' : '50% 60%', sealR)
-              }
-            />
-            <div
-              data-flap
+              data-rod="top"
               aria-hidden
-              style={
-                quiet || letter.passphrase
-                  ? undefined
-                  : sealHole('50% 100%', sealR)
-              }
-              className="bg-surface-elevated border-gold/40 absolute inset-x-0 top-0 h-3/5 origin-top border [backface-visibility:hidden] [clip-path:polygon(0_0,100%_0,50%_100%)]"
+              className={rod}
+              style={showOpen ? undefined : sealHole('50% 100%', sealR)}
             />
-            {letter.passphrase ? (
-              <div className="absolute inset-x-0 top-1/2 flex -translate-y-1/2 justify-center">
-                <span aria-hidden data-seal className="size-20" />
+          )}
+          <article
+            data-letter-card
+            data-lenis-prevent
+            aria-hidden={!showOpen}
+            className={cn(
+              'love-parchment relative min-h-0 flex-1 overflow-y-auto px-8 py-12 text-left md:px-14 md:py-14',
+              quiet ? 'rounded-lg' : '-my-3',
+              !showOpen && 'invisible',
+            )}
+          >
+            <ParchmentFrame />
+            <div className="relative mx-auto flex max-w-[60ch] flex-col gap-5 text-[1.15rem] leading-relaxed text-pretty break-words md:text-[1.25rem]">
+              {letter.salutation && (
+                <p
+                  data-letter-p
+                  className="font-display text-[1.4rem] md:text-[1.6rem]"
+                >
+                  {letter.salutation}
+                </p>
+              )}
+              {first && (
+                <p
+                  data-letter-p
+                  className="first-letter:font-display first-letter:text-gold-text first-letter:float-left first-letter:mr-2 first-letter:text-[3.4em] first-letter:leading-[0.85]"
+                >
+                  {first}
+                </p>
+              )}
+              <div data-letter-p>
+                <HeartDivider />
               </div>
-            ) : (
-              <div className="absolute inset-x-0 top-[60%] flex -translate-y-1/2 justify-center">
+              {rest.map((p, i) => (
+                <p key={i} data-letter-p>
+                  {p}
+                </p>
+              ))}
+              <div data-letter-p className="mt-4">
+                <HeartDivider />
+              </div>
+              <p data-letter-p className="text-right italic">
+                {letter.signoff}
+              </p>
+            </div>
+          </article>
+          {!quiet && (
+            <div
+              data-rod="bottom"
+              aria-hidden
+              className={rod}
+              style={showOpen ? undefined : sealHole('50% 0%', sealR)}
+            />
+          )}
+
+          {!showOpen && (
+            <div className="absolute inset-x-0 top-1/2 z-20 flex -translate-y-1/2 justify-center">
+              {letter.passphrase ? (
+                <span aria-hidden data-seal className="size-20" />
+              ) : (
                 <button
                   type="button"
                   data-seal
@@ -179,68 +273,44 @@ export function Letter({ title, letter }: Props) {
                   />
                   <span className="sr-only">Open the letter</span>
                 </button>
-              </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {!showOpen && (
+          <div className="absolute inset-x-4 top-[calc(56%+6rem)] z-10 mx-auto flex max-w-sm flex-col items-center">
+            {!letter.passphrase && (
+              <p id={`${passId}-hint`} className={labelText}>
+                Hold the seal, or keep scrolling.
+              </p>
+            )}
+            {letter.passphrase && (
+              <form onSubmit={submit} className="flex w-full flex-col gap-2">
+                <label htmlFor={passId} className={labelText}>
+                  Our word
+                </label>
+                <div className="flex gap-2">
+                  <Input
+                    id={passId}
+                    name="passphrase"
+                    autoComplete="off"
+                    aria-invalid={wrong || undefined}
+                    aria-describedby={`${passId}-msg`}
+                  />
+                  <Button type="submit">Open</Button>
+                </div>
+                <p
+                  id={`${passId}-msg`}
+                  aria-live="polite"
+                  className="text-small text-muted-foreground min-h-[1.5em] font-sans"
+                >
+                  {wrong ? 'Not quite, try again' : ''}
+                </p>
+              </form>
             )}
           </div>
         )}
-
-        {!showOpen && !letter.passphrase && (
-          <p id={`${passId}-hint`} className={cn(labelText, 'mt-6')}>
-            {quiet ? 'Tap the seal to open.' : 'Hold the seal to open.'}
-          </p>
-        )}
-
-        {!showOpen && letter.passphrase && (
-          <form
-            onSubmit={submit}
-            className="mt-8 flex w-full max-w-sm flex-col gap-2"
-          >
-            <label htmlFor={passId} className={labelText}>
-              Our word
-            </label>
-            <div className="flex gap-2">
-              <Input
-                id={passId}
-                name="passphrase"
-                autoComplete="off"
-                aria-invalid={wrong || undefined}
-                aria-describedby={`${passId}-msg`}
-              />
-              <Button type="submit">Open</Button>
-            </div>
-            <p
-              id={`${passId}-msg`}
-              aria-live="polite"
-              className="text-small text-muted-foreground min-h-[1.5em] font-sans"
-            >
-              {wrong ? 'Not quite, try again' : ''}
-            </p>
-          </form>
-        )}
-
-        <article
-          data-letter-card
-          data-lenis-prevent
-          aria-hidden={!showOpen}
-          className={cn(
-            'border-gold/40 bg-surface-elevated w-full max-w-2xl overflow-y-auto rounded-lg border p-8 text-left shadow-[0_0_48px_-12px_var(--color-primary)] md:p-12',
-            quiet
-              ? 'mt-12 max-h-[70svh]'
-              : 'absolute inset-x-4 top-[56%] mx-auto max-h-[64svh] w-auto -translate-y-1/2',
-            !showOpen && 'invisible',
-          )}
-        >
-          <div className="text-body mx-auto flex max-w-[60ch] flex-col gap-5 text-pretty break-words">
-            {letter.paragraphs.map((p, i) => (
-              <p key={i} data-letter-p>
-                {p}
-              </p>
-            ))}
-            <p data-letter-p className="mt-4 italic">
-              {letter.signoff}
-            </p>
-          </div>
-        </article>
       </div>
     </LoveSection>
   );

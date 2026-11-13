@@ -11,7 +11,8 @@ import { Arrow } from './arrow';
 import { Confetti } from './confetti';
 import { Heart } from './heart';
 import { MemoryOrbs } from './memory-orbs';
-import { MiniHearts } from './mini-hearts';
+import { DanceDuo } from './dance-duo';
+import { AmbientHearts, MiniHearts } from './mini-hearts';
 import { Petals } from './petals';
 import { ShockRing } from './shock-ring';
 import { Sparks } from './sparks';
@@ -66,6 +67,8 @@ export default function LoveCanvas({
         <MiniHearts tier={tier} />
       </Heart>
       <Petals tier={tier} />
+      <AmbientHearts tier={tier} />
+      {tier !== 'low' && <DanceDuo tier={tier} />}
       <Suspense fallback={null}>
         <MemoryOrbs tier={tier} memories={memories} />
       </Suspense>

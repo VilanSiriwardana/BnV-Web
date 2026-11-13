@@ -20,8 +20,29 @@ type Item = LoveSiteConfig['timeline'][number];
 type Props = { title: string; items: Item[] };
 
 // Thread paths in a 0–100 box stretched to the stage (vector-effect keeps the stroke even).
-const DESKTOP_PATH = 'M 3 58 C 18 22, 34 22, 50 50 S 82 78, 97 42';
-const MOBILE_PATH = 'M 9 10 C 14 22, 4 34, 9 46 S 13 56, 9 60';
+// Desktop: a spiral winding inward to the birthdate; mobile: a tall winding helix.
+const toPath = (pts: [number, number][]) =>
+  pts
+    .map(([x, y], i) => `${i ? 'L' : 'M'} ${x.toFixed(2)} ${y.toFixed(2)}`)
+    .join(' ');
+const STEPS = 160;
+const DESKTOP_PATH = toPath(
+  Array.from({ length: STEPS + 1 }, (_, i) => {
+    const t = i / STEPS;
+    const a = Math.PI + t * Math.PI * 2 * 1.75;
+    const r = 1 - 0.82 * t;
+    return [50 + Math.cos(a) * 44 * r, 52 + Math.sin(a) * 38 * r];
+  }),
+);
+const MOBILE_PATH = toPath(
+  Array.from({ length: STEPS + 1 }, (_, i) => {
+    const t = i / STEPS;
+    return [
+      50 + 38 * Math.sin(t * Math.PI * 2 * 1.25 - Math.PI / 2),
+      4 + t * 54,
+    ];
+  }),
+);
 const MOBILE_QUERY = '(max-width: 767px)';
 
 export function Timeline({ title, items }: Props) {
@@ -63,6 +84,7 @@ function ThreadStage({ items }: { items: Item[] }) {
         const pt = path.getPointAtLength(NODE_FRACTIONS[i] * len);
         node.style.left = `${pt.x}%`;
         node.style.top = `${pt.y}%`;
+        node.dataset.side = pt.x > 50 ? 'right' : 'left';
         const card = cards[i];
         if (!card) return;
         card.style.left = mobile
@@ -88,7 +110,10 @@ function ThreadStage({ items }: { items: Item[] }) {
 
   const thread = 'stroke-gold fill-none';
   return (
-    <div ref={layer} className="absolute inset-0">
+    <div
+      ref={layer}
+      className="absolute inset-0 max-md:top-[clamp(8rem,24svh,11rem)]"
+    >
       <svg
         aria-hidden
         viewBox="0 0 100 100"
@@ -142,7 +167,7 @@ function ThreadStage({ items }: { items: Item[] }) {
                 aria-hidden
                 className={cn(
                   labelText,
-                  'absolute top-full mt-1 whitespace-nowrap max-md:top-1/2 max-md:left-full max-md:mt-0 max-md:ml-1 max-md:-translate-y-1/2',
+                  'absolute top-full mt-1 whitespace-nowrap max-md:top-1/2 max-md:left-full max-md:mt-0 max-md:ml-1 max-md:-translate-y-1/2 max-md:group-data-[side=right]:right-full max-md:group-data-[side=right]:left-auto max-md:group-data-[side=right]:mr-1',
                 )}
               >
                 {t.date}

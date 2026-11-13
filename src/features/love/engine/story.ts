@@ -3,8 +3,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import { director } from './heart-director';
 import { replayHeroWeave } from './hero-intro';
-import { session } from './session';
+import { LETTER_OPEN_EVENT, session } from './session';
 import { poseFor, type SectionId, WISH_REST } from './heart-path';
+import { dance } from './dance-state';
 import { heart } from './heart-state';
 import { memoriesState } from './memories-state';
 import { RAIL_START_Z, railEndZ } from './memory-layout';
@@ -13,8 +14,9 @@ import { buildTheme, clearTheme } from './theme-timeline';
 import {
   activeNode,
   INTRO,
+  LAST_NODE,
   OUTRO,
-  REARM_BELOW,
+  pastLastNode,
   threadProgress,
 } from './timeline-progress';
 import type { Tier } from './tiers';
@@ -282,9 +284,8 @@ const buildTimeline: SectionBuilder = (root, mobile) => {
         activate(i, i > last);
         last = i;
       }
-      if (featured >= 0 && i >= featured && armed)
-        armed = !director.interrupt('arrowStrike');
-      if (p < REARM_BELOW && !armed) {
+      if (pastLastNode(tp) && armed) armed = !director.interrupt('arrowStrike');
+      if (tp < LAST_NODE && !armed) {
         armed = true;
         director.resetBoost();
       }
@@ -426,6 +427,59 @@ const buildGallery: SectionBuilder = (root, mobile, tier) => {
   });
 };
 
+// Experience §19.6: the duo fades in while the stage is on screen; scroll scrubs the move,
+// the heart floats above them and pulses once on the dip.
+const buildDance: SectionBuilder = (root, mobile) => {
+  const el = root.querySelector<HTMLElement>('#dance');
+  if (!el) return;
+  baselineOn(el, 'dance');
+  const from = poseFor('gallery', mobile);
+  const to = poseFor('dance', mobile);
+  const scrub = { immediateRender: false, ease: 'none' };
+  gsap
+    .timeline({
+      scrollTrigger: {
+        trigger: el,
+        start: 'top bottom',
+        end: 'top top',
+        scrub: 0.8,
+      },
+    })
+    .fromTo(
+      heart.ndc,
+      { x: from.x, y: from.y },
+      { x: to.x, y: to.y, ...scrub },
+      0,
+    )
+    .fromTo(heart, { scale: from.scale }, { scale: to.scale, ...scrub }, 0);
+  ScrollTrigger.create({
+    trigger: el,
+    start: 'top 60%',
+    end: 'bottom 40%',
+    onToggle: ({ isActive }) =>
+      gsap.to(dance, {
+        visible: isActive ? 1 : 0,
+        duration: 0.6,
+        overwrite: 'auto',
+      }),
+  });
+  let dipped = false;
+  ScrollTrigger.create({
+    trigger: el,
+    start: 'top top',
+    end: 'bottom bottom',
+    onUpdate: ({ progress }) => {
+      dance.t = progress;
+      if (progress >= 0.95 && !dipped) dipped = director.play('pulse');
+      if (progress < 0.8) dipped = false;
+    },
+  });
+  return () => {
+    dance.t = 0;
+    dance.visible = 0;
+  };
+};
+
 // Experience §12: the star shows while the stage is on screen; the heart waits below it.
 const buildWish: SectionBuilder = (root) => {
   const el = root.querySelector<HTMLElement>('#wish');
@@ -487,6 +541,33 @@ const buildLetter: SectionBuilder = (root) => {
       });
     },
   });
+  // §19.4: scrolling on without holding the seal opens the letter (never with a passphrase).
+  if (!el.querySelector('[data-letter-locked]'))
+    ScrollTrigger.create({
+      trigger: el,
+      start: () => `top+=${(el.offsetHeight - window.innerHeight) * 0.35} top`,
+      invalidateOnRefresh: true,
+      once: true,
+      onEnter: () => el.dispatchEvent(new Event(LETTER_OPEN_EVENT)),
+    });
+  gsap.utils
+    .toArray<HTMLElement>('[data-letter-layer]', el)
+    .forEach((layer, i) =>
+      gsap.fromTo(
+        layer,
+        { yPercent: 4 * (i + 1) },
+        {
+          yPercent: -6 * (i + 1),
+          ease: 'none',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true,
+          },
+        },
+      ),
+    );
   return () => gsap.ticker.remove(follow);
 };
 
@@ -533,6 +614,7 @@ const sections = [
   buildTimeline,
   buildStarlight,
   buildGallery,
+  buildDance,
   buildWish,
   buildLetter,
   buildFinale,

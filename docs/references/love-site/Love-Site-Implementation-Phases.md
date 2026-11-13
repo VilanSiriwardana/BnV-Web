@@ -61,18 +61,19 @@ These were checked in the code on 2026-11-12. Where a guidebook disagrees, **thi
 
 ## 3. Phase overview
 
-**Detailed, step-by-step guide per phase:** [phases/README.md](phases/README.md) — [Phase 1](phases/Phase-1-Foundations-and-Static-Skeleton.md) · [Phase 2](phases/Phase-2-Scroll-Engine-Theme-and-3D-Smoke-Test.md) · [Phase 3](phases/Phase-3-The-Heart.md) · [Phase 4](phases/Phase-4-Night-Story-Memories-and-Timeline.md) · [Phase 5](phases/Phase-5-Day-Story-Dawn-to-Finale.md) · [Phase 6](phases/Phase-6-Fallbacks-QA-Content-and-Launch.md). This file stays the summary; the phase guides hold the build steps.
+**Detailed, step-by-step guide per phase:** [phases/README.md](phases/README.md) — [Phase 1](phases/Phase-1-Foundations-and-Static-Skeleton.md) · [Phase 2](phases/Phase-2-Scroll-Engine-Theme-and-3D-Smoke-Test.md) · [Phase 3](phases/Phase-3-The-Heart.md) · [Phase 4](phases/Phase-4-Night-Story-Memories-and-Timeline.md) · [Phase 5](phases/Phase-5-Day-Story-Dawn-to-Finale.md) · [Phase 6](phases/Phase-6-Fallbacks-QA-Content-and-Launch.md) · [Phase 7](phases/Phase-7-Refinements-Letter-and-Dance.md). This file stays the summary; the phase guides hold the build steps.
 
-| Phase | Name                                               | Milestones        | Main result                                                                                                                         |
-| ----- | -------------------------------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| **1** | Foundations, approvals and static skeleton         | M0, M1            | A private, bare, noindex page with all ten sections as static content and the night/day token system                                |
-| **2** | Scroll engine, theme and 3D smoke test             | M2, M3            | Smooth scroll, sticky stages, the night → dawn colour shift, Calm mode, a working 3D canvas with quality tiers and a debug panel    |
-| **3** | The Heart: gate, hero, director, audio, bloom      | M4, M5, M6, M10   | The signature moment: ribbons weave into a heart, every heart event works, the heart travels the page, music starts on the gate tap |
-| **4** | The night story: Memories and Timeline             | M7, M8            | Photo orbs with dialogs; the golden thread timeline with the arrow strike                                                           |
-| **5** | The day story: Dawn, Gallery, Wish, Letter, Finale | M9, M11, M12, M13 | Night turns to day, the gallery and lightbox, the wish, the letter and seal, the finale and Replay                                  |
-| **6** | Fallbacks, QA, real content and launch             | M14, M15, M16     | Fully usable without WebGL or motion, performance budgets met on real phones, real photos/letter/music, deployed                    |
+| Phase | Name                                               | Milestones        | Main result                                                                                                                                         |
+| ----- | -------------------------------------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1** | Foundations, approvals and static skeleton         | M0, M1            | A private, bare, noindex page with all ten sections as static content and the night/day token system                                                |
+| **2** | Scroll engine, theme and 3D smoke test             | M2, M3            | Smooth scroll, sticky stages, the night → dawn colour shift, Calm mode, a working 3D canvas with quality tiers and a debug panel                    |
+| **3** | The Heart: gate, hero, director, audio, bloom      | M4, M5, M6, M10   | The signature moment: ribbons weave into a heart, every heart event works, the heart travels the page, music starts on the gate tap                 |
+| **4** | The night story: Memories and Timeline             | M7, M8            | Photo orbs with dialogs; the golden thread timeline with the arrow strike                                                                           |
+| **5** | The day story: Dawn, Gallery, Wish, Letter, Finale | M9, M11, M12, M13 | Night turns to day, the gallery and lightbox, the wish, the letter and seal, the finale and Replay                                                  |
+| **6** | Fallbacks, QA, real content and launch             | M14, M15, M16     | Fully usable without WebGL or motion, performance budgets met on real phones, real photos/letter/music, deployed                                    |
+| **7** | Refinements, premium letter and the dance          | M17–M21           | Calm hero glow + float-up, heart gate, spiral timeline, parchment-scroll letter with scroll auto-open, ambient hearts, 3D dancing duo after Gallery |
 
-**Dependency chain:** 1 → 2 → 3 → (4 and 5 in order) → 6. Phase 3 must finish before 4 or 5 because every later section drives the heart through the director. Audio (M10) moves into Phase 3 because the gate tap unlocks it and the beat feeds the heart.
+**Dependency chain:** 1 → 2 → 3 → (4 and 5 in order) → 6 → 7. Phase 3 must finish before 4 or 5 because every later section drives the heart through the director. Audio (M10) moves into Phase 3 because the gate tap unlocks it and the beat feeds the heart.
 
 **Cross-cutting rules for every phase**
 
@@ -422,6 +423,8 @@ Per R2, files are kebab-case. Folder tree from Tech Stack §6, adjusted:
 | `useHold`                                                                               | `src/features/love/hooks/use-hold.ts`                                     | 5                           |
 | `dev/HeartDebugPanel.tsx`                                                               | `dev/heart-debug-panel.tsx`                                               | 2                           |
 | `scripts/prepare-love-images.mjs`                                                       | same                                                                      | 1                           |
+| `sections/Dance.tsx`, `canvas/DanceDuo.tsx`                                             | `sections/dance.tsx`, `canvas/dance-duo.tsx`, `engine/dance-state.ts`     | 7                           |
+| Letter ornaments                                                                        | `sections/letter-ornaments.tsx`                                           | 7                           |
 
 Shared files modified: `src/components/layout/storefront-chrome.tsx` (P1), `app/globals.css` (P1), `package.json` + lockfile (P2), `next.config.ts` (P2, only if needed), `docs/decisions/DECISIONS.md` (P1), `docs/references/Technology-Stack.md` (P2), `docs/references/Brand-Identity.md` (P6 note).
 

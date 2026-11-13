@@ -756,3 +756,31 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 - Added the specific ngrok hostname to development-only `allowedDevOrigins`. The dev server must restart to load that configuration; update the hostname if the tunnel changes.
 - Restyled the gate as a romantic editorial welcome with layered night palette, ornamental frame, larger seed, personal heading, and a thumb-reachable action. Preserved audio unlock, scroll start, seed position, loading timeout, and 600 ms exit. An entrance animation exception is logged without retaining the gate.
 - Targeted TypeScript and ESLint checks pass. The production build is blocked by unavailable Google Fonts requests in this environment. Remote browser verification remains open.
+
+## 2026-11-13 — Love Site Phase 7: refinements, letter and dance (blueprints 039, 040)
+
+### Summary
+
+- Docs: new `phases/Phase-7-Refinements-Letter-and-Dance.md`, Experience Guidebook §19 (overrides Gate, Hero, Timeline, Letter; adds ambient hearts and the Dance section after Gallery), Implementation Phases (row, dependency chain, file map), phases/README, love-site README, `Love-Site-Improvement-Report.md`.
+- Hero: resting glow 0.6 (matches the intro), intro `shine` removed (cause of the post-intro brightening), heart floats up by `HERO_RISE` as the title types in.
+- Timeline: spiral thread (desktop inward spiral, mobile winding helix), mobile layer starts below the title, arrow strike fires on `pastLastNode` (just after the birthdate) and rearms before the last node; `REARM_BELOW` removed.
+- Gate: heart button (seed for the 3D entrance) with "Tap this" and a drawn gold arrow, grain and inner frame.
+- Letter: parchment with gold stripes, curls, ribbon, heart dividers and drop cap; backdrop of grain plus three parallax layers of tiny gold hearts; rods-and-unroll opening; `LETTER_OPEN_EVENT` auto-open at 55 % (not with a passphrase); draft letter text and `salutation` in config.
+- Ambient hearts: `AmbientHearts` in `canvas/mini-hearts.tsx` (6 instances, one draw call), every 4–9 s while petals are off, tier mid/high.
+- Dance: `engine/dance-state.ts` (keyframed `poseAt`, tested), `canvas/dance-duo.tsx` (11 low-poly emissive meshes), `sections/dance.tsx` (SVG dip silhouettes for calm/low/static), `buildDance`, `dance` section pose and copy.
+
+### Verification
+
+- See the Phase 7 implementation report in the session. Browser behaviour NOT verified by the agent (UNCERTAIN): spiral look, arrow timing feel, gate layout at 320–390 px, unroll, dance poses, cluster frequency, fps.
+
+## 2026-11-13 — Love Site: dance v2, particle silhouette couple (blueprint 041)
+
+- Owner rejected the low-poly mesh duo (read as mannequins). Replaced with one `Points` cloud in the heart's additive style: 8 side-view skeleton poses in `canvas/dance-silhouettes.ts` (2-bone IK `solveLimb` keeps joined hands and the waist hold together), parametric per-shape sampling in `canvas/dance-geometry.ts` (same body spot in every pose), GPU frame blend + hair/skirt sway in `canvas/dance-shaders.ts`, `engine/dance-state.ts` `frameAt` (hold then ease per pose), `danceParticles` tier field (14k/7k/0/0). Still SVG is generated from the dip pose.
+- Deviation from blueprint: skeleton + shape primitives instead of rasterised SVG paths (pure, testable, guaranteed correspondence).
+- Verification: tsc, ESLint, Vitest 55/55 pass. Browser look NOT verified (pose proportions, sway amount, framing at 390 px).
+
+## 2026-11-13 - Love Site follow-ups (blueprint 042)
+
+- Adjusted formed-heart alpha and hero beat, moved letter auto-open into the sticky pin range, widened the mobile timeline, and replaced ambient clusters with independent edge hearts.
+- Expanded the dance to 10 key poses and 32 sampled frames with an added leg; positions are read from a float DataTexture.
+- Verification: TypeScript and focused dance tests passed. TypeScript, Love Site ESLint and Vitest (92 tests) passed. The production build could not fetch Google Fonts. Browser appearance and frame rate remain unverified because browser access was unavailable.

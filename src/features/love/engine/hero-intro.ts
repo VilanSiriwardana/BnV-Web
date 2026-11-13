@@ -3,7 +3,7 @@ import { SplitText } from 'gsap/SplitText';
 
 import { spawnTapHearts } from '../canvas/mini-hearts';
 import { director } from './heart-director';
-import { HEART_PATH, isMobileViewport, poseFor } from './heart-path';
+import { HEART_PATH, HERO_RISE, isMobileViewport, poseFor } from './heart-path';
 import { heart } from './heart-state';
 import { REDUCED_MOTION_QUERY } from './motion-prefs';
 
@@ -70,16 +70,17 @@ export function playHeroIntro(
   }
 
   if (from) Object.assign(heart.ndc, from);
+  heart.glow = HEART_PATH.hero.glow;
   intro = gsap.timeline();
   intro
     .to(
       heart.ndc,
-      { x: pose.x, y: pose.y, duration: 3.2, ease: 'power2.inOut' },
+      { x: pose.x, y: pose.y - HERO_RISE, duration: 3.2, ease: 'power2.inOut' },
       0,
     )
+    .to(heart.ndc, { y: pose.y, duration: 2.6, ease: 'sine.inOut' }, 3.4)
     .call(() => void director.play('ribbonWeave'), [], 0)
-    .call(() => void director.play('pulse'), [], 3.2)
-    .call(() => void director.play('shine'), [], 6);
+    .call(() => void director.play('pulse'), [], 3.2);
 
   if (title) {
     // aria: 'auto' keeps one readable label on the heading; split chars are aria-hidden.

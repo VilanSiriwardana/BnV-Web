@@ -12,5 +12,6 @@ Summary and repo corrections: [../Love-Site-Implementation-Phases.md](../Love-Si
 | 4     | [Phase-4-Night-Story-Memories-and-Timeline.md](Phase-4-Night-Story-Memories-and-Timeline.md)         | M7, M8            | Memory orbs and dialog, golden thread timeline, arrow strike                                     |
 | 5     | [Phase-5-Day-Story-Dawn-to-Finale.md](Phase-5-Day-Story-Dawn-to-Finale.md)                           | M9, M11, M12, M13 | Dawn and Pearl skin, gallery and lightbox, wish, letter, finale and Replay                       |
 | 6     | [Phase-6-Fallbacks-QA-Content-and-Launch.md](Phase-6-Fallbacks-QA-Content-and-Launch.md)             | M14, M15, M16     | Static path, accessibility, performance, real content, deploy                                    |
+| 7     | [Phase-7-Refinements-Letter-and-Dance.md](Phase-7-Refinements-Letter-and-Dance.md)                   | M17–M21           | Hero glow/float, heart gate, spiral timeline, parchment letter, ambient hearts, dancing duo      |
 
 **How to use with Claude Code:** start each phase with "Read `docs/references/love-site/phases/Phase-N-….md` and its Read-first list, then `/plan` this phase." Build one step (or one commit slice) at a time, check the "you should see" line in the browser, and tick the exit checklist before moving on.

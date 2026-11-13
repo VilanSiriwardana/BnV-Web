@@ -13,6 +13,9 @@ export const site: LoveSiteConfig = {
     timelineTitle: 'How we got here',
     starlightLine: 'And the stars keep coming out for us.',
     galleryTitle: 'Us, in daylight',
+    danceTitle: 'My favourite dance partner',
+    danceLine:
+      'Every spin is better with your hand in mine, and I will always be there to catch the dip.',
     wishPrompt: 'Make a wish',
     wishDone: 'May every wish come true.',
     letterTitle: 'A letter for you',
@@ -288,12 +291,16 @@ export const site: LoveSiteConfig = {
     },
   ],
   letter: {
+    // Draft by Claude for the owner to rewrite in his own words before release.
+    salutation: 'My dearest Buwi,',
     paragraphs: [
-      'This is where the letter will go. It will be written by hand, in my own words, before your birthday.',
-      'For now, these lines only hold the space, so the page knows how long a real letter feels.',
-      'Every paragraph will be one small piece of what you mean to me.',
+      'Happy birthday, my love. Of all the days in the year, this is the one I am most grateful for, because it is the day the world got you, and somehow, one day, so did I.',
+      'I still remember how ordinary everything felt before you, and how quietly that changed. A conversation that did not want to end became a habit, and the habit became the best part of every day.',
+      'You make the small things golden: the late-night talks, the silly songs, the way you laugh before you finish your own jokes. You are my calm on loud days and my favourite noise on quiet ones.',
+      'Thank you for your patience, your warmth, and the way you believe in me even when I forget to. Every memory on this page is a little piece of the life we are building, and I would choose every one of them again.',
+      'Here is to another year of you: may it be gentle, bright, and full of everything you wish for. I will be right beside you for all of it, holding your hand through every spin and every dip.',
     ],
-    signoff: 'Always yours,',
+    signoff: 'Forever and always yours,',
   },
   // TODO(owner): credit text required before release (ADR-0030).
   music: { src: '/audio/wedding-background.mp3', credit: '' },

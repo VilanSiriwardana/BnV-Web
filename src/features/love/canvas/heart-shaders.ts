@@ -49,6 +49,7 @@ uniform vec3 uColorRose;
 uniform float uGlow;
 uniform float uShine;
 uniform float uBeat;
+uniform float uBeatScale;
 uniform float uGold;
 varying vec4 vRand;
 varying float vSide;
@@ -61,6 +62,7 @@ void main() {
   if (d > 0.5) discard;
   float alpha = smoothstep(0.5, 0.0, d);
   alpha *= alpha;
+  alpha *= mix(1.0, 0.6, vForm);
 
   // 55 % lavender, 15 % lilac, 22 % gold, 8 % rose.
   float m = vRand.z;
@@ -75,7 +77,7 @@ void main() {
 
   col = mix(col, uColorGold, uGold * 0.35);
 
-  float glow = min(uGlow + uBeat * 0.12, 1.1);
+  float glow = min(uGlow + uBeat * 0.12 * uBeatScale, 1.0);
   vec3 outCol = col * (0.35 + 0.55 * glow) + vec3(0.25) * shine;
   // Additive: keep each sprite dim so overlap never clips to white.
   gl_FragColor = vec4(min(outCol, vec3(0.9)), alpha * 0.55);

@@ -13,6 +13,8 @@
 
 > **Change 2026-11-13 (all-night theme):** the page no longer turns to day. §3.1 day values, §3.3 Pearl skin, `skinSwap` in §3.5, §10 Dawn (now **Starlight**, `#starlight`) and the Ivory/Blush theme notes in §11–§14 are superseded: every section stays on night tokens with more lavender and gold. See ADR-0029 (amendment) and blueprint 038.
 
+> **Change 2026-11-13 (Phase 7):** §19 overrides the Gate (§5), Hero (§6), Timeline (§9) and Letter (§13), adds ambient heart clusters, and inserts a new **Dance** section between Gallery and Wish. Section order: Gate → Hero → Bloom → Memories → Timeline → Starlight → Gallery → **Dance** → Wish → Letter → Finale.
+
 This document describes **what the site does, section by section, and how to build each part**: layout, scroll mechanics, the heart's behaviour, every interaction, reduced-motion and mobile behaviour, tools, and acceptance tests. Copy lines shown are placeholders to be rewritten by the owner.
 
 ---
@@ -885,3 +887,48 @@ Mount `HeartDebugPanel` only when `process.env.NODE_ENV !== 'production'` and `?
 - A section jump (`?s=timeline` also works) using `lenis.scrollTo`.
 
 This makes every moment testable in seconds instead of scrolling for a minute.
+
+---
+
+## 19. Phase 7 refinements
+
+Build guide: [phases/Phase-7-Refinements-Letter-and-Dance.md](phases/Phase-7-Refinements-Letter-and-Dance.md). Where this section differs from earlier ones, this section wins.
+
+### 19.1 Gate (replaces the §5 button)
+
+- Centre: a glowing heart that **is** the button (`aria-label` "Begin", Enter/Space work, `autoFocus`). It is also the seed for the 3D heart's entrance.
+- Beside it: script text **"Tap this"** with a hand-drawn gold arrow that draws in and points at the heart.
+- Premium frame: double gold border, canvas grain, slow breathing halo. While loading, a thin ring circles the heart and the label reads "Getting ready…".
+- Reduced motion: no breathing, arrow shown already drawn.
+
+### 19.2 Hero (amends §6)
+
+- **Glow:** after the intro the heart keeps the glow it had during the intro (resting glow 0.6). No shine sweep at the end of the intro. Formed particles use 60% of their ribbon alpha, and the hero music beat is damped to 40% so overlap does not spike.
+- **Float-up:** the weave ends a little below the hero pose; as the "Happy birthday" title types in (3.4 s) the heart floats slowly up into place (~2.6 s, `sine.inOut`).
+
+### 19.3 Timeline (amends §9)
+
+- Mobile: the title has clear space below it; nodes and cards never overlap it.
+- The golden thread is a **spiral** (wide on desktop, wide left-to-right serpentine on mobile). Nodes sit on the spiral; the heart rides its tip.
+- **Arrow strike** fires once the heart leaves the last node (the birthdate), on desktop and mobile. It rearms only when the visitor scrolls back before that node.
+
+### 19.4 Love Letter (amends §13)
+
+- **Look:** aged parchment with paper grain, gold double stripes, corner curls, a ribbon band, small gold hearts and a drop cap; Cormorant body, Cinzel heading.
+- **Background:** a canvas-grain wash with three depth layers of tiny gold hearts drifting at different speeds, behind all letter UI.
+- **Opening:** the seal (the docked heart) breaks, two scroll rods part and the parchment unrolls (~1.6 s), then paragraphs fade in one by one.
+- **Scroll to open:** without a passphrase, the letter opens at 35% of its sticky pin range; a fast fling scrolls back once so the unroll remains visible.
+- Calm / reduced motion: the letter is shown open, no unroll.
+
+### 19.5 Ambient hearts (new)
+
+Twelve independent gold, lavender and rose hearts twinkle around the frame with separate 1.8-3.2 s lifetimes and 0.5-4 s respawn gaps. They appear only when petals are gone, the tab is visible, motion is allowed and the tier is `mid` or `high`.
+
+### 19.6 Section 6b — Dance ("You and me, dancing") (new)
+
+- Placed after Gallery. A pinned stage (~250 vh) with the couple as **one glowing particle silhouette built like the heart** (him lavender, her gold; 14k / 7k particles on high / mid).
+- Ten key poses sampled into 32 frames, each particle staying on the same body part so the figures flow rather than scatter: walk-in → hands join → his hand on her waist, hers on his shoulder → under-arm turn (2 poses) → embrace → lean → **romantic dip**. Hair and skirt sway. Arms use 2-bone IK so hands always meet. Scroll eases between key poses with a short hold on each. A float DataTexture stores the frame positions for GPU blending. The heart rests above and pulses on the dip.
+- Files: `canvas/dance-silhouettes.ts` (skeleton poses), `canvas/dance-geometry.ts` (sampling), `canvas/dance-shaders.ts`, `canvas/dance-duo.tsx`, `engine/dance-state.ts` (`frameAt`).
+- Copy: a short line appreciating her as a dance partner.
+- Low / static tier and reduced motion: an SVG silhouette pair in the dip pose with a soft fade.
+- Acceptance: the move reverses cleanly on scroll-up; one extra draw call; ≥ 40 fps on mid tier. The still for calm / low is drawn from the same dip pose.
