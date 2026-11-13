@@ -663,3 +663,25 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 ### Open
 
 - Clean up the orphaned node processes (or reboot), then: `npm run build` (check three/R3F only in `/love` chunks), browser pass on desktop + phone width, Calm/reduced-motion toggling, `?debug` tier switching, 4× CPU step-down, Safari/Firefox, production `?debug` absent.
+
+## 2026-11-13 - Love Site Phase 3: the heart
+
+### Summary
+
+- On `main` by request (no branch), 8 commits (blueprint `.claude/blueprints/029-…`).
+- `canvas/heart-geometry.ts` (seeded `heartPoint`/ribbon/scatter generators, Vitest), `heart-shaders.ts`, `heart.tsx` (one `Points`, 18k buffers, `setDrawRange` per tier, NDC → world from the live viewport, invisible hit disc for taps).
+- `engine/heart-director-core.ts` (pure queue/drop/settle state machine, Vitest) + `heart-director.ts` (GSAP timelines per Experience §3.5; Phase 4–5 events stubbed as `pulse`). `pulse` tweens `heart.flinch` as a scale offset so it never fights the scrubbed `heart.scale`.
+- `canvas/mini-hearts.tsx` (instanced, `spawnTapHearts`), `canvas/petals.tsx` (shader-driven, `heart.petalRelease`), `tiers.ts` gains `petals`.
+- `engine/audio-engine.ts` + `audio-bands.ts` (Vitest), `ui/music-toggle.tsx`. Reads `site.music.src`; the 72 bpm synthetic lub-dub runs when the file is missing, errors, or is muted.
+- Gate is now a fixed overlay (`sections/gate.tsx`), outside `<main>`. Heart state additions: `roll`, `idleScale`, `idleGlow`, `petalRelease`, `cameraZ`. Token roles: `primary-hover` (lilac), `surface`, `foreground`.
+- Deviations: (1) drei `useProgress` not used in the gate, because importing drei there pulls three into the main chunk; readiness comes from the canvas `onCreated` plus the 6 s timeout. (2) Reduced motion = Calm in this codebase (no canvas), so canvas reduced-motion variants (still petals, no parallax) never render; the director still has reduced variants. (3) Audio was committed before gate/hero, and gate + hero share one commit, because the tap handler needs both.
+
+### Verification
+
+- `tsc --noEmit`, ESLint on `src/features/love`, Vitest (27 tests) pass. `npm run build` passes with `NODE_OPTIONS=--max-old-space-size=6144`.
+- NOT verified (UNCERTAIN): any browser behaviour: the weave look and timing, shader tuning, SplitText aria output, iOS audio unlock, fast-scroll stress, positions at 375/768/1440, draw calls.
+
+### Open
+
+- Add the music file to `public/audio/` and set `music.src` in the site config.
+- Browser pass with `?debug`; tune shader brightness and ribbon sizes by eye. ADR-0029/0030 notes, `PROGRESS.md` entry after verification.
