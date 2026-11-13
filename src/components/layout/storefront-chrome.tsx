@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 
-const isLovePath = (pathname: string) =>
+export const isLovePath = (pathname: string) =>
   pathname === '/love' || pathname.startsWith('/love/');
 
 // Hides the storefront header, footer, cart drawer, consent and analytics inside /admin and the private /love pages.
