@@ -1,56 +1,35 @@
 import gsap from 'gsap';
 
-// Night → day (Experience §3.1, §10): one scrubbed number each. Text in Dawn appears only after 75 %.
+// All-night theme (2026-11-13): one scrubbed number, --depth (0 aubergine → 1 velvet plum).
+// Each step matches the next section's Calm `depth` stop in its LoveSection.
+const STEPS: [trigger: string, from: number, to: number][] = [
+  ['#memories', 0, 0.5],
+  ['#timeline', 0.5, 1],
+  ['#gallery', 1, 0.5],
+  ['#wish', 0.5, 1],
+  ['#finale', 1, 0.5],
+];
+
 export function buildTheme(root: HTMLElement) {
-  gsap.fromTo(
-    root,
-    { '--dawn': 0 },
-    {
-      '--dawn': 1,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '#dawn',
-        start: 'top 80%',
-        end: 'bottom 20%',
-        scrub: true,
+  STEPS.forEach(([trigger, from, to], i) => {
+    gsap.fromTo(
+      root,
+      { '--depth': from },
+      {
+        '--depth': to,
+        ease: 'none',
+        immediateRender: i === 0,
+        scrollTrigger: {
+          trigger,
+          start: 'top bottom',
+          end: 'bottom bottom',
+          scrub: true,
+        },
       },
-    },
-  );
-
-  gsap.fromTo(
-    root,
-    { '--depth': 0 },
-    {
-      '--depth': 0.5,
-      ease: 'none',
-      immediateRender: false,
-      scrollTrigger: {
-        trigger: '#memories',
-        start: 'top bottom',
-        end: 'bottom bottom',
-        scrub: true,
-      },
-    },
-  );
-
-  gsap.fromTo(
-    root,
-    { '--depth': 0.5 },
-    {
-      '--depth': 1,
-      ease: 'none',
-      immediateRender: false,
-      scrollTrigger: {
-        trigger: '#timeline',
-        start: 'top bottom',
-        end: 'bottom bottom',
-        scrub: true,
-      },
-    },
-  );
+    );
+  });
 }
 
 export function clearTheme(root: HTMLElement) {
-  root.style.removeProperty('--dawn');
   root.style.removeProperty('--depth');
 }

@@ -11,6 +11,8 @@
 | Companion document               | `Love-Site-Tech-Stack-and-Tools.md` (packages, versions, architecture, performance, governance)                                                                          |
 | Brand source                     | `Brand-Identity.md` v1.6 (tokens, fonts, motion rules)                                                                                                                   |
 
+> **Change 2026-11-13 (all-night theme):** the page no longer turns to day. §3.1 day values, §3.3 Pearl skin, `skinSwap` in §3.5, §10 Dawn (now **Starlight**, `#starlight`) and the Ivory/Blush theme notes in §11–§14 are superseded: every section stays on night tokens with more lavender and gold. See ADR-0029 (amendment) and blueprint 038.
+
 This document describes **what the site does, section by section, and how to build each part**: layout, scroll mechanics, the heart's behaviour, every interaction, reduced-motion and mobile behaviour, tools, and acceptance tests. Copy lines shown are placeholders to be rewritten by the owner.
 
 ---

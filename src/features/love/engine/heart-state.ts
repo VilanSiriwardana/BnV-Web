@@ -8,7 +8,7 @@ export const heart = {
   burst: 0, // 0 = whole, 1 = fully scattered into small hearts
   glow: 0.6, // base glow; also drives bloom intensity
   shine: 0, // 0..1 highlight sweep progress
-  skin: 0, // 0 = aura (night), 1 = pearl (day); cross-faded
+  gold: 0, // 0..1 extra gold in the particle colours (rises section by section)
   beat: 0, // audio pulse, written by the audio engine
   flinch: 0, // arrow-hit recoil
   ring: 0, // shockwave ring progress
@@ -23,6 +23,6 @@ export const heart = {
   arrow: 0, // arrow flight progress 0..1 (arrowStrike)
   star: 0, // wish star visibility 0..1
   starHold: 0, // wish hold progress 0..1
-  pearlRim: 0, // extra gold rim while docked on the letter seal
+  sealRim: 0, // extra gold while docked on the letter seal
 };
 export type HeartState = typeof heart;

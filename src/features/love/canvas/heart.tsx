@@ -8,8 +8,6 @@ import {
   BufferGeometry,
   type Group,
   MathUtils,
-  NormalBlending,
-  type Points,
   ShaderMaterial,
   Vector3,
 } from 'three';
@@ -44,10 +42,10 @@ export function Heart({ tier, onTap, children }: Props) {
     return g;
   }, []);
 
-  const { material, pearlMaterial } = useMemo(() => {
+  const material = useMemo(() => {
     const root = document.querySelector<HTMLElement>('[data-love-root]');
     const c = root ? readTokenColors(root) : null;
-    const aura = new ShaderMaterial({
+    return new ShaderMaterial({
       vertexShader: heartVertex,
       fragmentShader: heartFragment,
       transparent: true,
@@ -62,36 +60,14 @@ export function Heart({ tier, onTap, children }: Props) {
         uBeatScale: { value: 1 },
         uShine: { value: 0 },
         uGlow: { value: heart.glow },
-        uSkin: { value: 0 },
+        uGold: { value: 0 },
         uColorLav: { value: c?.primary.night },
         uColorLilac: { value: c?.['primary-hover'].night },
         uColorGold: { value: c?.gold.night },
         uColorRose: { value: c?.secondary.night },
-        uColorIvory: { value: c?.background.day },
-        uPearl: { value: 0 },
       },
     });
-    // Pearl skin (Experience §3.3): same geometry, normal blend, day colours. The dynamic uniform
-    // objects are shared by reference, so one useFrame drives both materials.
-    const pearl = new ShaderMaterial({
-      vertexShader: heartVertex,
-      fragmentShader: heartFragment,
-      transparent: true,
-      depthWrite: false,
-      blending: NormalBlending,
-      uniforms: {
-        ...aura.uniforms,
-        uPearl: { value: 1 },
-        uColorLav: { value: c?.primary.day },
-        uColorLilac: { value: c?.['primary-hover'].day },
-        uColorGold: { value: c?.gold.day },
-        uColorRose: { value: c?.secondary.day },
-      },
-    });
-    return { material: aura, pearlMaterial: pearl };
   }, []);
-  const auraRef = useRef<Points>(null);
-  const pearlRef = useRef<Points>(null);
 
   useEffect(() => {
     geometry.setDrawRange(0, TIERS[tier].particles);
@@ -103,9 +79,8 @@ export function Heart({ tier, onTap, children }: Props) {
     () => () => {
       geometry.dispose();
       material.dispose();
-      pearlMaterial.dispose();
     },
-    [geometry, material, pearlMaterial],
+    [geometry, material],
   );
 
   useFrame((state, delta) => {
@@ -119,9 +94,13 @@ export function Heart({ tier, onTap, children }: Props) {
     u.uShine.value = heart.shine;
     u.uGlow.value = damp(u.uGlow.value, heart.glow + heart.idleGlow, 8, delta);
     u.uBeat.value = heart.beat;
-    u.uSkin.value = heart.skin;
-    if (auraRef.current) auraRef.current.visible = heart.skin < 0.999;
-    if (pearlRef.current) pearlRef.current.visible = heart.skin > 0.001;
+    // All-night theme: the heart turns more golden section by section and on the letter seal.
+    u.uGold.value = damp(
+      u.uGold.value,
+      Math.max(heart.gold, heart.sealRim),
+      4,
+      delta,
+    );
 
     const cam = state.camera;
     // Section hand-offs that jump the rail (Memories → Timeline) snap instead of flying back.
@@ -158,19 +137,7 @@ export function Heart({ tier, onTap, children }: Props) {
 
   return (
     <group ref={group}>
-      <points
-        ref={auraRef}
-        geometry={geometry}
-        material={material}
-        frustumCulled={false}
-      />
-      <points
-        ref={pearlRef}
-        geometry={geometry}
-        material={pearlMaterial}
-        frustumCulled={false}
-        visible={false}
-      />
+      <points geometry={geometry} material={material} frustumCulled={false} />
       {children}
       {onTap && (
         <mesh onClick={onTap}>

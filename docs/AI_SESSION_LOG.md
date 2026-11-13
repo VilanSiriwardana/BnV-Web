@@ -735,3 +735,17 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 - `tsc --noEmit`, ESLint (0 problems in love), Vitest 81/81 (new: use-hold 5, session 2), `npm run build` pass.
 - Follow-up (blueprint 036, owner: "day doesn't look like much, heart should be lavender, wish is weak"). Causes: `[data-stage-inner]` kept opaque backgrounds (Wish `bg-surface`) over the canvas; the opaque envelope hid the docked heart; Pearl body was lavender lerped 45 % to Ivory and tone-mapped to near white, Pearl particles ≈ alpha⁴; gallery clip used undefined `--radius`. Fixes: transparency rule now covers stage inners (motion only), radial mask hole at the seal, Pearl body `primary` → `primary-hover` with `toneMapped: false`, lilac sheen, stronger rim/shadow, particle alpha × 0.9; Wish Blush/gold glow, larger star, thicker ring, heart rest y −0.45; `--radius-lg`.
 - NOT verified (UNCERTAIN): all browser behaviour: Pearl look and no pop, Dawn text window, gallery CLS and lightbox keys/swipe, wish hold feel and confetti, seal docking scale (`sealScale` from a formula only), letter sequence, finale burst, Replay, fast-scroll stress.
+
+## 2026-11-13 — Love Site: half-heart mobile fix + all-night theme (blueprint 038)
+
+### Summary
+
+- Bug: `buildHeartAttributes` gave particles `i < count/2` to the left ribbon and `heart.tsx` draws a tier prefix (8k/3k), so mid/low tiers showed only the left half until the tier stepped up. Sides now alternate and `s` is seeded random; new balance test.
+- All-night theme (owner decision): `--dawn` and `--day-*` removed from the `[data-love-root]` block; `LoveSection` takes `depth` (data-depth, Calm stops); `theme-timeline.ts` scrubs `--depth` only (memories → finale). Pearl skin, `skinSwap`, `heart.skin`, `heart-pearl.tsx`, DayBloom removed; `heart.gold`/`uGold` per section; `sealRim` replaces `pearlRim`. `readTokenColors` night only.
+- Dawn → Starlight (`sections/starlight.tsx`, `copy.starlightLine`, aurora + 40 deterministic CSS stars, twinkle/drift keyframes off for reduced motion). Gold section titles, lavender names, gold hairlines on cards, letter and gallery; finale gold/lavender halo.
+- Docs: ADR-0029 amendment, Experience Guidebook change note, Implementation-Phases changelog 1.2.
+
+### Verification
+
+- `tsc --noEmit`, ESLint (0 problems in love), Vitest 82/82 pass. `npm run build` not run (sandbox blocks Google Fonts fetch).
+- NOT verified (UNCERTAIN): browser look on all tiers at 375 px, contrast on night surfaces, Starlight visuals, fast-scroll ×10.

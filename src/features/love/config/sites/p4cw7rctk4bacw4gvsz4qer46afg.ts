@@ -11,7 +11,7 @@ export const site: LoveSiteConfig = {
     bloomLine: 'Every moment with you opens like this.',
     memoriesHint: 'Touch a memory.',
     timelineTitle: 'How we got here',
-    dawnQuote: 'And somehow, it keeps getting lighter.',
+    starlightLine: 'And the stars keep coming out for us.',
     galleryTitle: 'Us, in daylight',
     wishPrompt: 'Make a wish',
     wishDone: 'May every wish come true.',

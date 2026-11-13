@@ -77,11 +77,8 @@ function build(event: HeartEvent, opts: PlayOptions, tl: gsap.core.Timeline) {
       case 'ribbonWeave':
         tl.set(heart, { form: 1 });
         return;
-      case 'skinSwap':
-        tl.to(heart, { skin: 1, duration: 0.3 });
-        return;
       case 'dockToSeal':
-        tl.set(heart, { scale: opts.scale ?? heart.scale, pearlRim: 1 });
+        tl.set(heart, { scale: opts.scale ?? heart.scale, sealRim: 1 });
         return;
       case 'wishMerge':
         tl.to(heart, { starHold: 0, duration: 0.3 }, 0);
@@ -137,16 +134,13 @@ function build(event: HeartEvent, opts: PlayOptions, tl: gsap.core.Timeline) {
     case 'arrowStrike':
       arrowStrike(tl);
       return;
-    case 'skinSwap':
-      tl.to(heart, { skin: 1, duration: 1.2, ease: 'power2.inOut' });
-      return;
     case 'wishMerge':
       wishMerge(tl);
       return;
     case 'dockToSeal':
       tl.to(heart, {
         scale: opts.scale ?? heart.scale,
-        pearlRim: 1,
+        sealRim: 1,
         duration: 0.9,
         ease: 'power3.inOut',
       });
@@ -154,7 +148,7 @@ function build(event: HeartEvent, opts: PlayOptions, tl: gsap.core.Timeline) {
     case 'sealBreak':
       tl.call(() => spawnTapHearts(8))
         .call(() => spawnTapHearts(8), [], 0.3)
-        .to(heart, { pearlRim: 0, duration: 0.3 }, 0);
+        .to(heart, { sealRim: 0, duration: 0.3 }, 0);
       flash(tl);
       return;
     case 'finaleBurst':
@@ -226,7 +220,7 @@ function toBaseline() {
     flinch: 0,
     shine: 0,
     starHold: 0,
-    skin: HEART_PATH[section].skin,
+    gold: HEART_PATH[section].gold,
     glow: baseGlow(),
     duration: 0.3,
     ease: 'power2.out',

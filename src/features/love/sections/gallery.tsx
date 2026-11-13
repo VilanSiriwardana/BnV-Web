@@ -14,7 +14,7 @@ export function Gallery({ title, photos }: Props) {
   const [index, setIndex] = useState<number | null>(null);
 
   return (
-    <LoveSection id="gallery" dawn={1}>
+    <LoveSection id="gallery" depth={0.5}>
       <h2 id="gallery-title" className={sectionTitle}>
         {title}
       </h2>
@@ -23,7 +23,7 @@ export function Gallery({ title, photos }: Props) {
           <li
             key={p.src}
             data-love-tile
-            className="border-border bg-surface mb-4 break-inside-avoid overflow-hidden rounded-lg border p-2"
+            className="border-gold/30 bg-surface-elevated mb-4 break-inside-avoid overflow-hidden rounded-lg border p-2"
           >
             <button
               type="button"

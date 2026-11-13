@@ -9,7 +9,6 @@ export const HEART_EVENTS = [
   'reform',
   'burstReform',
   'arrowStrike',
-  'skinSwap',
   'wishMerge',
   'dockToSeal',
   'sealBreak',

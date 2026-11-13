@@ -28,7 +28,7 @@ export function Timeline({ title, items }: Props) {
   const motion = !useQuiet();
 
   return (
-    <LoveSection id="timeline" dawn={0} stage="400vh">
+    <LoveSection id="timeline" depth={1} stage="400vh">
       <QuietHeart className="mb-4 size-10" />
       <h2 id="timeline-title" className={sectionTitle}>
         {title}
@@ -152,7 +152,7 @@ function ThreadStage({ items }: { items: Item[] }) {
               data-card
               data-featured={t.featured ? 'true' : undefined}
               className={cn(
-                'border-border bg-surface invisible absolute flex gap-4 overflow-hidden rounded-lg border p-4 text-left opacity-0',
+                'border-gold/25 bg-surface invisible absolute flex gap-4 overflow-hidden rounded-lg border p-4 text-left opacity-0',
                 'max-md:right-4 max-md:bottom-6 max-md:left-14 max-md:max-h-[38svh] md:w-80',
                 t.featured && 'border-gold',
               )}
@@ -186,7 +186,7 @@ function StaticList({ items }: { items: Item[] }) {
         <li
           key={t.id}
           className={cn(
-            'border-border bg-surface relative rounded-lg border p-5',
+            'border-gold/25 bg-surface relative rounded-lg border p-5',
             t.featured &&
               'border-gold shadow-[0_0_32px_-6px_var(--color-gold)]',
           )}

@@ -125,7 +125,7 @@ export function Letter({ title, letter }: Props) {
   };
 
   return (
-    <LoveSection id="letter" dawn={1} stage="200vh">
+    <LoveSection id="letter" depth={1} stage="200vh">
       <div ref={root} className="flex w-full flex-col items-center">
         <h2 id="letter-title" className={sectionTitle}>
           {title}
@@ -137,7 +137,7 @@ export function Letter({ title, letter }: Props) {
             className="relative mt-12 aspect-[3/2] w-[80vw] max-w-md [perspective:900px]"
           >
             <div
-              className="border-border bg-surface absolute inset-0 rounded-lg border shadow-sm"
+              className="border-gold/40 bg-surface absolute inset-0 rounded-lg border"
               style={
                 quiet
                   ? undefined
@@ -152,7 +152,7 @@ export function Letter({ title, letter }: Props) {
                   ? undefined
                   : sealHole('50% 100%', sealR)
               }
-              className="bg-surface-elevated border-border absolute inset-x-0 top-0 h-3/5 origin-top border [backface-visibility:hidden] [clip-path:polygon(0_0,100%_0,50%_100%)]"
+              className="bg-surface-elevated border-gold/40 absolute inset-x-0 top-0 h-3/5 origin-top border [backface-visibility:hidden] [clip-path:polygon(0_0,100%_0,50%_100%)]"
             />
             {letter.passphrase ? (
               <div className="absolute inset-x-0 top-1/2 flex -translate-y-1/2 justify-center">
@@ -223,7 +223,7 @@ export function Letter({ title, letter }: Props) {
           data-lenis-prevent
           aria-hidden={!showOpen}
           className={cn(
-            'border-border bg-surface-elevated w-full max-w-2xl overflow-y-auto rounded-lg border p-8 text-left shadow-sm md:p-12',
+            'border-gold/40 bg-surface-elevated w-full max-w-2xl overflow-y-auto rounded-lg border p-8 text-left shadow-[0_0_48px_-12px_var(--color-primary)] md:p-12',
             quiet
               ? 'mt-12 max-h-[70svh]'
               : 'absolute inset-x-4 top-[56%] mx-auto max-h-[64svh] w-auto -translate-y-1/2',

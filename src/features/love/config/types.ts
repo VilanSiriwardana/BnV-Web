@@ -16,7 +16,7 @@ export type LoveSiteConfig = {
     bloomLine: string;
     memoriesHint: string;
     timelineTitle: string;
-    dawnQuote: string;
+    starlightLine: string;
     galleryTitle: string;
     wishPrompt: string;
     wishDone: string;

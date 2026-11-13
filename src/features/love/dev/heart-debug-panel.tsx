@@ -17,7 +17,7 @@ const SECTIONS = [
   'bloom',
   'memories',
   'timeline',
-  'dawn',
+  'starlight',
   'gallery',
   'wish',
   'letter',

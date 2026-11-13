@@ -470,7 +470,8 @@ Full risk table: Tech Stack §13.
 
 ## 14. Changelog
 
-| Date       | Version | Change                                                                |
-| ---------- | ------- | --------------------------------------------------------------------- |
-| 2026-11-12 | 1.0     | First version: six phases, repo corrections R1–R8, file map, cut line |
-| 2026-11-12 | 1.1     | Added detailed per-phase guides in `phases/`                          |
+| Date       | Version | Change                                                                  |
+| ---------- | ------- | ----------------------------------------------------------------------- |
+| 2026-11-12 | 1.0     | First version: six phases, repo corrections R1–R8, file map, cut line   |
+| 2026-11-12 | 1.1     | Added detailed per-phase guides in `phases/`                            |
+| 2026-11-13 | 1.2     | All-night theme: day mode, Pearl skin and Dawn removed; Starlight added |

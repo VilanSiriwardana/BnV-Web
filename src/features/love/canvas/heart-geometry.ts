@@ -32,9 +32,9 @@ export type HeartAttributes = {
 const RIBBON = { W: 7, r0: 1.1, r1: 0.06, turns: 3.5 };
 const SCATTER_RADIUS = 3;
 
-// Particle i < count/2 belongs to the left ribbon (side -1), the rest to the right (side +1).
-export function ribbonSide(i: number, count: number): -1 | 1 {
-  return i < count / 2 ? -1 : 1;
+// Sides alternate (even = left, odd = right) so any setDrawRange prefix draws both ribbons.
+export function ribbonSide(i: number): -1 | 1 {
+  return i % 2 === 0 ? -1 : 1;
 }
 
 export function buildHeartAttributes(count: number, seed = 7): HeartAttributes {
@@ -43,12 +43,11 @@ export function buildHeartAttributes(count: number, seed = 7): HeartAttributes {
   const aRibbon = new Float32Array(count * 3);
   const aScatter = new Float32Array(count * 3);
   const aRand = new Float32Array(count * 4);
-  const half = count / 2;
-
   for (let i = 0; i < count; i++) {
-    const side = ribbonSide(i, count);
-    // s: position along this ribbon / half outline. Left half of the heart is t ∈ [π, 2π].
-    const s = side < 0 ? i / half : (i - half) / half;
+    const side = ribbonSide(i);
+    // s: position along this ribbon / half outline (seeded random, so any prefix spans the whole
+    // outline). Left half of the heart is t ∈ [π, 2π].
+    const s = rand();
     const outlineT = side < 0 ? Math.PI + s * Math.PI : s * Math.PI;
     const onOutline = rand() < 0.7;
     let radius: number;

@@ -10,7 +10,7 @@ const ROLES = [
   'foreground',
 ] as const;
 export type TokenRole = (typeof ROLES)[number];
-export type TokenColors = Record<TokenRole, { night: Color; day: Color }>;
+export type TokenColors = Record<TokenRole, { night: Color }>;
 
 // Accepts #rgb / #rrggbb and rgb()/rgba(). Returns null for anything else (e.g. color-mix()).
 export function parseCssColor(value: string): [number, number, number] | null {
@@ -47,8 +47,7 @@ function toColor(value: string) {
   return rgb ? new Color().setRGB(rgb[0], rgb[1], rgb[2], 'srgb') : new Color();
 }
 
-// Reads the night/day alias tokens once (Tech Stack §5.8). Derived roles are color-mix() strings,
-// so the canvas mixes night → day itself from --dawn.
+// Reads the night alias tokens once (Tech Stack §5.8); the derived roles are color-mix() strings.
 export function readTokenColors(root: HTMLElement): TokenColors {
   const style = getComputedStyle(root);
   return Object.fromEntries(
@@ -56,7 +55,6 @@ export function readTokenColors(root: HTMLElement): TokenColors {
       role,
       {
         night: toColor(style.getPropertyValue(`--night-${role}`)),
-        day: toColor(style.getPropertyValue(`--day-${role}`)),
       },
     ]),
   ) as TokenColors;

@@ -129,214 +129,89 @@
   --header-h: 4rem;
 }
 
-/* Love Site (/love/[slug]) — night/day aliases. Mirrors the :root and .dark token blocks above
-   and Brand §32.1/§41.6; update together. --dawn: 0 night → 1 day; --depth deepens the night (Love Site Experience §3.1). */
+/* Love Site (/love/[slug]) — night-only aliases (all-night theme, 2026-11-13). Mirrors the .dark token block above
+   and Brand §41.6; update together. --depth deepens the night (Love Site Experience §3.1). */
 [data-love-root] {
-  --dawn: 0;
   --depth: 0;
+  --love-aurora-lav: color-mix(in oklab, var(--night-primary) 35%, transparent);
+  --love-aurora-gold: color-mix(in oklab, var(--night-gold) 30%, transparent);
   --night-background: #17121d;
-  --day-background: #faf7f2;
   --night-foreground: #f7f1ea;
-  --day-foreground: #1c1b1a;
   --night-surface: #241b2e;
-  --day-surface: #f3d8d6;
   --night-surface-elevated: #2f243a;
-  --day-surface-elevated: #ffffff;
   --night-primary: #c8b6e2;
-  --day-primary: #c8b6e2;
   --night-primary-hover: #d8c9f0;
-  --day-primary-hover: #d8c9f0;
   --night-primary-foreground: #17121d;
-  --day-primary-foreground: #1c1b1a;
   --night-primary-text: #c8b6e2;
-  --day-primary-text: #6a5296;
   --night-primary-soft: #2f243a;
-  --day-primary-soft: #f1ebf9;
   --night-secondary: #b9828a;
-  --day-secondary: #c98f94;
   --night-secondary-foreground: #17121d;
-  --day-secondary-foreground: #1c1b1a;
   --night-gold: #d2b16f;
-  --day-gold: #c6a15b;
   --night-gold-foreground: #17121d;
-  --day-gold-foreground: #1c1b1a;
   --night-gold-text: #d2b16f;
-  --day-gold-text: #7a5c22;
   --night-accent: #2f243a;
-  --day-accent: #f5eee8;
   --night-accent-foreground: #f7f1ea;
-  --day-accent-foreground: #1c1b1a;
   --night-border: #4a3a50;
-  --day-border: #d8c8bd;
   --night-input: #85738b;
-  --day-input: #8f7d71;
   --night-ring: #c8b6e2;
-  --day-ring: #6a5296;
   --night-muted: #2a2133;
-  --day-muted: #efe7e0;
   --night-muted-foreground: #b8aabd;
-  --day-muted-foreground: #5e524c;
 }
 
-/* Calm/static path: each section carries its own night/day value. With motion on
-   ([data-love-motion]), GSAP scrubs --dawn/--depth on the root and sections inherit it. */
-[data-love-root]:not([data-love-motion]) [data-dawn='0'] {
-  --dawn: 0;
+/* Calm/static path: each section carries its own --depth stop. With motion on
+   ([data-love-motion]), GSAP scrubs --depth on the root and sections inherit it. */
+[data-love-root]:not([data-love-motion]) [data-depth='0'] {
+  --depth: 0;
 }
 
-[data-love-root]:not([data-love-motion]) [data-dawn='1'] {
-  --dawn: 1;
+[data-love-root]:not([data-love-motion]) [data-depth='0.5'] {
+  --depth: 0.5;
 }
 
-[data-love-root]:not([data-love-motion]) [data-dawn] {
+[data-love-root]:not([data-love-motion]) [data-depth='1'] {
+  --depth: 1;
+}
+
+[data-love-root]:not([data-love-motion]) [data-love-section] {
   transition:
     background-color 300ms var(--ease-standard),
     color 300ms var(--ease-standard);
 }
 
-/* Derived roles: redeclared wherever --dawn changes so var() resolves against the local value. */
+/* Derived roles: redeclared wherever --depth changes so var() resolves against the local value. */
 [data-love-root],
-[data-love-root]:not([data-love-motion]) [data-dawn] {
+[data-love-root]:not([data-love-motion]) [data-love-section] {
   --night-depth-background: color-mix(
     in oklab,
     var(--night-surface-elevated) calc(var(--depth) * 100%),
     var(--night-background)
   );
-  --background: var(--night-background);
-  --background: color-mix(
-    in oklab,
-    var(--day-background) calc(var(--dawn) * 100%),
-    var(--night-depth-background)
-  );
+  --background: var(--night-depth-background);
   --foreground: var(--night-foreground);
-  --foreground: color-mix(
-    in oklab,
-    var(--day-foreground) calc(var(--dawn) * 100%),
-    var(--night-foreground)
-  );
   --surface: var(--night-surface);
-  --surface: color-mix(
-    in oklab,
-    var(--day-surface) calc(var(--dawn) * 100%),
-    var(--night-surface)
-  );
   --surface-elevated: var(--night-surface-elevated);
-  --surface-elevated: color-mix(
-    in oklab,
-    var(--day-surface-elevated) calc(var(--dawn) * 100%),
-    var(--night-surface-elevated)
-  );
   --primary: var(--night-primary);
-  --primary: color-mix(
-    in oklab,
-    var(--day-primary) calc(var(--dawn) * 100%),
-    var(--night-primary)
-  );
   --primary-hover: var(--night-primary-hover);
-  --primary-hover: color-mix(
-    in oklab,
-    var(--day-primary-hover) calc(var(--dawn) * 100%),
-    var(--night-primary-hover)
-  );
   --primary-foreground: var(--night-primary-foreground);
-  --primary-foreground: color-mix(
-    in oklab,
-    var(--day-primary-foreground) calc(var(--dawn) * 100%),
-    var(--night-primary-foreground)
-  );
   --primary-text: var(--night-primary-text);
-  --primary-text: color-mix(
-    in oklab,
-    var(--day-primary-text) calc(var(--dawn) * 100%),
-    var(--night-primary-text)
-  );
   --primary-soft: var(--night-primary-soft);
-  --primary-soft: color-mix(
-    in oklab,
-    var(--day-primary-soft) calc(var(--dawn) * 100%),
-    var(--night-primary-soft)
-  );
   --secondary: var(--night-secondary);
-  --secondary: color-mix(
-    in oklab,
-    var(--day-secondary) calc(var(--dawn) * 100%),
-    var(--night-secondary)
-  );
   --secondary-foreground: var(--night-secondary-foreground);
-  --secondary-foreground: color-mix(
-    in oklab,
-    var(--day-secondary-foreground) calc(var(--dawn) * 100%),
-    var(--night-secondary-foreground)
-  );
   --gold: var(--night-gold);
-  --gold: color-mix(
-    in oklab,
-    var(--day-gold) calc(var(--dawn) * 100%),
-    var(--night-gold)
-  );
   --gold-foreground: var(--night-gold-foreground);
-  --gold-foreground: color-mix(
-    in oklab,
-    var(--day-gold-foreground) calc(var(--dawn) * 100%),
-    var(--night-gold-foreground)
-  );
   --gold-text: var(--night-gold-text);
-  --gold-text: color-mix(
-    in oklab,
-    var(--day-gold-text) calc(var(--dawn) * 100%),
-    var(--night-gold-text)
-  );
   --accent: var(--night-accent);
-  --accent: color-mix(
-    in oklab,
-    var(--day-accent) calc(var(--dawn) * 100%),
-    var(--night-accent)
-  );
   --accent-foreground: var(--night-accent-foreground);
-  --accent-foreground: color-mix(
-    in oklab,
-    var(--day-accent-foreground) calc(var(--dawn) * 100%),
-    var(--night-accent-foreground)
-  );
   --border: var(--night-border);
-  --border: color-mix(
-    in oklab,
-    var(--day-border) calc(var(--dawn) * 100%),
-    var(--night-border)
-  );
   --input: var(--night-input);
-  --input: color-mix(
-    in oklab,
-    var(--day-input) calc(var(--dawn) * 100%),
-    var(--night-input)
-  );
   --ring: var(--night-ring);
-  --ring: color-mix(
-    in oklab,
-    var(--day-ring) calc(var(--dawn) * 100%),
-    var(--night-ring)
-  );
   --muted: var(--night-muted);
-  --muted: color-mix(
-    in oklab,
-    var(--day-muted) calc(var(--dawn) * 100%),
-    var(--night-muted)
-  );
   --muted-foreground: var(--night-muted-foreground);
-  --muted-foreground: color-mix(
-    in oklab,
-    var(--day-muted-foreground) calc(var(--dawn) * 100%),
-    var(--night-muted-foreground)
-  );
   --card: var(--surface-elevated);
   --card-foreground: var(--foreground);
   --popover: var(--surface-elevated);
   --popover-foreground: var(--foreground);
   color-scheme: dark;
-}
-
-[data-love-root] [data-dawn='1'] {
-  color-scheme: light;
 }
 
 /* Sticky stages (Experience §4.1): track length from --stage-h, ~85 % on phones. Calm = natural flow. */
@@ -831,7 +706,44 @@
   }
 }
 
+/* Starlight: slow twinkle and aurora drift (opacity/transform only; off for reduced motion). */
+@keyframes love-twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes love-aurora-drift {
+  0%,
+  100% {
+    transform: translateX(-3%);
+  }
+
+  50% {
+    transform: translateX(3%);
+  }
+}
+
+[data-love-star] {
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-love-motion] [data-love-star] {
+    animation: love-twinkle 3.2s ease-in-out infinite;
+  }
+
+  [data-love-motion] [data-love-aurora] {
+    animation: love-aurora-drift 18s ease-in-out infinite;
+  }
+}
+
 /* Motion on: sections are see-through so the fixed heart canvas shows; the root paints the page colour. */
-[data-love-motion] main :is([data-dawn], [data-stage-inner]) {
+[data-love-motion] main :is([data-love-section], [data-stage-inner]) {
   background-color: transparent;
 }

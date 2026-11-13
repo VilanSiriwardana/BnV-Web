@@ -122,7 +122,7 @@ export function Memories({ hint, memories }: Props) {
   const hintText = done ? DONE_HINT : hint;
 
   return (
-    <LoveSection id="memories" dawn={0} stage="400vh">
+    <LoveSection id="memories" depth={0.5} stage="400vh">
       <QuietHeart className="mb-4 size-10" />
       <h2 id="memories-title" className={sectionTitle}>
         Memories
@@ -184,7 +184,7 @@ export function Memories({ hint, memories }: Props) {
               <button
                 type="button"
                 className={cn(
-                  'border-border bg-surface block w-full overflow-hidden rounded-lg border text-left',
+                  'border-gold/25 bg-surface block w-full overflow-hidden rounded-lg border text-left',
                   focusRing,
                 )}
                 onClick={(e) => {

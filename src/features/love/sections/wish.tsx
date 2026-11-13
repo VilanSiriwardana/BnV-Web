@@ -71,9 +71,9 @@ export function Wish({ name, prompt, done }: Props) {
   const busy = phase !== 'idle';
 
   return (
-    <LoveSection id="wish" dawn={1} stage="200vh" className="bg-surface">
+    <LoveSection id="wish" depth={1} stage="200vh" className="bg-surface">
       <h2 id="wish-title" className={sectionTitle}>
-        {prompt}, {name}.
+        {prompt}, <span className="text-primary">{name}</span>.
       </h2>
       <div
         className={cn(

@@ -56,8 +56,8 @@ export function WishStar() {
         depthWrite: false,
         blending: NormalBlending,
         uniforms: {
-          uGold: { value: c?.gold.day ?? new Color() },
-          uIvory: { value: c?.background.day ?? new Color() },
+          uGold: { value: c?.gold.night ?? new Color() },
+          uIvory: { value: c?.foreground.night ?? new Color() },
           uHold: { value: 0 },
           uVisible: { value: 0 },
           uTime: { value: 0 },

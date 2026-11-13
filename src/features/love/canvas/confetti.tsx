@@ -65,7 +65,7 @@ export function Confetti({ tier }: { tier: Tier }) {
     const root = document.querySelector<HTMLElement>('[data-love-root]');
     const c = root ? readTokenColors(root) : null;
     const palette = c
-      ? [c.primary.day, c.secondary.day, c.gold.day, c.background.day]
+      ? [c.primary.night, c.secondary.night, c.gold.night, c.foreground.night]
       : [new Color()];
     const rand = mulberry32(11);
     const vel = new Float32Array(MAX * 3);

@@ -3,15 +3,13 @@
 import { PerformanceMonitor, Stats } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
-import { type ComponentRef, Suspense, useRef } from 'react';
+import { Suspense } from 'react';
 
 import type { LoveSiteConfig } from '../config';
-import { heart } from '../engine/heart-state';
 import { TIERS, type Tier } from '../engine/tiers';
 import { Arrow } from './arrow';
 import { Confetti } from './confetti';
 import { Heart } from './heart';
-import { HeartPearl } from './heart-pearl';
 import { MemoryOrbs } from './memory-orbs';
 import { MiniHearts } from './mini-hearts';
 import { Petals } from './petals';
@@ -66,7 +64,6 @@ export default function LoveCanvas({
       <directionalLight position={[3, 4, 5]} intensity={1} />
       <Heart tier={tier} onTap={onHeartTap}>
         <MiniHearts tier={tier} />
-        <HeartPearl tier={tier} />
       </Heart>
       <Petals tier={tier} />
       <Suspense fallback={null}>
@@ -79,7 +76,7 @@ export default function LoveCanvas({
       <Confetti tier={tier} />
       {config.bloom !== 'off' && (
         <EffectComposer multisampling={0}>
-          <DayBloom base={config.bloom === 'on' ? 0.9 : 0.5} />
+          <NightBloom base={config.bloom === 'on' ? 0.9 : 0.5} />
         </EffectComposer>
       )}
       {debug && <Stats />}
@@ -88,16 +85,8 @@ export default function LoveCanvas({
   );
 }
 
-// Glow doesn't read on light backgrounds (Experience §3.3): bloom dims to 40 % as the Pearl skin
-// takes over. Set per frame on the effect, so the composer never remounts.
-function DayBloom({ base }: { base: number }) {
-  const ref = useRef<ComponentRef<typeof Bloom>>(null);
-  useFrame(() => {
-    if (ref.current) ref.current.intensity = base * (1 - 0.6 * heart.skin);
-  });
-  return (
-    <Bloom ref={ref} mipmapBlur luminanceThreshold={0.6} intensity={base} />
-  );
+function NightBloom({ base }: { base: number }) {
+  return <Bloom mipmapBlur luminanceThreshold={0.6} intensity={base} />;
 }
 
 function RenderStatsProbe() {

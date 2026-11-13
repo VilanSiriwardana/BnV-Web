@@ -10,7 +10,7 @@ export function Hero({ name, sub }: { name: string; sub: string }) {
   return (
     <LoveSection
       id="hero"
-      dawn={0}
+
       stage="200vh"
       className="relative flex min-h-svh items-end pb-[16svh] md:pb-[12svh]"
     >
@@ -19,9 +19,9 @@ export function Hero({ name, sub }: { name: string; sub: string }) {
         <h1
           id="hero-title"
           data-hero-title
-          className="text-display text-balance break-words"
+          className="text-display text-gold-text text-balance break-words"
         >
-          Happy Birthday, <span className="text-gold-text">{name}</span>
+          Happy Birthday, <span className="text-primary">{name}</span>
         </h1>
         <p
           data-hero-fade

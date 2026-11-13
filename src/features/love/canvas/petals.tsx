@@ -114,7 +114,7 @@ export function Petals({ tier }: { tier: Tier }) {
     const attr = ref.current?.geometry.getAttribute('aColor');
     if (!root || !attr) return;
     const c = readTokenColors(root);
-    const palette = [c.surface.day, c.primary.night, c.foreground.night];
+    const palette = [c.secondary.night, c.primary.night, c.gold.night];
     for (let i = 0; i < count; i++) {
       const col = palette[i % palette.length];
       attr.setXYZ(i, col.r, col.g, col.b);

@@ -15,7 +15,7 @@ import { buildStory } from './engine/story';
 import { TierProvider, useTier } from './engine/tier-provider';
 import { useQuiet } from './engine/use-quiet';
 import { Bloom } from './sections/bloom';
-import { Dawn } from './sections/dawn';
+import { Starlight } from './sections/starlight';
 import { Finale } from './sections/finale';
 import { Gallery } from './sections/gallery';
 import { Gate } from './sections/gate';
@@ -118,7 +118,7 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
         <Bloom line={site.copy.bloomLine} />
         <Memories hint={site.copy.memoriesHint} memories={site.memories} />
         <Timeline title={site.copy.timelineTitle} items={site.timeline} />
-        <Dawn quote={site.copy.dawnQuote} />
+        <Starlight line={site.copy.starlightLine} />
         <Gallery title={site.copy.galleryTitle} photos={site.gallery} />
         <Wish
           name={name}

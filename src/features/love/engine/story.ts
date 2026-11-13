@@ -207,7 +207,7 @@ const buildTimeline: SectionBuilder = (root, mobile) => {
   const cards = gsap.utils.toArray<HTMLElement>('[data-card]', el);
   const featured = cards.findIndex((c) => c.dataset.featured === 'true');
   const startPose = poseFor('memories', mobile);
-  const endPose = poseFor(mobile ? 'dawn' : 'memories', mobile);
+  const endPose = poseFor(mobile ? 'starlight' : 'memories', mobile);
   const scale = mobile ? 0.26 : 0.3;
   let len = 0;
   let ctm: DOMMatrix | null = null;
@@ -291,17 +291,17 @@ const buildTimeline: SectionBuilder = (root, mobile) => {
     },
   });
 };
-// Experience §10: heart rises and grows while --dawn scrubs; skin swap at 35 %, shine at 50 %,
-// the single line only after 75 % (text-free window).
-const buildDawn: SectionBuilder = (root, mobile) => {
-  const el = root.querySelector<HTMLElement>('#dawn');
+// Starlight (all-night theme, replaces Dawn): the heart rises and grows under the aurora; glowUp at
+// 35 %, shine at 50 %, the single line from 40 %.
+const buildStarlight: SectionBuilder = (root, mobile) => {
+  const el = root.querySelector<HTMLElement>('#starlight');
   if (!el) return;
-  baselineOn(el, 'dawn');
-  const from = poseFor(mobile ? 'dawn' : 'memories', mobile);
-  const to = poseFor('dawn', mobile);
-  const line = el.querySelector('[data-dawn-line]');
+  baselineOn(el, 'starlight');
+  const from = poseFor(mobile ? 'starlight' : 'memories', mobile);
+  const to = poseFor('starlight', mobile);
+  const line = el.querySelector('[data-starlight-line]');
   const scrub = { immediateRender: false, ease: 'none' };
-  let swapped = false;
+  let glowed = false;
   let shone = false;
   let lineOn = false;
   gsap.set(line, { autoAlpha: 0 });
@@ -314,16 +314,11 @@ const buildDawn: SectionBuilder = (root, mobile) => {
         end: 'bottom 20%',
         scrub: 0.8,
         onUpdate: ({ progress: p }) => {
-          if (p >= 0.35 && !swapped) {
-            swapped = true;
-            director.play('skinSwap');
-          } else if (p < 0.3 && swapped) {
-            swapped = false;
-            gsap.to(heart, { skin: 0, duration: 0.6, overwrite: 'auto' });
-          }
+          if (p >= 0.35 && !glowed) glowed = director.play('glowUp');
+          if (p < 0.3) glowed = false;
           if (p >= 0.5 && !shone) shone = director.play('shine');
           if (p < 0.4) shone = false;
-          const show = p >= 0.75;
+          const show = p >= 0.4;
           if (show !== lineOn) {
             lineOn = show;
             gsap.to(line, {
@@ -356,7 +351,7 @@ const buildGallery: SectionBuilder = (root, mobile, tier) => {
   const el = root.querySelector<HTMLElement>('#gallery');
   if (!el) return;
   baselineOn(el, 'gallery');
-  const from = poseFor('dawn', mobile);
+  const from = poseFor('starlight', mobile);
   const to = poseFor('gallery', mobile);
   const scrub = { immediateRender: false, ease: 'none' };
   gsap
@@ -482,7 +477,7 @@ const buildLetter: SectionBuilder = (root) => {
     onToggle: ({ isActive }) => {
       gsap.ticker.remove(follow);
       if (!isActive) {
-        gsap.to(heart, { pearlRim: 0, duration: 0.4, overwrite: 'auto' });
+        gsap.to(heart, { sealRim: 0, duration: 0.4, overwrite: 'auto' });
         return;
       }
       gsap.ticker.add(follow);
@@ -536,7 +531,7 @@ const sections = [
   buildBloom,
   buildMemories,
   buildTimeline,
-  buildDawn,
+  buildStarlight,
   buildGallery,
   buildWish,
   buildLetter,
@@ -553,7 +548,7 @@ function buildProgress(root: HTMLElement) {
   });
 }
 
-// Calm / reduced motion: no scrubbing; sections use their static data-dawn colours.
+// Calm / reduced motion: no scrubbing; sections use their static data-depth stops.
 export function applyStaticStory(root: HTMLElement) {
   clearTheme(root);
   buildProgress(root);

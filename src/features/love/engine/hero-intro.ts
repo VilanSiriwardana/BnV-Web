@@ -3,7 +3,7 @@ import { SplitText } from 'gsap/SplitText';
 
 import { spawnTapHearts } from '../canvas/mini-hearts';
 import { director } from './heart-director';
-import { isMobileViewport, poseFor } from './heart-path';
+import { HEART_PATH, isMobileViewport, poseFor } from './heart-path';
 import { heart } from './heart-state';
 import { REDUCED_MOTION_QUERY } from './motion-prefs';
 
@@ -138,7 +138,7 @@ export function replayHeroWeave() {
   const pose = poseFor('hero', isMobileViewport());
   Object.assign(heart.ndc, { x: pose.x, y: pose.y });
   heart.scale = pose.scale;
-  heart.skin = 0;
+  heart.gold = HEART_PATH.hero.gold;
   heart.form = 0;
   director.play('ribbonWeave');
   director.play('pulse');

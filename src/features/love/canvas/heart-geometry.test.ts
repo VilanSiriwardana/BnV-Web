@@ -25,14 +25,39 @@ describe('buildHeartAttributes', () => {
 
   it('puts each ribbon on its own half of the heart', () => {
     for (let i = 0; i < count; i++) {
-      const side = ribbonSide(i, count);
+      const side = ribbonSide(i);
       expect(Math.sign(a.aHeart[i * 3]) || side).toBe(side);
     }
   });
 
   it('starts ribbons on their own side of the screen', () => {
-    expect(a.aRibbon[0]).toBeLessThan(-3);
-    expect(a.aRibbon[(count / 2) * 3]).toBeGreaterThan(3);
+    let left = 0;
+    let right = 0;
+    for (let i = 0; i < count; i++) {
+      if (ribbonSide(i) < 0) left += a.aRibbon[i * 3];
+      else right += a.aRibbon[i * 3];
+    }
+    expect(left / (count / 2)).toBeLessThan(-2);
+    expect(right / (count / 2)).toBeGreaterThan(2);
+  });
+
+  it('balances both halves in any draw-range prefix (low tier)', () => {
+    const big = buildHeartAttributes(18000);
+    for (const n of [3000, 8000]) {
+      let left = 0;
+      let low = 0;
+      let high = 0;
+      for (let i = 0; i < n; i++) {
+        if (big.aHeart[i * 3] < 0) left++;
+        const y = big.aHeart[i * 3 + 1];
+        if (y > 0.5) high++;
+        if (y < -0.5) low++;
+      }
+      expect(left / n).toBeGreaterThan(0.45);
+      expect(left / n).toBeLessThan(0.55);
+      expect(high).toBeGreaterThan(0);
+      expect(low).toBeGreaterThan(0);
+    }
   });
 
   it('is deterministic for a seed', () => {

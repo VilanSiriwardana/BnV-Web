@@ -7,7 +7,7 @@ export const SECTION_IDS = [
   'bloom',
   'memories',
   'timeline',
-  'dawn',
+  'starlight',
   'gallery',
   'wish',
   'letter',
@@ -19,7 +19,8 @@ export type HeartPose = { x: number; y: number; scale: number };
 type PathEntry = {
   desktop: HeartPose;
   mobile: HeartPose;
-  skin: 0 | 1;
+  /** Extra gold in the heart colours, 0..1 (all-night theme). */
+  gold: number;
   glow: number;
 };
 
@@ -28,55 +29,55 @@ export const HEART_PATH: Record<SectionId, PathEntry> = {
   hero: {
     desktop: { x: 0, y: 0.05, scale: 1 },
     mobile: { x: 0, y: 0.25, scale: 0.9 },
-    skin: 0,
+    gold: 0,
     glow: 0.7,
   },
   bloom: {
     desktop: { x: 0.55, y: 0.1, scale: 0.55 },
     mobile: { x: 0, y: 0.6, scale: 0.3 },
-    skin: 0,
+    gold: 0,
     glow: 0.7,
   },
   memories: {
     desktop: { x: 0, y: -0.55, scale: 0.38 },
     mobile: { x: 0, y: 0.62, scale: 0.28 },
-    skin: 0,
+    gold: 0.1,
     glow: 0.55,
   },
   timeline: {
     desktop: { x: 0, y: 0, scale: 0.3 },
     mobile: { x: -0.8, y: 0, scale: 0.26 },
-    skin: 0,
+    gold: 0.2,
     glow: 0.6,
   },
-  dawn: {
+  starlight: {
     desktop: { x: 0, y: 0.15, scale: 0.6 },
     mobile: { x: 0, y: 0.5, scale: 0.5 },
-    skin: 1,
+    gold: 0.4,
     glow: 0.5,
   },
   gallery: {
     desktop: { x: 0.86, y: -0.78, scale: 0.2 },
     mobile: { x: 0.8, y: -0.85, scale: 0.16 },
-    skin: 1,
+    gold: 0.4,
     glow: 0.35,
   },
   wish: {
     desktop: { x: 0, y: 0, scale: 0.5 },
     mobile: { x: 0, y: 0, scale: 0.5 },
-    skin: 1,
+    gold: 0.5,
     glow: 0.5,
   },
   letter: {
     desktop: { x: 0, y: 0, scale: 0.3 },
     mobile: { x: 0, y: 0, scale: 0.3 },
-    skin: 1,
+    gold: 0.6,
     glow: 0.4,
   },
   finale: {
     desktop: { x: 0, y: 0.05, scale: 1.3 },
     mobile: { x: 0, y: 0.15, scale: 1 },
-    skin: 1,
+    gold: 0.6,
     glow: 0.7,
   },
 };
