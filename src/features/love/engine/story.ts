@@ -1,13 +1,53 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
+import { director } from './heart-director';
+import type { SectionId } from './heart-path';
+import { heart } from './heart-state';
 import { buildTheme, clearTheme } from './theme-timeline';
 import type { Tier } from './tiers';
 
 type SectionBuilder = (root: HTMLElement, mobile: boolean) => void;
 
-// Section stubs; filled in Phases 3–5.
-const buildHero: SectionBuilder = () => {};
+// Records the section whose baseline the director restores to while it is on screen.
+function baselineOn(el: HTMLElement, id: SectionId) {
+  ScrollTrigger.create({
+    trigger: el,
+    start: 'top center',
+    end: 'bottom center',
+    onToggle: (self) => self.isActive && director.setBaseline(id),
+  });
+}
+
+// Experience §6: over the first 40 % of the stage the heart tilts and the headline lifts away.
+const buildHero: SectionBuilder = (root) => {
+  const hero = root.querySelector<HTMLElement>('#hero');
+  if (!hero) return;
+  baselineOn(hero, 'hero');
+  gsap
+    .timeline({
+      scrollTrigger: {
+        trigger: hero,
+        start: 'top top',
+        end: '40% top',
+        scrub: 0.6,
+      },
+    })
+    .to(heart, { roll: (-8 * Math.PI) / 180, ease: 'none' }, 0)
+    .to(
+      hero.querySelector('[data-hero-copy]'),
+      { y: -60, autoAlpha: 0, ease: 'none' },
+      0,
+    );
+  const cue = hero.querySelector('[data-hero-cue]');
+  ScrollTrigger.create({
+    trigger: hero,
+    start: 'top+=8 top',
+    once: true,
+    onEnter: () =>
+      gsap.to(cue, { opacity: 0, duration: 0.4, overwrite: 'auto' }),
+  });
+};
 const buildBloom: SectionBuilder = () => {};
 const buildMemories: SectionBuilder = () => {};
 const buildTimeline: SectionBuilder = () => {};

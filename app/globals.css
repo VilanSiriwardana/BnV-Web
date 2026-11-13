@@ -806,3 +806,27 @@
     }
   }
 }
+
+/* Love Site gate seed (Experience §5): a ~72 bpm lub-dub. Static in Calm / reduced motion. */
+@keyframes love-seed-pulse {
+  0%,
+  34%,
+  100% {
+    transform: scale(1);
+  }
+  8% {
+    transform: scale(1.08);
+  }
+  16% {
+    transform: scale(1);
+  }
+  24% {
+    transform: scale(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-love-seed] {
+    animation: love-seed-pulse 833ms ease-out infinite;
+  }
+}

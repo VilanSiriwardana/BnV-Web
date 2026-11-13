@@ -3,12 +3,13 @@
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import dynamic from 'next/dynamic';
-import { useRef, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 import type { LoveSiteConfig } from './config';
 import { useMotionPrefs } from './engine/motion-prefs';
 import { MotionPrefsProvider } from './engine/motion-prefs-provider';
 import { ScrollEngine } from './engine/scroll-engine';
+import { killHeroIntro, playHeroIntro, tapHeart } from './engine/hero-intro';
 import { buildStory } from './engine/story';
 import { TierProvider, useTier } from './engine/tier-provider';
 import { Bloom } from './sections/bloom';
@@ -22,6 +23,7 @@ import { Memories } from './sections/memories';
 import { Timeline } from './sections/timeline';
 import { Wish } from './sections/wish';
 import { CalmModeToggle } from './ui/calm-mode-toggle';
+import { MusicToggle } from './ui/music-toggle';
 import { ProgressHeart } from './ui/progress-heart';
 
 // Client-only 3D chunk (Tech Stack §5.1): never in shop bundles, never server-rendered.
@@ -60,6 +62,10 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
     useSyncExternalStore(noSubscribe, readDebug, serverFalse) &&
     HeartDebugPanel !== null;
   const rootRef = useRef<HTMLDivElement>(null);
+  const [canvasReady, setCanvasReady] = useState(false);
+  const [entered, setEntered] = useState(false);
+
+  useEffect(() => killHeroIntro, []);
   const name = site.recipient.name;
 
   useGSAP(
@@ -90,11 +96,12 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
           onDecline={stepDown}
           onIncline={stepUp}
           debug={debug}
+          onHeartTap={tapHeart}
+          onReady={() => setCanvasReady(true)}
         />
       )}
       {debug && HeartDebugPanel && <HeartDebugPanel />}
       <main>
-        <Gate name={name} />
         <Hero name={name} sub={site.copy.heroSub} />
         <Bloom line={site.copy.bloomLine} />
         <Memories hint={site.copy.memoriesHint} memories={site.memories} />
@@ -105,6 +112,16 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
         <Letter title={site.copy.letterTitle} letter={site.letter} />
         <Finale name={name} message={site.copy.finaleMessage} />
       </main>
+      <Gate
+        name={name}
+        musicSrc={site.music.src}
+        sceneReady={canvasReady || !showCanvas}
+        onEnter={(seed) => {
+          setEntered(true);
+          playHeroIntro(rootRef.current!, { from: seed, calm });
+        }}
+      />
+      {entered && <MusicToggle />}
       <ProgressHeart />
       <CalmModeToggle />
     </div>

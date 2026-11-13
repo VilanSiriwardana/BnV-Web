@@ -14,6 +14,7 @@ type Props = {
   onIncline: () => void;
   debug?: boolean;
   onHeartTap?: () => void;
+  onReady?: () => void;
 };
 
 export default function LoveCanvas({
@@ -22,6 +23,7 @@ export default function LoveCanvas({
   onIncline,
   debug,
   onHeartTap,
+  onReady,
 }: Props) {
   const config = TIERS[tier];
   return (
@@ -38,6 +40,7 @@ export default function LoveCanvas({
       gl={{ antialias: false, powerPreference: 'high-performance' }}
       dpr={[1, config.dpr]}
       camera={{ position: [0, 0, 6], fov: 45 }}
+      onCreated={onReady}
     >
       {/* Step down on decline; step up only after a long stable run (flipflops ends adaptation). */}
       <PerformanceMonitor
