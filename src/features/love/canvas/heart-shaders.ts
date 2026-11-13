@@ -49,6 +49,9 @@ uniform vec3 uColorRose;
 uniform float uGlow;
 uniform float uShine;
 uniform float uBeat;
+uniform float uSkin;
+uniform float uPearl;
+uniform vec3 uColorIvory;
 varying vec4 vRand;
 varying float vSide;
 varying float vDiag;
@@ -74,7 +77,13 @@ void main() {
 
   float glow = min(uGlow + uBeat * 0.12, 1.1);
   vec3 outCol = col * (0.35 + 0.55 * glow) + vec3(0.25) * shine;
-  // Additive: keep each sprite dim so overlap never clips to white.
-  gl_FragColor = vec4(min(outCol, vec3(0.9)), alpha * 0.55);
+  if (uPearl < 0.5) {
+    // Aura, additive: keep each sprite dim so overlap never clips to white.
+    gl_FragColor = vec4(min(outCol, vec3(0.9)), alpha * 0.55 * (1.0 - uSkin));
+  } else {
+    // Pearl, normal blend: finer satin sparkles that read on Ivory (Experience §3.3).
+    vec3 pearl = mix(col, uColorIvory, 0.35) + vec3(0.2) * shine;
+    gl_FragColor = vec4(pearl, alpha * alpha * 0.8 * uSkin);
+  }
 }
 `;

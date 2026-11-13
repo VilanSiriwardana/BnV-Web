@@ -544,6 +544,7 @@ Each decision should include:
 - Alternatives: Hold everything to the 400 ms token.
 - Consequences: The exceptions apply only to `/love`. `Brand-Identity.md` gets a note in Phase 6.
 - Amendment 2026-11-13 (Phase 4, pointer routing): keep the default layer model (Tech Stack §7.2): `main` is `pointer-events: none`, real controls re-enable it, and the canvas receives everything else. Orbs use invisible hit spheres; every orb has a DOM twin button. The `eventSource` + `eventPrefix="client"` fallback is not used. UNCERTAIN until checked on Safari and a real phone; switch to the fallback in `canvas/love-canvas.tsx` if orb clicks are lost.
+- Amendment 2026-11-13 (Phase 5, letter opening): the letter unlock is a signature moment and runs about 1.4 s plus a paragraph reveal (500 ms each, 400 ms stagger), longer than the 400 ms UI token. GSAP only on the envelope, seal and letter elements; Calm / reduced motion shows the letter already open. Bloom also dims to 40 % of its tier value as the Pearl skin takes over in daylight.
 - Related Documents:
   - [../references/love-site/Love-Site-Experience-Guidebook.md](../references/love-site/Love-Site-Experience-Guidebook.md)
 

@@ -130,3 +130,16 @@ export function killHeroIntro() {
   intro = idle = split = removeParallax = null;
   heart.idleScale = heart.idleGlow = heart.yaw = 0;
 }
+
+// Replay (Experience §14): back at the top, the ribbons weave again. Idle and parallax keep running.
+export function replayHeroWeave() {
+  director.settle();
+  director.setBaseline('hero');
+  const pose = poseFor('hero', isMobileViewport());
+  Object.assign(heart.ndc, { x: pose.x, y: pose.y });
+  heart.scale = pose.scale;
+  heart.skin = 0;
+  heart.form = 0;
+  director.play('ribbonWeave');
+  director.play('pulse');
+}

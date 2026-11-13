@@ -21,5 +21,8 @@ export const heart = {
   cameraShake: 0, // camera jitter amplitude (world units), arrow hit
   lean: { x: 0, y: 0 }, // additive NDC offset toward a hovered/focused orb (≤ 0.15)
   arrow: 0, // arrow flight progress 0..1 (arrowStrike)
+  star: 0, // wish star visibility 0..1
+  starHold: 0, // wish hold progress 0..1
+  pearlRim: 0, // extra gold rim while docked on the letter seal
 };
 export type HeartState = typeof heart;

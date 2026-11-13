@@ -16,7 +16,7 @@ export const HEART_EVENTS = [
   'finaleBurst',
 ] as const;
 export type HeartEvent = (typeof HEART_EVENTS)[number];
-export type PlayOptions = { petals?: boolean };
+export type PlayOptions = { petals?: boolean; scale?: number };
 
 export type Running = { kill: () => void };
 

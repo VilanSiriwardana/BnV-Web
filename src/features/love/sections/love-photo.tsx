@@ -2,9 +2,14 @@ import Image from 'next/image';
 
 import type { PhotoRef } from '../config';
 
-type Props = { photo: PhotoRef; sizes: string; className?: string };
+type Props = {
+  photo: PhotoRef;
+  sizes: string;
+  className?: string;
+  priority?: boolean;
+};
 
-export function LovePhoto({ photo, sizes, className }: Props) {
+export function LovePhoto({ photo, sizes, className, priority }: Props) {
   return (
     <Image
       src={photo.src}
@@ -14,6 +19,7 @@ export function LovePhoto({ photo, sizes, className }: Props) {
       sizes={sizes}
       placeholder={photo.blur ? 'blur' : 'empty'}
       blurDataURL={photo.blur}
+      priority={priority}
       className={className}
     />
   );

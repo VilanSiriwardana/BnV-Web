@@ -18,6 +18,7 @@ import {
 import { orbRailProgress } from '../engine/memory-layout';
 import { useMotionPrefs } from '../engine/motion-prefs';
 import { useLoveScroll } from '../engine/scroll-engine';
+import { onSessionReset } from '../engine/session';
 import { useTier } from '../engine/tier-provider';
 import { TIERS } from '../engine/tiers';
 import { MemoryDialog } from '../ui/memory-dialog';
@@ -63,6 +64,16 @@ export function Memories({ hint, memories }: Props) {
       if (opened.current.size === count) director.play('glowUp');
     },
     [items, count],
+  );
+
+  // Replay resets the counter (Experience §14).
+  useEffect(
+    () =>
+      onSessionReset(() => {
+        opened.current.clear();
+        setOpenedCount(0);
+      }),
+    [],
   );
 
   // Orb clicks arrive from the canvas; focus returns to that orb's twin.

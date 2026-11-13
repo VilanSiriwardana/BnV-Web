@@ -8,7 +8,9 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import type { LoveSiteConfig } from './config';
 import { useMotionPrefs } from './engine/motion-prefs';
 import { MotionPrefsProvider } from './engine/motion-prefs-provider';
-import { ScrollEngine } from './engine/scroll-engine';
+import { ScrollEngine, useLoveScroll } from './engine/scroll-engine';
+import { director } from './engine/heart-director';
+import { resetSession } from './engine/session';
 import { killHeroIntro, playHeroIntro, tapHeart } from './engine/hero-intro';
 import { buildStory } from './engine/story';
 import { TierProvider, useTier } from './engine/tier-provider';
@@ -67,6 +69,15 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
 
   useEffect(() => killHeroIntro, []);
   const name = site.recipient.name;
+  const { scrollTo } = useLoveScroll();
+
+  // Experience §14 Replay: clean flags and heart, then glide home; the hero re-weaves on arrival.
+  const replay = () => {
+    resetSession();
+    director.settle();
+    ScrollTrigger.refresh();
+    scrollTo(0, calm ? { immediate: true } : { duration: 2.6 });
+  };
 
   useGSAP(
     () => {
@@ -109,9 +120,17 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
         <Timeline title={site.copy.timelineTitle} items={site.timeline} />
         <Dawn quote={site.copy.dawnQuote} />
         <Gallery title={site.copy.galleryTitle} photos={site.gallery} />
-        <Wish name={name} prompt={site.copy.wishPrompt} />
+        <Wish
+          name={name}
+          prompt={site.copy.wishPrompt}
+          done={site.copy.wishDone}
+        />
         <Letter title={site.copy.letterTitle} letter={site.letter} />
-        <Finale name={name} message={site.copy.finaleMessage} />
+        <Finale
+          name={name}
+          message={site.copy.finaleMessage}
+          onReplay={replay}
+        />
       </main>
       <Gate
         name={name}

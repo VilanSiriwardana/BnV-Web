@@ -1,5 +1,7 @@
 import gsap from 'gsap';
 
+import { spawnTapHearts } from '../canvas/mini-hearts';
+import { launchConfetti } from './confetti-state';
 import {
   createDirectorCore,
   type HeartEvent,
@@ -75,6 +77,16 @@ function build(event: HeartEvent, opts: PlayOptions, tl: gsap.core.Timeline) {
       case 'ribbonWeave':
         tl.set(heart, { form: 1 });
         return;
+      case 'skinSwap':
+        tl.to(heart, { skin: 1, duration: 0.3 });
+        return;
+      case 'dockToSeal':
+        tl.set(heart, { scale: opts.scale ?? heart.scale, pearlRim: 1 });
+        return;
+      case 'wishMerge':
+        tl.to(heart, { starHold: 0, duration: 0.3 }, 0);
+        flash(tl, 0.6);
+        return;
       case 'shine':
       case 'reform':
         return;
@@ -125,6 +137,33 @@ function build(event: HeartEvent, opts: PlayOptions, tl: gsap.core.Timeline) {
     case 'arrowStrike':
       arrowStrike(tl);
       return;
+    case 'skinSwap':
+      tl.to(heart, { skin: 1, duration: 1.2, ease: 'power2.inOut' });
+      return;
+    case 'wishMerge':
+      wishMerge(tl);
+      return;
+    case 'dockToSeal':
+      tl.to(heart, {
+        scale: opts.scale ?? heart.scale,
+        pearlRim: 1,
+        duration: 0.9,
+        ease: 'power3.inOut',
+      });
+      return;
+    case 'sealBreak':
+      tl.call(() => spawnTapHearts(8))
+        .call(() => spawnTapHearts(8), [], 0.3)
+        .to(heart, { pearlRim: 0, duration: 0.3 }, 0);
+      flash(tl);
+      return;
+    case 'finaleBurst':
+      tl.to(heart, { glow: baseGlow() + 0.3, duration: 0.3 });
+      burst(tl, opts);
+      tl.call(() => void launchConfetti(0.5), [], '<');
+      tl.to({}, { duration: 0.5 });
+      reform(tl);
+      return;
     default:
       pulse(tl, 0);
   }
@@ -165,6 +204,17 @@ function arrowStrike(tl: gsap.core.Timeline) {
   reform(tl);
 }
 
+// Experience §12 wishMerge (≈ 4 s): flash, burst with confetti, reform; the message is DOM-side.
+function wishMerge(tl: gsap.core.Timeline) {
+  tl.to(heart, { glow: 1, starHold: 1, duration: 0.3, ease: 'power2.out' }, 0)
+    .call(() => void launchConfetti(), [], 0.3)
+    .to(heart, { star: 0, duration: 0.4 }, 0.3);
+  burst(tl, {}, 0.3);
+  tl.to({}, { duration: 0.2 });
+  reform(tl);
+  tl.to(heart, { star: 1, starHold: 0, duration: 0.6 }, '<');
+}
+
 function toBaseline() {
   baselineTween?.kill();
   baselineTween = gsap.to(heart, {
@@ -175,6 +225,8 @@ function toBaseline() {
     cameraShake: 0,
     flinch: 0,
     shine: 0,
+    starHold: 0,
+    skin: HEART_PATH[section].skin,
     glow: baseGlow(),
     duration: 0.3,
     ease: 'power2.out',

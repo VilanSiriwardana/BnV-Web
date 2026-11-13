@@ -2,7 +2,9 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import { director } from './heart-director';
-import { poseFor, type SectionId } from './heart-path';
+import { replayHeroWeave } from './hero-intro';
+import { session } from './session';
+import { poseFor, type SectionId, WISH_REST } from './heart-path';
 import { heart } from './heart-state';
 import { memoriesState } from './memories-state';
 import { RAIL_START_Z, railEndZ } from './memory-layout';
@@ -17,7 +19,17 @@ import {
 } from './timeline-progress';
 import type { Tier } from './tiers';
 
-type SectionBuilder = (root: HTMLElement, mobile: boolean) => void;
+type SectionBuilder = (
+  root: HTMLElement,
+  mobile: boolean,
+  tier: Tier,
+) => void | (() => void);
+
+// Heart world height ≈ 2 units at scale 1; the day camera sits at z 6 with fov 45, so the
+// visible height is 2·6·tan(22.5°) ≈ 4.97 units. UNCERTAIN: tuned by eye against the seal.
+const VIEW_H = 4.97;
+const sealScale = (px: number) =>
+  (0.9 * px * VIEW_H) / (2 * window.innerHeight);
 
 // Records the section whose baseline the director restores to while it is on screen.
 function baselineOn(el: HTMLElement, id: SectionId) {
@@ -49,6 +61,17 @@ const buildHero: SectionBuilder = (root) => {
       { y: -60, autoAlpha: 0, ease: 'none' },
       0,
     );
+  // Replay (Experience §14): arriving back at the top weaves the ribbons again, once.
+  ScrollTrigger.create({
+    trigger: hero,
+    start: 'top top',
+    end: 'bottom top',
+    onEnterBack: () => {
+      if (!session.replayArmed) return;
+      session.replayArmed = false;
+      replayHeroWeave();
+    },
+  });
   const cue = hero.querySelector('[data-hero-cue]');
   ScrollTrigger.create({
     trigger: hero,
@@ -268,11 +291,241 @@ const buildTimeline: SectionBuilder = (root, mobile) => {
     },
   });
 };
-const buildDawn: SectionBuilder = () => {};
-const buildGallery: SectionBuilder = () => {};
-const buildWish: SectionBuilder = () => {};
-const buildLetter: SectionBuilder = () => {};
-const buildFinale: SectionBuilder = () => {};
+// Experience §10: heart rises and grows while --dawn scrubs; skin swap at 35 %, shine at 50 %,
+// the single line only after 75 % (text-free window).
+const buildDawn: SectionBuilder = (root, mobile) => {
+  const el = root.querySelector<HTMLElement>('#dawn');
+  if (!el) return;
+  baselineOn(el, 'dawn');
+  const from = poseFor(mobile ? 'dawn' : 'memories', mobile);
+  const to = poseFor('dawn', mobile);
+  const line = el.querySelector('[data-dawn-line]');
+  const scrub = { immediateRender: false, ease: 'none' };
+  let swapped = false;
+  let shone = false;
+  let lineOn = false;
+  gsap.set(line, { autoAlpha: 0 });
+
+  gsap
+    .timeline({
+      scrollTrigger: {
+        trigger: el,
+        start: 'top 80%',
+        end: 'bottom 20%',
+        scrub: 0.8,
+        onUpdate: ({ progress: p }) => {
+          if (p >= 0.35 && !swapped) {
+            swapped = true;
+            director.play('skinSwap');
+          } else if (p < 0.3 && swapped) {
+            swapped = false;
+            gsap.to(heart, { skin: 0, duration: 0.6, overwrite: 'auto' });
+          }
+          if (p >= 0.5 && !shone) shone = director.play('shine');
+          if (p < 0.4) shone = false;
+          const show = p >= 0.75;
+          if (show !== lineOn) {
+            lineOn = show;
+            gsap.to(line, {
+              autoAlpha: show ? 1 : 0,
+              y: show ? 0 : 16,
+              duration: 0.5,
+              overwrite: 'auto',
+            });
+          }
+        },
+      },
+    })
+    .fromTo(
+      heart.ndc,
+      { x: from.x, y: from.y },
+      { x: to.x, y: to.y, ...scrub },
+      0,
+    )
+    .fromTo(heart, { scale: 0.3 }, { scale: to.scale, ...scrub }, 0)
+    .fromTo(
+      heart,
+      { petalRelease: 1 },
+      { petalRelease: 0, ...scrub, duration: 0.5 },
+      0,
+    );
+};
+
+// Experience §11: batched clip reveals, light desktop parallax, quiet corner companion.
+const buildGallery: SectionBuilder = (root, mobile, tier) => {
+  const el = root.querySelector<HTMLElement>('#gallery');
+  if (!el) return;
+  baselineOn(el, 'gallery');
+  const from = poseFor('dawn', mobile);
+  const to = poseFor('gallery', mobile);
+  const scrub = { immediateRender: false, ease: 'none' };
+  gsap
+    .timeline({
+      scrollTrigger: {
+        trigger: el,
+        start: 'top bottom',
+        end: 'top 20%',
+        scrub: 0.8,
+      },
+    })
+    .fromTo(
+      heart.ndc,
+      { x: from.x, y: from.y },
+      { x: to.x, y: to.y, ...scrub },
+      0,
+    )
+    .fromTo(heart, { scale: from.scale }, { scale: to.scale, ...scrub }, 0);
+
+  const tiles = gsap.utils.toArray<HTMLElement>('[data-love-tile]', el);
+  const clip = tier !== 'low';
+  const hidden = clip
+    ? {
+        y: 24,
+        autoAlpha: 0,
+        clipPath: 'inset(12% 8% 12% 8% round var(--radius))',
+      }
+    : { y: 24, autoAlpha: 0 };
+  const shown = clip
+    ? { y: 0, autoAlpha: 1, clipPath: 'inset(0% 0% 0% 0% round var(--radius))' }
+    : { y: 0, autoAlpha: 1 };
+  gsap.set(tiles, hidden);
+  ScrollTrigger.batch(tiles, {
+    start: 'top 88%',
+    once: true,
+    onEnter: (batch) => {
+      gsap.to(batch, {
+        ...shown,
+        duration: 0.8,
+        ease: 'power3.out',
+        stagger: 0.08,
+        overwrite: 'auto',
+      });
+      director.play('shine'); // the director throttles shine to once per 4 s
+    },
+  });
+
+  if (mobile) return;
+  // ±6 % parallax on at most six tiles (Phase 5 §5 Step 3).
+  tiles.slice(0, 6).forEach((tile) => {
+    const img = tile.querySelector('[data-tile-img]');
+    if (!img) return;
+    gsap.fromTo(
+      img,
+      { yPercent: -6, scale: 1.12 },
+      {
+        yPercent: 6,
+        scale: 1.12,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: tile,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true,
+        },
+      },
+    );
+  });
+};
+
+// Experience §12: the star shows while the stage is on screen; the heart waits below it.
+const buildWish: SectionBuilder = (root) => {
+  const el = root.querySelector<HTMLElement>('#wish');
+  if (!el) return;
+  baselineOn(el, 'wish');
+  ScrollTrigger.create({
+    trigger: el,
+    start: 'top center',
+    end: 'bottom center',
+    onToggle: ({ isActive }) => {
+      gsap.to(heart, {
+        star: isActive ? 1 : 0,
+        duration: 0.4,
+        overwrite: 'auto',
+      });
+      if (!isActive) return;
+      gsap.to(heart.ndc, {
+        x: 0,
+        y: WISH_REST.y,
+        duration: 0.6,
+        overwrite: 'auto',
+      });
+      gsap.to(heart, {
+        scale: WISH_REST.scale,
+        duration: 0.6,
+        overwrite: 'auto',
+      });
+    },
+  });
+};
+
+// Experience §13: the heart docks onto the measured seal and stays exact while the stage is
+// stuck (re-measured every tick, so resize and scroll can't drift it).
+const buildLetter: SectionBuilder = (root) => {
+  const el = root.querySelector<HTMLElement>('#letter');
+  if (!el) return;
+  baselineOn(el, 'letter');
+  const follow = () => {
+    const seal = el.querySelector<HTMLElement>('[data-seal]');
+    if (!seal) return;
+    const r = seal.getBoundingClientRect();
+    heart.ndc.x = ((r.left + r.width / 2) / window.innerWidth) * 2 - 1;
+    heart.ndc.y = -(((r.top + r.height / 2) / window.innerHeight) * 2 - 1);
+  };
+  ScrollTrigger.create({
+    trigger: el,
+    start: 'top center',
+    end: 'bottom center',
+    onToggle: ({ isActive }) => {
+      gsap.ticker.remove(follow);
+      if (!isActive) {
+        gsap.to(heart, { pearlRim: 0, duration: 0.4, overwrite: 'auto' });
+        return;
+      }
+      gsap.ticker.add(follow);
+      const seal = el.querySelector<HTMLElement>('[data-seal]');
+      director.play('dockToSeal', {
+        scale: seal ? sealScale(seal.offsetWidth) : 0.3,
+      });
+    },
+  });
+  return () => gsap.ticker.remove(follow);
+};
+
+// Experience §14: centre stage, one finaleBurst per pass.
+const buildFinale: SectionBuilder = (root, mobile) => {
+  const el = root.querySelector<HTMLElement>('#finale');
+  if (!el) return;
+  baselineOn(el, 'finale');
+  const to = poseFor('finale', mobile);
+  const scrollTrigger = {
+    trigger: el,
+    start: 'top center',
+    end: 'top top',
+    scrub: 0.8,
+  };
+  gsap.to(heart.ndc, {
+    x: to.x,
+    y: to.y,
+    ease: 'none',
+    immediateRender: false,
+    scrollTrigger,
+  });
+  gsap.to(heart, {
+    scale: to.scale,
+    ease: 'none',
+    immediateRender: false,
+    scrollTrigger,
+  });
+  ScrollTrigger.create({
+    trigger: el,
+    start: 'top 60%',
+    onEnter: () => {
+      if (session.finalePlayed) return;
+      session.finalePlayed = true;
+      director.play('finaleBurst');
+    },
+  });
+};
 
 const sections = [
   buildHero,
@@ -324,7 +577,8 @@ export function buildStory(
       }
       buildTheme(root);
       buildProgress(root);
-      sections.forEach((build) => build(root, mobile));
+      const cleanups = sections.map((build) => build(root, mobile, ctx.tier));
+      return () => cleanups.forEach((fn) => fn?.());
     },
   );
   return () => {

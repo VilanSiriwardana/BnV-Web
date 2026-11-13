@@ -718,3 +718,19 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 - Arrow visibility: sized to 16 % of viewport height, thicker shaft/head/fletching, starts just outside the top-left edge, `power1.in`, gold × 2.5 so it blooms, denser trail.
 - Orb photos: `#include <colorspace_fragment>` + sRGB textures.
 - NOT verified in a browser (UNCERTAIN): arrow look and timing, photo colours.
+
+## 2026-11-13 - Love Site Phase 5: Dawn, Gallery, Wish, Letter, Finale
+
+### Summary
+
+- Blueprint `.claude/blueprints/035-love-site-phase-5-day-story.md`. Not committed. Phase 4 browser check and commits still open (owner decision: start Phase 5 anyway).
+- Pearl skin: second normal-blended `ShaderMaterial` on the shared heart geometry (`uPearl`, day colours, shared dynamic uniforms), cross-faded with Aura by `uSkin`; `canvas/heart-pearl.tsx` (extruded `heartShape`, `MeshPhysicalMaterial` on `high`, `MeshStandardMaterial` elsewhere, fresnel gold rim, fake contact shadow). `DayBloom` in `love-canvas.tsx` dims bloom to 40 % per frame.
+- Director: `skinSwap`, `wishMerge`, `dockToSeal` (`PlayOptions.scale`), `sealBreak`, `finaleBurst` + reduced variants; `toBaseline` restores `skin` and `starHold`.
+- New: `engine/confetti-state.ts` (three-free launch signal, one launch per 1.5 s), `canvas/confetti.tsx`, `canvas/wish-star.tsx`, `hooks/use-hold.ts` (pure `createHoldController` + hook), `engine/session.ts` (`resetSession`, `onSessionReset`), `ui/lightbox.tsx` (wraps the shared `components/ui/lightbox.tsx` and stops Lenis).
+- Sections: Dawn (sunrise layer, text after 75 %), Gallery (tile buttons, hover scrim captions, lightbox), Wish (hold ring, "Or tap once", aria-live message, local-only textarea), Letter (envelope, hold or passphrase, GSAP sequence, inner scroll), Finale (Replay + music button via new `useMusicToggle`). `buildDawn/Gallery/Wish/Letter/Finale` in `story.ts`; hero `onEnterBack` replays the weave after Replay (`replayHeroWeave`). Memories counter resets on Replay.
+- Deviations: confetti launch lives in `engine/confetti-state.ts` instead of `confetti.tsx` (keeps three.js out of engine imports); Calm (which already includes OS reduced motion) drives the quiet variants instead of framer's `useReducedMotion` (avoids a hydration mismatch).
+
+### Verification
+
+- `tsc --noEmit`, ESLint (0 problems in love), Vitest 81/81 (new: use-hold 5, session 2), `npm run build` pass.
+- NOT verified (UNCERTAIN): all browser behaviour: Pearl look and no pop, Dawn text window, gallery CLS and lightbox keys/swipe, wish hold feel and confetti, seal docking scale (`sealScale` from a formula only), letter sequence, finale burst, Replay, fast-scroll stress.

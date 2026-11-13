@@ -7,6 +7,7 @@ import { HEART_EVENTS } from '../engine/heart-director-core';
 import { heart } from '../engine/heart-state';
 import { useMotionPrefs } from '../engine/motion-prefs';
 import { useLoveScroll } from '../engine/scroll-engine';
+import { resetSession } from '../engine/session';
 import { useTier } from '../engine/tier-provider';
 import { TIER_ORDER } from '../engine/tiers';
 
@@ -110,6 +111,16 @@ export default function HeartDebugPanel() {
           onClick={() => director.settle()}
         >
           settle
+        </button>
+        <button
+          type="button"
+          className={button}
+          onClick={() => {
+            resetSession();
+            director.settle();
+          }}
+        >
+          reset session
         </button>
       </div>
       <label className="mb-3 flex items-center gap-2">
