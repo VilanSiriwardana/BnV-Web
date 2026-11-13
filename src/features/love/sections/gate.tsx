@@ -32,6 +32,7 @@ export function Gate({ name, musicSrc, sceneReady, onEnter }: Props) {
   const { tier, setTier } = useTier();
   const { start, stop } = useLoveScroll();
   const seedRef = useRef<HTMLDivElement>(null);
+  const enteringRef = useRef(false);
   const ready = sceneReady || timedOut;
 
   useEffect(() => {
@@ -56,7 +57,8 @@ export function Gate({ name, musicSrc, sceneReady, onEnter }: Props) {
   }, [timedOut, sceneReady, tier, setTier]);
 
   function enter() {
-    if (!ready || !open) return;
+    if (!ready || !open || enteringRef.current) return;
+    enteringRef.current = true;
     // Synchronous inside the gesture: iOS only unlocks audio here.
     audio.start(musicSrc);
     const r = seedRef.current?.getBoundingClientRect();
@@ -68,7 +70,12 @@ export function Gate({ name, musicSrc, sceneReady, onEnter }: Props) {
       : { x: 0, y: 0 };
     setOpen(false);
     start();
-    onEnter(seed);
+    try {
+      onEnter(seed);
+    } catch (error) {
+      // The page is still usable if the optional 3D entrance cannot start.
+      console.error('Love site entrance animation failed', error);
+    }
   }
 
   const shown = ready ? 100 : 35;
@@ -84,13 +91,29 @@ export function Gate({ name, musicSrc, sceneReady, onEnter }: Props) {
           initial={false}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="bg-background text-foreground fixed inset-0 z-40 flex flex-col items-center px-4 text-center"
+          className="love-gate text-foreground fixed inset-0 z-40 flex flex-col items-center overflow-hidden px-6 text-center"
         >
-          <h2 id="gate-title" className="sr-only">
-            Welcome
-          </h2>
-          <div className="mt-[22svh] flex flex-col items-center md:mt-auto">
-            <div className="relative grid size-32 place-items-center">
+          <div
+            aria-hidden
+            className="love-gate-frame pointer-events-none absolute inset-4 rounded-[1.5rem] sm:inset-7"
+          />
+          <div
+            aria-hidden
+            className="love-gate-halo pointer-events-none absolute top-[12%] left-1/2 size-[min(90vw,34rem)] -translate-x-1/2 rounded-full"
+          />
+          <p className="text-gold relative z-10 mt-[max(2.5rem,7svh)] font-sans text-[0.65rem] font-semibold tracking-[0.38em] uppercase sm:text-xs">
+            A moment made for you
+          </p>
+          <div className="relative z-10 mt-auto flex w-full max-w-xl flex-col items-center pb-6">
+            <div className="relative grid size-36 place-items-center sm:size-44">
+              <span
+                aria-hidden
+                className="border-gold/30 absolute inset-3 rotate-45 rounded-[2.4rem] border"
+              />
+              <span
+                aria-hidden
+                className="border-primary/15 absolute inset-0 rounded-full border"
+              />
               <svg
                 aria-hidden
                 viewBox="0 0 120 120"
@@ -112,19 +135,37 @@ export function Gate({ name, musicSrc, sceneReady, onEnter }: Props) {
                 ref={seedRef}
                 aria-hidden
                 data-love-seed={calm ? undefined : ''}
-                className="size-20 rounded-full bg-[radial-gradient(circle,var(--primary)_0%,color-mix(in_oklab,var(--primary)_35%,transparent)_40%,transparent_70%)]"
+                className="size-24 rounded-full bg-[radial-gradient(circle,var(--gold)_0%,var(--primary)_18%,color-mix(in_oklab,var(--secondary)_55%,transparent)_44%,transparent_72%)]"
               />
             </div>
-            <p className="text-body-lg mt-10 max-w-[60ch] text-balance break-words italic">
-              A little something for you, {name}.
+            <p className="text-primary mt-7 font-sans text-[0.65rem] font-semibold tracking-[0.32em] uppercase sm:text-xs">
+              To my favourite person
             </p>
+            <h2
+              id="gate-title"
+              className="font-display text-gold-text mt-3 text-[clamp(2.8rem,12vw,5rem)] leading-tight"
+            >
+              For {name}
+            </h2>
+            <p className="font-body text-foreground/90 mt-3 max-w-[30ch] text-[clamp(1.35rem,5vw,1.75rem)] leading-snug italic">
+              A little something for you. A story waiting to unfold.
+            </p>
+            <div
+              aria-hidden
+              className="text-gold/70 mt-6 flex items-center gap-3"
+            >
+              <span className="h-px w-12 bg-current" />
+              <span className="text-lg">✦</span>
+              <span className="h-px w-12 bg-current" />
+            </div>
           </div>
           <Button
             size="lg"
             autoFocus
+            type="button"
             aria-disabled={!ready}
             onClick={enter}
-            className="mt-auto mb-[16svh] min-h-12 md:mt-10 md:mb-auto"
+            className="bg-primary hover:bg-primary-hover relative z-10 mb-[max(3.5rem,10svh)] min-h-14 min-w-48 rounded-full border border-white/20 px-8 text-base shadow-[0_12px_42px_color-mix(in_oklab,var(--primary)_25%,transparent)] sm:mb-[12svh]"
           >
             {ready ? 'Tap to begin' : 'Getting ready…'}
           </Button>

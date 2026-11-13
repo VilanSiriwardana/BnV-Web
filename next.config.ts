@@ -15,6 +15,11 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // The private birthday page is previewed through this development tunnel.
+  allowedDevOrigins:
+    process.env.NODE_ENV === 'development'
+      ? ['unstopped-unequal-lantern.ngrok-free.dev']
+      : undefined,
   async headers() {
     return [{ source: '/(.*)', headers: securityHeaders }];
   },

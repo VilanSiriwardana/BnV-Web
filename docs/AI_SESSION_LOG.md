@@ -749,3 +749,10 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 
 - `tsc --noEmit`, ESLint (0 problems in love), Vitest 82/82 pass. `npm run build` not run (sandbox blocks Google Fonts fetch).
 - NOT verified (UNCERTAIN): browser look on all tiers at 375 px, contrast on night surfaces, Starlight visuals, fast-scroll ×10.
+
+## 2026-11-13 — Love Site ngrok gate and opening refresh
+
+- The reported `/_next/webpack-hmr` WebSocket failure is the Next.js development hot reload connection. The ngrok inspector confirms the current tunnel forwards to `http://localhost:3002`; localhost responds with HTTP 200. Public ngrok requests were unreachable from the agent environment, so the remote tap failure and WebSocket recovery remain unverified.
+- Added the specific ngrok hostname to development-only `allowedDevOrigins`. The dev server must restart to load that configuration; update the hostname if the tunnel changes.
+- Restyled the gate as a romantic editorial welcome with layered night palette, ornamental frame, larger seed, personal heading, and a thumb-reachable action. Preserved audio unlock, scroll start, seed position, loading timeout, and 600 ms exit. An entrance animation exception is logged without retaining the gate.
+- Targeted TypeScript and ESLint checks pass. The production build is blocked by unavailable Google Fonts requests in this environment. Remote browser verification remains open.

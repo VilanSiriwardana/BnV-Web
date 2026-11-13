@@ -205,6 +205,8 @@ Phase 2 exit criteria met, especially the canvas smoke test.
 
 1. `sections/gate.tsx`: Midnight Aubergine overlay, CSS-pulsing seed (~72 bpm), the "A little something for you, {name}." line, a "Tap to begin" button, and a loading ring from drei `useProgress`. States `loading → ready → entering`; 6 s timeout falls back to the lowest tier. Lenis is stopped until the tap.
 
+Current gate presentation uses a romantic editorial welcome addressed to the configured recipient, layered night colours, a decorative frame, and a larger seed. The loading timeout and tap handoff remain the same. The development ngrok hostname is listed in `next.config.ts` under `allowedDevOrigins`; update it when the tunnel hostname changes and restart `next dev`.
+
 **Audio (M10, Experience §3.7)**
 
 2. `engine/audio-engine.ts`: created **on the gate tap**: `<audio>` → source → gain → analyser (`fftSize` 512) → destination; 2 s fade-in to 0.6; loop; pause on `visibilitychange`. Bass/mid/treble bands smoothed into `heart.beat` (≤ 6 % scale). **Synthetic 72 bpm lub-dub** if the file is missing or fails.

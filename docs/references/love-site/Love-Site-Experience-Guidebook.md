@@ -448,6 +448,8 @@ export function buildStory(
 
 **Layout (DOM):** full-viewport Midnight Aubergine. Centre: a small lavender **seed** (layered radial gradients) pulsing like a heartbeat (CSS keyframes, about 72 bpm). Below it a short line (Cormorant Garamond italic): "A little something for you, {name}." Then a primary button "Tap to begin" (disabled until ready). A thin progress ring around the seed while loading.
 
+**Current presentation:** an editorial night composition frames the seed with lavender, dusty rose, and champagne accents. The heading addresses the recipient by name; a short invitation follows. The lower action remains prominent and thumb reachable. Decorative layers are hidden from assistive technology and reduced motion leaves the seed static.
+
 **States:** `loading` → `ready` → `entering`.
 
 - `loading`: lazily import the 3D chunk and textures; progress from drei `useProgress`; enable the button when done, or after a 6 s timeout (then continue with whatever loaded and the lowest tier).
