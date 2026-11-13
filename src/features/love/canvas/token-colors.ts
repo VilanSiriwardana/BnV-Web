@@ -1,6 +1,14 @@
 import { Color } from 'three';
 
-const ROLES = ['primary', 'gold', 'secondary', 'background'] as const;
+const ROLES = [
+  'primary',
+  'primary-hover',
+  'gold',
+  'secondary',
+  'background',
+  'surface',
+  'foreground',
+] as const;
 export type TokenRole = (typeof ROLES)[number];
 export type TokenColors = Record<TokenRole, { night: Color; day: Color }>;
 

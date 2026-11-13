@@ -1,52 +1,18 @@
 'use client';
 
 import { PerformanceMonitor, Stats } from '@react-three/drei';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
-import { useMemo, useRef } from 'react';
-import type { Mesh } from 'three';
 
 import { TIERS, type Tier } from '../engine/tiers';
-import { readTokenColors } from './token-colors';
-
-// Phase 2 smoke test: one lavender sphere proves R3F + bloom work in this repo.
-function TestSphere() {
-  const ref = useRef<Mesh>(null);
-  const color = useMemo(() => {
-    const root = document.querySelector<HTMLElement>('[data-love-root]');
-    return root ? readTokenColors(root).primary.night : undefined;
-  }, []);
-
-  useFrame((_, delta) => {
-    if (!ref.current) return;
-    ref.current.rotation.y += delta * 0.3;
-    ref.current.rotation.x += delta * 0.1;
-  });
-
-  return (
-    <mesh
-      ref={ref}
-      onClick={() => {
-        if (process.env.NODE_ENV !== 'production')
-          console.info('[love] canvas click');
-      }}
-    >
-      <icosahedronGeometry args={[1, 3]} />
-      <meshStandardMaterial
-        color={color}
-        emissive={color}
-        emissiveIntensity={1.4}
-        flatShading
-      />
-    </mesh>
-  );
-}
+import { Heart } from './heart';
 
 type Props = {
   tier: Tier;
   onDecline: () => void;
   onIncline: () => void;
   debug?: boolean;
+  onHeartTap?: () => void;
 };
 
 export default function LoveCanvas({
@@ -54,6 +20,7 @@ export default function LoveCanvas({
   onDecline,
   onIncline,
   debug,
+  onHeartTap,
 }: Props) {
   const config = TIERS[tier];
   return (
@@ -77,9 +44,9 @@ export default function LoveCanvas({
         onIncline={onIncline}
         flipflops={3}
       />
-      <ambientLight intensity={0.4} />
-      <directionalLight position={[3, 4, 5]} intensity={1.2} />
-      <TestSphere />
+      <ambientLight intensity={0.6} />
+      <directionalLight position={[3, 4, 5]} intensity={1} />
+      <Heart tier={tier} onTap={onHeartTap} />
       {config.bloom !== 'off' && (
         <EffectComposer multisampling={0}>
           <Bloom

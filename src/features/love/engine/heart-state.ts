@@ -13,5 +13,10 @@ export const heart = {
   flinch: 0, // arrow-hit recoil
   ring: 0, // shockwave ring progress
   yaw: 0, // pointer parallax rotation
+  roll: 0, // scrubbed hero tilt (radians)
+  idleScale: 0, // additive idle breathing (kept apart from director tweens)
+  idleGlow: 0,
+  petalRelease: 0, // 0..1 petal spawn progress (Bloom)
+  cameraZ: 6, // scrubbed camera dolly
 };
 export type HeartState = typeof heart;
