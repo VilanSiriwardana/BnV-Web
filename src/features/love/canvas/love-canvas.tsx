@@ -3,14 +3,21 @@
 import { PerformanceMonitor, Stats } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
+import { Suspense } from 'react';
 
+import type { LoveSiteConfig } from '../config';
 import { TIERS, type Tier } from '../engine/tiers';
+import { Arrow } from './arrow';
 import { Heart } from './heart';
+import { MemoryOrbs } from './memory-orbs';
 import { MiniHearts } from './mini-hearts';
 import { Petals } from './petals';
+import { ShockRing } from './shock-ring';
+import { Sparks } from './sparks';
 
 type Props = {
   tier: Tier;
+  memories: LoveSiteConfig['memories'];
   onDecline: () => void;
   onIncline: () => void;
   debug?: boolean;
@@ -20,6 +27,7 @@ type Props = {
 
 export default function LoveCanvas({
   tier,
+  memories,
   onDecline,
   onIncline,
   debug,
@@ -55,6 +63,12 @@ export default function LoveCanvas({
         <MiniHearts tier={tier} />
       </Heart>
       <Petals tier={tier} />
+      <Suspense fallback={null}>
+        <MemoryOrbs tier={tier} memories={memories} />
+      </Suspense>
+      <ShockRing />
+      <Sparks />
+      <Arrow />
       {config.bloom !== 'off' && (
         <EffectComposer multisampling={0}>
           <Bloom

@@ -66,6 +66,16 @@ export function createDirectorCore({ now, run, toBaseline }: Deps) {
       start(event, opts);
       return true;
     },
+    // Signature moments (arrowStrike) jump the queue: drop pending events, cut the current one.
+    interrupt(event: HeartEvent, opts: PlayOptions = {}): boolean {
+      if (current?.event === event) return false;
+      token++;
+      queue = [];
+      current?.handle.kill();
+      current = null;
+      start(event, opts);
+      return true;
+    },
     settle() {
       token++;
       queue = [];

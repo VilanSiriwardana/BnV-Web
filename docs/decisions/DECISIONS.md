@@ -543,6 +543,7 @@ Each decision should include:
   - Every animation has a reduced-motion or Calm variant. The `static` tier and Calm mode use the DOM-only path.
 - Alternatives: Hold everything to the 400 ms token.
 - Consequences: The exceptions apply only to `/love`. `Brand-Identity.md` gets a note in Phase 6.
+- Amendment 2026-11-13 (Phase 4, pointer routing): keep the default layer model (Tech Stack §7.2): `main` is `pointer-events: none`, real controls re-enable it, and the canvas receives everything else. Orbs use invisible hit spheres; every orb has a DOM twin button. The `eventSource` + `eventPrefix="client"` fallback is not used. UNCERTAIN until checked on Safari and a real phone; switch to the fallback in `canvas/love-canvas.tsx` if orb clicks are lost.
 - Related Documents:
   - [../references/love-site/Love-Site-Experience-Guidebook.md](../references/love-site/Love-Site-Experience-Guidebook.md)
 

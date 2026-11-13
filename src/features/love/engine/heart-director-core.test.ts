@@ -78,4 +78,28 @@ describe('heart director core', () => {
     expect(t.started).toEqual(['burst']);
     expect(t.baselines()).toBe(1);
   });
+
+  it('interrupt jumps a full queue and ignores stale completions', () => {
+    const t = setup();
+    t.core.play('glowUp');
+    t.core.play('pulse');
+    t.core.play('shine');
+    t.core.play('burst');
+    expect(t.core.play('arrowStrike')).toBe(false);
+    expect(t.core.interrupt('arrowStrike')).toBe(true);
+    expect(t.killed).toEqual(['glowUp']);
+    expect(t.core.current()).toBe('arrowStrike');
+    t.finish(); // glowUp's stale done
+    expect(t.started).toEqual(['glowUp', 'arrowStrike']);
+    t.finish(); // arrowStrike done: queue was cleared
+    expect(t.core.isBusy()).toBe(false);
+    expect(t.started).toEqual(['glowUp', 'arrowStrike']);
+  });
+
+  it('interrupt with the same running event is ignored', () => {
+    const t = setup();
+    t.core.interrupt('arrowStrike');
+    expect(t.core.interrupt('arrowStrike')).toBe(false);
+    expect(t.started).toEqual(['arrowStrike']);
+  });
 });

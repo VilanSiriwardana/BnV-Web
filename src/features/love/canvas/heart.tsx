@@ -22,6 +22,9 @@ import { readTokenColors } from './token-colors';
 const MAX_PARTICLES = TIERS.high.particles;
 const { damp } = MathUtils;
 const depthPoint = new Vector3();
+const SNAP_DISTANCE = 10;
+// The heart's world centre, for effects that live outside its group (arrow, ring, orbs).
+export const heartWorld = new Vector3();
 
 type Props = { tier: Tier; onTap?: () => void; children?: ReactNode };
 
@@ -94,18 +97,32 @@ export function Heart({ tier, onTap, children }: Props) {
     u.uSkin.value = heart.skin;
 
     const cam = state.camera;
-    cam.position.z = damp(cam.position.z, heart.cameraZ, 6, delta);
+    // Section hand-offs that jump the rail (Memories → Timeline) snap instead of flying back.
+    const snap = Math.abs(cam.position.z - heart.cameraZ) > SNAP_DISTANCE;
+    cam.position.z = snap
+      ? heart.cameraZ
+      : damp(cam.position.z, heart.cameraZ, 6, delta);
+    const shake = heart.cameraShake;
+    cam.position.x = shake ? (Math.random() * 2 - 1) * shake : 0;
+    cam.position.y = shake ? (Math.random() * 2 - 1) * shake : 0;
 
     const g = group.current;
     if (!g) return;
+    // Depth damps at the camera's rate so the heart keeps its distance while the rail moves.
+    g.position.z = snap
+      ? heart.depth
+      : damp(g.position.z, heart.depth, 6, delta);
     const vp = state.viewport.getCurrentViewport(
       cam,
-      depthPoint.set(0, 0, heart.depth),
+      depthPoint.set(0, 0, g.position.z),
     );
-    const w = ndcToWorld(heart.ndc, vp);
+    const w = ndcToWorld(
+      { x: heart.ndc.x + heart.lean.x, y: heart.ndc.y + heart.lean.y },
+      vp,
+    );
     g.position.x = damp(g.position.x, w.x, 6, delta);
     g.position.y = damp(g.position.y, w.y, 6, delta);
-    g.position.z = heart.depth;
+    heartWorld.copy(g.position);
     const s = heart.scale * (1 + heart.idleScale + heart.flinch);
     g.scale.setScalar(damp(g.scale.x, s, 8, delta));
     g.rotation.y = damp(g.rotation.y, heart.yaw, 4, delta);

@@ -29,6 +29,8 @@ export type LoveSiteConfig = {
     date: string;
     caption: string;
     photo: PhotoRef;
+    /** 512 px square texture for the 3D orb; falls back to photo.src. */
+    orb?: string;
   }[];
   timeline: {
     id: string;

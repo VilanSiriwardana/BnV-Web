@@ -11,7 +11,7 @@ export function Hero({ name, sub }: { name: string; sub: string }) {
       id="hero"
       dawn={0}
       stage="200vh"
-      className="relative flex min-h-svh items-center"
+      className="relative flex min-h-svh items-end pb-[16svh] md:pb-[12svh]"
     >
       <div data-hero-copy className="flex flex-col items-center">
         <h1

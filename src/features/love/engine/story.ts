@@ -4,7 +4,17 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { director } from './heart-director';
 import { poseFor, type SectionId } from './heart-path';
 import { heart } from './heart-state';
+import { memoriesState } from './memories-state';
+import { RAIL_START_Z, railEndZ } from './memory-layout';
+import { svgPointToNdc } from './svg-ndc';
 import { buildTheme, clearTheme } from './theme-timeline';
+import {
+  activeNode,
+  INTRO,
+  OUTRO,
+  REARM_BELOW,
+  threadProgress,
+} from './timeline-progress';
 import type { Tier } from './tiers';
 
 type SectionBuilder = (root: HTMLElement, mobile: boolean) => void;
@@ -101,8 +111,163 @@ const buildBloom: SectionBuilder = (root, mobile) => {
       },
     });
 };
-const buildMemories: SectionBuilder = () => {};
-const buildTimeline: SectionBuilder = () => {};
+// Experience §8: heart settles low, then the camera flies the rail through the orbs.
+const buildMemories: SectionBuilder = (root, mobile) => {
+  const el = root.querySelector<HTMLElement>('#memories');
+  if (!el) return;
+  baselineOn(el, 'memories');
+  const count = el.querySelectorAll('[data-memory-twin]').length;
+  if (!count) return;
+  const from = poseFor('bloom', mobile);
+  const to = poseFor('memories', mobile);
+  const end = railEndZ(count);
+  const scrub = { immediateRender: false, ease: 'none' };
+
+  ScrollTrigger.create({
+    trigger: el,
+    start: 'top 60%',
+    end: 'bottom 60%',
+    onToggle: (self) => {
+      memoriesState.active = self.isActive;
+    },
+  });
+  gsap
+    .timeline({
+      scrollTrigger: {
+        trigger: el,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.8,
+      },
+    })
+    .fromTo(
+      heart.ndc,
+      { x: from.x, y: from.y },
+      { x: to.x, y: to.y, ...scrub, duration: 0.12 },
+      0,
+    )
+    .fromTo(
+      heart,
+      { scale: from.scale },
+      { scale: to.scale, ...scrub, duration: 0.12 },
+      0,
+    )
+    .fromTo(
+      heart,
+      { cameraZ: RAIL_START_Z, depth: 0 },
+      { cameraZ: end, depth: end - RAIL_START_Z, ...scrub, duration: 0.88 },
+      0.12,
+    );
+
+  // Rail hand-off: the Timeline is a flat stage, so the camera returns home (heart.tsx snaps).
+  ScrollTrigger.create({
+    trigger: '#timeline',
+    start: 'top top',
+    onEnter: () => gsap.set(heart, { cameraZ: RAIL_START_Z, depth: 0 }),
+    onLeaveBack: () =>
+      gsap.set(heart, { cameraZ: end, depth: end - RAIL_START_Z }),
+  });
+};
+
+// Experience §9: thread drawn by scroll, heart on its tip, nodes trigger, featured node strikes.
+const buildTimeline: SectionBuilder = (root, mobile) => {
+  const el = root.querySelector<HTMLElement>('#timeline');
+  if (!el) return;
+  baselineOn(el, 'timeline');
+  const path = el.querySelector<SVGPathElement>(
+    mobile ? '[data-thread="mobile"]' : '[data-thread="desktop"]',
+  );
+  const stage = el.querySelector<HTMLElement>('[data-stage-inner]');
+  if (!path || !stage) return;
+  const nodes = gsap.utils.toArray<HTMLElement>('[data-node]', el);
+  const dots = gsap.utils.toArray<HTMLElement>('[data-node-dot]', el);
+  const cards = gsap.utils.toArray<HTMLElement>('[data-card]', el);
+  const featured = cards.findIndex((c) => c.dataset.featured === 'true');
+  const startPose = poseFor('memories', mobile);
+  const endPose = poseFor(mobile ? 'dawn' : 'memories', mobile);
+  const scale = mobile ? 0.26 : 0.3;
+  let len = 0;
+  let ctm: DOMMatrix | null = null;
+  let last = -1;
+  let armed = true;
+
+  // CTM as it is while the stage is stuck at the top (stable during the whole scrub).
+  const measure = () => {
+    len = path.getTotalLength();
+    ctm = path.getScreenCTM();
+    if (ctm) ctm.f -= stage.getBoundingClientRect().top;
+    path.style.strokeDasharray = `${len}`;
+    path.style.strokeDashoffset = `${len}`;
+  };
+  measure();
+
+  gsap.set(cards, { autoAlpha: 0, y: 24 });
+  gsap.set(dots, { scale: 0.6 });
+
+  const activate = (i: number, forward: boolean) => {
+    nodes.forEach((n, j) => {
+      gsap.to(dots[j], {
+        scale: j <= i ? 1 : 0.6,
+        duration: 0.25,
+        ease: 'power2.out',
+        overwrite: 'auto',
+      });
+      n.toggleAttribute('data-lit', j <= i);
+      if (j === i) n.setAttribute('aria-current', 'step');
+      else n.removeAttribute('aria-current');
+    });
+    cards.forEach((c, j) => {
+      const state =
+        j === i
+          ? { autoAlpha: 1, y: 0 }
+          : j < i
+            ? { autoAlpha: mobile ? 0 : 0.4, y: 0 }
+            : { autoAlpha: 0, y: 24 };
+      gsap.to(c, {
+        ...state,
+        duration: 0.4,
+        ease: 'power2.out',
+        overwrite: 'auto',
+      });
+    });
+    if (forward && i >= 0 && i !== featured) {
+      director.play('glowUp');
+      director.play('pulse');
+    }
+  };
+
+  ScrollTrigger.create({
+    trigger: el,
+    start: 'top top',
+    end: 'bottom bottom',
+    onRefresh: measure,
+    onUpdate: (self) => {
+      const p = self.progress;
+      const tp = threadProgress(p);
+      path.style.strokeDashoffset = `${len * (1 - tp)}`;
+      const tip = svgPointToNdc(path, len, tp, ctm);
+      const into = Math.min(1, p / INTRO);
+      const out = Math.max(0, (p - OUTRO) / (1 - OUTRO));
+      const x = startPose.x + (tip.x - startPose.x) * into;
+      const y = startPose.y + (tip.y - startPose.y) * into;
+      heart.ndc.x = x + (endPose.x - x) * out;
+      heart.ndc.y = y + (endPose.y - y) * out;
+      heart.scale = startPose.scale + (scale - startPose.scale) * into;
+
+      const i = activeNode(tp, nodes.length);
+      if (i !== last) {
+        activate(i, i > last);
+        last = i;
+      }
+      if (featured >= 0 && i >= featured && armed)
+        armed = !director.interrupt('arrowStrike');
+      if (p < REARM_BELOW && !armed) {
+        armed = true;
+        director.resetBoost();
+      }
+    },
+  });
+};
 const buildDawn: SectionBuilder = () => {};
 const buildGallery: SectionBuilder = () => {};
 const buildWish: SectionBuilder = () => {};

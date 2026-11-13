@@ -25,6 +25,7 @@ export const site: LoveSiteConfig = {
       date: 'March 2021',
       caption:
         'A quiet table, two coffees, and a conversation that did not want to end.',
+      orb: '/images/prototype/love-memory-01-orb.webp',
       photo: {
         src: '/images/prototype/love-memory-01.webp',
         alt: 'Placeholder photo for “The first hello”',
@@ -38,6 +39,7 @@ export const site: LoveSiteConfig = {
       title: 'Our first walk',
       date: 'April 2021',
       caption: 'We took the long way home on purpose.',
+      orb: '/images/prototype/love-memory-02-orb.webp',
       photo: {
         src: '/images/prototype/love-memory-02.webp',
         alt: 'Placeholder photo for “Our first walk”',
@@ -51,6 +53,7 @@ export const site: LoveSiteConfig = {
       title: 'Matching outfits',
       date: 'June 2021',
       caption: 'You said it was silly. You wore it anyway.',
+      orb: '/images/prototype/love-memory-03-orb.webp',
       photo: {
         src: '/images/prototype/love-memory-03.webp',
         alt: 'Placeholder photo for “Matching outfits”',
@@ -64,6 +67,7 @@ export const site: LoveSiteConfig = {
       title: 'Rainy evening',
       date: 'August 2021',
       caption: 'The rain stopped. We did not notice.',
+      orb: '/images/prototype/love-memory-04-orb.webp',
       photo: {
         src: '/images/prototype/love-memory-04.webp',
         alt: 'Placeholder photo for “Rainy evening”',
@@ -77,6 +81,7 @@ export const site: LoveSiteConfig = {
       title: 'The little gift',
       date: 'December 2021',
       caption: 'Small box, big smile.',
+      orb: '/images/prototype/love-memory-05-orb.webp',
       photo: {
         src: '/images/prototype/love-memory-05.webp',
         alt: 'Placeholder photo for “The little gift”',
@@ -90,6 +95,7 @@ export const site: LoveSiteConfig = {
       title: 'A surprise',
       date: 'February 2022',
       caption: 'You knew. You pretended you did not.',
+      orb: '/images/prototype/love-memory-06-orb.webp',
       photo: {
         src: '/images/prototype/love-memory-06.webp',
         alt: 'Placeholder photo for “A surprise”',
@@ -103,6 +109,7 @@ export const site: LoveSiteConfig = {
       title: 'Weekend away',
       date: 'May 2022',
       caption: 'Two days that felt like a whole summer.',
+      orb: '/images/prototype/love-memory-07-orb.webp',
       photo: {
         src: '/images/prototype/love-memory-07.webp',
         alt: 'Placeholder photo for “Weekend away”',
@@ -116,6 +123,7 @@ export const site: LoveSiteConfig = {
       title: 'Just us',
       date: 'January 2023',
       caption: 'Nothing special happened. That was the special part.',
+      orb: '/images/prototype/love-memory-08-orb.webp',
       photo: {
         src: '/images/prototype/love-memory-08.webp',
         alt: 'Placeholder photo for “Just us”',

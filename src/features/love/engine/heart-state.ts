@@ -18,5 +18,8 @@ export const heart = {
   idleGlow: 0,
   petalRelease: 0, // 0..1 petal spawn progress (Bloom)
   cameraZ: 6, // scrubbed camera dolly
+  cameraShake: 0, // camera jitter amplitude (world units), arrow hit
+  lean: { x: 0, y: 0 }, // additive NDC offset toward a hovered/focused orb (≤ 0.15)
+  arrow: 0, // arrow flight progress 0..1 (arrowStrike)
 };
 export type HeartState = typeof heart;

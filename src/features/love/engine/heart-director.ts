@@ -13,8 +13,12 @@ export type { HeartEvent, PlayOptions };
 
 let section: SectionId = 'hero';
 let baselineTween: gsap.core.Tween | null = null;
+// Timeline only: the heart stays brighter after the arrow strike ("stronger").
+const STRIKE_BOOST = 0.15;
+let boost = 0;
 
-const baseGlow = () => HEART_PATH[section].glow;
+const baseGlow = () =>
+  HEART_PATH[section].glow + (section === 'timeline' ? boost : 0);
 const reduced = () =>
   typeof window !== 'undefined' &&
   window.matchMedia(REDUCED_MOTION_QUERY).matches;
@@ -34,8 +38,12 @@ function flash(tl: gsap.core.Timeline, duration = 0.2) {
   });
 }
 
-function burst(tl: gsap.core.Timeline, opts: PlayOptions) {
-  tl.to(heart, { burst: 1, duration: 1.1, ease: 'power3.out' }, '>').to(
+function burst(
+  tl: gsap.core.Timeline,
+  opts: PlayOptions,
+  at: number | string = '>',
+) {
+  tl.to(heart, { burst: 1, duration: 1.1, ease: 'power3.out' }, at).to(
     heart,
     { glow: 0.3, duration: 1.1, ease: 'power3.out' },
     '<',
@@ -114,9 +122,47 @@ function build(event: HeartEvent, opts: PlayOptions, tl: gsap.core.Timeline) {
       tl.to({}, { duration: 0.5 });
       reform(tl);
       return;
+    case 'arrowStrike':
+      arrowStrike(tl);
+      return;
     default:
       pulse(tl, 0);
   }
+}
+
+// Experience §3.5 arrowStrike (≈ 5.2 s). The boost is set first so an interrupted strike still
+// settles to the brighter baseline.
+function arrowStrike(tl: gsap.core.Timeline) {
+  boost = STRIKE_BOOST;
+  const glow = baseGlow();
+  tl.to(heart, { glow: glow - 0.15, flinch: -0.03, duration: 0.2 }, 0)
+    .fromTo(
+      heart,
+      { arrow: 0 },
+      { arrow: 1, duration: 0.9, ease: 'power1.in' },
+      0.2,
+    )
+    .to(heart, { flinch: -0.08, duration: 0.08, ease: 'power2.out' }, 1.1)
+    .to(heart, { flinch: 0.06, duration: 0.22, ease: 'power2.out' })
+    .to(heart, { flinch: 0, duration: 0.3, ease: 'power2.inOut' })
+    .fromTo(
+      heart,
+      { ring: 0 },
+      { ring: 1, duration: 0.8, ease: 'power2.out' },
+      1.1,
+    )
+    .to(heart, { glow: glow * 2, duration: 0.04 }, 1.1)
+    .to(heart, { glow, duration: 0.08 }, 1.14)
+    .fromTo(
+      heart,
+      { cameraShake: 0.015 },
+      { cameraShake: 0, duration: 0.25, ease: 'power2.out' },
+      1.1,
+    )
+    .set(heart, { arrow: 0 }, 1.45);
+  burst(tl, {}, 1.4);
+  tl.to({}, { duration: 0.5 });
+  reform(tl);
 }
 
 function toBaseline() {
@@ -125,6 +171,8 @@ function toBaseline() {
     burst: 0,
     form: 1,
     ring: 0,
+    arrow: 0,
+    cameraShake: 0,
     flinch: 0,
     shine: 0,
     glow: baseGlow(),
@@ -148,6 +196,7 @@ const core = createDirectorCore({
 
 export const director = {
   play: core.play,
+  interrupt: core.interrupt,
   settle: core.settle,
   isBusy: core.isBusy,
   current: core.current,
@@ -155,4 +204,9 @@ export const director = {
     section = id;
   },
   baseline: () => section,
+  resetBoost() {
+    boost = 0;
+    if (!core.isBusy() && section === 'timeline')
+      gsap.to(heart, { glow: baseGlow(), duration: 0.6, overwrite: 'auto' });
+  },
 };

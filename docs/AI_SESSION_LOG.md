@@ -694,3 +694,27 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 ## 2026-11-13 - Love Site: heart canvas hidden behind sections
 
 - Cause: `[data-love-root] main` (z-index 10) sits above the fixed canvas (z-index 0) and every `LoveSection` had an opaque `bg-background`, so the heart (and Phase 2's test sphere) was never visible. Fix: `[data-love-motion] main [data-dawn] { background-color: transparent; }` in `app/globals.css`; Calm keeps solid sections. Blueprint `031`.
+
+## 2026-11-13 - Love Site Phase 4: Memories and Timeline
+
+### Summary
+
+- Blueprint `.claude/blueprints/033-love-site-phase-4-night-story.md`. Not committed.
+- Memories: `canvas/memory-orbs.tsx` + `orb-shaders.ts` (fresnel shell, desaturated photo disc in a `Billboard`, invisible hit sphere, tier orb count), `engine/memories-state.ts` (hover/focus/projected screen positions, open-request bus), `engine/memory-layout.ts` (orb formula, rail end), `canvas/projection.ts`, `ui/memory-dialog.tsx` (Radix primitives + framer-motion scale from the orb, `lenis.stop/start`, portal inside `[data-love-root]`), `sections/memories.tsx` (sr-only twin buttons, ticker-driven focus ring, counter, completion `glowUp`; Calm/static = card grid that opens the same dialog).
+- Timeline: `sections/timeline.tsx` (desktop S-curve + mobile left-edge SVG thread, node buttons with `aria-current`, cards; Calm/static = list with a glowing featured card), `engine/timeline-progress.ts`, `engine/svg-ndc.ts`, `buildTimeline` in `story.ts` (one trigger: dashoffset, heart on the tip via a stage-relative CTM, node activation, strike armed / re-armed below 45 %).
+- Arrow strike: `canvas/arrow.tsx` (mounted only while `heart.arrow > 0`), `canvas/shock-ring.tsx`, `canvas/sparks.tsx` (60-point pool, `emitSparks`), director `arrowStrike` + timeline-only `boost` (+0.15, set at strike start so an interrupted strike settles bright; `director.resetBoost()`).
+- Heart state: `lean`, `cameraShake`, `arrow`. `heart.tsx` damps depth with the camera, snaps on jumps > 10 units, exports `heartWorld`.
+- Decisions: no `engine/camera-rig.ts` (`heart.cameraZ` stays the only camera writer); optional `memories[].orb` in the config; shared `DialogContent` untouched; pointer routing = default layers (ADR-0029 amendment).
+- Deviation: the camera flies with the heart (`heart.depth` follows `cameraZ`) and snaps home at the Timeline's `top top`. Petals stay at the origin, so they are left behind during the rail.
+
+### Verification
+
+- `tsc --noEmit`, ESLint (0 errors in love), Vitest 72/72 (new: memory-layout, timeline-progress, svg-ndc), `npm run build` pass. `/love/<slug>` returns 200 on the dev server with no server errors.
+- NOT verified (UNCERTAIN): all browser behaviour (orb look, hover/click on Safari and touch, dialog focus restore, thread placement and card overlap at 375/768/1440, strike timing and look, fast-scroll stress, draw calls, texture memory).
+
+## 2026-11-13 - Love Site Phase 4 fixes: arrow strike
+
+- Cause: `arrowStrike` was dropped by the director queue (max 2 pending) while node `glowUp`/`pulse` were waiting, and `armed` was cleared anyway, so it never retried. Fix: `interrupt()` in `heart-director-core.ts` (clears the queue, kills the current event, starts the strike; Vitest), `director.interrupt`; `buildTimeline` uses it and skips the featured node's own glowUp/pulse. Blueprint `034`.
+- Arrow visibility: sized to 16 % of viewport height, thicker shaft/head/fletching, starts just outside the top-left edge, `power1.in`, gold × 2.5 so it blooms, denser trail.
+- Orb photos: `#include <colorspace_fragment>` + sRGB textures.
+- NOT verified in a browser (UNCERTAIN): arrow look and timing, photo colours.

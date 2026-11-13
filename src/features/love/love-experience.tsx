@@ -93,6 +93,7 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
       {showCanvas && (
         <LoveCanvas
           tier={tier}
+          memories={site.memories}
           onDecline={stepDown}
           onIncline={stepUp}
           debug={debug}
