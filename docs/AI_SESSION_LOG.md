@@ -792,3 +792,9 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 - Dance dip split into lunge, half-dip and dip keyframes (12 keyframes, 48 frames); new tests cap per-frame movement and keep her on his right.
 - Gate reduced to title, heart button with "Tap this" scribble (right of the heart on desktop), and one line.
 - Verification: tsc, Love Site ESLint and Vitest (57 tests) pass. Browser look not verified in this session.
+
+## 2026-11-19 - Love Site docs: as-built Experience Guidebook (blueprint 044)
+
+- Audited `src/features/love/` against the Experience Guidebook and rewrote it as v2.0, an as-built reference: new §0 (status per section, better-than-planned list, changed-by-decision table, known gaps, release pending); §3–§14 now state built values; §19 folded into sections; Dawn → Starlight; Dance added as §11b.
+- Tech Stack guide v1.1: status Adopted, as-built notes (all-night removals, fixed bloom), actual kebab-case folder map.
+- Docs only; no code changed. Known gaps recorded (bloom not glow-driven, treble unused, no shine glints or ribbon-dust, smaller sealBreak, no calm gallery fade). Release items still pending (real photos, music licence, deploy, device QA).

@@ -3,13 +3,15 @@
 | Field                            | Value                                                                                                                                                            |
 | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Version                          | 1.0                                                                                                                                                              |
-| Status                           | **Proposed.** Needs owner approval and an ADR before any dependency is installed (see §12)                                                                       |
+| Status                           | **Adopted and built (v1.1).** As-built state and gaps: [Experience Guidebook §0](Love-Site-Experience-Guidebook.md) (audited 2026-11-19)                         |
 | Created                          | 2026-11-12                                                                                                                                                       |
 | Audience                         | Claude Code (builder) and the developer (reviewer)                                                                                                               |
 | Location                         | `docs/references/love-site/Love-Site-Tech-Stack-and-Tools.md` (moved 2026-11-12)                                                                                 |
 | Build order and repo corrections | [Love-Site-Implementation-Phases.md](Love-Site-Implementation-Phases.md). Its §2 overrides this file where they differ (shop chrome, file naming, token aliases) |
 | Companion document               | `Love-Site-Experience-Guidebook.md` (every section, interaction and milestone)                                                                                   |
 | Based on                         | Decisions made in chat; `Brand-Identity.md` v1.6; `Design_Skills_Setup.md` v2.0; `AGENTS.md`; the two scroll-3D guides; web research done 2026-11-12             |
+
+> **As-built notes (2026-11-19):** the site is all-night (ADR-0029 amendment): no `--dawn`, no day tokens, no Pearl skin or `MeshPhysicalMaterial`, no `skinSwap`; `heart.skin` is replaced by `heart.gold` and `sealRim`. Bloom intensity is fixed per tier (0.7 / 0.4 / off) rather than driven by glow. Files are kebab-case (see §6). A Dance section (`canvas/dance-*`) was added in Phase 7.
 
 **Confidence labels** (same convention as `AGENTS.md`): `VERIFIED` = confirmed in a named document or a source read during research. `INFERRED` = strongly implied, not directly confirmed. `UNCERTAIN` = must be checked before use.
 
@@ -246,7 +248,31 @@ Use the existing component for memory cards and the gallery lightbox: focus trap
 
 ---
 
-## 6. Folder structure (proposed)
+## 6. Folder structure
+
+As built (kebab-case per Implementation-Phases §2):
+
+```text
+app/love/[slug]/page.tsx        # Server Component, noindex
+src/features/love/
+  love-experience.tsx           # client root
+  config/    types.ts, index.ts, sites/<slug>.ts
+  engine/    scroll-engine.tsx, story.ts, heart-state.ts, heart-director.ts, heart-director-core.ts,
+             heart-path.ts, hero-intro.ts, theme-timeline.ts, tiers.ts, tier-provider.tsx, motion-prefs.ts,
+             motion-prefs-provider.tsx, use-quiet.ts, audio-engine.ts, audio-bands.ts, session.ts,
+             memory-layout.ts, memories-state.ts, timeline-progress.ts, svg-ndc.ts, confetti-state.ts,
+             dance-state.ts, render-stats.ts
+  canvas/    love-canvas.tsx, heart.tsx, heart-shaders.ts, heart-geometry.ts, mini-hearts.tsx, petals.tsx,
+             confetti.tsx, arrow.tsx, shock-ring.tsx, sparks.tsx, memory-orbs.tsx, orb-shaders.ts, wish-star.tsx,
+             projection.ts, token-colors.ts, dance-duo.tsx, dance-geometry.ts, dance-shaders.ts, dance-silhouettes.ts
+  sections/  gate, hero, bloom, memories, timeline, starlight, gallery, dance, wish, letter,
+             letter-ornaments, finale, love-section, love-photo (.tsx)
+  ui/        music-toggle, progress-heart, calm-mode-toggle, memory-dialog, lightbox, static-heart, sticky-stage
+  hooks/     use-hold.ts
+  dev/       heart-debug-panel.tsx
+```
+
+Original proposal (v1.0, superseded):
 
 ```text
 app/
