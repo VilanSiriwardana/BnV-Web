@@ -4,6 +4,10 @@ attribute vec3 aRibbon;
 attribute vec3 aHeart;
 attribute vec3 aScatter;
 attribute vec4 aRand;
+attribute vec3 aTextA;
+attribute vec3 aTextB;
+uniform float uSpell;
+uniform float uSpellB;
 uniform float uForm;
 uniform float uBurst;
 uniform float uTime;
@@ -28,6 +32,10 @@ void main() {
   r.yz = mat2(c, -s, s, c) * r.yz;
 
   vec3 p = mix(r, aHeart, f);
+  // Finale spell (F1): heart → text A → text B, staggered like the burst, before the burst blend.
+  float sp = smoothstep(0.0, 1.0, clamp((uSpell - aRand.x * 0.30) / 0.70, 0.0, 1.0));
+  float sb = smoothstep(0.0, 1.0, clamp((uSpellB - aRand.w * 0.30) / 0.70, 0.0, 1.0));
+  p = mix(p, mix(aTextA, aTextB, sb), sp);
   p = mix(p, aScatter, b);
   p += 0.02 * vec3(sin(uTime * 0.7 + aRand.w * 6.28), cos(uTime * 0.6 + aRand.w * 4.0), 0.0);
   p *= 1.0 + uBeat * 0.04 * uBeatScale;

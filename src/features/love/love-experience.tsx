@@ -23,6 +23,7 @@ import { Gate } from './sections/gate';
 import { Hero } from './sections/hero';
 import { Letter } from './sections/letter';
 import { Memories } from './sections/memories';
+import { Reasons } from './sections/reasons';
 import { Timeline } from './sections/timeline';
 import { Wish } from './sections/wish';
 import { CalmModeToggle } from './ui/calm-mode-toggle';
@@ -44,6 +45,8 @@ const noSubscribe = () => () => {};
 const readDebug = () =>
   new URLSearchParams(window.location.search).has('debug');
 const serverFalse = () => false;
+const readMic = () =>
+  typeof navigator.mediaDevices?.getUserMedia === 'function';
 
 export function LoveExperience({ site }: { site: LoveSiteConfig }) {
   return (
@@ -70,6 +73,13 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
 
   useEffect(() => killHeroIntro, []);
   const name = site.recipient.name;
+  // F5: the candle replaces the star when the config allows it and a mic API exists.
+  const micApi = useSyncExternalStore(noSubscribe, readMic, serverFalse);
+  const candleMode = site.wish?.mode !== 'star' && micApi;
+  const spell: [string, string] = [
+    site.finale?.spell?.line1 ?? name,
+    site.finale?.spell?.line2 ?? 'I love you',
+  ];
   const { scrollTo } = useLoveScroll();
 
   // Experience §14 Replay: clean flags and heart, then glide home; the hero re-weaves on arrival.
@@ -111,6 +121,8 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
           debug={debug}
           onHeartTap={tapHeart}
           onReady={() => setCanvasReady(true)}
+          spell={spell}
+          candleMode={candleMode}
         />
       )}
       {debug && HeartDebugPanel && <HeartDebugPanel />}
@@ -123,18 +135,32 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
         />
         <Memories hint={site.copy.memoriesHint} memories={site.memories} />
         <Timeline title={site.copy.timelineTitle} items={site.timeline} />
-        <Starlight line={site.copy.starlightLine} />
+        <Starlight
+          line={site.copy.starlightLine}
+          hint={site.copy.skyHint ?? 'Join the stars, one to the next.'}
+          done={site.copy.skyDone ?? 'It was always a heart.'}
+          slug={site.slug}
+          memories={site.memories}
+        />
         <Gallery title={site.copy.galleryTitle} photos={site.gallery} />
         <Dance title={site.copy.danceTitle} line={site.copy.danceLine} />
+        <Reasons
+          title={site.copy.reasonsTitle ?? 'Reasons'}
+          hint={site.copy.reasonsHint ?? ''}
+          items={site.reasons ?? []}
+        />
         <Wish
           name={name}
           prompt={site.copy.wishPrompt}
           done={site.copy.wishDone}
+          candleMode={candleMode}
+          blowHint={site.copy.blowHint}
         />
         <Letter title={site.copy.letterTitle} letter={site.letter} />
         <Finale
           name={name}
           message={site.copy.finaleMessage}
+          spell={spell}
           credit={site.music.credit}
           onReplay={replay}
         />

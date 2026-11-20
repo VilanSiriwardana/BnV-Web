@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils/cn';
 import type { LoveSiteConfig } from '../config';
 import { director } from '../engine/heart-director';
 import { LETTER_OPEN_EVENT } from '../engine/session';
+import { LetterVoice } from './letter-voice';
 import { useLoveScroll } from '../engine/scroll-engine';
 import { useQuiet } from '../engine/use-quiet';
 import { useHold } from '../hooks/use-hold';
@@ -259,6 +260,9 @@ export function Letter({ title, letter }: Props) {
                 <p data-letter-p className="text-right italic">
                   {letter.signoff}
                 </p>
+                {letter.voice && (
+                  <LetterVoice {...letter.voice} open={showOpen} />
+                )}
               </div>
             </div>
             {!quiet && !scrolled && (

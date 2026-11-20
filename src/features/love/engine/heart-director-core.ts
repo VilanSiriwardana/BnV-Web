@@ -13,6 +13,10 @@ export const HEART_EVENTS = [
   'dockToSeal',
   'sealBreak',
   'finaleBurst',
+  'finaleSpell',
+  'skyHeartIn',
+  'candleOut',
+  'reasonFront',
 ] as const;
 export type HeartEvent = (typeof HEART_EVENTS)[number];
 export type PlayOptions = { petals?: boolean; scale?: number };

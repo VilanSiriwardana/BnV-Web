@@ -20,6 +20,11 @@ export const site: LoveSiteConfig = {
     wishDone: 'May every wish come true.',
     letterTitle: 'A letter for you',
     finaleMessage: 'Thank you for every ordinary day that became our story.',
+    reasonsTitle: 'Twelve reasons, for now',
+    reasonsHint: 'Turn the ring, or let the scroll turn it for you.',
+    skyHint: 'Join our stars, one memory to the next.',
+    skyDone: 'It was always a heart.',
+    blowHint: "I'll listen for your breath. Nothing is recorded or sent.",
   },
   memories: [
     {
@@ -304,4 +309,21 @@ export const site: LoveSiteConfig = {
   },
   // TODO(owner): credit text required before release (ADR-0030).
   music: { src: '/audio/wedding-background.mp3', credit: '' },
+  // Placeholder reasons (Phase 9); replace with your own twelve.
+  reasons: [
+    'You laugh with your whole face.',
+    'You make ordinary days feel like holidays.',
+    'You remember the small things I say.',
+    'You are brave when it matters.',
+    'Your hand fits mine exactly.',
+    'You make every room warmer.',
+    'You believe in me before I do.',
+    'You turn bad days around with one look.',
+    'You are kind even when nobody sees.',
+    'You dance like nobody is watching.',
+    'You feel like home.',
+    'You chose me, and keep choosing me.',
+  ],
+  wish: { mode: 'candle' },
+  finale: { spell: { line2: 'I love you' } },
 };

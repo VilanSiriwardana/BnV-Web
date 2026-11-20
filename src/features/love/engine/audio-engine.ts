@@ -1,6 +1,7 @@
 import gsap from 'gsap';
 
 import { band, lubDub, smoothFastAttack } from './audio-bands';
+import { duckRamp } from './audio-duck';
 import { heart } from './heart-state';
 
 // Experience §3.7 / Tech Stack §5.9. Created only on the gate tap. Per-frame work runs on the
@@ -33,7 +34,10 @@ function tick(_time: number, deltaMs: number) {
   let bass = 0;
   let mid = 0;
   let treble = 0;
-  if (live()) {
+  const voiceBass = readVoiceBass();
+  if (voiceBass !== null) {
+    bass = Math.min(1, voiceBass);
+  } else if (live()) {
     analyser!.getByteFrequencyData(data!);
     bass = band(data!, 0, 2);
     mid = band(data!, 3, 12);
@@ -61,6 +65,7 @@ function ramp(to: number, seconds: number) {
 }
 
 function onVisibility() {
+  if (document.hidden) voiceEl?.pause();
   if (!ctx || !el) return;
   if (document.hidden) {
     el.pause();
@@ -132,7 +137,10 @@ function unmute() {
   if (el && ctx && !failed) {
     void ctx.resume();
     if (gain) gain.gain.value = 0;
-    void el.play().then(() => ramp(VOLUME, 0.6), fail);
+    void el.play().then(() => {
+      const r = duckRamp(VOLUME, voicePlaying(), false);
+      ramp(r?.to ?? VOLUME, 0.6);
+    }, fail);
   }
   notify();
 }
@@ -147,5 +155,96 @@ export const audio = {
   subscribe(listener: () => void) {
     listeners.add(listener);
     return () => listeners.delete(listener);
+  },
+};
+
+// Romance Additions F2: a second element on the same context for the voice note. The music ducks
+// while it plays and the heart beat follows the voice.
+let voiceEl: HTMLAudioElement | null = null;
+let voiceAnalyser: AnalyserNode | null = null;
+let voiceData: Uint8Array<ArrayBuffer> | null = null;
+let voiceFailed = false;
+const voiceListeners = new Set<() => void>();
+const voiceNotify = () => voiceListeners.forEach((l) => l());
+
+function voicePlaying() {
+  return !!voiceEl && !voiceEl.paused && !voiceEl.ended;
+}
+
+function applyDuck() {
+  if (!ctx || !gain || !el || el.paused) return;
+  const r = duckRamp(VOLUME, voicePlaying(), muted);
+  if (r) ramp(r.to, r.seconds);
+}
+
+function readVoiceBass(): number | null {
+  if (!voicePlaying() || !voiceAnalyser || !voiceData) return null;
+  voiceAnalyser.getByteFrequencyData(voiceData);
+  return band(voiceData, 0, 2);
+}
+
+function voiceElement(src: string) {
+  if (voiceEl) return voiceEl;
+  voiceEl = new Audio();
+  voiceEl.preload = 'none';
+  voiceEl.src = src;
+  const update = () => {
+    applyDuck();
+    voiceNotify();
+  };
+  voiceEl.addEventListener('play', update);
+  voiceEl.addEventListener('pause', update);
+  voiceEl.addEventListener('ended', update);
+  voiceEl.addEventListener('timeupdate', voiceNotify);
+  voiceEl.addEventListener('error', () => {
+    voiceFailed = true;
+    voiceNotify();
+  });
+  return voiceEl;
+}
+
+// The graph is wired on the first play (inside her tap) so iOS allows it.
+function connectVoice(v: HTMLAudioElement) {
+  if (voiceAnalyser) return;
+  const c = getAudioContext();
+  if (!c) return;
+  try {
+    const source = c.createMediaElementSource(v);
+    voiceAnalyser = c.createAnalyser();
+    voiceAnalyser.fftSize = 512;
+    voiceData = new Uint8Array(voiceAnalyser.frequencyBinCount);
+    source.connect(voiceAnalyser).connect(c.destination);
+  } catch {
+    // Plays without the analyser: the beat falls back to the music.
+  }
+}
+
+export const voice = {
+  // preload="none" until the letter opens, then metadata.
+  prepare(src: string) {
+    const v = voiceElement(src);
+    if (v.preload === 'none') v.preload = 'metadata';
+  },
+  play(src: string) {
+    const v = voiceElement(src);
+    connectVoice(v);
+    if (v.ended) v.currentTime = 0;
+    return v.play();
+  },
+  pause() {
+    voiceEl?.pause();
+  },
+  state() {
+    const v = voiceEl;
+    return {
+      playing: voicePlaying(),
+      failed: voiceFailed,
+      ended: !!v?.ended,
+      progress: v && v.duration ? v.currentTime / v.duration : 0,
+    };
+  },
+  subscribe(listener: () => void) {
+    voiceListeners.add(listener);
+    return () => voiceListeners.delete(listener);
   },
 };

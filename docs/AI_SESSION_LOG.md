@@ -891,3 +891,45 @@ Implemented M22–M27: ADR-0031–0034; optional romance config fields with vali
 ### Remaining Work
 
 - Browser pass at 1440 and 375 px with before/after screenshots; tune values (heart alpha at small scales, bloom, vignette); real iPhone and Android; Experience Guidebook section updates to as-built.
+
+## 2026-11-20 — Love Site Phase 9: interactive heart moments (blueprint 047)
+
+### Summary
+
+Implemented M28–M33 in the order M28 → M32 → M29 → M31 → M30 → M33:
+
+- Pure, tested helpers: `blow-detector`, `ring-physics`, `text-points`, `sky-layout` and `audio-duck`.
+- Four new director events, `finaleSpell`, `skyHeartIn`, `candleOut` and `reasonFront`, each with a reduced-motion case. `toBaseline()` resets `spell` and `spellB`.
+- A new Reasons section after Dance (CSS 3D ring turned by scroll and drag).
+- Finale: the heart spells the name, then "I love you".
+- Our sky: an interactive constellation in Starlight.
+- Voice-note channel with music ducking. It stays hidden until `letter.voice` is configured.
+- Candle wish with microphone blow detection. Hold and tap always work.
+- Placeholder reasons, copy, `wish.mode` and `finale.spell` added to the site config.
+
+### Deviations
+
+- `engine/mic-input.ts` was added so the debug panel and `use-blow` share one microphone path.
+- New state objects `reasons-state.ts` and `candle-state.ts` follow the `dance-state` pattern.
+- `HEART_PATH.starlight` now holds the constellation-centre pose (the `skyHeartIn` target). The `SKY_WAIT` pose is used while she plays.
+- `skyStarLayout` spaces stars by arc length, because equal parameters bunched up at the tip.
+- The voice note and the candle use an `IntersectionObserver` for "section leave" instead of a new ScrollTrigger.
+- `WishCandle` is mounted whenever candle mode is on. It skips all work while `candle.visible` is 0.
+- `wishMerge` takes a time offset so `candleOut` can chain into it.
+
+### Verification
+
+- `tsc --noEmit` clean.
+- `eslint src/features/love` clean.
+- Prettier clean.
+- Vitest: 23 files, 91 tests pass (love).
+- `next build` was blocked by the Google Fonts fetch (environment).
+- Not yet checked in a browser or on devices.
+
+### Remaining Work
+
+- Device tuning of the blow thresholds on an iPhone and an Android phone, then accept ADR-0033.
+- Browser and fast-scroll QA.
+- Owner content: the real reasons, the voice note and its transcript.
+- Remove `finaleBurst` after the release QA.
+- Experience Guidebook as-built updates.

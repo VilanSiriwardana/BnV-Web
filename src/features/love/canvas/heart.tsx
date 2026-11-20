@@ -12,12 +12,13 @@ import {
   Vector3,
 } from 'three';
 
-import { ndcToWorld } from '../engine/heart-path';
+import { isMobileViewport, ndcToWorld } from '../engine/heart-path';
 import { director } from '../engine/heart-director';
 import { heart } from '../engine/heart-state';
 import { TIERS, type Tier } from '../engine/tiers';
 import { buildHeartAttributes } from './heart-geometry';
 import { heartFragment, heartVertex } from './heart-shaders';
+import { displayFamily, sampleText } from './text-points';
 import { readTokenColors } from './token-colors';
 
 const MAX_PARTICLES = TIERS.high.particles;
@@ -27,9 +28,18 @@ const SNAP_DISTANCE = 10;
 // The heart's world centre, for effects that live outside its group (arrow, ring, orbs).
 export const heartWorld = new Vector3();
 
-type Props = { tier: Tier; onTap?: () => void; children?: ReactNode };
+// Spell text width in heart units (finale pose scale 1.1 desktop, 0.9 mobile).
+const SPELL_WIDTH = { desktop: 2.6, mobile: 2.1 };
 
-export function Heart({ tier, onTap, children }: Props) {
+type Props = {
+  tier: Tier;
+  onTap?: () => void;
+  /** Finale spell phrases (F1): name, then line two. */
+  spell?: [string, string];
+  children?: ReactNode;
+};
+
+export function Heart({ tier, onTap, spell, children }: Props) {
   const group = useRef<Group>(null);
 
   const geometry = useMemo(() => {
@@ -40,6 +50,14 @@ export function Heart({ tier, onTap, children }: Props) {
     g.setAttribute('aRibbon', new BufferAttribute(a.aRibbon, 3));
     g.setAttribute('aScatter', new BufferAttribute(a.aScatter, 3));
     g.setAttribute('aRand', new BufferAttribute(a.aRand, 4));
+    g.setAttribute(
+      'aTextA',
+      new BufferAttribute(new Float32Array(MAX_PARTICLES * 3), 3),
+    );
+    g.setAttribute(
+      'aTextB',
+      new BufferAttribute(new Float32Array(MAX_PARTICLES * 3), 3),
+    );
     return g;
   }, []);
 
@@ -63,6 +81,8 @@ export function Heart({ tier, onTap, children }: Props) {
         uGlow: { value: heart.glow },
         uGold: { value: 0 },
         uScale: { value: 1 },
+        uSpell: { value: 0 },
+        uSpellB: { value: 0 },
         uColorLav: { value: c?.primary.night },
         uColorLilac: { value: c?.['primary-hover'].night },
         uColorGold: { value: c?.gold.night },
@@ -76,6 +96,52 @@ export function Heart({ tier, onTap, children }: Props) {
     drawn.current = TIERS[tier].particles;
     geometry.setDrawRange(0, drawn.current);
   }, [geometry, tier]);
+
+  // F1: sample the two phrases once, in idle time, after the display font is ready.
+  const bold = tier === 'low';
+  const [textA, textB] = spell ?? ['', ''];
+  useEffect(() => {
+    if (!textA && !textB) return;
+    let cancelled = false;
+    let idle = 0;
+    const fill = () => {
+      if (cancelled) return;
+      const width = isMobileViewport()
+        ? SPELL_WIDTH.mobile
+        : SPELL_WIDTH.desktop;
+      const weight = bold ? 800 : 600;
+      (
+        [
+          ['aTextA', textA, 11],
+          ['aTextB', textB, 12],
+        ] as const
+      ).forEach(([name, text, seed]) => {
+        const attr = geometry.getAttribute(name) as BufferAttribute;
+        (attr.array as Float32Array).set(
+          sampleText(text, MAX_PARTICLES, width, seed, weight),
+        );
+        attr.needsUpdate = true;
+      });
+    };
+    const fonts = document.fonts;
+    void fonts
+      .load(`600 64px ${displayFamily()}`)
+      .catch(() => {})
+      .then(() => fonts.ready)
+      .then(() => {
+        if (cancelled) return;
+        idle =
+          typeof window.requestIdleCallback === 'function'
+            ? window.requestIdleCallback(fill, { timeout: 2000 })
+            : (setTimeout(fill, 200) as unknown as number);
+      });
+    return () => {
+      cancelled = true;
+      if (typeof window.cancelIdleCallback === 'function')
+        window.cancelIdleCallback(idle);
+      else clearTimeout(idle);
+    };
+  }, [geometry, textA, textB, bold]);
 
   const materialRef = useRef(material);
 
@@ -96,6 +162,8 @@ export function Heart({ tier, onTap, children }: Props) {
     u.uForm.value = damp(u.uForm.value, heart.form, 20, delta);
     u.uBurst.value = damp(u.uBurst.value, heart.burst, 20, delta);
     u.uShine.value = heart.shine;
+    u.uSpell.value = heart.spell;
+    u.uSpellB.value = heart.spellB;
     u.uGlow.value = damp(u.uGlow.value, heart.glow + heart.idleGlow, 8, delta);
     u.uBeat.value = heart.beat;
     u.uBeatScale.value = damp(

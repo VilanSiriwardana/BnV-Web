@@ -6,7 +6,8 @@ const STEPS: [trigger: string, from: number, to: number][] = [
   ['#memories', 0, 0.5],
   ['#timeline', 0.5, 1],
   ['#gallery', 1, 0.5],
-  ['#wish', 0.5, 1],
+  ['#reasons', 0.5, 0.8],
+  ['#wish', 0.8, 1],
   ['#finale', 1, 0.5],
 ];
 

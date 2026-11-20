@@ -3,9 +3,11 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import { director } from './heart-director';
 import { replayHeroWeave } from './hero-intro';
-import { LETTER_OPEN_EVENT, session } from './session';
-import { poseFor, type SectionId, WISH_REST } from './heart-path';
+import { LETTER_OPEN_EVENT, session, SKY_COMPLETE_EVENT } from './session';
+import { poseFor, type SectionId, SKY_WAIT, WISH_REST } from './heart-path';
+import { candle } from './candle-state';
 import { dance } from './dance-state';
+import { reasons } from './reasons-state';
 import { heart } from './heart-state';
 import { memoriesState } from './memories-state';
 import { RAIL_START_Z, railEndZ } from './memory-layout';
@@ -363,59 +365,64 @@ const buildTimeline: SectionBuilder = (root, mobile) => {
     },
   });
 };
-// Starlight (all-night theme, replaces Dawn): the heart rises and grows under the aurora; glowUp at
-// 35 %, shine at 50 %, the single line from 40 %.
+// Starlight → Our sky (F3): the aurora and line open the stage (first 35 %); then the memory stars
+// fade in and the heart waits low while she connects them. ui/sky-constellation.tsx plays
+// skyHeartIn on completion; leaving forward asks it to finish the remaining links.
 const buildStarlight: SectionBuilder = (root, mobile) => {
   const el = root.querySelector<HTMLElement>('#starlight');
   if (!el) return;
   baselineOn(el, 'starlight');
-  const from = poseFor(mobile ? 'starlight' : 'memories', mobile);
-  const to = poseFor('starlight', mobile);
+  const from = poseFor('timeline', mobile);
+  const wait = mobile ? SKY_WAIT.mobile : SKY_WAIT.desktop;
   const line = el.querySelector('[data-starlight-line]');
+  const sky = el.querySelector('[data-sky]');
   const scrub = { immediateRender: false, ease: 'none' };
-  let glowed = false;
-  let shone = false;
   let lineOn = false;
+  let skyOn = false;
   gsap.set(line, { autoAlpha: 0 });
+  gsap.set(sky, { autoAlpha: 0 });
+  const fade = (target: Element | null, show: boolean) =>
+    gsap.to(target, {
+      autoAlpha: show ? 1 : 0,
+      y: show ? 0 : 16,
+      duration: 0.5,
+      overwrite: 'auto',
+    });
 
   gsap
     .timeline({
       scrollTrigger: {
         trigger: el,
-        start: 'top 80%',
-        end: 'bottom 20%',
+        start: 'top bottom',
+        end: 'top top',
         scrub: 0.8,
-        onUpdate: ({ progress: p }) => {
-          if (p >= 0.35 && !glowed) glowed = director.play('glowUp');
-          if (p < 0.3) glowed = false;
-          if (p >= 0.5 && !shone) shone = director.play('shine');
-          if (p < 0.4) shone = false;
-          const show = p >= 0.4;
-          if (show !== lineOn) {
-            lineOn = show;
-            gsap.to(line, {
-              autoAlpha: show ? 1 : 0,
-              y: show ? 0 : 16,
-              duration: 0.5,
-              overwrite: 'auto',
-            });
-          }
-        },
       },
     })
     .fromTo(
       heart.ndc,
       { x: from.x, y: from.y },
-      { x: to.x, y: to.y, ...scrub },
+      { x: wait.x, y: wait.y, ...scrub },
       0,
     )
-    .fromTo(heart, { scale: 0.3 }, { scale: to.scale, ...scrub }, 0)
+    .fromTo(heart, { scale: 0.3 }, { scale: wait.scale, ...scrub }, 0)
     .fromTo(
       heart,
       { petalRelease: 1 },
       { petalRelease: 0, ...scrub, duration: 0.5 },
       0,
     );
+  ScrollTrigger.create({
+    trigger: el,
+    start: 'top top',
+    end: 'bottom bottom',
+    onUpdate: ({ progress: p }) => {
+      const showLine = p < 0.35;
+      if (showLine !== lineOn) fade(line, (lineOn = showLine));
+      const showSky = p >= 0.25;
+      if (showSky !== skyOn) fade(sky, (skyOn = showSky));
+    },
+    onLeave: () => el.dispatchEvent(new Event(SKY_COMPLETE_EVENT)),
+  });
 };
 
 // Experience §11: batched clip reveals, light desktop parallax, quiet corner companion.
@@ -551,6 +558,47 @@ const buildDance: SectionBuilder = (root, mobile) => {
   };
 };
 
+// Romance Additions F4: the heart rests above the ring; scroll turns the ring once over the stage.
+const buildReasons: SectionBuilder = (root, mobile) => {
+  const el = root.querySelector<HTMLElement>('#reasons');
+  if (!el) return;
+  baselineOn(el, 'reasons');
+  const from = poseFor('dance', mobile);
+  const to = poseFor('reasons', mobile);
+  const scrub = { immediateRender: false, ease: 'none' };
+  gsap
+    .timeline({
+      scrollTrigger: {
+        trigger: el,
+        start: 'top bottom',
+        end: 'top top',
+        scrub: 0.8,
+      },
+    })
+    .fromTo(
+      heart.ndc,
+      { x: from.x, y: from.y },
+      { x: to.x, y: to.y, ...scrub },
+      0,
+    )
+    .fromTo(heart, { scale: from.scale }, { scale: to.scale, ...scrub }, 0);
+  ScrollTrigger.create({
+    trigger: el,
+    start: 'top top',
+    end: 'bottom bottom',
+    onUpdate: ({ progress }) => {
+      reasons.progress = progress;
+    },
+    onToggle: ({ isActive }) => {
+      reasons.active = isActive;
+    },
+  });
+  return () => {
+    reasons.progress = 0;
+    reasons.active = false;
+  };
+};
+
 // Experience §12: the star shows while the stage is on screen; the heart waits below it.
 const buildWish: SectionBuilder = (root) => {
   const el = root.querySelector<HTMLElement>('#wish');
@@ -561,8 +609,16 @@ const buildWish: SectionBuilder = (root) => {
     start: 'top center',
     end: 'bottom center',
     onToggle: ({ isActive }) => {
+      // F5: with the candle, the star appears only once the flame is out (candleOut).
+      const candleMode = !!el.querySelector('[data-wish-candle]');
+      if (candleMode)
+        gsap.to(candle, {
+          visible: isActive ? 1 : 0,
+          duration: 0.4,
+          overwrite: 'auto',
+        });
       gsap.to(heart, {
-        star: isActive ? 1 : 0,
+        star: isActive && (!candleMode || candle.out === 1) ? 1 : 0,
         duration: 0.4,
         overwrite: 'auto',
       });
@@ -580,6 +636,9 @@ const buildWish: SectionBuilder = (root) => {
       });
     },
   });
+  return () => {
+    candle.visible = 0;
+  };
 };
 
 // Experience §13: the heart docks onto the measured seal and stays exact while the stage is
@@ -643,7 +702,7 @@ const buildLetter: SectionBuilder = (root) => {
   return () => gsap.ticker.remove(follow);
 };
 
-// Experience §14: centre stage, one finaleBurst per pass.
+// Experience §14 + Romance Additions F1: centre stage, one finaleSpell per pass.
 const buildFinale: SectionBuilder = (root, mobile) => {
   const el = root.querySelector<HTMLElement>('#finale');
   if (!el) return;
@@ -674,7 +733,7 @@ const buildFinale: SectionBuilder = (root, mobile) => {
     onEnter: () => {
       if (session.finalePlayed) return;
       session.finalePlayed = true;
-      director.play('finaleBurst');
+      director.play('finaleSpell');
     },
   });
 };
@@ -687,6 +746,7 @@ const sections = [
   buildStarlight,
   buildGallery,
   buildDance,
+  buildReasons,
   buildWish,
   buildLetter,
   buildFinale,

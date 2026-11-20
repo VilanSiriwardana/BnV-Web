@@ -397,7 +397,7 @@ export function updateBlow(
   dtMs: number,
 ): BlowState {
   const loud = rms > Math.max(0.05, s.baseline * 3);
-  const breathy = lowRatio > 0.5 && flatness > 0.25; // thresholds UNCERTAIN: tune on devices
+  const breathy = lowRatio > 0.5 && flatness > 0.25; // defaults shipped in engine/blow-detector.ts BLOW_THRESHOLDS (2026-11-20); pending device tuning (ADR-0033)
   const intensity = loud && breathy ? Math.min(1, (rms - s.baseline) * 6) : 0;
   const blow = Math.min(
     1,

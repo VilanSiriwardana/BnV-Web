@@ -7,6 +7,8 @@ export const session = {
 
 // Dispatched on #letter by story.ts buildLetter when she scrolls on without opening it.
 export const LETTER_OPEN_EVENT = 'love:letter-open';
+// Dispatched on #starlight when she scrolls on before joining every star (F3 auto-complete).
+export const SKY_COMPLETE_EVENT = 'love:sky-complete';
 
 const listeners = new Set<() => void>();
 

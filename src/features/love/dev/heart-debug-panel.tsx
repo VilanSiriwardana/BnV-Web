@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
+import { calibrate, CALIBRATE_MS, updateBlow } from '../engine/blow-detector';
 import { director } from '../engine/heart-director';
 import { HEART_EVENTS } from '../engine/heart-director-core';
 import { SECTION_IDS } from '../engine/heart-path';
@@ -9,6 +10,7 @@ import { heart } from '../engine/heart-state';
 import { useMotionPrefs } from '../engine/motion-prefs';
 import { useLoveScroll } from '../engine/scroll-engine';
 import { renderStats } from '../engine/render-stats';
+import { type MicInput, openMic } from '../engine/mic-input';
 import { resetSession } from '../engine/session';
 import { useTier } from '../engine/tier-provider';
 import { TIER_ORDER } from '../engine/tiers';
@@ -116,6 +118,7 @@ export default function HeartDebugPanel() {
           reset session
         </button>
       </div>
+      <MicTest />
       <label className="mb-3 flex items-center gap-2">
         form
         <input
@@ -130,5 +133,70 @@ export default function HeartDebugPanel() {
       <p className="mb-1 font-semibold">heart</p>
       <pre className="whitespace-pre-wrap">{snapshot}</pre>
     </aside>
+  );
+}
+
+// M28 spike: live blow-detector values for tuning thresholds on real phones (ADR-0033).
+function MicTest() {
+  const [on, setOn] = useState(false);
+  const [readout, setReadout] = useState('');
+  const mic = useRef<MicInput | null>(null);
+
+  useEffect(() => {
+    if (!on) return;
+    let raf = 0;
+    let alive = true;
+    void openMic().then(
+      (input) => {
+        if (!alive) return input.stop();
+        mic.current = input;
+        const start = performance.now();
+        let last = start;
+        const samples: number[] = [];
+        let state = calibrate([]);
+        const loop = (now: number) => {
+          const f = input.read();
+          if (now - start < CALIBRATE_MS) {
+            samples.push(f.rms);
+            state = calibrate(samples);
+          } else {
+            state = updateBlow(
+              state,
+              f.rms,
+              f.lowRatio,
+              f.flatness,
+              now - last,
+            );
+          }
+          last = now;
+          setReadout(
+            `rms ${f.rms.toFixed(3)} base ${state.baseline.toFixed(3)}\nlow ${f.lowRatio.toFixed(2)} flat ${f.flatness.toFixed(2)}\nblow ${state.blow.toFixed(2)}`,
+          );
+          raf = requestAnimationFrame(loop);
+        };
+        raf = requestAnimationFrame(loop);
+      },
+      (e: unknown) => setReadout(`mic error: ${String(e)}`),
+    );
+    return () => {
+      alive = false;
+      cancelAnimationFrame(raf);
+      mic.current?.stop();
+      mic.current = null;
+    };
+  }, [on]);
+
+  return (
+    <div className="mb-3">
+      <button
+        type="button"
+        aria-pressed={on}
+        className={button}
+        onClick={() => setOn((v) => !v)}
+      >
+        Mic test {on ? 'on' : 'off'}
+      </button>
+      {on && <pre className="mt-1 whitespace-pre-wrap">{readout}</pre>}
+    </div>
   );
 }

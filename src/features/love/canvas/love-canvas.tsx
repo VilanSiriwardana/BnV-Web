@@ -23,6 +23,7 @@ import { Petals } from './petals';
 import { ShockRing } from './shock-ring';
 import { Sparks } from './sparks';
 import { WishStar } from './wish-star';
+import { WishCandle } from './wish-candle';
 import { renderStats } from '../engine/render-stats';
 
 type Props = {
@@ -33,6 +34,9 @@ type Props = {
   debug?: boolean;
   onHeartTap?: () => void;
   onReady?: () => void;
+  spell?: [string, string];
+  /** F5: the Wish shows the candle instead of the star. */
+  candleMode?: boolean;
 };
 
 export default function LoveCanvas({
@@ -43,6 +47,8 @@ export default function LoveCanvas({
   debug,
   onHeartTap,
   onReady,
+  spell,
+  candleMode,
 }: Props) {
   const config = TIERS[tier];
   return (
@@ -69,7 +75,7 @@ export default function LoveCanvas({
       />
       <ambientLight intensity={0.6} />
       <directionalLight position={[3, 4, 5]} intensity={1} />
-      <Heart tier={tier} onTap={onHeartTap}>
+      <Heart tier={tier} onTap={onHeartTap} spell={spell}>
         <MiniHearts tier={tier} />
       </Heart>
       <Petals tier={tier} />
@@ -82,6 +88,7 @@ export default function LoveCanvas({
       <Sparks />
       <Arrow />
       <WishStar />
+      {candleMode && <WishCandle tier={tier} />}
       <Confetti tier={tier} />
       {config.bloom !== 'off' && (
         <EffectComposer multisampling={0}>

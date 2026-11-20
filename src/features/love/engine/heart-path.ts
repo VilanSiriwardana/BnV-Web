@@ -10,6 +10,7 @@ export const SECTION_IDS = [
   'starlight',
   'gallery',
   'dance',
+  'reasons',
   'wish',
   'letter',
   'finale',
@@ -53,8 +54,8 @@ export const HEART_PATH: Record<SectionId, PathEntry> = {
     glow: 0.6,
   },
   starlight: {
-    desktop: { x: 0, y: 0.15, scale: 0.6 },
-    mobile: { x: 0, y: 0.5, scale: 0.5 },
+    desktop: { x: 0, y: 0.04, scale: 0.42 },
+    mobile: { x: 0, y: 0.04, scale: 0.32 },
     gold: 0.4,
     glow: 0.5,
   },
@@ -69,6 +70,12 @@ export const HEART_PATH: Record<SectionId, PathEntry> = {
     mobile: { x: 0, y: 0.62, scale: 0.16 },
     gold: 0.45,
     glow: 0.45,
+  },
+  reasons: {
+    desktop: { x: 0, y: 0.5, scale: 0.2 },
+    mobile: { x: 0, y: 0.58, scale: 0.18 },
+    gold: 0.45,
+    glow: 0.5,
   },
   wish: {
     desktop: { x: 0, y: 0, scale: 0.5 },
@@ -103,6 +110,15 @@ export const WISH_STAR_NDC = { x: 0, y: 0 };
 // The heart rests below the star and rises to it as she holds.
 export const WISH_REST = { y: -0.45, scale: 0.35 };
 export const WISH_TOP = { y: -0.05, scale: 0.5 };
+// Blowing lifts the heart only part of the way; wishMerge takes it the rest.
+export const WISH_BLOW_TOP = { y: -0.15, scale: 0.42 };
+
+// Our sky (F3): the heart waits low while she connects the stars, then rises into the shape
+// (HEART_PATH.starlight, via skyHeartIn).
+export const SKY_WAIT = {
+  desktop: { x: 0, y: -0.75, scale: 0.2 },
+  mobile: { x: 0, y: -0.8, scale: 0.18 },
+};
 
 // Live viewport (world units at the heart's depth) → world position.
 export function ndcToWorld(

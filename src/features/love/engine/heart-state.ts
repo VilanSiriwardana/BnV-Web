@@ -24,5 +24,7 @@ export const heart = {
   star: 0, // wish star visibility 0..1
   starHold: 0, // wish hold progress 0..1
   sealRim: 0, // extra gold while docked on the letter seal
+  spell: 0, // 0 = heart, 1 = particles spell text A (Finale, F1)
+  spellB: 0, // 0 = text A, 1 = text B
 };
 export type HeartState = typeof heart;

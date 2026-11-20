@@ -1,6 +1,12 @@
+'use client';
+
 import { mulberry32 } from '../canvas/heart-geometry';
-import { QuietHeart } from '../ui/static-heart';
+import type { LoveSiteConfig } from '../config';
+import { useQuiet } from '../engine/use-quiet';
+import { SkyConstellation } from '../ui/sky-constellation';
 import { LoveSection, proseColumn } from './love-section';
+
+const SKY_STARS = 8;
 
 // Deterministic star field (same on server and client, no hydration drift).
 const STARS = (() => {
@@ -13,15 +19,25 @@ const STARS = (() => {
   }));
 })();
 
-// All-night theme (replaces Dawn): a breath under a lavender and gold aurora; the heart rises
-// and glows (story.ts buildStarlight). The single line is revealed from 40 %.
-export function Starlight({ line }: { line: string }) {
+type Props = {
+  line: string;
+  hint: string;
+  done: string;
+  slug: string;
+  memories: LoveSiteConfig['memories'];
+};
+
+// All-night theme + Our sky (F3): the line opens the stage under the aurora, then she joins eight
+// memory stars into a heart (story.ts buildStarlight). Calm: the finished constellation and the list.
+export function Starlight({ line, hint, done, slug, memories }: Props) {
+  const quiet = useQuiet();
+  const stars = memories.slice(0, SKY_STARS);
   return (
     <LoveSection
       id="starlight"
       depth={1}
-      stage="100vh"
-      className="flex min-h-[60svh] items-end"
+      stage="220vh"
+      className="flex min-h-svh flex-col items-center justify-center"
     >
       <div
         aria-hidden
@@ -44,16 +60,33 @@ export function Starlight({ line }: { line: string }) {
           />
         ))}
       </div>
-      <QuietHeart glow className="relative mb-8 size-28" />
       <h2 id="starlight-title" className="sr-only">
-        Starlight
+        Our sky
       </h2>
       <p
         data-starlight-line
-        className={`${proseColumn} text-body-lg text-gold-text relative italic`}
+        className={`${proseColumn} text-body-lg text-gold-text relative italic ${quiet ? 'mb-8' : 'absolute top-[18svh] left-1/2 -translate-x-1/2'}`}
       >
         {line}
       </p>
+      {stars.length >= 3 && (
+        <SkyConstellation
+          stars={stars}
+          hint={hint}
+          done={done}
+          slug={slug}
+          quiet={quiet}
+        />
+      )}
+      {quiet && (
+        <ol className="mt-8 grid gap-2 text-left font-sans text-sm">
+          {stars.map((m) => (
+            <li key={m.id}>
+              <span className="text-gold-text">{m.date}</span> · {m.title}
+            </li>
+          ))}
+        </ol>
+      )}
     </LoveSection>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import gsap from 'gsap';
+import { Mic } from 'lucide-react';
 import {
   type ReactNode,
   useCallback,
@@ -15,10 +16,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils/cn';
 
 import { director } from '../engine/heart-director';
-import { WISH_REST, WISH_TOP } from '../engine/heart-path';
+import { candle } from '../engine/candle-state';
+import { WISH_BLOW_TOP, WISH_REST, WISH_TOP } from '../engine/heart-path';
 import { heart } from '../engine/heart-state';
 import { useQuiet } from '../engine/use-quiet';
 import { onSessionReset, session } from '../engine/session';
+import { useBlow } from '../hooks/use-blow';
 import { useHold } from '../hooks/use-hold';
 import { LoveSection, sectionTitle } from './love-section';
 
@@ -32,14 +35,26 @@ type Props = {
   name: string;
   prompt: string;
   done: string;
+  /** F5: a candle replaces the star (config wish.mode !== 'star' and a mic API exists). */
+  candleMode?: boolean;
+  blowHint?: string;
   children?: ReactNode;
 };
 
 const TICKS = Array.from({ length: 60 }, (_, i) => i * 6);
 const sparkles = [0, 120, 240];
+const MERGING: ReadonlySet<string | null> = new Set(['wishMerge', 'candleOut']);
 
-export function Wish({ name, prompt, done, children }: Props) {
+export function Wish({
+  name,
+  prompt,
+  done,
+  candleMode = false,
+  blowHint = "I'll listen for your breath. Nothing is recorded or sent.",
+  children,
+}: Props) {
   const quiet = useQuiet();
+  const sectionRef = useRef<HTMLDivElement>(null);
   const ring = useRef<SVGCircleElement>(null);
   const pill = useRef<HTMLParagraphElement>(null);
   const timer = useRef<gsap.core.Tween | null>(null);
@@ -47,12 +62,13 @@ export function Wish({ name, prompt, done, children }: Props) {
   const [writing, setWriting] = useState(false);
   const fieldId = useId();
   const ringGradient = `wish-ring-${fieldId.replace(/[^a-z0-9]/gi, '')}`;
+  const snuff = candleMode && !quiet;
 
   const onProgress = useCallback((p: number) => {
     if (ring.current)
       ring.current.style.strokeDashoffset = `${RING_C * (1 - p)}`;
     pill.current?.toggleAttribute('data-holding', p > 0 && p < 1);
-    if (director.current() === 'wishMerge') return;
+    if (MERGING.has(director.current())) return;
     heart.starHold = p;
     heart.ndc.y = lerp(WISH_REST.y, WISH_TOP.y, p);
     heart.scale = lerp(WISH_REST.scale, WISH_TOP.scale, p);
@@ -62,12 +78,31 @@ export function Wish({ name, prompt, done, children }: Props) {
     if (session.wishDone) return;
     session.wishDone = true;
     setPhase('merging');
-    director.interrupt('wishMerge');
+    director.interrupt(snuff ? 'candleOut' : 'wishMerge');
     try {
       navigator.vibrate?.(10);
     } catch {}
-    timer.current = gsap.delayedCall(quiet ? 0 : 2, () => setPhase('done'));
-  }, [quiet]);
+    timer.current = gsap.delayedCall(quiet ? 0 : snuff ? 4 : 2, () =>
+      setPhase('done'),
+    );
+  }, [quiet, snuff]);
+
+  // Breath bends the flame and lifts the heart only part of the way (WISH_BLOW_TOP).
+  const onBlow = useCallback((b: number) => {
+    candle.blow = b;
+    if (ring.current)
+      ring.current.style.strokeDashoffset = `${RING_C * (1 - b)}`;
+    if (MERGING.has(director.current())) return;
+    heart.ndc.y = lerp(WISH_REST.y, WISH_BLOW_TOP.y, b);
+    heart.scale = lerp(WISH_REST.scale, WISH_BLOW_TOP.scale, b);
+  }, []);
+
+  const blow = useBlow({
+    enabled: snuff,
+    sectionRef,
+    onProgress: onBlow,
+    onBlown: onComplete,
+  });
 
   const { handlers, complete, reset } = useHold({
     duration: HOLD_MS,
@@ -80,9 +115,12 @@ export function Wish({ name, prompt, done, children }: Props) {
     timer.current?.kill();
     session.wishDone = false;
     reset();
+    candle.out = 0;
+    if (snuff) gsap.to(heart, { star: 0, duration: 0.4, overwrite: 'auto' });
+    candle.blow = 0;
     if (ring.current) ring.current.style.strokeDashoffset = `${RING_C}`;
     setPhase('idle');
-  }, [reset]);
+  }, [reset, snuff]);
 
   useEffect(() => onSessionReset(again), [again]);
   useEffect(() => () => void timer.current?.kill(), []);
@@ -98,6 +136,8 @@ export function Wish({ name, prompt, done, children }: Props) {
         {prompt}, <span className="text-primary">{name}</span>.
       </h2>
       <div
+        ref={sectionRef}
+        data-wish-candle={snuff ? '' : undefined}
         className={cn(
           'flex flex-col items-center',
           quiet
@@ -177,11 +217,14 @@ export function Wish({ name, prompt, done, children }: Props) {
             />
           </svg>
           {children ??
-            (quiet && (
-              <span aria-hidden className="text-gold-text text-h3">
-                ✦
-              </span>
-            ))}
+            (quiet &&
+              (candleMode ? (
+                <FlatCandle lit={phase === 'idle'} />
+              ) : (
+                <span aria-hidden className="text-gold-text text-h3">
+                  ✦
+                </span>
+              )))}
           <span className="sr-only">Make a wish</span>
         </button>
         <p
@@ -193,13 +236,17 @@ export function Wish({ name, prompt, done, children }: Props) {
             ☝
           </span>
           {quiet ? (
-            'Tap the star'
+            candleMode ? (
+              'Tap the candle'
+            ) : (
+              'Tap the star'
+            )
           ) : (
             <>
-              <span className="group-data-[holding]:hidden">
-                Press and hold
+              <span className="group-data-holding:hidden">
+                {snuff ? 'Hold the candle' : 'Press and hold'}
               </span>
-              <span className="hidden group-data-[holding]:inline">
+              <span className="hidden group-data-holding:inline">
                 Keep holding…
               </span>
             </>
@@ -214,6 +261,46 @@ export function Wish({ name, prompt, done, children }: Props) {
           >
             Or tap once
           </Button>
+        )}
+        {snuff && blow.supported && !busy && (
+          <div className="pointer-events-auto mt-4 flex max-w-xs flex-col items-center gap-2">
+            {blow.status === 'listening' ? (
+              <p
+                role="status"
+                className="text-label text-gold-text flex items-center gap-2 font-sans"
+              >
+                <span
+                  aria-hidden
+                  className="bg-gold size-2 animate-pulse rounded-full motion-reduce:animate-none"
+                />
+                Listening… blow gently
+                <Button
+                  variant="love-link"
+                  size="inline"
+                  onClick={() => blow.stop()}
+                >
+                  Stop
+                </Button>
+              </p>
+            ) : blow.status === 'denied' ? (
+              <p role="status" className="text-small font-sans opacity-80">
+                No problem, just hold the candle.
+              </p>
+            ) : (
+              <>
+                <Button
+                  variant="love-ghost"
+                  size="sm"
+                  disabled={blow.status === 'starting'}
+                  onClick={() => void blow.start()}
+                >
+                  <Mic aria-hidden />
+                  Use my microphone to blow
+                </Button>
+                <p className="text-small font-sans opacity-70">{blowHint}</p>
+              </>
+            )}
+          </div>
         )}
       </div>
       <div
@@ -265,5 +352,34 @@ export function Wish({ name, prompt, done, children }: Props) {
         )}
       </div>
     </LoveSection>
+  );
+}
+
+// Calm / static (F5): a flat candle; one click blows it out (opacity only, no mic).
+function FlatCandle({ lit }: { lit: boolean }) {
+  return (
+    <svg aria-hidden viewBox="0 0 40 64" className="h-20 w-12">
+      <path
+        d="M20 4 C26 14 26 20 20 24 C14 20 14 14 20 4 Z"
+        className="fill-gold transition-opacity duration-500"
+        style={{ opacity: lit ? 1 : 0 }}
+      />
+      <rect
+        x="17"
+        y="26"
+        width="6"
+        height="22"
+        rx="1.5"
+        className="fill-gold/70"
+      />
+      <rect
+        x="4"
+        y="48"
+        width="32"
+        height="12"
+        rx="3"
+        className="fill-primary/60"
+      />
+    </svg>
   );
 }
