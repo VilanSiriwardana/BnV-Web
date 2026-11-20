@@ -9,6 +9,7 @@ const STEPS: [trigger: string, from: number, to: number][] = [
   ['#reasons', 0.5, 0.8],
   ['#wish', 0.8, 1],
   ['#finale', 1, 0.5],
+  ['#afterglow', 0.5, 0.7],
 ];
 
 export function buildTheme(root: HTMLElement) {

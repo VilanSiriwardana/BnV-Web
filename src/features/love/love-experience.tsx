@@ -14,6 +14,7 @@ import { killHeroIntro, playHeroIntro, tapHeart } from './engine/hero-intro';
 import { buildStory } from './engine/story';
 import { TierProvider, useTier } from './engine/tier-provider';
 import { useQuiet } from './engine/use-quiet';
+import { Afterglow, AfterglowLink } from './sections/afterglow';
 import { Bloom } from './sections/bloom';
 import { Starlight } from './sections/starlight';
 import { Finale } from './sections/finale';
@@ -27,6 +28,8 @@ import { Reasons } from './sections/reasons';
 import { Timeline } from './sections/timeline';
 import { Wish } from './sections/wish';
 import { CalmModeToggle } from './ui/calm-mode-toggle';
+import { FoundChip } from './ui/found-chip';
+import { LoveSlugContext } from './ui/hidden-heart';
 import { MusicToggle } from './ui/music-toggle';
 import { ProgressHeart } from './ui/progress-heart';
 
@@ -53,7 +56,9 @@ export function LoveExperience({ site }: { site: LoveSiteConfig }) {
     <MotionPrefsProvider>
       <TierProvider>
         <ScrollEngine>
-          <LoveStory site={site} />
+          <LoveSlugContext value={site.slug}>
+            <LoveStory site={site} />
+          </LoveSlugContext>
         </ScrollEngine>
       </TierProvider>
     </MotionPrefsProvider>
@@ -163,7 +168,10 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
           spell={spell}
           credit={site.music.credit}
           onReplay={replay}
-        />
+        >
+          {site.afterglow && <AfterglowLink />}
+        </Finale>
+        <Afterglow site={site} onReplay={replay} />
       </main>
       <Gate
         name={name}
@@ -175,6 +183,7 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
         }}
       />
       {entered && <MusicToggle />}
+      {entered && <FoundChip slug={site.slug} />}
       <ProgressHeart />
       <CalmModeToggle />
     </div>

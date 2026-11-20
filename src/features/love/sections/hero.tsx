@@ -5,6 +5,7 @@ import { Heart } from 'lucide-react';
 import { tapHeart } from '../engine/hero-intro';
 import { QuietHeart } from '../ui/static-heart';
 import { LoveSection, proseColumn } from './love-section';
+import { HiddenHeart } from '../ui/hidden-heart';
 
 export function Hero({ name, sub }: { name: string; sub: string }) {
   return (
@@ -19,9 +20,10 @@ export function Hero({ name, sub }: { name: string; sub: string }) {
         <h1
           id="hero-title"
           data-hero-title
-          className="text-display text-gold-text text-balance break-words"
+          className="text-display text-gold-text relative text-balance break-words"
         >
           Happy Birthday, <span className="text-primary">{name}</span>
+          <HiddenHeart id="hero" />
         </h1>
         <p
           data-hero-fade

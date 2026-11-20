@@ -823,6 +823,31 @@
   [data-love-motion] [data-love-aurora] {
     animation: love-aurora-drift 18s ease-in-out infinite;
   }
+
+  /* Afterglow (F7, F9): floating gifts and twinkling hidden hearts; static glow otherwise. */
+  [data-love-motion] .love-gift-float {
+    animation: love-gift-float 4.5s ease-in-out infinite;
+  }
+
+  [data-love-motion] .love-hidden-twinkle {
+    animation: love-twinkle 4s ease-in-out infinite;
+  }
+}
+
+@keyframes love-gift-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+[data-love-root] .love-hidden-twinkle {
+  opacity: 0.7;
+  filter: drop-shadow(0 0 4px var(--love-aurora-gold));
 }
 
 /* Motion on: sections are see-through so the fixed heart canvas shows; the root paints the page colour. */

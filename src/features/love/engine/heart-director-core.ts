@@ -17,6 +17,9 @@ export const HEART_EVENTS = [
   'skyHeartIn',
   'candleOut',
   'reasonFront',
+  'giftOpen',
+  'noteOpen',
+  'hiddenFound',
 ] as const;
 export type HeartEvent = (typeof HEART_EVENTS)[number];
 export type PlayOptions = { petals?: boolean; scale?: number };

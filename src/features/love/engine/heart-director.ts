@@ -107,6 +107,9 @@ function build(event: HeartEvent, opts: PlayOptions, tl: gsap.core.Timeline) {
         flash(tl, 0.6);
         return;
       case 'glowUp':
+      case 'giftOpen':
+      case 'noteOpen':
+      case 'hiddenFound':
         flash(tl, 0.25);
         return;
       default:
@@ -210,6 +213,25 @@ function build(event: HeartEvent, opts: PlayOptions, tl: gsap.core.Timeline) {
         heart,
         { flinch: 0, duration: 0.2, ease: 'power1.in' },
       );
+      return;
+    // Romance Additions F7–F9: small, quick acknowledgements.
+    case 'giftOpen':
+      tl.to(heart, {
+        glow: baseGlow() + 0.3,
+        duration: 0.4,
+        ease: 'power2.out',
+      })
+        .to(heart, { glow: baseGlow(), duration: 0.8, ease: 'power2.inOut' })
+        .call(() => spawnTapHearts(6), [], 0);
+      return;
+    case 'noteOpen':
+      pulse(tl, 0);
+      tl.call(() => spawnTapHearts(4), [], 0);
+      flash(tl, 0.5);
+      return;
+    case 'hiddenFound':
+      tl.call(() => spawnTapHearts(3), [], 0);
+      flash(tl, 0.4);
       return;
     default:
       pulse(tl, 0);

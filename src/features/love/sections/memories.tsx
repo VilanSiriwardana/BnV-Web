@@ -25,6 +25,7 @@ import { TIERS } from '../engine/tiers';
 import { MemoryDialog } from '../ui/memory-dialog';
 import { LovePhoto } from './love-photo';
 import { LoveSection, labelText, sectionTitle } from './love-section';
+import { HiddenHeart } from '../ui/hidden-heart';
 
 type Memory = LoveSiteConfig['memories'][number];
 type Props = { hint: string; memories: Memory[] };
@@ -124,8 +125,9 @@ export function Memories({ hint, memories }: Props) {
   return (
     <LoveSection id="memories" depth={0.5} stage="400vh">
       <QuietHeart className="mb-4 size-10" />
-      <h2 id="memories-title" className={sectionTitle}>
+      <h2 id="memories-title" className={`${sectionTitle} relative`}>
         Memories
+        <HiddenHeart id="memories" />
       </h2>
       <p className={`${labelText} mt-3`} aria-live="polite">
         {hintText}

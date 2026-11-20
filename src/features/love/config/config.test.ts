@@ -31,6 +31,16 @@ describe('love site config', () => {
     }
   });
 
+  it('dates plans and note locks with an explicit offset', () => {
+    const offset = /(Z|[+-]\d{2}:\d{2})$/;
+    site.afterglow?.gifts?.items.forEach((g) => {
+      if (g.plan) expect(g.plan.startsAt).toMatch(offset);
+    });
+    site.afterglow?.openWhen?.forEach((n) => {
+      if (n.unlockAt) expect(n.unlockAt).toMatch(offset);
+    });
+  });
+
   it('looks up by slug only', () => {
     expect(getLoveSite(site.slug)).toBe(site);
     expect(getLoveSite('wrong-slug')).toBeUndefined();

@@ -30,6 +30,7 @@ import {
   ParchmentFrame,
 } from './letter-ornaments';
 import { labelText, LoveSection, sectionTitle } from './love-section';
+import { HiddenHeart } from '../ui/hidden-heart';
 
 const HOLD_MS = 1200;
 type Props = { title: string; letter: LoveSiteConfig['letter'] };
@@ -257,8 +258,9 @@ export function Letter({ title, letter }: Props) {
                 <div data-letter-p className="mt-4">
                   <HeartDivider />
                 </div>
-                <p data-letter-p className="text-right italic">
+                <p data-letter-p className="relative text-right italic">
                   {letter.signoff}
+                  <HiddenHeart id="letter" className="-top-12 right-0" />
                 </p>
                 {letter.voice && (
                   <LetterVoice {...letter.voice} open={showOpen} />

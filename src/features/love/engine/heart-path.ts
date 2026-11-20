@@ -14,6 +14,7 @@ export const SECTION_IDS = [
   'wish',
   'letter',
   'finale',
+  'afterglow',
 ] as const;
 export type SectionId = (typeof SECTION_IDS)[number];
 
@@ -94,6 +95,12 @@ export const HEART_PATH: Record<SectionId, PathEntry> = {
     mobile: { x: 0, y: 0.3, scale: 0.9 },
     gold: 0.6,
     glow: 0.7,
+  },
+  afterglow: {
+    desktop: { x: 0.86, y: -0.78, scale: 0.2 },
+    mobile: { x: 0.8, y: -0.85, scale: 0.16 },
+    gold: 0.6,
+    glow: 0.4,
   },
 };
 

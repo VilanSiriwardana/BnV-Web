@@ -933,3 +933,20 @@ Implemented M28–M33 in the order M28 → M32 → M29 → M31 → M30 → M33:
 - Owner content: the real reasons, the voice note and its transcript.
 - Remove `finaleBurst` after the release QA.
 - Experience Guidebook as-built updates.
+
+## 2026-11-20 — Love Site Phase 10: Afterglow room (blueprint 048)
+
+### Summary
+
+- Added the Afterglow section after the Finale (natural flow, heart in the corner, `ScrollTrigger.batch` reveals) and the Finale link "There's a little more…".
+- Gifts (F7): `ui/gift-box.tsx`, `sections/afterglow-gifts.tsx`, plan card with countdown, `.ics` download and Maps link. Pure `engine/ics.ts` and `engine/countdown.ts` with tests.
+- Notes (F8): `sections/afterglow-notes.tsx` and `ui/note-dialog.tsx` (mirrors MemoryDialog), `unlockAt` soft lock.
+- Hidden hearts (F9): `engine/hidden-hearts.ts` (persisted set, also used for opened gifts/notes), `ui/hidden-heart.tsx`, placements constants, `ui/found-chip.tsx`, `sections/afterglow-secret.tsx`.
+- New heart events `giftOpen`, `noteOpen`, `hiddenFound` with reduced-motion cases.
+- Story re-dated: Dec 2025 → Nov 2026; "Our first home" became "Our little rituals". Placeholder Afterglow content is marked `TODO(owner)`.
+
+### Verification
+
+- `tsc --noEmit`, `eslint src/features/love`, Prettier clean.
+- Vitest: 32 files, 141 tests pass. `next build` passes.
+- Not yet checked in a browser or on devices (M37).

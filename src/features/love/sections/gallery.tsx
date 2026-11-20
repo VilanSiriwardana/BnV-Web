@@ -6,6 +6,8 @@ import type { PhotoRef } from '../config';
 import { GalleryLightbox } from '../ui/lightbox';
 import { LovePhoto } from './love-photo';
 import { LoveSection, sectionTitle } from './love-section';
+import { HiddenHeart } from '../ui/hidden-heart';
+import { HIDDEN_GALLERY_TILE } from '../ui/hidden-heart-placements';
 
 type Props = { title: string; photos: PhotoRef[] };
 
@@ -23,8 +25,9 @@ export function Gallery({ title, photos }: Props) {
           <li
             key={p.src}
             data-love-tile
-            className="border-gold/30 bg-surface-elevated mb-4 break-inside-avoid overflow-hidden rounded-lg border p-2"
+            className="border-gold/30 bg-surface-elevated relative mb-4 break-inside-avoid overflow-hidden rounded-lg border p-2"
           >
+            {i === HIDDEN_GALLERY_TILE && <HiddenHeart id="gallery" />}
             <button
               type="button"
               onClick={() => setIndex(i)}

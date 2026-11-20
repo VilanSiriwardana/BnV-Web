@@ -1,0 +1,148 @@
+'use client';
+
+import { CalendarPlus, MapPin } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
+import { Button } from '@/components/ui/button';
+
+import type { LoveSiteConfig } from '../config';
+import { countdownParts } from '../engine/countdown';
+import { director } from '../engine/heart-director';
+import { progressSet, usePersistedSet } from '../engine/hidden-hearts';
+import { buildIcs, downloadIcs } from '../engine/ics';
+import { GiftBox } from '../ui/gift-box';
+import { labelText } from './love-section';
+
+type Gifts = NonNullable<NonNullable<LoveSiteConfig['afterglow']>['gifts']>;
+type Plan = NonNullable<Gifts['items'][number]['plan']>;
+
+const card =
+  'border-gold/40 bg-surface/70 mt-1 rounded-lg border p-5 text-left shadow-sm';
+
+export function AfterglowGifts({
+  slug,
+  gifts,
+}: {
+  slug: string;
+  gifts: Gifts;
+}) {
+  const set = progressSet(slug, 'gifts');
+  const opened = usePersistedSet(set);
+  const pickedOne = gifts.mode === 'pick-one' && opened.length > 0;
+
+  return (
+    <div data-reveal className="w-full">
+      <h3 id="afterglow-gifts-title" className="text-h3 font-display">
+        Three little gifts
+      </h3>
+      <p className="text-body text-muted-foreground mt-2">
+        {gifts.mode === 'pick-one'
+          ? 'Choose one. Hold it until the ribbon lets go.'
+          : 'Hold each one until the ribbon lets go.'}
+      </p>
+      <ul className="mt-10 grid justify-items-center gap-10 md:grid-cols-3">
+        {gifts.items.map((g, i) => {
+          const isOpen = opened.includes(g.id);
+          return (
+            <li key={g.id} className="w-full">
+              <GiftBox
+                index={i}
+                total={gifts.items.length}
+                label={g.label}
+                opened={isOpen}
+                sealed={!isOpen && pickedOne}
+                onOpen={() => set.add(g.id)}
+              >
+                <div className={card}>
+                  <p className="font-display text-h4 text-gold-text">
+                    {g.title}
+                  </p>
+                  <p className="text-body mt-2 text-pretty">{g.text}</p>
+                  {g.plan && <PlanCard title={g.title} plan={g.plan} />}
+                </div>
+              </GiftBox>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+// One clock (§4.1): ticks once a second and stops itself once `until` has passed.
+function useNow(until: number) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      const t = Date.now();
+      setNow(t);
+      if (t >= until) window.clearInterval(id);
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [until]);
+  return now;
+}
+
+const when = new Intl.DateTimeFormat(undefined, {
+  dateStyle: 'full',
+  timeStyle: 'short',
+});
+
+function PlanCard({ title, plan }: { title: string; plan: Plan }) {
+  const start = new Date(plan.startsAt).getTime();
+  const now = useNow(start + plan.durationMin * 60_000);
+  const left = countdownParts(start, plan.durationMin, now);
+  useEffect(() => {
+    void director.play('shine');
+  }, []);
+
+  const maps = plan.mapsQuery ?? plan.place;
+  return (
+    <div className="border-gold/30 mt-4 border-t pt-4">
+      <p className={labelText}>{when.format(start)}</p>
+      <p className="text-body mt-1 font-semibold">{plan.place}</p>
+      {plan.note && (
+        <p className="text-small text-muted-foreground mt-1">{plan.note}</p>
+      )}
+      <p className="font-display text-h4 text-gold-text mt-3" aria-live="off">
+        {left.state === 'future'
+          ? `${left.days}d ${left.hours}h ${left.minutes}m to go`
+          : left.state === 'today'
+            ? "It's today. I'll see you there."
+            : 'We did this one. More to come.'}
+      </p>
+      <div className="mt-4 flex flex-wrap gap-3">
+        {left.state !== 'past' && (
+          <Button
+            variant="love-primary"
+            onClick={() =>
+              downloadIcs(
+                'our-plan.ics',
+                buildIcs({
+                  title,
+                  startsAt: plan.startsAt,
+                  durationMin: plan.durationMin,
+                  location: plan.place,
+                  description: plan.note,
+                }),
+              )
+            }
+          >
+            <CalendarPlus aria-hidden />
+            Add to calendar
+          </Button>
+        )}
+        <Button variant="love-ghost" asChild>
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(maps)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <MapPin aria-hidden />
+            Open in Maps
+          </a>
+        </Button>
+      </div>
+    </div>
+  );
+}

@@ -738,6 +738,48 @@ const buildFinale: SectionBuilder = (root, mobile) => {
   });
 };
 
+// Romance Additions F6: natural flow, heart parked in a corner, one batch for reveals.
+const buildAfterglow: SectionBuilder = (root, mobile) => {
+  const el = root.querySelector<HTMLElement>('#afterglow');
+  if (!el) return;
+  baselineOn(el, 'afterglow');
+  const to = poseFor('afterglow', mobile);
+  const scrollTrigger = {
+    trigger: el,
+    start: 'top bottom',
+    end: 'top center',
+    scrub: 0.8,
+  };
+  gsap.to(heart.ndc, {
+    x: to.x,
+    y: to.y,
+    ease: 'none',
+    immediateRender: false,
+    scrollTrigger,
+  });
+  gsap.to(heart, {
+    scale: to.scale,
+    ease: 'none',
+    immediateRender: false,
+    scrollTrigger,
+  });
+  const items = el.querySelectorAll<HTMLElement>('[data-reveal]');
+  gsap.set(items, { autoAlpha: 0, y: 16 });
+  ScrollTrigger.batch(items, {
+    start: 'top 85%',
+    once: true,
+    onEnter: (batch) =>
+      gsap.to(batch, {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.7,
+        ease: 'power2.out',
+        stagger: 0.08,
+      }),
+  });
+  return () => gsap.set(items, { clearProps: 'opacity,visibility,transform' });
+};
+
 const sections = [
   buildHero,
   buildBloom,
@@ -750,6 +792,7 @@ const sections = [
   buildWish,
   buildLetter,
   buildFinale,
+  buildAfterglow,
 ];
 
 function buildProgress(root: HTMLElement) {

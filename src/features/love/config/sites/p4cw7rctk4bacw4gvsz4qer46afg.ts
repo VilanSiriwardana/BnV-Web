@@ -25,12 +25,16 @@ export const site: LoveSiteConfig = {
     skyHint: 'Join our stars, one memory to the next.',
     skyDone: 'It was always a heart.',
     blowHint: "I'll listen for your breath. Nothing is recorded or sent.",
+    // TODO(owner): Afterglow copy (Phase 10 placeholder).
+    afterglowTitle: 'Afterglow',
+    afterglowIntro:
+      'For when you want to stay a little longer. A few small things, kept just for you.',
   },
   memories: [
     {
       id: 'memory-01',
       title: 'The first hello',
-      date: 'March 2021',
+      date: 'December 2025',
       caption:
         'A quiet table, two coffees, and a conversation that did not want to end.',
       orb: '/images/prototype/love-memory-01-orb.webp',
@@ -45,7 +49,7 @@ export const site: LoveSiteConfig = {
     {
       id: 'memory-02',
       title: 'Our first walk',
-      date: 'April 2021',
+      date: 'January 2026',
       caption: 'We took the long way home on purpose.',
       orb: '/images/prototype/love-memory-02-orb.webp',
       photo: {
@@ -59,7 +63,7 @@ export const site: LoveSiteConfig = {
     {
       id: 'memory-03',
       title: 'Matching outfits',
-      date: 'June 2021',
+      date: 'February 2026',
       caption: 'You said it was silly. You wore it anyway.',
       orb: '/images/prototype/love-memory-03-orb.webp',
       photo: {
@@ -73,7 +77,7 @@ export const site: LoveSiteConfig = {
     {
       id: 'memory-04',
       title: 'Rainy evening',
-      date: 'August 2021',
+      date: 'March 2026',
       caption: 'The rain stopped. We did not notice.',
       orb: '/images/prototype/love-memory-04-orb.webp',
       photo: {
@@ -87,7 +91,7 @@ export const site: LoveSiteConfig = {
     {
       id: 'memory-05',
       title: 'The little gift',
-      date: 'December 2021',
+      date: 'May 2026',
       caption: 'Small box, big smile.',
       orb: '/images/prototype/love-memory-05-orb.webp',
       photo: {
@@ -101,7 +105,7 @@ export const site: LoveSiteConfig = {
     {
       id: 'memory-06',
       title: 'A surprise',
-      date: 'February 2022',
+      date: 'July 2026',
       caption: 'You knew. You pretended you did not.',
       orb: '/images/prototype/love-memory-06-orb.webp',
       photo: {
@@ -115,7 +119,7 @@ export const site: LoveSiteConfig = {
     {
       id: 'memory-07',
       title: 'Weekend away',
-      date: 'May 2022',
+      date: 'September 2026',
       caption: 'Two days that felt like a whole summer.',
       orb: '/images/prototype/love-memory-07-orb.webp',
       photo: {
@@ -129,7 +133,7 @@ export const site: LoveSiteConfig = {
     {
       id: 'memory-08',
       title: 'Just us',
-      date: 'January 2023',
+      date: 'October 2026',
       caption: 'Nothing special happened. That was the special part.',
       orb: '/images/prototype/love-memory-08-orb.webp',
       photo: {
@@ -144,7 +148,7 @@ export const site: LoveSiteConfig = {
   timeline: [
     {
       id: 'timeline-01',
-      date: 'March 2021',
+      date: 'December 2025',
       title: 'We met',
       text: 'Two strangers, one ordinary day.',
       photo: {
@@ -157,7 +161,7 @@ export const site: LoveSiteConfig = {
     },
     {
       id: 'timeline-02',
-      date: 'June 2021',
+      date: 'February 2026',
       title: 'Our first trip',
       text: 'The day we learned we travel well together.',
       photo: {
@@ -170,7 +174,7 @@ export const site: LoveSiteConfig = {
     },
     {
       id: 'timeline-03',
-      date: 'October 2021',
+      date: 'April 2026',
       title: 'The day I knew',
       text: 'Nothing dramatic happened. I just knew.',
       photo: {
@@ -184,12 +188,12 @@ export const site: LoveSiteConfig = {
     },
     {
       id: 'timeline-04',
-      date: 'September 2022',
-      title: 'Our first home',
-      text: 'A small place that felt enormous.',
+      date: 'August 2026',
+      title: 'Our little rituals',
+      text: 'Sunday mornings that quietly became ours.',
       photo: {
         src: '/images/prototype/love-timeline-04.webp',
-        alt: 'Placeholder photo for “Our first home”',
+        alt: 'Placeholder photo for “Our little rituals”',
         width: 1122,
         height: 1403,
         blur: 'data:image/webp;base64,UklGRnYAAABXRUJQVlA4IGoAAADwAwCdASoQABQAPu1iqU2ppaOiMAgBMB2JQBOmUABwXzT5WnGlmeUoAP7qu/0ue4HxP69GAC8lmmfGJPMsDzKh5FEUukM3k1DZfNZ52Qf7347l17bVDhpV/EHZlk+mRfT96UUH9kH08CAA',
@@ -326,4 +330,84 @@ export const site: LoveSiteConfig = {
   ],
   wish: { mode: 'candle' },
   finale: { spell: { line2: 'I love you' } },
+  // TODO(owner): replace every Afterglow placeholder below (Phase 10). Plan: general place only,
+  // never a home address; startsAt needs an explicit offset.
+  afterglow: {
+    gifts: {
+      mode: 'pick-one',
+      items: [
+        {
+          id: 'gift-song',
+          label: 'The lavender one',
+          title: 'A song, only ours',
+          text: 'The next time it plays, wherever we are, the next dance is mine.',
+        },
+        {
+          id: 'gift-plan',
+          label: 'The rose one',
+          title: 'Dinner by the sea',
+          text: 'One evening, just us, the sea and no phones. I have already booked it.',
+          plan: {
+            startsAt: '2026-12-06T18:30:00+05:30',
+            durationMin: 180,
+            place: 'A quiet table by the sea, Colombo',
+            mapsQuery: 'Galle Face Green, Colombo',
+            note: 'Wear something comfortable. I will pick you up at six.',
+          },
+        },
+        {
+          id: 'gift-promise',
+          label: 'The golden one',
+          title: 'A promise',
+          text: 'One whole Sunday, every month, planned entirely by you. I will not complain once.',
+        },
+      ],
+    },
+    openWhen: [
+      {
+        id: 'note-miss',
+        label: 'Open when you miss me',
+        paragraphs: [
+          'Close your eyes for a second. I am probably thinking about you right now too.',
+          'Distance is only the time between one hug and the next. I am already counting.',
+        ],
+      },
+      {
+        id: 'note-sleep',
+        label: 'Open when you can’t sleep',
+        paragraphs: [
+          'Breathe in for four, out for six. Imagine my hand on your back, slow and steady.',
+          'Tomorrow can wait. You are safe, you are loved, and you are doing better than you think.',
+        ],
+      },
+      {
+        id: 'note-hard-day',
+        label: 'Open on a hard day',
+        paragraphs: [
+          'Whatever happened today does not change who you are: kind, brave and wonderfully stubborn.',
+          'Call me. Or don’t, and just read this twice. Either way, I am on your side.',
+        ],
+      },
+      {
+        id: 'note-christmas',
+        label: 'Open on Christmas morning',
+        paragraphs: [
+          'Our first Christmas. I hope there is something warm in your hands and something silly on the radio.',
+          'Thank you for being the best gift of my year.',
+        ],
+        unlockAt: '2026-12-25T00:00:00+05:30',
+      },
+    ],
+    secret: {
+      title: 'You found every heart',
+      paragraphs: [
+        'I hid five little hearts because I knew you would look closely. You always do.',
+        'That is one of my favourite things about you: you notice the small things, and you make me feel seen.',
+        'One year ago this was just the beginning. Here is to every hidden thing we still get to find together.',
+      ],
+    },
+  },
+  hidden: {
+    hint: 'Look near your name, the memories title, the end of our thread, a gallery photo and my signature.',
+  },
 };

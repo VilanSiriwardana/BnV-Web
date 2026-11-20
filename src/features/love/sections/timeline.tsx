@@ -15,6 +15,7 @@ import {
 } from '../engine/timeline-progress';
 import { LovePhoto } from './love-photo';
 import { LoveSection, labelText, sectionTitle } from './love-section';
+import { HiddenHeart } from '../ui/hidden-heart';
 
 type Item = LoveSiteConfig['timeline'][number];
 type Props = { title: string; items: Item[] };
@@ -114,6 +115,7 @@ function ThreadStage({ items }: { items: Item[] }) {
       ref={layer}
       className="absolute inset-0 max-md:top-[clamp(8rem,24svh,11rem)]"
     >
+      <HiddenHeart id="timeline" />
       <svg
         aria-hidden
         viewBox="0 0 100 100"
@@ -232,6 +234,12 @@ function StaticList({ items }: { items: Item[] }) {
           <p className="text-body mt-2 text-pretty">{t.text}</p>
         </li>
       ))}
+      <li className="relative h-6 list-none">
+        <HiddenHeart
+          id="timeline"
+          className="-bottom-4 -left-[calc(1.5rem+23px)] md:-left-[calc(2.5rem+23px)]"
+        />
+      </li>
     </ol>
   );
 }
