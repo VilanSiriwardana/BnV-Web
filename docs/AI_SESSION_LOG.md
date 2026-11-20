@@ -870,3 +870,24 @@ Imported the owner's two specs (`Phase-8-Romance-Additions.md`, `Dance-Clip-Prod
 ### Remaining Work
 
 - Phase 8 starts with `/plan` (ADR-0031–0034 are written in M22, not yet). Owner: start the dance clip (production guide §16) and provide the content in spec §7.
+
+## 2026-11-20 — Love Site Phase 8: look, polish and foundations (blueprint 046)
+
+### Summary
+
+Implemented M22–M27: ADR-0031–0034; optional romance config fields with validation; device-only `persist.ts`; procedural `chime.ts` with a lazy shared `getAudioContext()`; darker look (aurora, gate, depth cap at Deep Plum, grain); heart point size and alpha now scale with the heart (fixes the white small heart) with a scale-aware draw range; bloom 0.8 / 0.45 / 0.28 plus ACES tone mapping and vignette; token-tinted mini and ambient hearts; Bloom line emerging word by word from the burst with petal dimming; `love-primary` / `love-ghost` / `love-link` button variants and an `inline` size; new Finale layout with a quiet music link; Wish medallion as the whole hold target; Letter frame inside a growing sheet with fades, gold scrollbar and scroll hint; full-stage letter backdrop.
+
+### Deviations
+
+- Bloom words are pre-split into spans at render time instead of runtime SplitText (keeps the per-word gradient, no revert needed, one sentence for screen readers).
+- Ambient hearts reduced to 8 on all tiers (constant) rather than 8 on high only.
+
+### Verification
+
+- `tsc --noEmit` clean; `vitest` 24 files / 105 tests pass; `eslint` 0 errors (188 warnings, all in pre-existing `.claude`/`.github` skill scripts).
+- `next build`: first run compiled and failed collecting `/products/[slug]` data (database unreachable); second run failed fetching Google Fonts. Both environmental; not verified as a full build.
+- Not yet checked in a browser or on devices.
+
+### Remaining Work
+
+- Browser pass at 1440 and 375 px with before/after screenshots; tune values (heart alpha at small scales, bloom, vignette); real iPhone and Android; Experience Guidebook section updates to as-built.

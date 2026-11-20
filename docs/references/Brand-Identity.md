@@ -804,6 +804,8 @@ Visual mood: Warm Ivory base, soft lavender identity moments, blush sections, Ch
 
 ### 24.1 Buttons
 
+> **Love Site variants (2026-11-20, Phase 8):** `love-primary` (plum fill, 1 px gold border, Cinzel small caps, soft gold hover glow), `love-ghost` (hairline lavender) and `love-link` (gold text link; use with `size="inline"`) are used only on the private `/love` route. They are additions to `src/components/ui/button.tsx`; shop buttons are unchanged.
+
 Primary buttons:
 
 - use semantic primary

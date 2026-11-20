@@ -41,6 +41,13 @@ const buttonVariants = cva(
           lift,
         ),
         soft: 'bg-primary-soft text-primary-text hover:bg-primary/40',
+        // Love Site (Romance Additions §9.6): premium night buttons.
+        'love-primary':
+          'border-gold/60 bg-background text-gold-text hover:border-gold font-display border tracking-[0.18em] uppercase hover:shadow-[0_0_6px_color-mix(in_oklab,var(--gold)_35%,transparent)] max-sm:w-full',
+        'love-ghost':
+          'border-primary/40 text-primary-text hover:border-primary border bg-transparent',
+        'love-link':
+          'text-gold-text decoration-gold/60 font-medium underline-offset-4 hover:underline',
       },
       size: {
         default: 'h-10 px-5 py-2 has-[>svg]:px-4',
@@ -48,6 +55,7 @@ const buttonVariants = cva(
         lg: 'h-12 px-7 text-base has-[>svg]:px-5',
         icon: 'size-10',
         'icon-sm': 'size-8',
+        inline: 'h-auto gap-1.5 p-0',
       },
     },
     defaultVariants: {

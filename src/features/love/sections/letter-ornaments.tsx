@@ -21,9 +21,9 @@ export function TinyHeart({
 
 // Three depth layers of tiny gold hearts (parallax scrubbed in story.ts buildLetter).
 const LAYERS = [
-  { count: 26, size: [6, 9], opacity: 0.25, blur: 1.5 },
-  { count: 18, size: [9, 13], opacity: 0.4, blur: 0.5 },
-  { count: 10, size: [13, 18], opacity: 0.6, blur: 0 },
+  { count: 26, size: [6, 9], opacity: 0.15, blur: 1.5 },
+  { count: 18, size: [9, 13], opacity: 0.24, blur: 0.5 },
+  { count: 10, size: [13, 18], opacity: 0.36, blur: 0 },
 ] as const;
 
 const HEARTS = LAYERS.map((layer, li) => {
@@ -40,7 +40,8 @@ export function LetterBackdrop() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-y-[-8rem] left-1/2 w-screen -translate-x-1/2 overflow-hidden"
+      // Covers the whole sticky stage (offset by the section padding) with soft edges: no seam.
+      className="pointer-events-none absolute -top-24 left-1/2 h-svh w-screen -translate-x-1/2 overflow-hidden [mask-image:linear-gradient(transparent,#000_12%,#000_88%,transparent)] md:-top-32"
     >
       <div className="love-grain absolute inset-0" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_55%,color-mix(in_oklab,var(--gold)_10%,transparent),transparent_70%)]" />

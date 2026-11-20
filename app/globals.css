@@ -133,8 +133,8 @@
    and Brand §41.6; update together. --depth deepens the night (Love Site Experience §3.1). */
 [data-love-root] {
   --depth: 0;
-  --love-aurora-lav: color-mix(in oklab, var(--night-primary) 35%, transparent);
-  --love-aurora-gold: color-mix(in oklab, var(--night-gold) 30%, transparent);
+  --love-aurora-lav: color-mix(in oklab, var(--night-primary) 14%, transparent);
+  --love-aurora-gold: color-mix(in oklab, var(--night-gold) 10%, transparent);
   --night-background: #17121d;
   --night-foreground: #f7f1ea;
   --night-surface: #241b2e;
@@ -163,13 +163,9 @@
   background:
     radial-gradient(
       ellipse 58% 42% at 50% 33%,
-      color-mix(in oklab, var(--night-primary) 18%, transparent),
+      color-mix(in oklab, var(--night-primary) 12%, transparent),
+      color-mix(in oklab, var(--night-primary) 5%, transparent) 40%,
       transparent 72%
-    ),
-    radial-gradient(
-      ellipse 52% 38% at 8% 78%,
-      color-mix(in oklab, var(--night-secondary) 19%, transparent),
-      transparent 76%
     ),
     radial-gradient(
       ellipse 46% 35% at 94% 88%,
@@ -188,7 +184,8 @@
 [data-love-root] .love-gate-halo {
   background: radial-gradient(
     circle,
-    color-mix(in oklab, var(--night-primary) 15%, transparent),
+    color-mix(in oklab, var(--night-primary) 9%, transparent),
+    color-mix(in oklab, var(--night-primary) 4%, transparent) 40%,
     transparent 68%
   );
 }
@@ -201,7 +198,7 @@
 [data-love-root] .love-grain {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   mix-blend-mode: soft-light;
-  opacity: 0.35;
+  opacity: 0.45;
 }
 
 [data-love-root] .love-parchment {
@@ -214,6 +211,28 @@
   box-shadow:
     0 0 60px -14px color-mix(in oklab, var(--night-gold) 55%, transparent),
     inset 0 0 50px color-mix(in oklab, var(--night-gold) 30%, transparent);
+}
+
+/* Romance Additions §9.5: soft parchment fades at the window edges and a thin gold scrollbar. */
+[data-love-root] .love-parchment[data-letter-card] {
+  mask-image: linear-gradient(
+    transparent,
+    #000 24px,
+    #000 calc(100% - 24px),
+    transparent
+  );
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--night-gold) 70%, transparent)
+    transparent;
+}
+
+[data-love-root] .love-parchment[data-letter-card]::-webkit-scrollbar {
+  width: 6px;
+}
+
+[data-love-root] .love-parchment[data-letter-card]::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--night-gold) 70%, transparent);
 }
 
 [data-love-root] .love-parchment .love-grain {
@@ -246,7 +265,7 @@
 [data-love-root]:not([data-love-motion]) [data-love-section] {
   --night-depth-background: color-mix(
     in oklab,
-    var(--night-surface-elevated) calc(var(--depth) * 100%),
+    var(--night-surface) calc(var(--depth) * 100%),
     var(--night-background)
   );
   --background: var(--night-depth-background);

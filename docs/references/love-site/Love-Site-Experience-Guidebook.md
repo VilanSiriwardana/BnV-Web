@@ -76,7 +76,7 @@
 | "Make another wish" appears at 2 s with the message (spec 4 s)                                                                   | §12             | `sections/wish.tsx`                           |
 | Bloom line triggers at `top 70%` and is centred (spec about 30 %, left on desktop)                                               | §7              | `engine/story.ts`, `sections/bloom.tsx`       |
 | Gate readiness from canvas `onCreated`, ring shows a fixed 35 % (spec drei `useProgress`)                                        | §5              | `sections/gate.tsx`                           |
-| Petals are not dimmed behind the Bloom text column                                                                               | §7              | `canvas/petals.tsx`                           |
+| ~~Petals are not dimmed behind the Bloom text column~~ Closed in Phase 8 (M24): shader dims petals in the text zone              | §7              | `canvas/petals.tsx`                           |
 | `config.test.ts` does not check "exactly 5 timeline items, one featured"                                                         | §3.9            | `config/config.test.ts`                       |
 
 ### 0.5 Release pending (from `docs/AI_SESSION_LOG.md`)

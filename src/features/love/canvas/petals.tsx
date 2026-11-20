@@ -30,6 +30,7 @@ uniform float uRelease;
 uniform float uDrift;
 uniform vec3 uOrigin;
 uniform vec2 uSpan;
+uniform float uMobile;
 varying vec3 vColor;
 varying float vAlpha;
 varying vec2 vUv;
@@ -56,7 +57,10 @@ void main() {
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(world, 1.0);
   vColor = aColor;
-  vAlpha = spawn;
+  // Romance Additions §9.2: dim petals behind the Bloom text (left third; lower third on phones).
+  vec2 ndc = gl_Position.xy / gl_Position.w;
+  float textZone = mix(smoothstep(-0.1, -0.3, ndc.x), smoothstep(-0.2, -0.45, ndc.y), uMobile);
+  vAlpha = spawn * mix(1.0, 0.4, textZone);
   vUv = uv;
 }
 `;
@@ -103,6 +107,7 @@ export function Petals({ tier }: { tier: Tier }) {
           uDrift: { value: 1 },
           uOrigin: { value: new Vector3() },
           uSpan: { value: [8, 7] },
+          uMobile: { value: 0 },
         },
       }),
     [],
@@ -137,6 +142,7 @@ export function Petals({ tier }: { tier: Tier }) {
     mesh.visible = heart.petalRelease > 0.001;
     if (!mesh.visible) return;
     u.uTime.value += delta;
+    u.uMobile.value = state.size.width < 768 ? 1 : 0;
     u.uRelease.value = heart.petalRelease;
     u.uDrift.value = MathUtils.damp(
       u.uDrift.value,

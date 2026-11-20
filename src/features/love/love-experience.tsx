@@ -116,7 +116,11 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
       {debug && HeartDebugPanel && <HeartDebugPanel />}
       <main>
         <Hero name={name} sub={site.copy.heroSub} />
-        <Bloom line={site.copy.bloomLine} />
+        <Bloom
+          line={site.copy.bloomLine}
+          lines={site.copy.bloomLines}
+          emphasis={site.copy.bloomEmphasis}
+        />
         <Memories hint={site.copy.memoriesHint} memories={site.memories} />
         <Timeline title={site.copy.timelineTitle} items={site.timeline} />
         <Starlight line={site.copy.starlightLine} />

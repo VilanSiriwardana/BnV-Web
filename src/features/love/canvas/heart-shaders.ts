@@ -10,10 +10,12 @@ uniform float uTime;
 uniform float uPR;
 uniform float uBeat;
 uniform float uBeatScale;
+uniform float uScale;
 varying vec4 vRand;
 varying float vSide;
 varying float vDiag;
 varying float vForm;
+varying float vBurst;
 
 void main() {
   float f = smoothstep(0.0, 1.0, clamp((uForm - aRand.x * 0.35) / 0.65, 0.0, 1.0));
@@ -31,13 +33,17 @@ void main() {
   p *= 1.0 + uBeat * 0.04 * uBeatScale;
 
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
-  gl_PointSize = aRand.y * uPR * (28.0 / -mv.z) * (1.0 + uBeat * 0.3 * uBeatScale);
+  // Small hearts pack every sprite into a tiny area: shrink them so overlap never clips to white.
+  float size = aRand.y * uPR * (28.0 / -mv.z) * mix(0.45, 1.0, smoothstep(0.15, 1.0, uScale));
+  size *= mix(1.0, 0.55, b) * (1.0 + uBeat * 0.3 * uBeatScale);
+  gl_PointSize = min(size, 6.5 * uPR);
   gl_Position = projectionMatrix * mv;
 
   vRand = aRand;
   vSide = clamp(aHeart.x * 0.5 + 0.5, 0.0, 1.0);
   vDiag = (aHeart.x + aHeart.y) * 0.5;
   vForm = f;
+  vBurst = b;
 }
 `;
 
@@ -51,10 +57,12 @@ uniform float uShine;
 uniform float uBeat;
 uniform float uBeatScale;
 uniform float uGold;
+uniform float uScale;
 varying vec4 vRand;
 varying float vSide;
 varying float vDiag;
 varying float vForm;
+varying float vBurst;
 
 void main() {
   vec2 uv = gl_PointCoord - 0.5;
@@ -80,6 +88,7 @@ void main() {
   float glow = min(uGlow + uBeat * 0.12 * uBeatScale, 1.0);
   vec3 outCol = col * (0.35 + 0.55 * glow) + vec3(0.25) * shine;
   // Additive: keep each sprite dim so overlap never clips to white.
-  gl_FragColor = vec4(min(outCol, vec3(0.9)), alpha * 0.55);
+  alpha *= 0.45 * mix(0.25, 1.0, smoothstep(0.2, 1.0, uScale)) * mix(1.0, 0.7, vBurst);
+  gl_FragColor = vec4(min(outCol, vec3(0.72)), alpha);
 }
 `;

@@ -30,7 +30,7 @@ export type HeartAttributes = {
 };
 
 const RIBBON = { W: 7, r0: 1.1, r1: 0.06, turns: 3.5 };
-const SCATTER_RADIUS = 3;
+const SCATTER_RADIUS = 2.2;
 
 // Sides alternate (even = left, odd = right) so any setDrawRange prefix draws both ribbons.
 export function ribbonSide(i: number): -1 | 1 {

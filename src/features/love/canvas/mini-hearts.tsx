@@ -143,13 +143,38 @@ export function MiniHearts({ tier }: { tier: Tier }) {
         emissive="#ffffff"
         emissiveIntensity={0.15}
         roughness={0.5}
+        onBeforeCompile={tintEmissive}
       />
     </instancedMesh>
   );
 }
 
+// Emissive takes the instance (token) colour instead of white, so hearts never read as neon.
+function tintEmissive(shader: {
+  vertexShader: string;
+  fragmentShader: string;
+}) {
+  shader.vertexShader = shader.vertexShader
+    .replace(
+      'void main() {',
+      'varying vec3 vEmissiveInstanceColor;\nvoid main() {',
+    )
+    .replace(
+      '#include <color_vertex>',
+      '#include <color_vertex>\n#ifdef USE_INSTANCING_COLOR\nvEmissiveInstanceColor = instanceColor.rgb;\n#else\nvEmissiveInstanceColor = vec3(1.0);\n#endif',
+    );
+  shader.fragmentShader = shader.fragmentShader.replace(
+    'void main() {',
+    'varying vec3 vEmissiveInstanceColor;\nvoid main() {',
+  );
+  shader.fragmentShader = shader.fragmentShader.replace(
+    'vec3 totalEmissiveRadiance = emissive;',
+    'vec3 totalEmissiveRadiance = emissive * vEmissiveInstanceColor;',
+  );
+}
+
 // Experience ?19.5: independent twinkles around the frame.
-const AMBIENT = 12;
+const AMBIENT = 8;
 const ambientRand = mulberry32(23);
 const ambient = Array.from({ length: AMBIENT }, (_, i) => ({
   start: i * 350 + ambientRand() * 2000,
@@ -249,28 +274,9 @@ export function AmbientHearts({ tier }: { tier: Tier }) {
     >
       <meshStandardMaterial
         emissive="#ffffff"
-        emissiveIntensity={1.6}
+        emissiveIntensity={0.6}
         roughness={0.5}
-        toneMapped={false}
-        onBeforeCompile={(shader) => {
-          shader.vertexShader = shader.vertexShader
-            .replace(
-              'void main() {',
-              'varying vec3 vEmissiveInstanceColor;\nvoid main() {',
-            )
-            .replace(
-              '#include <color_vertex>',
-              '#include <color_vertex>\n#ifdef USE_INSTANCING_COLOR\nvEmissiveInstanceColor = instanceColor.rgb;\n#else\nvEmissiveInstanceColor = vec3(1.0);\n#endif',
-            );
-          shader.fragmentShader = shader.fragmentShader.replace(
-            'void main() {',
-            'varying vec3 vEmissiveInstanceColor;\nvoid main() {',
-          );
-          shader.fragmentShader = shader.fragmentShader.replace(
-            'vec3 totalEmissiveRadiance = emissive;',
-            'vec3 totalEmissiveRadiance = emissive * vEmissiveInstanceColor;',
-          );
-        }}
+        onBeforeCompile={tintEmissive}
       />
     </instancedMesh>
   );

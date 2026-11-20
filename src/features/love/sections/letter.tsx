@@ -11,6 +11,8 @@ import {
   useState,
 } from 'react';
 
+import { ChevronDown } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils/cn';
@@ -49,6 +51,8 @@ export function Letter({ title, letter }: Props) {
   const { scrollTo } = useLoveScroll();
   const root = useRef<HTMLDivElement>(null);
   const opened = useRef(false);
+  const card = useRef<HTMLElement>(null);
+  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [opening, setOpening] = useState(false);
   const [wrong, setWrong] = useState(false);
@@ -131,6 +135,15 @@ export function Letter({ title, letter }: Props) {
   }, [quiet, contextSafe]);
 
   // story.ts buildLetter dispatches this once she scrolls on without opening (no passphrase).
+  // The scroll hint disappears after the first scroll inside the letter.
+  useEffect(() => {
+    const el = card.current;
+    if (!el) return;
+    const hide = () => setScrolled(true);
+    el.addEventListener('scroll', hide, { once: true, passive: true });
+    return () => el.removeEventListener('scroll', hide);
+  }, []);
+
   useEffect(() => {
     const section = root.current?.closest('section');
     if (!section || letter.passphrase) return;
@@ -200,48 +213,63 @@ export function Letter({ title, letter }: Props) {
             />
           )}
           <article
+            ref={card}
             data-letter-card
             data-lenis-prevent
             aria-hidden={!showOpen}
             className={cn(
-              'love-parchment relative min-h-0 flex-1 overflow-y-auto px-8 py-12 text-left md:px-14 md:py-14',
+              'love-parchment relative min-h-0 flex-1 overflow-y-auto px-8 text-left md:px-14',
               quiet ? 'rounded-lg' : '-my-3',
               !showOpen && 'invisible',
             )}
           >
-            <ParchmentFrame />
-            <div className="relative mx-auto flex max-w-[60ch] flex-col gap-5 text-[1.15rem] leading-relaxed text-pretty break-words md:text-[1.25rem]">
-              {letter.salutation && (
-                <p
-                  data-letter-p
-                  className="font-display text-[1.4rem] md:text-[1.6rem]"
-                >
-                  {letter.salutation}
+            <div
+              data-letter-sheet
+              className="relative min-h-full pt-10 pb-12 md:pt-12 md:pb-14"
+            >
+              <ParchmentFrame />
+              <div className="relative mx-auto flex max-w-[60ch] flex-col gap-5 text-[1.15rem] leading-relaxed text-pretty break-words md:text-[1.25rem]">
+                {letter.salutation && (
+                  <p
+                    data-letter-p
+                    className="font-display text-[1.4rem] md:text-[1.6rem]"
+                  >
+                    {letter.salutation}
+                  </p>
+                )}
+                {first && (
+                  <p
+                    data-letter-p
+                    className="first-letter:font-display first-letter:text-gold-text first-letter:float-left first-letter:mr-2 first-letter:text-[3.4em] first-letter:leading-[0.85]"
+                  >
+                    {first}
+                  </p>
+                )}
+                <div data-letter-p>
+                  <HeartDivider />
+                </div>
+                {rest.map((p, i) => (
+                  <p key={i} data-letter-p>
+                    {p}
+                  </p>
+                ))}
+                <div data-letter-p className="mt-4">
+                  <HeartDivider />
+                </div>
+                <p data-letter-p className="text-right italic">
+                  {letter.signoff}
                 </p>
-              )}
-              {first && (
-                <p
-                  data-letter-p
-                  className="first-letter:font-display first-letter:text-gold-text first-letter:float-left first-letter:mr-2 first-letter:text-[3.4em] first-letter:leading-[0.85]"
-                >
-                  {first}
-                </p>
-              )}
-              <div data-letter-p>
-                <HeartDivider />
               </div>
-              {rest.map((p, i) => (
-                <p key={i} data-letter-p>
-                  {p}
-                </p>
-              ))}
-              <div data-letter-p className="mt-4">
-                <HeartDivider />
-              </div>
-              <p data-letter-p className="text-right italic">
-                {letter.signoff}
-              </p>
             </div>
+            {!quiet && !scrolled && (
+              <span
+                aria-hidden
+                data-letter-hint
+                className="text-gold sticky bottom-8 left-1/2 block h-0 w-fit -translate-x-1/2 animate-bounce motion-reduce:animate-none"
+              >
+                <ChevronDown className="size-5" />
+              </span>
+            )}
           </article>
           {!quiet && (
             <div
@@ -301,7 +329,13 @@ export function Letter({ title, letter }: Props) {
                     aria-invalid={wrong || undefined}
                     aria-describedby={`${passId}-msg`}
                   />
-                  <Button type="submit">Open</Button>
+                  <Button
+                    type="submit"
+                    variant="love-primary"
+                    className="max-sm:w-auto"
+                  >
+                    Open
+                  </Button>
                 </div>
                 <p
                   id={`${passId}-msg`}

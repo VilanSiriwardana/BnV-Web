@@ -15,6 +15,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Keep the dev badge clear of the Love Site Calm toggle (bottom-left).
+  devIndicators: { position: 'bottom-right' },
   // The private birthday page is previewed through this development tunnel.
   allowedDevOrigins:
     process.env.NODE_ENV === 'development'

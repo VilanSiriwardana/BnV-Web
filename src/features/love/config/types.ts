@@ -24,6 +24,15 @@ export type LoveSiteConfig = {
     wishDone: string;
     letterTitle: string;
     finaleMessage: string;
+    bloomLines?: [string, string, string];
+    bloomEmphasis?: string;
+    reasonsTitle?: string;
+    reasonsHint?: string;
+    skyHint?: string;
+    skyDone?: string;
+    blowHint?: string;
+    afterglowTitle?: string;
+    afterglowIntro?: string;
   };
   memories: {
     id: string;
@@ -48,6 +57,36 @@ export type LoveSiteConfig = {
     paragraphs: string[];
     signoff: string;
     passphrase?: string;
+    voice?: { src: string; transcript: string; label?: string };
   };
   music: { src: string; credit: string };
+  reasons?: string[];
+  wish?: { mode?: 'candle' | 'star' };
+  finale?: { spell?: { line1?: string; line2?: string } };
+  afterglow?: {
+    gifts?: {
+      mode: 'pick-one' | 'open-all';
+      items: {
+        id: string;
+        label: string;
+        title: string;
+        text: string;
+        plan?: {
+          startsAt: string;
+          durationMin: number;
+          place: string;
+          mapsQuery?: string;
+          note?: string;
+        };
+      }[];
+    };
+    openWhen?: {
+      id: string;
+      label: string;
+      paragraphs: string[];
+      unlockAt?: string;
+    }[];
+    secret?: { title: string; paragraphs: string[]; photo?: PhotoRef };
+  };
+  hidden?: { hint: string };
 };

@@ -14,6 +14,23 @@ describe('love site config', () => {
     expect(site.gallery.length).toBeLessThanOrEqual(12);
   });
 
+  it('validates optional romance fields', () => {
+    if (site.reasons) expect(site.reasons).toHaveLength(12);
+    const gifts = site.afterglow?.gifts;
+    if (gifts) {
+      expect(gifts.items).toHaveLength(3);
+      if (gifts.mode !== 'open-all')
+        expect(gifts.items.filter((g) => g.plan).length).toBeLessThanOrEqual(1);
+    }
+    if (site.letter.voice)
+      expect(site.letter.voice.transcript.trim()).not.toBe('');
+    const notes = site.afterglow?.openWhen;
+    if (notes) {
+      expect(notes.length).toBeGreaterThanOrEqual(3);
+      expect(notes.length).toBeLessThanOrEqual(5);
+    }
+  });
+
   it('looks up by slug only', () => {
     expect(getLoveSite(site.slug)).toBe(site);
     expect(getLoveSite('wrong-slug')).toBeUndefined();

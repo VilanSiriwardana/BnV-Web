@@ -115,27 +115,98 @@ const buildBloom: SectionBuilder = (root, mobile) => {
     )
     .to(heart, { cameraZ: 6, duration: 0.5, ease: 'sine.inOut' }, 0.5);
 
+  const line = bloom.querySelector<HTMLElement>('[data-bloom-line]');
+  const words = line ? buildBloomWords(line) : null;
+
   ScrollTrigger.create({
     trigger: bloom,
     start: 'top 60%',
-    onEnter: () => director.play('burstReform', { petals: true }),
+    onEnter: () => {
+      director.play('burstReform', { petals: true });
+      words?.restart();
+    },
     onEnterBack: () => director.settle(),
   });
-
-  const line = bloom.querySelector('[data-bloom-line]');
-  if (line)
-    gsap.from(line, {
-      y: 16,
-      autoAlpha: 0,
-      duration: 0.4,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: bloom,
-        start: 'top 70%',
-        toggleActions: 'play none none reverse',
-      },
-    });
+  if (!line || !words) return;
+  // Above the burst again: fully hidden, ready to replay (never half-animated).
+  ScrollTrigger.create({
+    trigger: bloom,
+    start: 'top 80%',
+    onLeaveBack: () => words.pause(0),
+  });
+  gsap.to(line, {
+    x: -24,
+    autoAlpha: 0,
+    ease: 'none',
+    immediateRender: false,
+    scrollTrigger: {
+      trigger: bloom,
+      start: 'bottom 60%',
+      end: 'bottom top',
+      scrub: 0.6,
+    },
+  });
+  return () => words.kill();
 };
+
+// Romance Additions §9.2: words travel out of the burst (the heart's screen point) to their places.
+function buildBloomWords(line: HTMLElement) {
+  const words = gsap.utils.toArray<HTMLElement>('[data-bloom-word]', line);
+  const emphasis = line.querySelector('[data-bloom-emphasis]');
+  const underline = line.querySelector('[data-bloom-underline]');
+  const rule = line.querySelector('[data-bloom-rule]');
+  const from = (el: HTMLElement) => {
+    const r = el.getBoundingClientRect();
+    const hx = ((heart.ndc.x + 1) / 2) * window.innerWidth;
+    const hy = ((1 - heart.ndc.y) / 2) * window.innerHeight;
+    return { x: hx - (r.left + r.width / 2), y: hy - (r.top + r.height / 2) };
+  };
+  gsap.set([...words, rule].filter(Boolean), { autoAlpha: 0 });
+  gsap.set(underline, { strokeDasharray: 1, strokeDashoffset: 1 });
+  return gsap
+    .timeline({ paused: true })
+    .set(line, { x: 0, autoAlpha: 1 })
+    .set(words, { autoAlpha: 0 })
+    .set(underline, { strokeDasharray: 1, strokeDashoffset: 1 })
+    .fromTo(rule, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.6 }, 0.2)
+    .fromTo(
+      words,
+      {
+        x: (_, el: HTMLElement) => from(el).x,
+        y: (_, el: HTMLElement) => from(el).y,
+        scale: 0.6,
+        rotation: () => gsap.utils.random(-8, 8),
+        autoAlpha: 0,
+        filter: 'blur(6px)',
+      },
+      {
+        x: 0,
+        y: 0,
+        scale: 1,
+        rotation: 0,
+        autoAlpha: 1,
+        filter: 'blur(0px)',
+        duration: 1.1,
+        ease: 'power3.out',
+        stagger: 0.14,
+        clearProps: 'filter,willChange',
+        willChange: 'transform',
+        immediateRender: false,
+      },
+      0.35,
+    )
+    .fromTo(
+      emphasis,
+      { letterSpacing: '-0.05em' },
+      { letterSpacing: '0.02em', duration: 0.9, ease: 'power2.out' },
+      2,
+    )
+    .to(
+      underline,
+      { strokeDashoffset: 0, duration: 0.9, ease: 'power2.inOut' },
+      2.4,
+    );
+}
 // Experience §8: heart settles low, then the camera flies the rail through the orbs.
 const buildMemories: SectionBuilder = (root, mobile) => {
   const el = root.querySelector<HTMLElement>('#memories');

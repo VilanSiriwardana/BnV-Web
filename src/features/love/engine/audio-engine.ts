@@ -71,6 +71,29 @@ function onVisibility() {
   }
 }
 
+function ensureContext() {
+  if (!ctx) {
+    const AC =
+      window.AudioContext ??
+      (window as unknown as { webkitAudioContext: typeof AudioContext })
+        .webkitAudioContext;
+    ctx = new AC();
+  }
+  return ctx;
+}
+
+// Shared context for chimes and voice; null before the gate tap (no audio before a gesture).
+export function getAudioContext(): AudioContext | null {
+  if (!started) return null;
+  try {
+    const c = ensureContext();
+    if (c.state === 'suspended' && !document.hidden) void c.resume();
+    return c;
+  } catch {
+    return null;
+  }
+}
+
 // Must be called synchronously inside the tap handler (iOS unlock).
 function start(src: string) {
   if (started) return;
@@ -79,11 +102,7 @@ function start(src: string) {
   document.addEventListener('visibilitychange', onVisibility);
   if (!src) return fail();
   try {
-    const AC =
-      window.AudioContext ??
-      (window as unknown as { webkitAudioContext: typeof AudioContext })
-        .webkitAudioContext;
-    ctx = new AC();
+    ctx = ensureContext();
     el = new Audio(src);
     el.loop = true;
     el.preload = 'auto';

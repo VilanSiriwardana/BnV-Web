@@ -83,8 +83,8 @@ export const HEART_PATH: Record<SectionId, PathEntry> = {
     glow: 0.4,
   },
   finale: {
-    desktop: { x: 0, y: 0.05, scale: 1.3 },
-    mobile: { x: 0, y: 0.15, scale: 1 },
+    desktop: { x: 0, y: 0.25, scale: 1.1 },
+    mobile: { x: 0, y: 0.3, scale: 0.9 },
     gold: 0.6,
     glow: 0.7,
   },

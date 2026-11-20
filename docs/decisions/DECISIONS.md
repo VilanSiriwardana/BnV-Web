@@ -562,3 +562,57 @@ Each decision should include:
 - Consequences: Becomes Accepted once the track and licence are confirmed.
 - Related Documents:
   - [../references/love-site/Love-Site-Experience-Guidebook.md](../references/love-site/Love-Site-Experience-Guidebook.md)
+
+## ADR-0031 - Love Site Section Order: Reasons and Afterglow
+
+- Status: Accepted
+- Date: 2026-11-20
+- Context: The Romance Additions add a Reasons ring and a quiet Afterglow room without lengthening the main path more than needed.
+- Decision:
+  - Reasons sits after Dance and before Wish (250 vh sticky stage).
+  - Afterglow sits after Finale in natural flow (not pinned), reached by scrolling or a quiet Finale link.
+  - Starlight becomes "Our sky" (stage 220 vh). No other section moves.
+- Alternatives: Reasons after the Letter (breaks the build-up to intimacy); Afterglow as a separate route (loses the heart and Replay).
+- Consequences: `SECTION_IDS`, `HEART_PATH`, the theme `STEPS` and the story builders gain two entries; main journey grows to about 7–8 minutes.
+- Related Documents:
+  - [../references/love-site/Love-Site-Romance-Additions.md](../references/love-site/Love-Site-Romance-Additions.md)
+
+## ADR-0032 - Love Site Device-Only Persistence
+
+- Status: Accepted
+- Date: 2026-11-20
+- Context: Hidden hearts found, gifts and notes opened, and the completed sky should survive a refresh on her device.
+- Decision:
+  - A tiny wrapper (`src/features/love/engine/persist.ts`) over `localStorage`, keys prefixed `love:<slug>:`, every access in `try/catch`.
+  - Nothing is sent anywhere; no personal text is stored. Replay does not clear it.
+- Alternatives: In-memory only (progress lost on refresh); server storage (needs accounts and a backend for a private gift).
+- Consequences: Every feature must render correctly with storage empty or blocked.
+- Related Documents:
+  - [../references/love-site/Love-Site-Romance-Additions.md](../references/love-site/Love-Site-Romance-Additions.md)
+
+## ADR-0033 - Love Site Microphone Use and Privacy
+
+- Status: Proposed (accepted after the Phase 9 blow-detector spike on real devices)
+- Date: 2026-11-20
+- Context: The candle wish lets her blow out a candle using the microphone.
+- Decision:
+  - The microphone is requested only after an explicit tap, analysed in memory for loudness and spectrum, never recorded, stored or sent.
+  - A visible "Listening…" indicator shows while it is live; tracks stop on success, section leave, tab hidden, unmount, error and Calm mode.
+  - Hold and tap alternatives are always available.
+- Alternatives: No microphone (hold only).
+- Consequences: Thresholds must be tuned on an iPhone and an Android before acceptance.
+- Related Documents:
+  - [../references/love-site/Love-Site-Romance-Additions.md](../references/love-site/Love-Site-Romance-Additions.md)
+
+## ADR-0034 - Love Site Dance as a Pre-Rendered Frame Sequence
+
+- Status: Proposed (accepted when the final clip passes QA in Phase 11)
+- Date: 2026-11-20
+- Context: Generated particle silhouettes cannot reach believable partner contact (hands, spin, dip).
+- Decision:
+  - The Dance plays a pre-made couple clip (AI-generated stylised 3D, exact likenesses with consent) as WebP frames drawn to a 2D canvas, scrubbed by scroll.
+  - Desktop and mobile frame sets, posters as fallback; the particle dancers are removed after QA.
+- Alternatives: Keep the particle dancers; `<video>` scrubbing (unreliable seeking on mobile); a 3D render with mocap (needs a 3D artist).
+- Consequences: Adds about 4–5 MB (desktop) / 2.5 MB (mobile) of frames loaded after the gate.
+- Related Documents:
+  - [../references/love-site/Dance-Clip-Production-Guide.md](../references/love-site/Dance-Clip-Production-Guide.md)

@@ -2,7 +2,13 @@
 
 import { PerformanceMonitor, Stats } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Bloom, EffectComposer } from '@react-three/postprocessing';
+import {
+  Bloom,
+  EffectComposer,
+  ToneMapping,
+  Vignette,
+} from '@react-three/postprocessing';
+import { ToneMappingMode } from 'postprocessing';
 import { Suspense } from 'react';
 
 import type { LoveSiteConfig } from '../config';
@@ -79,7 +85,9 @@ export default function LoveCanvas({
       <Confetti tier={tier} />
       {config.bloom !== 'off' && (
         <EffectComposer multisampling={0}>
-          <NightBloom base={config.bloom === 'on' ? 0.7 : 0.4} />
+          <NightBloom base={config.bloom === 'on' ? 0.45 : 0.28} />
+          <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
+          <Vignette offset={0.3} darkness={0.5} />
         </EffectComposer>
       )}
       {debug && <Stats />}
@@ -89,7 +97,7 @@ export default function LoveCanvas({
 }
 
 function NightBloom({ base }: { base: number }) {
-  return <Bloom mipmapBlur luminanceThreshold={0.6} intensity={base} />;
+  return <Bloom mipmapBlur luminanceThreshold={0.8} intensity={base} />;
 }
 
 function RenderStatsProbe() {

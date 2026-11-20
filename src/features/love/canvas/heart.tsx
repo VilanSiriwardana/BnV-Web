@@ -21,7 +21,7 @@ import { heartFragment, heartVertex } from './heart-shaders';
 import { readTokenColors } from './token-colors';
 
 const MAX_PARTICLES = TIERS.high.particles;
-const { damp } = MathUtils;
+const { clamp, damp } = MathUtils;
 const depthPoint = new Vector3();
 const SNAP_DISTANCE = 10;
 // The heart's world centre, for effects that live outside its group (arrow, ring, orbs).
@@ -62,6 +62,7 @@ export function Heart({ tier, onTap, children }: Props) {
         uShine: { value: 0 },
         uGlow: { value: heart.glow },
         uGold: { value: 0 },
+        uScale: { value: 1 },
         uColorLav: { value: c?.primary.night },
         uColorLilac: { value: c?.['primary-hover'].night },
         uColorGold: { value: c?.gold.night },
@@ -70,8 +71,10 @@ export function Heart({ tier, onTap, children }: Props) {
     });
   }, []);
 
+  const drawn = useRef(0);
   useEffect(() => {
-    geometry.setDrawRange(0, TIERS[tier].particles);
+    drawn.current = TIERS[tier].particles;
+    geometry.setDrawRange(0, drawn.current);
   }, [geometry, tier]);
 
   const materialRef = useRef(material);
@@ -138,6 +141,13 @@ export function Heart({ tier, onTap, children }: Props) {
     heartWorld.copy(g.position);
     const s = heart.scale * (1 + heart.idleScale + heart.flinch);
     g.scale.setScalar(damp(g.scale.x, s, 8, delta));
+    u.uScale.value = g.scale.x;
+    // A small heart needs fewer sprites; any prefix stays balanced (ribbonSide alternates).
+    const n = Math.round(TIERS[tier].particles * clamp(g.scale.x, 0.25, 1));
+    if (n !== drawn.current) {
+      drawn.current = n;
+      geometry.setDrawRange(0, n);
+    }
     g.rotation.y = damp(g.rotation.y, heart.yaw, 4, delta);
     g.rotation.z = heart.roll;
   });

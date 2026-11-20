@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { director } from '../engine/heart-director';
 import { HEART_EVENTS } from '../engine/heart-director-core';
+import { SECTION_IDS } from '../engine/heart-path';
 import { heart } from '../engine/heart-state';
 import { useMotionPrefs } from '../engine/motion-prefs';
 import { useLoveScroll } from '../engine/scroll-engine';
@@ -11,19 +12,6 @@ import { renderStats } from '../engine/render-stats';
 import { resetSession } from '../engine/session';
 import { useTier } from '../engine/tier-provider';
 import { TIER_ORDER } from '../engine/tiers';
-
-const SECTIONS = [
-  'hero',
-  'bloom',
-  'memories',
-  'timeline',
-  'starlight',
-  'gallery',
-  'dance',
-  'wish',
-  'letter',
-  'finale',
-];
 
 const button =
   'rounded-sm border border-border px-2 py-1 hover:bg-primary-soft aria-pressed:bg-primary aria-pressed:text-primary-foreground';
@@ -48,7 +36,7 @@ export default function HeartDebugPanel() {
 
   useEffect(() => {
     const target = new URLSearchParams(window.location.search).get('s');
-    if (!target || !SECTIONS.includes(target)) return;
+    if (!target || !(SECTION_IDS as readonly string[]).includes(target)) return;
     const id = window.setTimeout(
       () => scrollTo(`#${target}`, { immediate: true }),
       300,
@@ -85,7 +73,7 @@ export default function HeartDebugPanel() {
       </button>
       <p className="mb-1 font-semibold">Jump</p>
       <div className="mb-3 flex flex-wrap gap-1">
-        {SECTIONS.map((s) => (
+        {SECTION_IDS.map((s) => (
           <button
             key={s}
             type="button"

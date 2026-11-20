@@ -33,7 +33,7 @@ void main() {
   float ax = abs(p.x), ay = abs(p.y);
   float star = max(0.0, 1.0 - (ax * ay * 60.0 + r * 1.6));
   star = pow(star, 1.6);
-  float halo = smoothstep(1.0, 0.0, r) * mix(0.2, 1.0, uHold) * 0.7;
+  float halo = smoothstep(1.0, 0.0, r) * mix(0.2, 1.0, uHold) * 0.49;
   float twinkle = 0.9 + 0.1 * sin(uTime * 3.0);
   vec3 col = mix(uGold, uIvory, star * 0.35);
   float a = clamp(star * (0.7 + 0.5 * uHold) * twinkle + halo, 0.0, 1.0);

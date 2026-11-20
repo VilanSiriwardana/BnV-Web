@@ -1,9 +1,13 @@
 'use client';
 
+import { RotateCcw } from 'lucide-react';
+import type { ReactNode } from 'react';
+
 import { Button } from '@/components/ui/button';
 
 import { useMusicToggle } from '../ui/music-toggle';
 import { QuietHeart } from '../ui/static-heart';
+import { TinyHeart } from './letter-ornaments';
 import {
   LoveSection,
   labelText,
@@ -16,43 +20,64 @@ type Props = {
   message: string;
   credit: string;
   onReplay: () => void;
+  children?: ReactNode;
 };
 
-// Experience §14. The heart, finaleBurst and the Replay reset are driven from story.ts and
-// love-experience.tsx; this is the DOM only.
-export function Finale({ name, message, credit, onReplay }: Props) {
+// Experience §14, Romance Additions §9.6. The heart sits high (HEART_PATH.finale) and its zone
+// stays clear of text; finaleBurst and Replay are driven from story.ts and love-experience.tsx.
+export function Finale({ name, message, credit, onReplay, children }: Props) {
   const { muted, toggle } = useMusicToggle();
   return (
     <LoveSection
       id="finale"
       depth={0.5}
       stage="100vh"
-      className="flex min-h-svh items-center"
+      className="flex min-h-svh flex-col items-center justify-end pb-[10svh]"
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute top-1/2 left-1/2 -z-10 size-[min(90vw,40rem)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,var(--love-aurora-gold)_0%,var(--love-aurora-lav)_40%,transparent_70%)]"
+        className="pointer-events-none absolute top-[28%] left-1/2 -z-10 size-[min(70vw,28rem)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,var(--love-aurora-gold)_0%,var(--love-aurora-lav)_35%,transparent_62%)] opacity-60"
       />
       <QuietHeart glow className="mb-10 size-40 md:size-52" />
-      <h2 id="finale-title" className={sectionTitle}>
-        Happy birthday, <span className="text-primary">{name}</span>.
-      </h2>
-      <p className={`${proseColumn} mt-6`}>{message}</p>
-      <div className="mt-10 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-        <Button size="lg" className="w-full sm:w-auto" onClick={onReplay}>
+      <div className="relative flex w-full flex-col items-center">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-[-10%] -inset-y-12 -z-10 bg-[radial-gradient(ellipse_at_center,color-mix(in_oklab,var(--background)_70%,transparent)_0%,transparent_70%)]"
+        />
+        <h2 id="finale-title" className={sectionTitle}>
+          Happy birthday, <span className="text-primary">{name}</span>.
+        </h2>
+        <p className={`${proseColumn} mt-6 italic`}>{message}</p>
+        <div
+          aria-hidden
+          className="text-gold-text mt-8 flex w-40 items-center gap-3"
+        >
+          <span className="bg-gold/50 h-px flex-1" />
+          <TinyHeart className="size-3" />
+          <span className="bg-gold/50 h-px flex-1" />
+        </div>
+        <Button
+          variant="love-primary"
+          size="lg"
+          className="mt-6"
+          onClick={onReplay}
+        >
+          <RotateCcw aria-hidden />
           Replay our story
         </Button>
-        <Button
-          size="lg"
-          variant="secondary"
-          className="w-full sm:w-auto"
-          aria-pressed={!muted}
-          onClick={toggle}
-        >
-          {muted ? 'Music on' : 'Music off'}
-        </Button>
+        <div className="mt-4 flex flex-col items-center gap-3">
+          <Button
+            variant="love-link"
+            size="inline"
+            aria-pressed={!muted}
+            onClick={toggle}
+          >
+            ♪ Music {muted ? 'on' : 'off'}
+          </Button>
+          {children}
+        </div>
+        {credit && <p className={`${labelText} mt-8`}>Music: {credit}</p>}
       </div>
-      {credit && <p className={`${labelText} mt-8`}>Music: {credit}</p>}
     </LoveSection>
   );
 }
