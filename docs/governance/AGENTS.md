@@ -66,9 +66,9 @@ This project uses seven workflow artifacts. Each answers a different question; d
 ## Repository Structure
 
 - `app/`: Next.js App Router routes, layouts, global CSS, and page modules.
-- `public/`: public static assets (currently the default `create-next-app` placeholders).
-- `src/`: planned location for centralized config/lib code; does not exist yet (VERIFIED 2026-10-28).
-- `prisma/`: multi-file Prisma schema under `schema/` (ADR-0016), migrations under `migrations/` (5 as of 2026-10-28: `init` through `004_commerce_domain`), and seeders under `seed/` (ADR-0015). `prisma.config.ts` lives at the repository root.
+- `public/`: public static assets — now includes `images/` and `audio/` alongside the original SVG placeholders (VERIFIED 2026-11-20).
+- `src/`: the application source tree (VERIFIED 2026-11-20, built out since Phase 1 — supersedes the 2026-10-28 "does not exist yet" note). Contains `components/` (incl. `ui/` shadcn/radix, `motion/`, `forms/`), `features/` (per-feature Server Actions, schemas, views — incl. `love/`), `lib/` (`prisma*.ts` data access, `auth/`, `forms/`, `seo/`, `cloudinary.ts`, `consent.ts`, `utils/`), `config/`, `constants/`, `data/`, and `types/`. See [../references/System-Map.md](../references/System-Map.md) for the full layout.
+- `prisma/`: multi-file Prisma schema under `schema/` (ADR-0016), migrations under `migrations/` (**8 as of 2026-11-20**: `20260721…_init` through `20261029…_admin_dispatch_and_reference_images`), and seeders under `seed/` (ADR-0015). `prisma.config.ts` lives at the repository root.
 - `docker/`: empty `postgres/` folder kept from the Docker era; `docker-compose.yml` is an empty `services: {}` placeholder (ADR-0010).
 - `docs/governance/`: AI governance, roadmap, progress, and decision index.
 - `docs/references/`: authoritative project reference documents.
@@ -101,12 +101,14 @@ Verified from repository files:
 - ORM: Prisma `7.8.0`.
 - Local services: native PostgreSQL 16 + pgAdmin 4 (ADR-0010).
 - Package manager: npm.
-- Installed in `package.json` but not yet imported by any code (VERIFIED 2026-10-28): `next-themes`, `lucide-react`, `clsx`, `tailwind-merge`, `class-variance-authority`, `framer-motion`, `zod`, `tsx` (dev). Do not re-request approval to install these.
+- Auth: NextAuth (Auth.js) `5.0.0-beta.32` with `bcryptjs`. Media: Cloudinary `2.x` (signed uploads). These are in active use (VERIFIED 2026-11-20).
+- The dependencies previously listed as "installed but not yet imported" (`next-themes`, `lucide-react`, `clsx`, `tailwind-merge`, `class-variance-authority`, `framer-motion`, `zod`, `tsx`) are **now imported and in active use** across `src/` (VERIFIED 2026-11-20, supersedes the 2026-10-28 note). Do not re-request approval to install these.
+- Love Site (`/love`) stack — `three`, `@react-three/fiber` (v9), `@react-three/drei`, `@react-three/postprocessing` + `postprocessing`, `gsap` + `@gsap/react`, `lenis` — is installed and used only under `src/features/love/`. Full version mapping: [../references/System-Map.md](../references/System-Map.md) §4.
 - `node_modules/` may be absent on a fresh checkout (it was on 2026-10-28). Run `npm install` (approval required) before relying on `node_modules/next/dist/docs/` or Prisma CLI commands. `npx prisma …` without a local install downloads an unpinned Prisma version, so do not use it as a substitute.
 
 ### Prisma Schema Source of Truth (Critical Invariant)
 
-- `prisma.config.ts` sets `schema: 'prisma/schema'`, a **folder** (multi-file schema, ADR-0016). Prisma loads every `.prisma` file in `prisma/schema/`: `schema.prisma` (generator and datasource only), `identity.prisma`, `catalog.prisma`, `products.prisma`, `commerce.prisma`.
+- `prisma.config.ts` sets `schema: 'prisma/schema'`, a **folder** (multi-file schema, ADR-0016). Prisma loads every `.prisma` file in `prisma/schema/`: `schema.prisma` (generator and datasource only), `identity.prisma`, `catalog.prisma`, `products.prisma`, `commerce.prisma`, `inquiries.prisma`, `settings.prisma` (last two added since 2026-10-28; VERIFIED 2026-11-20).
 - Those files are the only schema source for migrations and the client. Put new models in the file for their domain (or a new domain file in the same folder). Keep `generator` and `datasource` only in `schema.prisma`. Run `npm run db:validate` after every edit.
 - The former `prisma/models/` copies (never read by Prisma) were deleted on 2026-10-28. Never put `.prisma` files outside `prisma/schema/`: Prisma will not read them.
 
@@ -159,22 +161,23 @@ Use [../references/Brand-Identity.md](../references/Brand-Identity.md) for the d
 
 ## Design Skills
 
-Installed: Impeccable (project, `.claude/skills/impeccable`, with design hook), Emil Kowalski skills and Taste Skill (`design-taste-frontend`) at user level. Setup: [../references/Design_Skills_Setup.md](../references/Design_Skills_Setup.md) (ADR-0022). Context files: `PRODUCT.md` and `DESIGN.md` at the repo root; load them only for UI tasks. [../references/Brand-Identity.md](../references/Brand-Identity.md) wins where `DESIGN.md` disagrees.
+Installed: Impeccable (project, `.claude/skills/impeccable`, with design hook) and the official **GSAP skills** (project, `.claude/skills/gsap-*`: `gsap-core`, `gsap-scrolltrigger`, `gsap-timeline`, `gsap-react`, `gsap-plugins`, `gsap-performance`, `gsap-utils`, `gsap-frameworks`); Emil Kowalski skills and Taste Skill (`design-taste-frontend`) at user level. Setup: [../references/Design_Skills_Setup.md](../references/Design_Skills_Setup.md) (ADR-0022). Context files: `PRODUCT.md` and `DESIGN.md` at the repo root; load them only for UI tasks. [../references/Brand-Identity.md](../references/Brand-Identity.md) wins where `DESIGN.md` disagrees. For Love Site (`/love`) scroll/3D animation work, see also [../references/love-site/Love-Site-Tech-Stack-and-Tools.md](../references/love-site/Love-Site-Tech-Stack-and-Tools.md) §10 and the GSAP skills row below.
 
 Call skills by name; roles do not overlap:
 
-| Job                             | Skill                                                                          |
-| ------------------------------- | ------------------------------------------------------------------------------ |
-| Project context / design system | Impeccable `init`, `document`                                                  |
-| New app screen or section       | Impeccable                                                                     |
-| New landing or marketing page   | Taste Skill (expensive; ask first)                                             |
-| Diagnose an existing page       | Impeccable `critique`, then `audit`                                            |
-| Refine an existing page         | Impeccable `polish`, `typeset`, `layout`, `quieter`                            |
-| Build motion                    | Emil `animate`                                                                 |
-| Review or audit motion          | Emil `review-animations`, `improve-animations`, `find-animation-opportunities` |
-| Janky motion                    | Emil `animation-performance`                                                   |
-| Stress test                     | Emil `break-ui`                                                                |
-| Mobile web feel                 | Emil `mobile-native`                                                           |
+| Job                                                                | Skill                                                                                                             |
+| ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| Project context / design system                                    | Impeccable `init`, `document`                                                                                     |
+| New app screen or section                                          | Impeccable                                                                                                        |
+| New landing or marketing page                                      | Taste Skill (expensive; ask first)                                                                                |
+| Diagnose an existing page                                          | Impeccable `critique`, then `audit`                                                                               |
+| Refine an existing page                                            | Impeccable `polish`, `typeset`, `layout`, `quieter`                                                               |
+| Build motion (DOM)                                                 | Emil `animate`                                                                                                    |
+| Scroll-driven / 3D animation (Love Site: GSAP, ScrollTrigger, R3F) | GSAP skills: `gsap-core`, `gsap-scrolltrigger`, `gsap-timeline`, `gsap-react`, `gsap-plugins`, `gsap-performance` |
+| Review or audit motion                                             | Emil `review-animations`, `improve-animations`, `find-animation-opportunities`                                    |
+| Janky motion                                                       | Emil `animation-performance`                                                                                      |
+| Stress test                                                        | Emil `break-ui`                                                                                                   |
+| Mobile web feel                                                    | Emil `mobile-native`                                                                                              |
 
 Rules:
 
@@ -328,6 +331,7 @@ Before implementation, read:
 
 Then read only the specific reference document needed for the task:
 
+- Orientation — what exists in the full system, the tech-stack-to-code mapping, and which reference to open: [../references/System-Map.md](../references/System-Map.md)
 - Any Phase 1 feature, route, schema, or navigation work: first check [../references/Phase-1-Reconciled-Decisions.md](../references/Phase-1-Reconciled-Decisions.md); if the topic is listed there and still PROPOSED, ask before choosing an option
 - Phase scope and build order: [../references/Phase-Development.md](../references/Phase-Development.md) and [../references/Phase-1-Step-by-Step.md](../references/Phase-1-Step-by-Step.md)
 - Brand/design work: [../references/Brand-Identity.md](../references/Brand-Identity.md)
@@ -381,6 +385,7 @@ Reference documents in `../references/` describe approved strategy, design, and 
 - [Research and Prototype Audit](../references/Research_and_Prototype.md)
 - [Authentication](../references/Authentication.md)
 - [Hosting and Deployment](../references/Hosting_Deployment.md)
+- [System Map (full system + tech-stack mapping)](../references/System-Map.md)
 - [Reference Library Index](../references/README.md)
 - [Architecture Index](../architecture/README.md)
 - [ADR Directory](../decisions/DECISIONS.md)
@@ -401,6 +406,8 @@ Reference documents in `../references/` describe approved strategy, design, and 
 
 ## AGENTS.md Changelog
 
+- 2026-11-20 (love-site update-audit): Recorded the installed GSAP skills (`.claude/skills/gsap-*`) in the Design Skills section and added a Scroll-driven/3D animation row pointing Love Site animation work at them and at the love Tech Stack guide §10. Reconciled `references/Technology-Stack.md` install-status drift (Zod, NextAuth, Framer Motion, next-themes, Lucide, Cloudinary now VERIFIED installed; Vitest is the test framework; `typecheck`/`test` scripts exist; brand fonts are Cinzel/Cormorant/Inter). Noted the GSAP skills as installed in the love Tech Stack guide §10.
+- 2026-11-20 (map + reconcile audit): Added [../references/System-Map.md](../references/System-Map.md) (full-system + tech-stack mapping) to the reference map. Reconciled stale 2026-10-28 facts against current source: `src/` now exists and is fully built out; `public/` has `images/` and `audio/`; migrations are now 8 (through `admin_dispatch_and_reference_images`); schema folder gained `inquiries.prisma` and `settings.prisma`; the "installed but not imported" dependencies are now in active use; recorded NextAuth, Cloudinary, and the Love Site 3D stack as in-use. See the corresponding [../AI_SESSION_LOG.md](../AI_SESSION_LOG.md) entry.
 - 2026-10-30: Added the Design Skills section (ADR-0022).
 - 2026-10-29: Added the Forms section (ADR-0019).
 - 2026-10-29: Added image (eager/lazy, presets, blur) and motion rules to Performance after the image and motion pass.

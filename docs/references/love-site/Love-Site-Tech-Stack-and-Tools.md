@@ -488,7 +488,7 @@ Per `Design_Skills_Setup.md` v2.0 (installed on this machine). Use them by name 
 | GSAP official skills (`greensock/gsap-skills`)                                 | Correct ScrollTrigger, React and performance usage                           | Install once, before M2 (see below)                                    |
 | Taste skill (`design-taste-frontend`)                                          | Full landing-page art direction                                              | **Do not use** here: slow, costly, and it would fight the brand tokens |
 
-**Installing the GSAP skills (needs approval; verify first):** the `/plugin` command does not exist in the VS Code extension (confirmed in the runbook). Use the same `skills` CLI pattern as the other skills, e.g. `npx -y skills@latest add greensock/gsap-skills -g -a claude-code -y` (INFERRED: confirm the exact command in that repo's README, and read the scan summary the CLI prints before accepting). Skills run with full agent permissions once loaded.
+**GSAP skills — installed (VERIFIED 2026-11-20).** The official GSAP skills are present at `.claude/skills/gsap-*`: `gsap-core`, `gsap-scrolltrigger`, `gsap-timeline`, `gsap-react`, `gsap-plugins`, `gsap-performance`, `gsap-utils`, `gsap-frameworks`. Invoke them by name for ScrollTrigger, React (`useGSAP`) and performance work; no reinstall is needed. (For history: they were added via the `skills` CLI pattern, not the VS Code `/plugin` command, which does not exist in that extension.)
 
 **Skills that do not apply:** `animate-expo` and `write-swift` (native only).
 

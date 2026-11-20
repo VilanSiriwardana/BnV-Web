@@ -798,3 +798,52 @@ Permanent, append-only, chronological record of meaningful AI-assisted work sess
 - Audited `src/features/love/` against the Experience Guidebook and rewrote it as v2.0, an as-built reference: new §0 (status per section, better-than-planned list, changed-by-decision table, known gaps, release pending); §3–§14 now state built values; §19 folded into sections; Dawn → Starlight; Dance added as §11b.
 - Tech Stack guide v1.1: status Adopted, as-built notes (all-night removals, fixed bloom), actual kebab-case folder map.
 - Docs only; no code changed. Known gaps recorded (bloom not glow-driven, treble unused, no shine glints or ribbon-dust, smaller sealBreak, no calm gallery fade). Release items still pending (real photos, music licence, deploy, device QA).
+
+## 2026-11-20 — Audit: full-system map + governance reconciliation
+
+### Summary
+
+Ran a map-and-reconcile audit (not a rebuild — the governance set already exists and is mature). Created a new full-system map and tech-stack mapping, and corrected stale structural facts in the governance handbook against current source. Documentation only; no application source, schema, config, or package files were changed.
+
+### Files Inspected
+
+- `package.json`, `README.md`; `app/` and `app/api/` route tree; `src/` tree (`components/`, `features/`, `lib/`, `config/`, `constants/`, `data/`, `types/`); `prisma/schema/` and `prisma/migrations/`; `public/`.
+- Governance: `docs/governance/AGENTS.md`, `PLAN.md`, `PROGRESS.md`; `docs/AI_SESSION_LOG.md`; `docs/references/README.md` and `docs/references/love-site/` (README + Tech-Stack-and-Tools); `.gitignore`; `docs/decisions/DECISIONS.md` (ADR range).
+
+### Files Created / Modified
+
+- **Created** `docs/references/System-Map.md` (v1.0, STATUS: PARTIALLY IMPLEMENTED): two-subsystem overview (Storefront+Admin, Love Site), as-built route/feature/lib/schema inventory, layered tech-stack mapping with verified versions, reference-docs map (in-repo + love-site + `../BnV Docs/` source material), high-risk areas.
+- **Modified** `docs/governance/AGENTS.md`: reconciled Repository Structure (`src/` now exists; `public/` has `images/`+`audio/`; 8 migrations; schema gained `inquiries.prisma` + `settings.prisma`), Technology Overview (previously "not imported" deps now in use; NextAuth + Cloudinary + Love Site 3D stack recorded), added System-Map to the reference map, reference list, and a Changelog entry.
+- **Modified** `docs/references/README.md`: added the System-Map row.
+
+### Verification
+
+- Structure, versions, migration count, schema file list, ADR range (through ADR-0030), and gitignore strategy (`/plan.md`, `/progress.md`) confirmed by direct file reads on 2026-11-20. No build/lint/test run (documentation-only task). Source of every corrected fact is the current repository, not prior docs.
+
+### Remaining Work
+
+- Recommended but not authored (owner approval needed): a `Logging-Observability` and a `Payment-Gateway` reference (already flagged in `references/README.md` Pending), and an architecture overview under `docs/architecture/`. The Love Site release items (real photos, music licence, deploy, device QA) remain open.
+
+## 2026-11-20 — Update-audit: Love Site animation tooling + stack reconciliation
+
+### Summary
+
+Follow-up to the map/reconcile audit, scoped to Love Site animations, stack and tools so future implementations know what to reference. Confirmed the Love Site reference library (Experience Guidebook v2.0, Tech Stack v1.1, Improvement Report, two Scroll-3D guides) is already comprehensive and as-built — not rewritten. Closed the remaining gaps: the installed GSAP skills were not recorded in the governance Design Skills section, and `Technology-Stack.md` still marked several now-installed packages as "not installed". Documentation only; no application source changed.
+
+### Files Inspected
+
+- All five Love Site reference docs (Experience Guidebook, Tech-Stack-and-Tools, Improvement-Report, Scroll-3D-Guide-Complete, Scroll-3D-Guide-Overview); `docs/references/Technology-Stack.md`; `docs/governance/AGENTS.md` Design Skills section; `.claude/skills/` (8 `gsap-*` + `impeccable` confirmed on disk); Love Site test files (15 `*.test.ts`).
+
+### Files Modified
+
+- `docs/governance/AGENTS.md`: Design Skills section now lists the installed GSAP skills and adds a "Scroll-driven / 3D animation (Love Site)" row routing to them and to the love Tech Stack guide §10; changelog entry added.
+- `docs/references/Technology-Stack.md`: reconciled §3 status cells (Zod, Auth.js/NextAuth, Framer Motion, next-themes, Lucide, Cloudinary → VERIFIED installed with versions) and §4 (Vitest is the test framework; `typecheck`/`test` scripts exist; brand fonts corrected to Cinzel/Cormorant/Inter). The Love Site 3D/scroll row (ADR-0027, exact pins) was already present and was left intact.
+- `docs/references/love-site/Love-Site-Tech-Stack-and-Tools.md`: §10 updated from "GSAP skills need install/approval" to "installed (VERIFIED)" with the on-disk skill names.
+
+### Verification
+
+- GSAP skills presence, 15 Love Site test files, and all install-status corrections confirmed by direct reads on 2026-11-20. No build/lint/test run (documentation-only). Love Site as-built behaviour detail is unchanged and remains sourced from the Experience Guidebook v2.0 (audited 2026-11-19).
+
+### Remaining Work
+
+- Unchanged from the prior entry: Love Site release items (real photos, music licence, deploy, device QA) and the Improvement-Report proposals (P1–P7, G1–G6) remain owner-gated and unbuilt.
