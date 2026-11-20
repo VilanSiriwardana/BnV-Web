@@ -558,18 +558,19 @@ Positions are converted to world units with the live viewport at the heart's dep
 
 ## 15. Build plan and status
 
-| M / Phase         | Goal                                                                      | Status                                                      |
-| ----------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| M0                | Approvals and prep                                                        | Done (versions, ADRs, image script)                         |
-| M1 (Phase 1)      | Route scaffold, tokens, static skeleton                                   | Done                                                        |
-| M2–M3 (Phase 2)   | Scroll engine, theme, canvas smoke test, tiers                            | Done                                                        |
-| M4–M6 (Phase 3)   | Heart, director, events, heart path, Bloom                                | Done                                                        |
-| M7–M8 (Phase 4)   | Memories, Timeline, arrow                                                 | Done (browser check open)                                   |
-| M9–M13 (Phase 5)  | Starlight (was Dawn), Gallery, Audio, Wish, Letter, Finale                | Done (all-night amendment applied)                          |
-| M14 (Phase 6)     | Fallbacks and accessibility                                               | Built (calm/static path); full keyboard and SR pass pending |
-| M15 (Phase 6)     | Performance and QA                                                        | **Pending** (no Lighthouse or real-device results)          |
-| M16 (Phase 6)     | Content and launch                                                        | **Pending** (§0.5)                                          |
-| M17–M21 (Phase 7) | Gate, hero glow, spiral timeline, parchment letter, ambient hearts, Dance | Done (exit checklist unticked)                              |
+| M / Phase             | Goal                                                                                                                      | Status                                                                            |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| M0                    | Approvals and prep                                                                                                        | Done (versions, ADRs, image script)                                               |
+| M1 (Phase 1)          | Route scaffold, tokens, static skeleton                                                                                   | Done                                                                              |
+| M2–M3 (Phase 2)       | Scroll engine, theme, canvas smoke test, tiers                                                                            | Done                                                                              |
+| M4–M6 (Phase 3)       | Heart, director, events, heart path, Bloom                                                                                | Done                                                                              |
+| M7–M8 (Phase 4)       | Memories, Timeline, arrow                                                                                                 | Done (browser check open)                                                         |
+| M9–M13 (Phase 5)      | Starlight (was Dawn), Gallery, Audio, Wish, Letter, Finale                                                                | Done (all-night amendment applied)                                                |
+| M14 (Phase 6)         | Fallbacks and accessibility                                                                                               | Built (calm/static path); full keyboard and SR pass pending                       |
+| M15 (Phase 6)         | Performance and QA                                                                                                        | **Pending** (no Lighthouse or real-device results)                                |
+| M16 (Phase 6)         | Content and launch                                                                                                        | **Pending** (§0.5)                                                                |
+| M17–M21 (Phase 7)     | Gate, hero glow, spiral timeline, parchment letter, ambient hearts, Dance                                                 | Done (exit checklist unticked)                                                    |
+| M22–M40 (Phases 8–11) | Romance Additions: look, Bloom line, buttons, Wish, Letter; spell, voice, Our sky, Reasons, candle; Afterglow; Dance reel | **Planned** ([Love-Site-Romance-Additions.md](Love-Site-Romance-Additions.md) §0) |
 
 Phase guides: [phases/](phases/README.md).
 

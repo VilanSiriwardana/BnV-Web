@@ -847,3 +847,26 @@ Follow-up to the map/reconcile audit, scoped to Love Site animations, stack and 
 ### Remaining Work
 
 - Unchanged from the prior entry: Love Site release items (real photos, music licence, deploy, device QA) and the Improvement-Report proposals (P1–P7, G1–G6) remain owner-gated and unbuilt.
+
+## 2026-11-20 — Love Site Romance Additions: phase guides 8–11 (blueprint 045)
+
+### Summary
+
+Imported the owner's two specs (`Phase-8-Romance-Additions.md`, `Dance-Clip-Production-Guide.md`) into `docs/references/love-site/` and corrected every `INFERRED` item against the source code. Split the work into four phase guides with the Dance reel last: Phase 8 look, polish and foundations (M22–M27), Phase 9 interactive heart moments (M28–M33), Phase 10 Afterglow room and QA (M34–M37), Phase 11 Dance reel (M38–M40; clip production starts now in parallel; `/plan` before building). Documentation only; no application source changed.
+
+### Files Inspected
+
+- `src/features/love/` engine, canvas, sections, ui, hooks, config and dev files (heart state, director, story builders, heart path, theme timeline, tiers, audio, shaders, letter, wish, finale, debug panel); `src/components/ui/button.tsx`; `app/globals.css`; `next.config.ts`; `package.json`; `vitest.config.ts`; love-site docs and phase guides; `docs/decisions/DECISIONS.md`.
+
+### Files Modified
+
+- New: `docs/references/love-site/Love-Site-Romance-Additions.md` (master spec v1.2, §0 delivery map, verified facts), `docs/references/love-site/Dance-Clip-Production-Guide.md` (v1.1, renumbered to Phase 11), `docs/references/love-site/phases/Phase-8-Look-Polish-and-Foundations.md`, `Phase-9-Interactive-Heart-Moments.md`, `Phase-10-Afterglow-Room-and-QA.md`, `Phase-11-Dance-Reel.md`; `.claude/blueprints/045-love-phase-guides-8-11-romance.md`.
+- Updated: `docs/references/love-site/phases/README.md` (rows 8–11), `docs/references/love-site/README.md` (eleven phases, two new files), `Love-Site-Implementation-Phases.md` (§3 rows, dependency chain, changelog 1.3), `Love-Site-Experience-Guidebook.md` (§15 row).
+
+### Verification
+
+- No `INFERRED` left in the master spec except its own verification note; relative links checked by script; `git status` shows only Markdown changes. No build/lint/test run (documentation-only).
+
+### Remaining Work
+
+- Phase 8 starts with `/plan` (ADR-0031–0034 are written in M22, not yet). Owner: start the dance clip (production guide §16) and provide the content in spec §7.
