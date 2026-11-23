@@ -868,3 +868,32 @@
 [data-love-motion] main :is([data-love-section], [data-stage-inner]) {
   background-color: transparent;
 }
+
+/* Phase 12 gallery note: tiny hearts drift up from the gold note while a frame is open. */
+@keyframes love-note-heart {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.6);
+  }
+
+  25% {
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-56px) scale(1);
+  }
+}
+
+[data-love-root] .love-note-heart {
+  opacity: 0;
+  animation: love-note-heart 2.6s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-love-root] .love-note-heart {
+    animation: none;
+    opacity: 0.8;
+  }
+}

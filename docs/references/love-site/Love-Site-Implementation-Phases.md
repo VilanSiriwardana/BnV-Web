@@ -77,7 +77,7 @@ These were checked in the code on 2026-11-12. Where a guidebook disagrees, **thi
 | **10** | Afterglow room and QA                              | M34–M37           | Afterglow, gifts and plan, Open when… notes, hidden hearts and secret room; QA of Phases 8–10                                                           |
 | **11** | Dance reel                                         | M38–M40           | AI dance clip (owner task, starts now in parallel), scroll-played frame reel, particle dancers removed                                                  |
 
-**Dependency chain:** 1 → 2 → 3 → (4 and 5 in order) → 6 → 7 → 8 → 9 → 10 → 11 (the Phase 11 clip is produced in parallel from the start of Phase 8). Spec for 8–11: [Love-Site-Romance-Additions.md](Love-Site-Romance-Additions.md). Phase 3 must finish before 4 or 5 because every later section drives the heart through the director. Audio (M10) moves into Phase 3 because the gate tap unlocks it and the beat feeds the heart.
+**Dependency chain:** 1 → 2 → 3 → (4 and 5 in order) → 6 → 7 → 8 → 9 → 10 → 11 (the Phase 11 clip is produced in parallel from the start of Phase 8). **Phase 12 (Gallery Walk, M41–M46)** replaces the Gallery with a 3D corridor: spec [phases/Phase-12-Gallery-Walk.md](phases/Phase-12-Gallery-Walk.md), blueprint 051, ADR-0035/0036. It does not depend on Phase 11. Spec for 8–11: [Love-Site-Romance-Additions.md](Love-Site-Romance-Additions.md). Phase 3 must finish before 4 or 5 because every later section drives the heart through the director. Audio (M10) moves into Phase 3 because the gate tap unlocks it and the beat feeds the heart.
 
 **Cross-cutting rules for every phase**
 

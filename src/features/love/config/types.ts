@@ -4,6 +4,8 @@ export type PhotoRef = {
   width: number;
   height: number;
   blur?: string;
+  /** Gallery only: one short line shown in gold when the photo is opened. */
+  note?: string;
 };
 
 export type LoveSiteConfig = {
@@ -53,6 +55,8 @@ export type LoveSiteConfig = {
     featured?: boolean;
   }[];
   gallery: PhotoRef[];
+  /** Spotlit end frame of the gallery walk; falls back to gallery[0]. */
+  galleryEnd?: PhotoRef;
   letter: {
     salutation?: string;
     paragraphs: string[];

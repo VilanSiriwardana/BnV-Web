@@ -616,3 +616,34 @@ Each decision should include:
 - Consequences: Adds about 4–5 MB (desktop) / 2.5 MB (mobile) of frames loaded after the gate.
 - Related Documents:
   - [../references/love-site/Dance-Clip-Production-Guide.md](../references/love-site/Dance-Clip-Production-Guide.md)
+
+## ADR-0035 - Love Site Gallery Walk and Camera Ownership
+
+- Status: Proposed (accepted when Phase 12 passes QA)
+- Date: 2026-11-23
+- Context: Phase 12 replaces the flat gallery masonry with a scroll-driven 3D corridor. Today the heart's `useFrame` is the only camera writer (`canvas/heart.tsx`), so a second camera driver needs an explicit owner.
+- Decision:
+  - The corridor is procedural geometry inside the existing single `<Canvas>` (no second canvas, no GLB, Spline or Blender).
+  - A mutable `galleryState.cameraOwner` (`story` | `gallery`) decides which rig writes the camera. The heart rig skips its camera writes while the gallery owns it; releasing restores rotation, fov 45 and `position.z = heart.cameraZ`.
+  - Pointer routing reuses the memory-orb pattern (ADR-0029 Phase 4 amendment): CSS pass-through, invisible hit meshes, `sr-only` DOM twins. No `eventSource`.
+  - Motion exception: walk-to-frame camera tweens may exceed the 400 ms UI token (about 0.9–1.2 s).
+  - The masonry and lightbox stay as the quiet, static and no-WebGL path.
+- Alternatives: Blender GLB corridor with baked light (deferred); Spline (rejected); a second canvas (rejected); a horizontal filmstrip, Improvement Report G6 (superseded).
+- Consequences: One more camera writer to keep in step with story handoffs; a pinned scroll of about 550 vh.
+- Related Documents:
+  - [../references/love-site/phases/Phase-12-Gallery-Walk.md](../references/love-site/phases/Phase-12-Gallery-Walk.md)
+
+## ADR-0036 - Love Site CC0 Textures and Gallery Texture Budget
+
+- Status: Proposed
+- Date: 2026-11-23
+- Context: The corridor needs surface detail (floor, wainscot, wallpaper). The Tech Stack guide caps texture memory at 64 MB.
+- Decision:
+  - Only CC0 maps (ambientCG or Poly Haven), at 1K WebP, stored in `public/textures/gallery/` with a `CREDITS.md` recording source, asset ID and licence. The owner approves asset IDs before download.
+  - Frame gilding is procedural (material only, no texture).
+  - The gallery scene may use up to 150 MB of texture memory on mobile (owner decision), using a residency window of resident photo textures that are disposed when evicted.
+  - Missing maps fall back to flat brand-colour materials.
+- Alternatives: Keep 64 MB (rejected by owner); KTX2 compression (not needed yet, adds a transcoder).
+- Consequences: The Tech Stack guide's texture budget gets a gallery exception; the budget must be measured on real devices.
+- Related Documents:
+  - [../references/love-site/Love-Site-Tech-Stack-and-Tools.md](../references/love-site/Love-Site-Tech-Stack-and-Tools.md)

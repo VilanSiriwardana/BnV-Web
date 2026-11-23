@@ -1,6 +1,6 @@
 // Prepares Love Site images. Uses sharp from Next's dependency tree (ADR-0027 notes; pin it if this import ever fails).
 // Usage: node scripts/prepare-love-images.mjs [sourceDir]  → writes public/images/prototype/love-*.webp and prints a JSON of sizes + blur.
-// With sourceDir (e.g. private/love-photos, git-ignored), files are picked by prefix memory-*, timeline-*, gallery-* (jpg/jpeg/png/webp), sorted by name.
+// With sourceDir (e.g. private/love-photos, git-ignored), files are picked by prefix memory-*, timeline-*, gallery-*, portrait-* (jpg/jpeg/png/webp), sorted by name.
 import { readdirSync } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
@@ -41,12 +41,14 @@ const prototypeSources = {
     'product-gift-box-05',
     'banner-couple-capsule-light-mobile',
   ],
+  // Gallery walk end frame (Phase 12). Prototype until the real portrait is supplied.
+  portrait: ['banner-couples-dark-mobile'],
 };
 
 const imageExt = /\.(jpe?g|png|webp)$/i;
 const sources = sourceDir
   ? Object.fromEntries(
-      ['memory', 'timeline', 'gallery'].map((kind) => [
+      ['memory', 'timeline', 'gallery', 'portrait'].map((kind) => [
         kind,
         readdirSync(sourceDir)
           .filter((f) => f.startsWith(`${kind}-`) && imageExt.test(f))
@@ -55,7 +57,7 @@ const sources = sourceDir
     )
   : prototypeSources;
 
-const widths = { memory: 1600, timeline: 1200, gallery: 1200 };
+const widths = { memory: 1600, timeline: 1200, gallery: 1200, portrait: 1600 };
 const result = {};
 
 async function blurOf(input) {
@@ -87,6 +89,13 @@ for (const [kind, list] of Object.entries(sources)) {
         .resize(512, 512, { fit: 'cover', withoutEnlargement: true })
         .webp({ quality: 80 })
         .toFile(path.join(dir, `love-${kind}-${nn}-orb.webp`));
+    }
+    // 1024 px variant for the gallery walk on mid and low tiers.
+    if (kind === 'gallery' || kind === 'portrait') {
+      await sharp(input)
+        .resize({ width: 1024, withoutEnlargement: true })
+        .webp({ quality: 80 })
+        .toFile(path.join(dir, `love-${kind}-${nn}-1024.webp`));
     }
   }
 }

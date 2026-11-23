@@ -43,6 +43,10 @@ const HeartDebugPanel =
   process.env.NODE_ENV !== 'production'
     ? dynamic(() => import('./dev/heart-debug-panel'), { ssr: false })
     : null;
+const GalleryDebugPanel =
+  process.env.NODE_ENV !== 'production'
+    ? dynamic(() => import('./dev/gallery-debug-panel'), { ssr: false })
+    : null;
 
 const noSubscribe = () => () => {};
 const readDebug = () =>
@@ -67,7 +71,7 @@ export function LoveExperience({ site }: { site: LoveSiteConfig }) {
 
 function LoveStory({ site }: { site: LoveSiteConfig }) {
   const quiet = useQuiet();
-  const { tier, stepDown, stepUp } = useTier();
+  const { tier, setTier, stepDown, stepUp } = useTier();
   const showCanvas = !quiet;
   const debug =
     useSyncExternalStore(noSubscribe, readDebug, serverFalse) &&
@@ -121,6 +125,9 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
         <LoveCanvas
           tier={tier}
           memories={site.memories}
+          gallery={site.gallery}
+          galleryEnd={site.galleryEnd}
+          onContextLost={() => setTier('static')}
           onDecline={stepDown}
           onIncline={stepUp}
           debug={debug}
@@ -131,6 +138,7 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
         />
       )}
       {debug && HeartDebugPanel && <HeartDebugPanel />}
+      {debug && GalleryDebugPanel && <GalleryDebugPanel />}
       <main>
         <Hero name={name} sub={site.copy.heroSub} />
         <Bloom
@@ -148,7 +156,11 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
           slug={site.slug}
           memories={site.memories}
         />
-        <Gallery title={site.copy.galleryTitle} photos={site.gallery} />
+        <Gallery
+          title={site.copy.galleryTitle}
+          photos={site.gallery}
+          galleryEnd={site.galleryEnd}
+        />
         <Dance title={site.copy.danceTitle} line={site.copy.danceLine} />
         <Reasons
           title={site.copy.reasonsTitle ?? 'Reasons'}

@@ -14,6 +14,7 @@ import {
 
 import { isMobileViewport, ndcToWorld } from '../engine/heart-path';
 import { director } from '../engine/heart-director';
+import { galleryState } from '../engine/gallery-state';
 import { heart } from '../engine/heart-state';
 import { TIERS, type Tier } from '../engine/tiers';
 import { buildHeartAttributes } from './heart-geometry';
@@ -183,12 +184,15 @@ export function Heart({ tier, onTap, spell, children }: Props) {
     const cam = state.camera;
     // Section hand-offs that jump the rail (Memories → Timeline) snap instead of flying back.
     const snap = Math.abs(cam.position.z - heart.cameraZ) > SNAP_DISTANCE;
-    cam.position.z = snap
-      ? heart.cameraZ
-      : damp(cam.position.z, heart.cameraZ, 6, delta);
-    const shake = heart.cameraShake;
-    cam.position.x = shake ? (Math.random() * 2 - 1) * shake : 0;
-    cam.position.y = shake ? (Math.random() * 2 - 1) * shake : 0;
+    // ADR-0035: the gallery walk owns the camera while it is on screen.
+    if (galleryState.cameraOwner !== 'gallery') {
+      cam.position.z = snap
+        ? heart.cameraZ
+        : damp(cam.position.z, heart.cameraZ, 6, delta);
+      const shake = heart.cameraShake;
+      cam.position.x = shake ? (Math.random() * 2 - 1) * shake : 0;
+      cam.position.y = shake ? (Math.random() * 2 - 1) * shake : 0;
+    }
 
     const g = group.current;
     if (!g) return;

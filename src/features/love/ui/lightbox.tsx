@@ -28,7 +28,7 @@ export function GalleryLightbox({ photos, index, onClose }: Props) {
   return (
     <Lightbox
       key={index ?? -1}
-      images={photos.map(({ src, alt }) => ({ src, alt }))}
+      images={photos.map(({ src, alt, note }) => ({ src, alt, caption: note }))}
       open={open}
       onOpenChange={(o) => !o && onClose()}
       startIndex={index ?? 0}

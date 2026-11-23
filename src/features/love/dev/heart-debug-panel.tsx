@@ -18,18 +18,24 @@ import { TIER_ORDER } from '../engine/tiers';
 const button =
   'rounded-sm border border-border px-2 py-1 hover:bg-primary-soft aria-pressed:bg-primary aria-pressed:text-primary-foreground';
 
+// GSAP stores a self-referencing _gsap cache on every tweened object.
+const skipGsap = (key: string, value: unknown) =>
+  key === '_gsap' ? undefined : value;
+
 // Dev only (Experience §18): loaded by love-experience.tsx when NODE_ENV !== 'production' and ?debug.
 export default function HeartDebugPanel() {
   const { tier, setTier } = useTier();
   const { calm, reason, setCalm } = useMotionPrefs();
   const { scrollTo } = useLoveScroll();
-  const [snapshot, setSnapshot] = useState(() => JSON.stringify(heart));
+  const [snapshot, setSnapshot] = useState(() =>
+    JSON.stringify(heart, skipGsap),
+  );
 
   useEffect(() => {
     const id = window.setInterval(
       () =>
         setSnapshot(
-          JSON.stringify({ ...heart, gl: { ...renderStats } }, null, 1),
+          JSON.stringify({ ...heart, gl: { ...renderStats } }, skipGsap, 1),
         ),
       250,
     );

@@ -35,6 +35,16 @@ describe('stepTier', () => {
     expect(stepTier('static', 1)).toBe('static');
   });
 
+  it('drops gallery extras in order: reflection, motes, companion', () => {
+    expect(TIERS.high.galleryReflection).toBe(true);
+    expect(TIERS.mid.galleryReflection).toBe(false);
+    expect(TIERS.mid.galleryMotes).toBeLessThan(TIERS.high.galleryMotes);
+    expect(TIERS.mid.galleryCompanion).toBe(true);
+    expect(TIERS.low.galleryMotes).toBe(0);
+    expect(TIERS.low.galleryCompanion).toBe(false);
+    expect(TIERS.low.galleryLights).toBeGreaterThanOrEqual(1);
+  });
+
   it('keeps bloom off on low', () => {
     expect(TIERS.low.bloom).toBe('off');
   });

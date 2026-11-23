@@ -22,20 +22,20 @@
 
 ### 0.1 Status by section
 
-| #   | Section   | Status                      | Key files                                                                               | One-line note                                                                                    |
-| --- | --------- | --------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| 0   | Gate      | Built, redesigned (better)  | `sections/gate.tsx`                                                                     | The glowing heart **is** the button; "Tap this" with a hand-drawn gold arrow; premium gold frame |
-| 1   | Hero      | Built as planned (+ tuning) | `sections/hero.tsx`, `engine/hero-intro.ts`                                             | All §6 timings match; glow 0.4, beat damped, float-up after the weave                            |
-| 2   | Bloom     | Built as planned            | `sections/bloom.tsx`, `canvas/petals.tsx`                                               | Burst releases petals; camera dolly; line triggers a little earlier than spec                    |
-| 3   | Memories  | Built as planned            | `sections/memories.tsx`, `canvas/memory-orbs.tsx`, `ui/memory-dialog.tsx`               | Orb formula, rail, hover, twins, focus ring, completion moment all present                       |
-| 4   | Timeline  | Built, redesigned (better)  | `sections/timeline.tsx`, `engine/timeline-progress.ts`                                  | Golden **spiral** thread (serpentine on mobile); arrow fires after the last node                 |
-| 5   | Starlight | Built, replaces Dawn        | `sections/starlight.tsx`                                                                | All-night decision: aurora + stars instead of a sunrise and skin swap                            |
-| 6   | Gallery   | Built as planned            | `sections/gallery.tsx`, `ui/lightbox.tsx`                                               | Batch clip-path reveal, throttled shine, lightbox with swipe and thumbnails                      |
-| 6b  | Dance     | **New** (beyond plan)       | `sections/dance.tsx`, `canvas/dance-*.ts(x)`, `engine/dance-state.ts`                   | Particle silhouette couple, 12 key poses, ends in a romantic dip                                 |
-| 7   | Wish      | Built as planned            | `sections/wish.tsx`, `hooks/use-hold.ts`, `canvas/wish-star.tsx`, `canvas/confetti.tsx` | 2.4 s hold, confetti by tier, local-only wish field, tap-once alternative                        |
-| 8   | Letter    | Built, redesigned (better)  | `sections/letter.tsx`, `sections/letter-ornaments.tsx`                                  | Parchment scroll with rods that unroll; opens by hold **or** by scrolling past the seal          |
-| 9   | Finale    | Built as planned            | `sections/finale.tsx`, `love-experience.tsx` (`replay`)                                 | Finale burst once per pass; Replay resets cleanly                                                |
-| –   | Global    | Built                       | `engine/*`, `canvas/*`, `ui/*`, `app/globals.css` `[data-love-root]`                    | Theme, director, tiers, audio, chrome, calm/static fallback, debug panel                         |
+| #   | Section   | Status                                  | Key files                                                                                 | One-line note                                                                                                                   |
+| --- | --------- | --------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| 0   | Gate      | Built, redesigned (better)              | `sections/gate.tsx`                                                                       | The glowing heart **is** the button; "Tap this" with a hand-drawn gold arrow; premium gold frame                                |
+| 1   | Hero      | Built as planned (+ tuning)             | `sections/hero.tsx`, `engine/hero-intro.ts`                                               | All §6 timings match; glow 0.4, beat damped, float-up after the weave                                                           |
+| 2   | Bloom     | Built as planned                        | `sections/bloom.tsx`, `canvas/petals.tsx`                                                 | Burst releases petals; camera dolly; line triggers a little earlier than spec                                                   |
+| 3   | Memories  | Built as planned                        | `sections/memories.tsx`, `canvas/memory-orbs.tsx`, `ui/memory-dialog.tsx`                 | Orb formula, rail, hover, twins, focus ring, completion moment all present                                                      |
+| 4   | Timeline  | Built, redesigned (better)              | `sections/timeline.tsx`, `engine/timeline-progress.ts`                                    | Golden **spiral** thread (serpentine on mobile); arrow fires after the last node                                                |
+| 5   | Starlight | Built, replaces Dawn                    | `sections/starlight.tsx`                                                                  | All-night decision: aurora + stars instead of a sunrise and skin swap                                                           |
+| 6   | Gallery   | Replaced by the Gallery Walk (Phase 12) | `sections/gallery.tsx`, `canvas/gallery-*.tsx`, `engine/gallery-*.ts`, `ui/gallery-*.tsx` | Scroll-driven 3D corridor (550vh sticky stage), click-to-inspect with gold note; masonry + lightbox remain the Calm/static path |
+| 6b  | Dance     | **New** (beyond plan)                   | `sections/dance.tsx`, `canvas/dance-*.ts(x)`, `engine/dance-state.ts`                     | Particle silhouette couple, 12 key poses, ends in a romantic dip                                                                |
+| 7   | Wish      | Built as planned                        | `sections/wish.tsx`, `hooks/use-hold.ts`, `canvas/wish-star.tsx`, `canvas/confetti.tsx`   | 2.4 s hold, confetti by tier, local-only wish field, tap-once alternative                                                       |
+| 8   | Letter    | Built, redesigned (better)              | `sections/letter.tsx`, `sections/letter-ornaments.tsx`                                    | Parchment scroll with rods that unroll; opens by hold **or** by scrolling past the seal                                         |
+| 9   | Finale    | Built as planned                        | `sections/finale.tsx`, `love-experience.tsx` (`replay`)                                   | Finale burst once per pass; Replay resets cleanly                                                                               |
+| –   | Global    | Built                                   | `engine/*`, `canvas/*`, `ui/*`, `app/globals.css` `[data-love-root]`                      | Theme, director, tiers, audio, chrome, calm/static fallback, debug panel                                                        |
 
 ### 0.2 Better than planned
 
@@ -71,8 +71,8 @@
 | No idle ribbon-dust orbiting the hero heart                                                                                      | §6              | `canvas/heart.tsx`                            |
 | No pointer push on petals (was optional)                                                                                         | §7              | `canvas/petals.tsx`                           |
 | `sealBreak` releases 2 × 8 tap hearts for about 1.3 s (spec about 12 for about 3 s)                                              | §3.5, §13       | `engine/heart-director.ts`                    |
-| Gallery tiles get no fade at all in calm / reduced motion (spec: simple fade)                                                    | §11             | `engine/story.ts` (`applyStaticStory`)        |
-| Gallery parallax always on the first 6 tiles, not "at most six at a time"                                                        | §11             | `engine/story.ts` (`buildGallery`)            |
+| ~~Gallery tiles get no fade in calm~~ Fixed in Phase 12: 0.4 s opacity fade in Calm (none under OS reduced motion)               | §11             | `engine/story.ts` (`applyStaticStory`)        |
+| ~~Gallery parallax always on~~ Removed in Phase 12 (the masonry only shows on the quiet path, without parallax)                  | §11             | `engine/story.ts` (`buildGallery`)            |
 | "Make another wish" appears at 2 s with the message (spec 4 s)                                                                   | §12             | `sections/wish.tsx`                           |
 | Bloom line triggers at `top 70%` and is centred (spec about 30 %, left on desktop)                                               | §7              | `engine/story.ts`, `sections/bloom.tsx`       |
 | Gate readiness from canvas `onCreated`, ring shows a fixed 35 % (spec drei `useProgress`)                                        | §5              | `sections/gate.tsx`                           |
@@ -329,19 +329,19 @@ Assets: `scripts/prepare-love-images.mjs` (sharp) produces 512 × 512 orb square
 
 ### 4.1 Scroll map (desktop; mobile stages ×0.85)
 
-| #   | Section   | `id`        | Stage                       | Mechanism                                              | Main tools               |
-| --- | --------- | ----------- | --------------------------- | ------------------------------------------------------ | ------------------------ |
-| 0   | Gate      | `gate`      | Fixed overlay               | `lenis.stop()` + `html { overflow: hidden }` until tap | Motion, CSS              |
-| 1   | Hero      | `hero`      | 200 vh                      | Time-based intro + sticky stage                        | GSAP, SplitText, R3F     |
-| 2   | Bloom     | `bloom`     | 150 vh                      | Scrubbed path + triggered burst                        | GSAP, R3F                |
-| 3   | Memories  | `memories`  | 400 vh                      | Sticky stage; camera rail scrubbed                     | GSAP, R3F, Radix Dialog  |
-| 4   | Timeline  | `timeline`  | 400 vh                      | Sticky stage; spiral thread; triggered arrow           | GSAP, SVG, R3F           |
-| 5   | Starlight | `starlight` | 100 vh                      | Scrubbed heart rise; triggered glowUp and shine        | GSAP, CSS                |
-| 6   | Gallery   | `gallery`   | Natural flow                | Batched reveals                                        | GSAP batch, `next/image` |
-| 6b  | Dance     | `dance`     | 250 vh                      | Sticky stage; scrubbed poses                           | GSAP, R3F DataTexture    |
-| 7   | Wish      | `wish`      | 200 vh                      | Sticky stage; press-and-hold                           | R3F, `useHold`           |
-| 8   | Letter    | `letter`    | 200 vh                      | Sticky stage; hold or scroll to open                   | GSAP, DOM/SVG            |
-| 9   | Finale    | `finale`    | Natural flow (about 100 vh) | Triggered finale                                       | GSAP, R3F, Lenis         |
+| #   | Section   | `id`        | Stage                       | Mechanism                                              | Main tools                     |
+| --- | --------- | ----------- | --------------------------- | ------------------------------------------------------ | ------------------------------ |
+| 0   | Gate      | `gate`      | Fixed overlay               | `lenis.stop()` + `html { overflow: hidden }` until tap | Motion, CSS                    |
+| 1   | Hero      | `hero`      | 200 vh                      | Time-based intro + sticky stage                        | GSAP, SplitText, R3F           |
+| 2   | Bloom     | `bloom`     | 150 vh                      | Scrubbed path + triggered burst                        | GSAP, R3F                      |
+| 3   | Memories  | `memories`  | 400 vh                      | Sticky stage; camera rail scrubbed                     | GSAP, R3F, Radix Dialog        |
+| 4   | Timeline  | `timeline`  | 400 vh                      | Sticky stage; spiral thread; triggered arrow           | GSAP, SVG, R3F                 |
+| 5   | Starlight | `starlight` | 100 vh                      | Scrubbed heart rise; triggered glowUp and shine        | GSAP, CSS                      |
+| 6   | Gallery   | `gallery`   | 550vh sticky stage          | Corridor walk + inspect (ADR-0035)                     | R3F, GSAP, `next/image` (Calm) |
+| 6b  | Dance     | `dance`     | 250 vh                      | Sticky stage; scrubbed poses                           | GSAP, R3F DataTexture          |
+| 7   | Wish      | `wish`      | 200 vh                      | Sticky stage; press-and-hold                           | R3F, `useHold`                 |
+| 8   | Letter    | `letter`    | 200 vh                      | Sticky stage; hold or scroll to open                   | GSAP, DOM/SVG                  |
+| 9   | Finale    | `finale`    | Natural flow (about 100 vh) | Triggered finale                                       | GSAP, R3F, Lenis               |
 
 Sticky scenes use a tall container with an inner `position: sticky` stage (`ui/sticky-stage.tsx`, `[data-stage-inner]`); `pin: true` is never used.
 

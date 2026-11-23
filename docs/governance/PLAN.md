@@ -16,7 +16,7 @@ This file tracks only **where we are now**. Update it as work progresses, and re
 
 - Stage: **Gate B — Partial** (docs and assets done; owner business values and commissions open). Next: **1D–1H manual QA**.
 - Next: 1D–1H manual QA. Fill Cloudinary keys in `.env` to enable uploads.
-- Side track: **Love Site** (private `/love/[slug]`, [plan](../references/love-site/Love-Site-Implementation-Phases.md)). Phase 1 (static skeleton) built 2026-11-12; Phase 2 (scroll engine, installs per ADR-0027) next.
+- Side track: **Love Site** (private `/love/[slug]`, [plan](../references/love-site/Love-Site-Implementation-Phases.md)). Phase 1 (static skeleton) built 2026-11-12; Phase 2 (scroll engine, installs per ADR-0027) next. Phase 12 Gallery Walk (blueprint 051, M41–M46) built 2026-11-23; owner browser and device QA pending.
 
 ## Gate Progress
 

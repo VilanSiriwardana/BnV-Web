@@ -969,3 +969,46 @@ Implemented M28–M33 in the order M28 → M32 → M29 → M31 → M30 → M33:
 - Letter frame hugs the paper edge (padding moved from the article to the text), rounded borders, corner curls grow from the inner border.
 - Native scrollbar hidden on the love route; ProgressHeart rail is the scrollbar.
 - Arrow: thinner shaft, single larger head, dim swept-back fletching, additive glow halo, denser trail.
+
+## 2026-11-23 — Phase 12 Gallery Walk, M41 Foundations (blueprint 051)
+
+- Plan `.claude/plans/025-gallery-walk.md`, blueprint `.claude/blueprints/051-gallery-walk.md`. Owner decisions: 150 MB mobile gallery texture budget, clickable end frame (`galleryEnd`), procedural gilding, 550 vh pin, note in fallback lightbox.
+- ADR-0035 (gallery walk and camera ownership) and ADR-0036 (CC0 textures and budget) drafted as Proposed.
+- Config: `PhotoRef.note?`, `LoveSiteConfig.galleryEnd?`; config test validates both.
+- `scripts/prepare-love-images.mjs`: `portrait` kind (1600 px) and `-1024` variants for gallery and portrait. Script not re-run.
+- `love-canvas.tsx`: debug-only `PointerProbe` plane (bottom right) to prove canvas clicks through the pass-through DOM; remove in M42.
+
+### Verification
+
+- `tsc --noEmit` clean; eslint 0 errors; Vitest 32 files, 141 tests pass.
+- `next build`: compiles and type-checks; prerender of shop pages fails because PostgreSQL is not running (unrelated).
+- Pointer probe not yet clicked in a browser or on an iPhone.
+
+## 2026-11-23 — Phase 12 Gallery Walk, M42 Corridor prototype (blueprint 051)
+
+- `engine/gallery-state.ts` (mutable state, `claimCamera` / `releaseCamera`), `engine/gallery-path.ts` (left-sweep CatmullRom, min radius about 11 m, 16 wall slots + end slot, `walkPose`) with tests.
+- `canvas/gallery-corridor.tsx` (flat-colour ribbons: floor, walls, ceiling, wainscot, rails, cove), `canvas/gallery-camera-rig.tsx`, `canvas/gallery-walk.tsx`; corridor sits at z -400, behind the story camera.
+- `heart.tsx` skips camera writes while the gallery owns the camera; rig restores rotation and fov 45 on release, heart snaps z back.
+- `buildGallery`: masonry reveal and parallax removed from the motion path; a trigger over the 550vh sticky stage writes progress and claims/releases the camera. Deviation from blueprint: uses the repo's CSS `StickyStage` instead of GSAP `pin`.
+- `sections/gallery.tsx`: quiet → masonry + lightbox (unchanged), motion → walk stage with title, hidden heart, "Skip gallery" button. Twins arrive in M44.
+- `dev/gallery-debug-panel.tsx` (?debug): owner/progress readout and a progress slider. M41 pointer probe removed.
+- Fix: `heart-debug-panel.tsx` snapshot skips GSAP's self-referencing `_gsap` cache (crashed `?debug`).
+
+### Verification
+
+- `tsc --noEmit`, eslint (love) clean; Vitest 33 files, 146 tests pass. Dev server returns 200 for the love page.
+- Not yet checked visually in a browser or on a phone.
+
+## 2026-11-23 — Phase 12 Gallery Walk, M43–M46 (blueprint 051)
+
+- Frames: instanced gold borders + ivory mats, photo planes with blur placeholders, texture residency window (`engine/gallery-textures.ts`), decor (map, mirror, empty frame), clickable end portrait (`galleryEnd` → `gallery[0]`).
+- Surfaces are procedural canvas textures (`canvas/gallery-surfaces.ts`); `CC0_MAPS` stays empty until the owner approves picks. Lights: emissive sconces, additive wall washes, 1–3 camera-following point lights (allocated once), scoped fog, doorway glow, end spotlight + exit glow.
+- Inspect: `engine/gallery-director-core.ts` (pure, tested) + `gallery-director.ts` (one tween on `galleryState.blend`), rig blends walk/inspect poses with aspect-fitted distance (fov 62 on portrait screens). Overlay: Back/Prev/Next, Esc/arrows, swipe, tap outside, wheel blocked, Lenis stopped, exact scroll restore, focus back to the twin. Gold note + CSS hearts (tap hearts sit off-camera, so not reused).
+- Tiers: gallery flags in `TIERS`; Steady camera toggle (`love:gallery-comfort`). Calm fade for the masonry, lightbox `caption` (note), `webglcontextlost` → static tier.
+- Lint gotcha: React compiler `react-hooks/immutability` rejects writes to `useMemo` objects inside `useFrame`; write through mesh refs or module setter functions instead.
+
+### Verification
+
+- `tsc --noEmit`, eslint (love + lightbox) clean; Vitest 35 files, 156 tests pass.
+- Headless Chrome (SwiftShader, low tier, 1280×800): walk renders, twin opens frame, Next works, Esc closes, scroll identical before/after, focus returns to twin, no console errors. Later fixes (title fade, inspect fit, end glow timing) not re-screenshotted.
+- Not checked: real devices, 375px, high/mid tier look, iOS tap.

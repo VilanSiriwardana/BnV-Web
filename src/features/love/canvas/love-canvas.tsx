@@ -18,6 +18,7 @@ import { Confetti } from './confetti';
 import { Heart } from './heart';
 import { MemoryOrbs } from './memory-orbs';
 import { DanceDuo } from './dance-duo';
+import { GalleryWalk } from './gallery-walk';
 import { AmbientHearts, MiniHearts } from './mini-hearts';
 import { Petals } from './petals';
 import { ShockRing } from './shock-ring';
@@ -29,11 +30,15 @@ import { renderStats } from '../engine/render-stats';
 type Props = {
   tier: Tier;
   memories: LoveSiteConfig['memories'];
+  gallery: LoveSiteConfig['gallery'];
+  galleryEnd?: LoveSiteConfig['galleryEnd'];
   onDecline: () => void;
   onIncline: () => void;
   debug?: boolean;
   onHeartTap?: () => void;
   onReady?: () => void;
+  /** GPU context lost (driver reset, memory pressure): the page falls back to the static path. */
+  onContextLost?: () => void;
   spell?: [string, string];
   /** F5: the Wish shows the candle instead of the star. */
   candleMode?: boolean;
@@ -42,11 +47,14 @@ type Props = {
 export default function LoveCanvas({
   tier,
   memories,
+  gallery,
+  galleryEnd,
   onDecline,
   onIncline,
   debug,
   onHeartTap,
   onReady,
+  onContextLost,
   spell,
   candleMode,
 }: Props) {
@@ -65,7 +73,14 @@ export default function LoveCanvas({
       gl={{ antialias: false, powerPreference: 'high-performance' }}
       dpr={[1, config.dpr]}
       camera={{ position: [0, 0, 6], fov: 45 }}
-      onCreated={onReady}
+      onCreated={({ gl }) => {
+        gl.domElement.addEventListener(
+          'webglcontextlost',
+          () => onContextLost?.(),
+          { once: true },
+        );
+        onReady?.();
+      }}
     >
       {/* Step down on decline; step up only after a long stable run (flipflops ends adaptation). */}
       <PerformanceMonitor
@@ -84,6 +99,7 @@ export default function LoveCanvas({
       <Suspense fallback={null}>
         <MemoryOrbs tier={tier} memories={memories} />
       </Suspense>
+      <GalleryWalk tier={tier} gallery={gallery} galleryEnd={galleryEnd} />
       <ShockRing />
       <Sparks />
       <Arrow />

@@ -24,6 +24,18 @@ describe('love site config', () => {
     }
     if (site.letter.voice)
       expect(site.letter.voice.transcript.trim()).not.toBe('');
+    site.gallery.forEach((p) => {
+      if (p.note !== undefined) {
+        expect(p.note.trim()).not.toBe('');
+        expect(p.note.length).toBeLessThanOrEqual(80);
+      }
+    });
+    if (site.galleryEnd) {
+      expect(site.galleryEnd.src).not.toBe('');
+      expect(site.galleryEnd.alt.trim()).not.toBe('');
+      expect(site.galleryEnd.width).toBeGreaterThan(0);
+      expect(site.galleryEnd.height).toBeGreaterThan(0);
+    }
     const notes = site.afterglow?.openWhen;
     if (notes) {
       expect(notes.length).toBeGreaterThanOrEqual(3);

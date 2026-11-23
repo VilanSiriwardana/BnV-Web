@@ -16,7 +16,7 @@ import { focusRing } from '@/components/ui/styles';
 import { imageQuality } from '@/config/images';
 import { cn } from '@/lib/utils/cn';
 
-export type LightboxImage = { src: string; alt: string };
+export type LightboxImage = { src: string; alt: string; caption?: string };
 
 const MIN = 1;
 const MAX = 4;
@@ -221,6 +221,11 @@ export function Lightbox({
               ),
             )}
           </Carousel>
+          {images[index]?.caption && (
+            <p className="text-chrome-foreground text-small mx-auto mt-3 max-w-prose text-center font-serif italic">
+              {images[index].caption}
+            </p>
+          )}
           <div className="absolute top-4 right-4 flex gap-2">
             <button
               type="button"

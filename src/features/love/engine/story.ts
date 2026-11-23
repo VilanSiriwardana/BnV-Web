@@ -8,6 +8,8 @@ import { poseFor, type SectionId, SKY_WAIT, WISH_REST } from './heart-path';
 import { candle } from './candle-state';
 import { dance } from './dance-state';
 import { reasons } from './reasons-state';
+import { resetGalleryDirector } from './gallery-director';
+import { claimCamera, galleryState, releaseCamera } from './gallery-state';
 import { heart } from './heart-state';
 import { memoriesState } from './memories-state';
 import { RAIL_START_Z, railEndZ } from './memory-layout';
@@ -465,8 +467,14 @@ const buildStarlight: SectionBuilder = (root, mobile) => {
   });
 };
 
-// Experience §11: batched clip reveals, light desktop parallax, quiet corner companion.
-const buildGallery: SectionBuilder = (root, mobile, tier) => {
+// Phase 12 (ADR-0035): the heart drifts to its gallery pose, then the sticky stage becomes the
+// corridor walk. Stage progress drives the camera; the gallery owns the camera only while pinned.
+function leaveGallery() {
+  resetGalleryDirector();
+  releaseCamera();
+}
+
+const buildGallery: SectionBuilder = (root, mobile) => {
   const el = root.querySelector<HTMLElement>('#gallery');
   if (!el) return;
   baselineOn(el, 'gallery');
@@ -490,59 +498,33 @@ const buildGallery: SectionBuilder = (root, mobile, tier) => {
     )
     .fromTo(heart, { scale: from.scale }, { scale: to.scale, ...scrub }, 0);
 
-  const tiles = gsap.utils.toArray<HTMLElement>('[data-love-tile]', el);
-  const clip = tier !== 'low';
-  const hidden = clip
-    ? {
-        y: 24,
-        autoAlpha: 0,
-        clipPath: 'inset(12% 8% 12% 8% round var(--radius-lg))',
-      }
-    : { y: 24, autoAlpha: 0 };
-  const shown = clip
-    ? {
-        y: 0,
-        autoAlpha: 1,
-        clipPath: 'inset(0% 0% 0% 0% round var(--radius-lg))',
-      }
-    : { y: 0, autoAlpha: 1 };
-  gsap.set(tiles, hidden);
-  ScrollTrigger.batch(tiles, {
-    start: 'top 88%',
-    once: true,
-    onEnter: (batch) => {
-      gsap.to(batch, {
-        ...shown,
-        duration: 0.8,
-        ease: 'power3.out',
-        stagger: 0.08,
-        overwrite: 'auto',
-      });
-      director.play('shine'); // the director throttles shine to once per 4 s
-    },
-  });
-
-  if (mobile) return;
-  // ±6 % parallax on at most six tiles (Phase 5 §5 Step 3).
-  tiles.slice(0, 6).forEach((tile) => {
-    const img = tile.querySelector('[data-tile-img]');
-    if (!img) return;
-    gsap.fromTo(
-      img,
-      { yPercent: -6, scale: 1.12 },
-      {
-        yPercent: 6,
-        scale: 1.12,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: tile,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: true,
-        },
+  // The title and hint greet her at the door, then fade so the hall is clear.
+  gsap.fromTo(
+    el.querySelectorAll('[data-gallery-intro]'),
+    { autoAlpha: 1 },
+    {
+      autoAlpha: 0,
+      ease: 'none',
+      immediateRender: false,
+      scrollTrigger: {
+        trigger: el,
+        start: 'top top',
+        end: '6% top',
+        scrub: true,
       },
-    );
+    },
+  );
+
+  ScrollTrigger.create({
+    trigger: el,
+    start: 'top top',
+    end: 'bottom bottom',
+    onUpdate: (self) => {
+      galleryState.progress = self.progress;
+    },
+    onToggle: (self) => (self.isActive ? claimCamera() : leaveGallery()),
   });
+  return leaveGallery;
 };
 
 // Experience §19.6: the duo fades in while the stage is on screen; scroll scrubs the move,
@@ -852,6 +834,26 @@ function buildProgress(root: HTMLElement) {
   });
 }
 
+// Calm mode (Phase 12 fallback gap): gallery tiles fade in once, 0.4 s, opacity only.
+function buildCalmGallery(root: HTMLElement) {
+  const tiles = gsap.utils.toArray<HTMLElement>('[data-love-tile]', root);
+  if (!tiles.length) return;
+  gsap.set(tiles, { autoAlpha: 0 });
+  ScrollTrigger.batch(tiles, {
+    start: 'top 92%',
+    once: true,
+    onEnter: (batch) =>
+      gsap.to(batch, {
+        autoAlpha: 1,
+        duration: 0.4,
+        ease: 'power1.out',
+        stagger: 0.05,
+        overwrite: 'auto',
+      }),
+  });
+  return () => gsap.set(tiles, { clearProps: 'opacity,visibility' });
+}
+
 // Calm / reduced motion: no scrubbing; sections use their static data-depth stops.
 export function applyStaticStory(root: HTMLElement) {
   clearTheme(root);
@@ -876,7 +878,8 @@ export function buildStory(
       };
       if (!motion || ctx.quiet) {
         applyStaticStory(root);
-        return;
+        // Calm with OS motion allowed: the masonry fades in (opacity only, no movement).
+        return motion ? buildCalmGallery(root) : undefined;
       }
       buildTheme(root);
       buildProgress(root);

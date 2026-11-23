@@ -3,6 +3,8 @@ export type Tier = 'high' | 'mid' | 'low' | 'static';
 export const TIER_ORDER: readonly Tier[] = ['high', 'mid', 'low', 'static'];
 
 // Tech Stack §8.2. `static` = no canvas (DOM-only path).
+// Gallery walk (Phase 12): step-down drops reflection, then motes, then companion, then bloom.
+// galleryResident = photo textures kept on the GPU (the camera's frame plus the next few).
 export const TIERS = {
   high: {
     particles: 18000,
@@ -14,6 +16,12 @@ export const TIERS = {
     petals: 120,
     danceParticles: 14000,
     cakeParticles: 1500,
+    galleryLights: 3,
+    galleryReflection: true,
+    galleryMotes: 600,
+    galleryCompanion: true,
+    galleryResident: 6,
+    galleryHiRes: true,
   },
   mid: {
     particles: 8000,
@@ -25,6 +33,12 @@ export const TIERS = {
     petals: 70,
     danceParticles: 7000,
     cakeParticles: 800,
+    galleryLights: 2,
+    galleryReflection: false,
+    galleryMotes: 250,
+    galleryCompanion: true,
+    galleryResident: 5,
+    galleryHiRes: false,
   },
   low: {
     particles: 3000,
@@ -36,6 +50,12 @@ export const TIERS = {
     petals: 40,
     danceParticles: 0,
     cakeParticles: 0,
+    galleryLights: 1,
+    galleryReflection: false,
+    galleryMotes: 0,
+    galleryCompanion: false,
+    galleryResident: 4,
+    galleryHiRes: false,
   },
   static: {
     particles: 0,
@@ -47,6 +67,12 @@ export const TIERS = {
     petals: 0,
     danceParticles: 0,
     cakeParticles: 0,
+    galleryLights: 0,
+    galleryReflection: false,
+    galleryMotes: 0,
+    galleryCompanion: false,
+    galleryResident: 0,
+    galleryHiRes: false,
   },
 } as const satisfies Record<
   Tier,
@@ -60,6 +86,12 @@ export const TIERS = {
     petals: number;
     danceParticles: number;
     cakeParticles: number;
+    galleryLights: number;
+    galleryReflection: boolean;
+    galleryMotes: number;
+    galleryCompanion: boolean;
+    galleryResident: number;
+    galleryHiRes: boolean;
   }
 >;
 

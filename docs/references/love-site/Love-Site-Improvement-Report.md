@@ -24,14 +24,14 @@ Confidence: **Checked** = read in the repo. **To measure** = needs a real device
 
 ## 2. Gallery
 
-| #   | Proposal                                                                                                             | Why                                                                               |
-| --- | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| G1  | Give tiles a fixed `aspect-ratio` from config `width/height`, so the masonry never reflows as images decode          | Removes layout shift and late `ScrollTrigger.refresh()` calls                     |
-| G2  | `priority` only on the first visible tile; others `loading="lazy"` with `fetchPriority="low"`                        | Today the first three tiles are `priority`, but the gallery is far below the fold |
-| G3  | Tighter `sizes` (`(min-width: 1024px) 22rem, (min-width: 768px) 30vw, 46vw`)                                         | Smaller downloads; AVIF/WebP already enabled in `next.config.ts`                  |
-| G4  | Lightbox: preload only the next and previous photo; render only three slides                                         | Large photos stay out of memory                                                   |
-| G5  | Replace the per-tile clip-path reveal with one batched opacity/translate reveal on `low` (already) and on `mid`      | Clip-path animation repaints on mid phones                                        |
-| G6  | Optional "story mode": a horizontal pinned filmstrip on desktop with captions, falling back to the masonry on mobile | More cinematic, fewer images on screen at once                                    |
+| #   | Proposal                                                                                                                                                                  | Why                                                                               |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| G1  | Give tiles a fixed `aspect-ratio` from config `width/height`, so the masonry never reflows as images decode                                                               | Removes layout shift and late `ScrollTrigger.refresh()` calls                     |
+| G2  | `priority` only on the first visible tile; others `loading="lazy"` with `fetchPriority="low"`                                                                             | Today the first three tiles are `priority`, but the gallery is far below the fold |
+| G3  | Tighter `sizes` (`(min-width: 1024px) 22rem, (min-width: 768px) 30vw, 46vw`)                                                                                              | Smaller downloads; AVIF/WebP already enabled in `next.config.ts`                  |
+| G4  | Lightbox: preload only the next and previous photo; render only three slides                                                                                              | Large photos stay out of memory                                                   |
+| G5  | Replace the per-tile clip-path reveal with one batched opacity/translate reveal on `low` (already) and on `mid`                                                           | Clip-path animation repaints on mid phones                                        |
+| G6  | **Superseded by Phase 12 (Gallery Walk, ADR-0035).** Optional "story mode": a horizontal pinned filmstrip on desktop with captions, falling back to the masonry on mobile | More cinematic, fewer images on screen at once                                    |
 
 ## 3. New birthday sections (ideas)
 

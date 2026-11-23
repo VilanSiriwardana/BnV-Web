@@ -393,17 +393,17 @@ When WebGL is unavailable, reduced motion is on, or the tier is `static`, the pa
 
 ### 8.1 Budgets
 
-| Metric                                                     | Target                                                            |
-| ---------------------------------------------------------- | ----------------------------------------------------------------- |
-| Route JS before the gate is dismissed                      | ≤ 120 KB gzipped (the 3D chunk loads lazily while the gate shows) |
-| 3D chunk (three, R3F, drei bits, postprocessing, our code) | ≤ 450 KB gzipped                                                  |
-| Frame time on a mid-range phone                            | ≤ 16.6 ms typical; never sustained below 40 fps                   |
-| Draw calls                                                 | < 60                                                              |
-| Texture memory                                             | < 64 MB                                                           |
-| Largest Contentful Paint (gate screen)                     | < 2.5 s on a mid-range phone, 4G                                  |
-| Cumulative Layout Shift                                    | ~0                                                                |
-| Interaction to Next Paint                                  | < 200 ms                                                          |
-| Total image weight above the fold                          | < 300 KB                                                          |
+| Metric                                                     | Target                                                                                       |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Route JS before the gate is dismissed                      | ≤ 120 KB gzipped (the 3D chunk loads lazily while the gate shows)                            |
+| 3D chunk (three, R3F, drei bits, postprocessing, our code) | ≤ 450 KB gzipped                                                                             |
+| Frame time on a mid-range phone                            | ≤ 16.6 ms typical; never sustained below 40 fps                                              |
+| Draw calls                                                 | < 60                                                                                         |
+| Texture memory                                             | < 64 MB; the Phase 12 gallery walk may use up to 150 MB on mobile (ADR-0036, owner decision) |
+| Largest Contentful Paint (gate screen)                     | < 2.5 s on a mid-range phone, 4G                                                             |
+| Cumulative Layout Shift                                    | ~0                                                                                           |
+| Interaction to Next Paint                                  | < 200 ms                                                                                     |
+| Total image weight above the fold                          | < 300 KB                                                                                     |
 
 These are targets to measure against with Lighthouse and real devices, not guarantees.
 
