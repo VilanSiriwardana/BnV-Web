@@ -2,6 +2,7 @@
 
 import gsap from 'gsap';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
 import {
   type CSSProperties,
   type KeyboardEvent,
@@ -271,6 +272,16 @@ function ReasonCard({
       <span className="text-gold-text font-sans text-xs tracking-[0.2em]">
         {pad2(index)}
       </span>
+      <div className="relative my-3 flex-1 overflow-hidden rounded">
+        <Image
+          src={`/images/prototype/love-gallery-${String(index + 1).padStart(2, '0')}.webp`}
+          alt=""
+          fill
+          className="object-cover"
+          sizes="(max-width: 767px) 192px, 240px"
+          aria-hidden
+        />
+      </div>
       <blockquote className="font-body text-[20px] leading-snug text-pretty">
         {text}
       </blockquote>
