@@ -1,16 +1,21 @@
 'use client';
 
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import {
-  type Color,
+  BufferGeometry,
+  Color,
   ExtrudeGeometry,
+  Float32BufferAttribute,
   type InstancedMesh,
   MathUtils,
   Object3D,
+  PMREMGenerator,
   Shape,
+  type Texture,
   Vector3,
 } from 'three';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 import { heart } from '../engine/heart-state';
 import { REDUCED_MOTION_QUERY } from '../engine/motion-prefs';
@@ -39,6 +44,99 @@ export function heartShape(samples = 32) {
   return shape;
 }
 
+// Blueprint 054: the 3D floating hearts — two full round lobes, a soft cleft and one clean point,
+// built from béziers (the parametric heartPoint curve stays for the particle heart and the sky).
+export function softHeartShape() {
+  const s = new Shape();
+  s.moveTo(0, -0.9);
+  s.bezierCurveTo(0.35, -0.55, 0.95, -0.15, 0.95, 0.35);
+  s.bezierCurveTo(0.95, 0.75, 0.62, 0.95, 0.42, 0.95);
+  s.bezierCurveTo(0.2, 0.95, 0.05, 0.8, 0, 0.62);
+  s.bezierCurveTo(-0.05, 0.8, -0.2, 0.95, -0.42, 0.95);
+  s.bezierCurveTo(-0.62, 0.95, -0.95, 0.75, -0.95, 0.35);
+  s.bezierCurveTo(-0.95, -0.15, -0.35, -0.55, 0, -0.9);
+  return s;
+}
+
+/** Pillowy extrusion for softHeartShape (rounded edges all round). */
+export const SOFT_HEART_EXTRUDE = {
+  depth: 0.22,
+  bevelEnabled: true,
+  bevelSize: 0.12,
+  bevelThickness: 0.14,
+  bevelSegments: 4,
+  curveSegments: 16,
+} as const;
+
+// Blueprint 055: one smooth, inflated surface (no bevel rings) from the softHeartShape outline.
+export function inflatedHeartGeometry(depth = 0.32, rings = 4) {
+  const outline = softHeartShape().getSpacedPoints(48).slice(0, -1);
+  const n = outline.length;
+  const cy = 0.1;
+  const pos: number[] = [];
+  const idx: number[] = [];
+  const lift = (t: number) => (depth / 2) * Math.sqrt(1 - (1 - t) ** 2);
+  for (const p of outline) pos.push(p.x, p.y, 0);
+  const base = (side: number) => n + side * (rings * n + 1);
+  for (const side of [0, 1]) {
+    const sign = side === 0 ? 1 : -1;
+    for (let r = 1; r <= rings; r++) {
+      const k = 1 - r / (rings + 1);
+      for (const p of outline)
+        pos.push(p.x * k, cy + (p.y - cy) * k, sign * lift(1 - k));
+    }
+    pos.push(0, cy, sign * (depth / 2));
+    const ring = (r: number) => (r === 0 ? 0 : base(side) + (r - 1) * n);
+    const centre = base(side) + rings * n;
+    const tri = (a: number, b: number, c: number) =>
+      side === 0 ? idx.push(a, b, c) : idx.push(a, c, b);
+    for (let r = 0; r < rings; r++) {
+      const a = ring(r);
+      const b = ring(r + 1);
+      for (let i = 0; i < n; i++) {
+        const j = (i + 1) % n;
+        tri(a + i, a + j, b + j);
+        tri(a + i, b + j, b + i);
+      }
+    }
+    const last = ring(rings);
+    for (let i = 0; i < n; i++) tri(last + i, last + ((i + 1) % n), centre);
+  }
+  const g = new BufferGeometry();
+  g.setAttribute('position', new Float32BufferAttribute(pos, 3));
+  g.setIndex(idx);
+  g.computeVertexNormals();
+  g.center();
+  return g;
+}
+
+let shared: BufferGeometry | null = null;
+/** Module-cached inflated heart shared by the instanced hearts (never disposed per component). */
+export const sharedHeartGeometry = () => (shared ??= inflatedHeartGeometry());
+
+const LAVENDER = new Color('#b9a6e0');
+
+/** Local studio reflections for the gold hearts (never set as scene.environment). */
+export function useHeartEnvMap() {
+  const gl = useThree((s) => s.gl);
+  const env = useMemo<Texture>(() => {
+    const pmrem = new PMREMGenerator(gl);
+    const tex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    pmrem.dispose();
+    return tex;
+  }, [gl]);
+  useEffect(() => () => env.dispose(), [env]);
+  return env;
+}
+
+function extrudedHeart() {
+  const g = new ExtrudeGeometry(softHeartShape(), SOFT_HEART_EXTRUDE);
+  g.center();
+  return g;
+}
+
+const lite = (tier: Tier) => tier === 'low' || tier === 'static';
+
 const easeOutCubic = (t: number) => 1 - (1 - t) ** 3;
 const { smoothstep } = MathUtils;
 
@@ -47,18 +145,12 @@ export function MiniHearts({ tier }: { tier: Tier }) {
   const burstCount = TIERS[tier].miniHearts;
   const total = burstCount + TAP_POOL;
 
-  const geometry = useMemo(() => {
-    const g = new ExtrudeGeometry(heartShape(), {
-      depth: 0.25,
-      bevelEnabled: true,
-      bevelSize: 0.06,
-      bevelThickness: 0.06,
-      bevelSegments: 2,
-      curveSegments: 6,
-    });
-    g.center();
-    return g;
-  }, []);
+  const env = useHeartEnvMap();
+  const owned = lite(tier);
+  const geometry = useMemo(
+    () => (owned ? extrudedHeart() : sharedHeartGeometry()),
+    [owned],
+  );
 
   const instances = useMemo(() => {
     const rand = mulberry32(11);
@@ -81,12 +173,13 @@ export function MiniHearts({ tier }: { tier: Tier }) {
     const root = document.querySelector<HTMLElement>('[data-love-root]');
     if (!mesh || !root) return;
     const c = readTokenColors(root);
+    const gold = c.gold.night;
     const palette: Color[] = [
-      c.primary.night,
-      c.secondary.night,
-      c.gold.night,
-      c.foreground.night,
-      c['primary-hover'].night,
+      gold,
+      gold.clone().offsetHSL(0, 0, 0.08),
+      gold.clone().offsetHSL(0, 0, -0.08),
+      gold,
+      LAVENDER,
     ];
     instances.forEach((inst, i) => {
       mesh.setColorAt(i, palette[inst.color]);
@@ -98,7 +191,12 @@ export function MiniHearts({ tier }: { tier: Tier }) {
     mesh.instanceMatrix.needsUpdate = true;
   }, [instances]);
 
-  useEffect(() => () => geometry.dispose(), [geometry]);
+  useEffect(
+    () => () => {
+      if (owned) geometry.dispose();
+    },
+    [geometry, owned],
+  );
 
   const wasActive = useRef(false);
 
@@ -139,10 +237,15 @@ export function MiniHearts({ tier }: { tier: Tier }) {
       args={[geometry, undefined, total]}
       frustumCulled={false}
     >
-      <meshStandardMaterial
+      <meshPhysicalMaterial
+        metalness={1}
+        roughness={0.22}
+        clearcoat={0.6}
+        clearcoatRoughness={0.15}
+        envMap={env}
+        envMapIntensity={1.2}
         emissive="#ffffff"
-        emissiveIntensity={0.15}
-        roughness={0.5}
+        emissiveIntensity={0.08}
         onBeforeCompile={tintEmissive}
       />
     </instancedMesh>
@@ -207,25 +310,19 @@ function respawn(o: (typeof ambient)[number], now: number) {
 export function AmbientHearts({ tier }: { tier: Tier }) {
   const ref = useRef<InstancedMesh>(null);
   const centre = useMemo(() => new Vector3(), []);
-  const geometry = useMemo(() => {
-    const g = new ExtrudeGeometry(heartShape(), {
-      depth: 0.2,
-      bevelEnabled: true,
-      bevelSize: 0.05,
-      bevelThickness: 0.05,
-      bevelSegments: 2,
-      curveSegments: 6,
-    });
-    g.center();
-    return g;
-  }, []);
+  const env = useHeartEnvMap();
+  const owned = lite(tier);
+  const geometry = useMemo(
+    () => (owned ? extrudedHeart() : sharedHeartGeometry()),
+    [owned],
+  );
 
   useEffect(() => {
     const mesh = ref.current;
     const root = document.querySelector<HTMLElement>('[data-love-root]');
     if (!mesh || !root) return;
     const c = readTokenColors(root);
-    const palette: Color[] = [c.gold.night, c.primary.night, c.secondary.night];
+    const palette: Color[] = [c.gold.night, LAVENDER, c.gold.night];
     ambient.forEach((o, i) => {
       mesh.setColorAt(i, palette[o.color]);
       dummy.scale.setScalar(0);
@@ -236,7 +333,12 @@ export function AmbientHearts({ tier }: { tier: Tier }) {
     mesh.instanceMatrix.needsUpdate = true;
   }, []);
 
-  useEffect(() => () => geometry.dispose(), [geometry]);
+  useEffect(
+    () => () => {
+      if (owned) geometry.dispose();
+    },
+    [geometry, owned],
+  );
 
   useFrame((state) => {
     const mesh = ref.current;
@@ -272,10 +374,15 @@ export function AmbientHearts({ tier }: { tier: Tier }) {
       args={[geometry, undefined, AMBIENT]}
       frustumCulled={false}
     >
-      <meshStandardMaterial
+      <meshPhysicalMaterial
+        metalness={1}
+        roughness={0.22}
+        clearcoat={0.6}
+        clearcoatRoughness={0.15}
+        envMap={env}
+        envMapIntensity={1.2}
         emissive="#ffffff"
-        emissiveIntensity={0.6}
-        roughness={0.5}
+        emissiveIntensity={0.25}
         onBeforeCompile={tintEmissive}
       />
     </instancedMesh>

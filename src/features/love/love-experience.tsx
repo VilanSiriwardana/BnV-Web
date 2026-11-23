@@ -31,7 +31,7 @@ import { CalmModeToggle } from './ui/calm-mode-toggle';
 import { FoundChip } from './ui/found-chip';
 import { LoveSlugContext } from './ui/hidden-heart';
 import { MusicToggle } from './ui/music-toggle';
-import { ProgressHeart } from './ui/progress-heart';
+import { LoveScrollbar } from './ui/love-scrollbar';
 
 // Client-only 3D chunk (Tech Stack §5.1): never in shop bundles, never server-rendered.
 const LoveCanvas = dynamic(() => import('./canvas/love-canvas'), {
@@ -139,7 +139,7 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
       )}
       {debug && HeartDebugPanel && <HeartDebugPanel />}
       {debug && GalleryDebugPanel && <GalleryDebugPanel />}
-      <main>
+      <main id="love-main">
         <Hero name={name} sub={site.copy.heroSub} />
         <Bloom
           line={site.copy.bloomLine}
@@ -200,7 +200,7 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
       />
       {entered && <MusicToggle />}
       {entered && <FoundChip slug={site.slug} />}
-      <ProgressHeart />
+      <LoveScrollbar />
       <CalmModeToggle />
     </div>
   );

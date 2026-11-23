@@ -72,14 +72,16 @@ export function shardMotion(
   t: number,
   impact: Point2,
   out: ShardPose,
+  /** Screen-space swipe direction (x right, y down); shards follow the blow. */
+  push: Point2 = { x: 0, y: 0 },
 ) {
   const rand = mulberry32(index * 97 + 13);
   const ox = shard.centroid.x - impact.x;
   const oy = shard.centroid.y - impact.y;
   const d = Math.hypot(ox, oy) || 1;
   const burst = 0.6 + rand() * 0.9;
-  const vx = (ox / d) * burst;
-  const vy = (oy / d) * burst + 0.4 * rand();
+  const vx = (ox / d) * burst + push.x * 0.8;
+  const vy = (oy / d) * burst + 0.4 * rand() - push.y * 0.8;
   const vz = 0.9 + rand() * 1.1;
   out.x = shard.centroid.x + vx * t;
   out.y = shard.centroid.y + vy * t - 0.5 * GRAVITY * t * t;

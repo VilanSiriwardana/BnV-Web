@@ -38,6 +38,7 @@ import { GalleryRitualOverlay } from '../ui/gallery-ritual-overlay';
 import { GalleryLightbox } from '../ui/lightbox';
 import { HiddenHeart } from '../ui/hidden-heart';
 import { HIDDEN_GALLERY_TILE } from '../ui/hidden-heart-placements';
+import { TinyHeart } from './letter-ornaments';
 import { LoveSection, sectionTitle } from './love-section';
 import { LovePhoto } from './love-photo';
 
@@ -71,6 +72,7 @@ function GalleryWalkStage({
   ritual: ritualPrompts,
 }: Props) {
   const { scrollTo, stop, start } = useLoveScroll();
+  const [welcomeWord, welcomeName] = splitWelcome(welcome, name);
   const photos = useMemo(
     () => galleryPhotos(gallery, galleryEnd),
     [gallery, galleryEnd],
@@ -158,18 +160,50 @@ function GalleryWalkStage({
   return (
     <LoveSection id="gallery" depth={0.5} stage="550vh" className="min-h-svh">
       <div className="pointer-events-none absolute inset-0 grid place-items-center px-4">
-        <span
-          aria-hidden
-          className="bg-scrim/60 col-start-1 row-start-1 size-[min(80vw,36rem)] rounded-full blur-3xl"
-        />
-        <h2
-          id="gallery-title"
+        <div
           data-gallery-welcome
-          className="text-display text-gold-text col-start-1 row-start-1 text-center text-balance opacity-0 drop-shadow-[0_0_24px_var(--love-aurora-gold)]"
+          className="relative flex flex-col items-center opacity-0 [perspective:600px]"
         >
-          {welcome ?? `Welcome, ${name}`}
-          <span className="sr-only">. {title}</span>
-        </h2>
+          <span
+            aria-hidden
+            data-welcome-bloom
+            className="absolute top-1/2 left-1/2 size-[min(80vw,34rem)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--love-aurora-gold)_45%,transparent),transparent_65%)] opacity-0 blur-2xl"
+          />
+          <h2
+            id="gallery-title"
+            className="text-gold-text relative flex flex-col items-center text-center drop-shadow-[0_0_24px_var(--love-aurora-gold)]"
+          >
+            <span className="flex items-center gap-3 md:gap-5">
+              <WelcomeFlourish side="left" />
+              <span
+                data-welcome-word
+                className="font-display text-small md:text-h3 tracking-[0.4em] uppercase"
+              >
+                {welcomeWord}
+              </span>
+              <WelcomeFlourish side="right" />
+            </span>
+            <span className="relative mt-1 pr-2">
+              <span
+                data-welcome-name
+                className="font-body text-display block italic"
+              >
+                {welcomeName}
+              </span>
+              <span
+                aria-hidden
+                data-welcome-shine
+                className="font-body text-display love-foil pointer-events-none absolute inset-0 pr-2 italic"
+              >
+                {welcomeName}
+              </span>
+            </span>
+            <span className="sr-only">. {title}</span>
+          </h2>
+          <span aria-hidden data-welcome-dot className="mt-2">
+            <TinyHeart className="text-gold size-4" />
+          </span>
+        </div>
       </div>
 
       <ul className="sr-only">
@@ -226,6 +260,35 @@ function GalleryWalkStage({
         <GalleryInspect state={state} photos={photos} />
       )}
     </LoveSection>
+  );
+}
+
+/** "Welcome, Buwi" → ["Welcome", "Buwi"]; a custom line without a comma stays whole. */
+function splitWelcome(welcome: string | undefined, name: string) {
+  if (!welcome) return ['Welcome', name] as const;
+  const i = welcome.indexOf(',');
+  return i < 0
+    ? (['', welcome] as const)
+    : ([welcome.slice(0, i).trim(), welcome.slice(i + 1).trim()] as const);
+}
+
+// Gilt flourish beside "WELCOME": a scroll that draws in from the centre (DrawSVG).
+function WelcomeFlourish({ side }: { side: 'left' | 'right' }) {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 120 24"
+      className={`text-gold h-4 w-16 md:h-6 md:w-28 ${side === 'left' ? '-scale-x-100' : ''}`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+    >
+      <path
+        data-welcome-flourish
+        d="M2 12 H58 C70 12 74 4 84 4 C94 4 96 14 88 16 C82 17 80 10 86 9 M58 12 C72 12 78 20 92 20 C104 20 110 12 118 12"
+      />
+    </svg>
   );
 }
 

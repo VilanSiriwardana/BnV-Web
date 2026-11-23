@@ -28,7 +28,7 @@ import { galleryState } from '../engine/gallery-state';
 import { placeAcross } from './gallery-corridor';
 import { createKeyGeometry } from './gallery-key';
 import { filigreeTexture, glowTexture } from './gallery-surfaces';
-import { heartShape } from './mini-hearts';
+import { inflatedHeartGeometry } from './mini-hearts';
 
 const W = GALLERY_DIMS.width;
 const PILASTER = 0.22;
@@ -130,11 +130,7 @@ export function GalleryDoorway({ curve }: { curve: CatmullRomCurve3 }) {
       bevelThickness: 0.02,
       bevelSegments: 2,
     };
-    const crest = new ExtrudeGeometry(heartShape(), {
-      ...bevel,
-      curveSegments: 8,
-    });
-    crest.center();
+    const crest = inflatedHeartGeometry(0.36);
 
     return {
       textures: [filigree, glow],

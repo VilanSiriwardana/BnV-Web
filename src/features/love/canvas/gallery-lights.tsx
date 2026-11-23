@@ -8,12 +8,12 @@ import {
   BufferGeometry,
   type CatmullRomCurve3,
   Color,
-  ExtrudeGeometry,
   Fog,
   type InstancedMesh,
   type Mesh,
   MathUtils,
   MeshBasicMaterial,
+  MeshPhysicalMaterial,
   Object3D,
   PlaneGeometry,
   type PointLight,
@@ -34,7 +34,7 @@ import {
 import { galleryState, inspectWeight } from '../engine/gallery-state';
 import { TIERS, type Tier } from '../engine/tiers';
 import { glowTexture } from './gallery-surfaces';
-import { heartShape } from './mini-hearts';
+import { inflatedHeartGeometry, useHeartEnvMap } from './mini-hearts';
 import { mulberry32 } from './heart-geometry';
 
 const WARM = '#ffd29a';
@@ -374,22 +374,22 @@ function Motes({ curve, count }: { curve: CatmullRomCurve3; count: number }) {
 function Companion({ curve }: { curve: CatmullRomCurve3 }) {
   // FR-10: a small gold heart floating ahead; it pulses as a frame opens.
   const ref = useRef<Mesh>(null);
+  const env = useHeartEnvMap();
   const parts = useMemo(() => {
-    const geo = new ExtrudeGeometry(heartShape(), {
-      depth: 0.25,
-      bevelEnabled: true,
-      bevelSize: 0.06,
-      bevelThickness: 0.06,
-      bevelSegments: 2,
-      curveSegments: 6,
-    });
-    geo.center();
-    const mat = new MeshBasicMaterial({
-      color: new Color('#e8c46a').multiplyScalar(1.8),
-      toneMapped: false,
+    const geo = inflatedHeartGeometry();
+    const mat = new MeshPhysicalMaterial({
+      color: '#e8c46a',
+      metalness: 1,
+      roughness: 0.22,
+      clearcoat: 0.6,
+      clearcoatRoughness: 0.15,
+      envMap: env,
+      envMapIntensity: 1.4,
+      emissive: '#6b4a10',
+      emissiveIntensity: 0.6,
     });
     return { geo, mat };
-  }, []);
+  }, [env]);
   useEffect(
     () => () => {
       parts.geo.dispose();

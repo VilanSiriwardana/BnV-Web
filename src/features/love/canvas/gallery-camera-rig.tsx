@@ -16,6 +16,7 @@ import {
   inspectPose,
   walkPose,
 } from '../engine/gallery-path';
+import { decayRitualKick, ritualState } from '../engine/gallery-ritual';
 import { galleryState } from '../engine/gallery-state';
 
 const { damp, lerp } = MathUtils;
@@ -27,6 +28,7 @@ const posA = new Vector3();
 const lookA = new Vector3();
 const posB = new Vector3();
 const lookB = new Vector3();
+const kickOffset = new Vector3();
 
 type Props = {
   curve: CatmullRomCurve3;
@@ -76,7 +78,11 @@ export function GalleryCameraRig({ curve, order, sizes }: Props) {
     const fovB = pose(to, cam.aspect, posB, lookB);
     posA.lerp(posB, blend).add(GALLERY_ORIGIN);
     lookA.lerp(lookB, blend).add(GALLERY_ORIGIN);
+    // Strike kick from the unlock ritual (decays within ~150 ms).
+    decayRitualKick(delta);
+    const kick = ritualState.kick;
     cam.position.copy(posA);
+    if (kick) cam.position.add(kickOffset.set(0.015 * kick, -0.01 * kick, 0));
     cam.lookAt(lookA);
     const fov = lerp(fovA, fovB, blend);
     if (Math.abs(cam.fov - fov) > 1e-3) {

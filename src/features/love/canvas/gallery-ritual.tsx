@@ -48,7 +48,30 @@ import { projectRadius, projectToScreen } from './projection';
 const CASE = { x: -0.86, y: 1.2, z: 0.85, w: 0.34, h: 0.26, d: 0.3 };
 const PEDESTAL_H = 1.05;
 const HAMMER_LEN = 0.55;
-const RAISED = MathUtils.degToRad(-100);
+// Blueprint 055: the strike follows her stroke — the head starts on the stroke's start side and
+// leads along it into the pane, the handle pointing ahead toward its end.
+const IMPACT = new Vector3(CASE.x, CASE.y + 0.03, CASE.z + CASE.d / 2 + 0.07);
+const REACH = 0.6;
+const UP = new Vector3(0, 1, 0);
+const swingDir = new Vector3();
+const swingFrom = new Vector3();
+const swingVia = new Vector3();
+const handleDir = new Vector3();
+const swingQuat = new Quaternion();
+const hammerAt = (dir: Vector3, t: number, out: Vector3) => {
+  swingFrom.copy(IMPACT).addScaledVector(dir, -REACH);
+  swingFrom.z += 0.15;
+  swingVia.lerpVectors(swingFrom, IMPACT, 0.5);
+  swingVia.x += -dir.y * 0.08;
+  swingVia.y += dir.x * 0.08;
+  swingVia.z += 0.12;
+  const u = 1 - t;
+  return out
+    .copy(swingFrom)
+    .multiplyScalar(u * u)
+    .addScaledVector(swingVia, 2 * u * t)
+    .addScaledVector(IMPACT, t * t);
+};
 const SPARKS = 40;
 const KEY_REST = new Vector3(CASE.x, PEDESTAL_H + 0.03, CASE.z);
 const KEY_HOVER = new Vector3(KEYHOLE_LOCAL.x, KEYHOLE_LOCAL.y, 0.28);
@@ -238,7 +261,7 @@ export function GalleryRitual({ curve, tier }: Props) {
       if (sm.visible) {
         const pos = sm.geometry.attributes.position as BufferAttribute;
         shards.forEach((shard, i) => {
-          shardMotion(shard, i, t, s.impact, pose);
+          shardMotion(shard, i, t, s.impact, pose, s.swipe);
           const cr = Math.cos(pose.rx);
           const sr = Math.sin(pose.rx);
           const cy = Math.cos(pose.ry);
@@ -279,11 +302,17 @@ export function GalleryRitual({ curve, tier }: Props) {
     const h = hammer.current;
     if (h) {
       h.visible = s.mode === 'smashing';
-      h.rotation.set(
-        MathUtils.lerp(RAISED, 0, s.hammer),
-        0,
-        s.hammerDir * 0.35 * (1 - s.hammer),
-      );
+      const along = MathUtils.clamp(s.hammer, 0, 1);
+      // Screen y points down; the door group's y points up.
+      swingDir.set(s.swipe.x, -s.swipe.y, 0).normalize();
+      hammerAt(swingDir, along, h.position);
+      // Wind-up pulls back against the stroke before the strike.
+      const pull = Math.max(0, -s.hammer) / 0.12;
+      h.position.addScaledVector(swingDir, -pull * 0.1);
+      handleDir
+        .set(swingDir.x, swingDir.y, 0.5 * (1 - along) + 0.2 * pull)
+        .normalize();
+      h.quaternion.copy(swingQuat.setFromUnitVectors(UP, handleDir));
     }
 
     // Key: resting on the velvet, held under her finger, drifting home, or sliding into the lock.
@@ -490,24 +519,15 @@ export function GalleryRitual({ curve, tier }: Props) {
         raycast={none}
       />
 
-      {/* Sledgehammer: pivots above her side of the case */}
-      <group
-        ref={hammer}
-        position={[CASE.x, CASE.y + HAMMER_LEN, CASE.z + CASE.d / 2 + 0.06]}
-        visible={false}
-      >
+      {/* Sledgehammer: origin at the head, handle pointing ahead along her stroke */}
+      <group ref={hammer} visible={false}>
         <mesh
           geometry={handle}
           material={wood}
-          position={[0, -HAMMER_LEN / 2, 0]}
+          position={[0, HAMMER_LEN / 2, 0]}
           raycast={none}
         />
-        <mesh
-          geometry={head}
-          material={gold}
-          position={[0, -HAMMER_LEN, 0]}
-          raycast={none}
-        />
+        <mesh geometry={head} material={gold} raycast={none} />
       </group>
     </group>
   );

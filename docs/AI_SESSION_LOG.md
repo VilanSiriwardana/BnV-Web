@@ -1036,3 +1036,26 @@ Implemented M28–M33 in the order M28 → M32 → M29 → M31 → M30 → M33:
 
 - `tsc --noEmit`, eslint (love) clean; Vitest 37 files, 165 tests pass.
 - Headless Chrome with real CDP mouse input: scroll stays put under wheel input while locked; a mouse swipe across the case swings the hammer and advances to "Carefully take the key…"; a far drop returns the key; Use the key inserts, turns and opens the doors; wheel scroll works afterwards. Not checked on real devices or with a real touch drag into the keyhole.
+
+## 2026-11-23 — Gallery polish (blueprint 054)
+
+- Soft 3D hearts: `softHeartShape()` + `SOFT_HEART_EXTRUDE` (béziers, round lobes, one point, pillowy bevel) for mini, ambient, companion and the door crest; particle heart unchanged (test `canvas/soft-heart.test.ts`).
+- Diagonal hammer: the head follows a curve from up-left of the case to the pane (handle trailing up-left), wind-up → strike → rebound, camera kick (`ritualState.kick`, decayed in the rig), shards pushed along the swipe. Deviation: a single fixed pivot cannot read as a top-left → bottom-right strike, so the head travels a bézier path instead.
+- Overlay: only a down-right diagonal (15–75°, ≥ 70 px, across the case) counts; an animated DrawSVG arrow shows the stroke; misses shake the prompt with a hint; Break the glass / Use the key / Open it for me appear after 3 misses or via the Help pill (20 s timer removed).
+- Welcome: bloom, drawn flourishes, spaced Cinzel "WELCOME" (SplitText), italic Cormorant name lifting in letter by letter, a foil band on an unsplit overlay (background-clip text breaks on split letters), heart dot, then rises. Dev double-mount fix: kill pending tweens on mount, revert the split on cleanup.
+- `ui/love-scrollbar.tsx` replaces `ProgressHeart` (left in place, unused): gold rail + draggable gold-heart thumb on `--progress`, click-to-jump, dimmed/inert while Lenis is stopped, phone thumb on the right edge while scrolling; `role="scrollbar"` controlling `#love-main`.
+
+### Verification
+
+- `tsc --noEmit`, eslint (love) clean; Vitest 38 files, 167 tests pass.
+- Headless Chrome: Help only at first; a sideways swipe shakes the prompt with the hint; after 3 misses Break the glass + Open it for me appear; a real diagonal mouse swipe swings the hammer and moves on to the key; the welcome animates and rises; the heart scrollbar shows and reports position. Not checked on phones (thumb drag, touch swipe).
+
+## 2026-11-23 — Love Site: glossy gold/lavender hearts, swipe-aligned hammer (blueprint 055)
+
+- `canvas/mini-hearts.tsx`: `inflatedHeartGeometry()` (one smooth pillow surface from `softHeartShape`, no bevel rings), module-shared `sharedHeartGeometry()`, `useHeartEnvMap()` (local `RoomEnvironment` PMREM, not `scene.environment`). Mini and ambient hearts use metallic `meshPhysicalMaterial` in gold shades plus lavender `#b9a6e0`; `low`/`static` tiers keep the extrude.
+- Companion (`gallery-lights.tsx`) and door crest (`gallery-doorway.tsx`) use the inflated geometry; the companion is now polished gold. Hero particle heart unchanged.
+- Hammer (`canvas/gallery-ritual.tsx`): the strike arc and orientation follow `ritualState.swipe`; head leads along the stroke, handle trails toward its start. Any stroke direction across the case breaks the glass; the prompts no longer name a direction.
+
+### Verification
+
+- `tsc --noEmit`, eslint (love) clean; Vitest love suite 32 files, 133 tests pass (new inflated-geometry tests). Not checked visually in a browser.

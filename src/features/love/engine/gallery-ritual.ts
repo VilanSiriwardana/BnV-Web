@@ -18,7 +18,10 @@ type Screen = { x: number; y: number; r: number; visible: boolean };
 export const ritualState = {
   mode: 'idle' as RitualMode,
   hammer: 0, // swing 0..1 (1 = strike)
-  hammerDir: 1 as 1 | -1, // swipe direction (sign of x)
+  /** Normalised swipe direction on screen (x right, y down); pushes the shards. */
+  swipe: { x: 0.7, y: 0.7 },
+  /** Camera kick at the strike, 1 → 0 (decayed by the camera rig). */
+  kick: 0,
   shatterAt: -1, // performance.now() of the strike, -1 = intact
   impact: { x: 0, y: 0 }, // pane-local strike point
   keyHeld: false,
@@ -77,11 +80,19 @@ export function arriveAtDoor(stageTop: number) {
   sendRitual({ type: 'arrive' });
 }
 
-/** Swipe direction (sign of x) picks the hammer's swing side and the strike point. */
-export function setRitualSwipe(dir: 1 | -1) {
-  ritualState.hammerDir = dir;
-  ritualState.impact.x = -dir * 0.05;
-  ritualState.impact.y = 0.02;
+/** Direction of her stroke: the hammer swings along it and the shards follow it. */
+export function setRitualSwipe(dx: number, dy: number) {
+  const d = Math.hypot(dx, dy) || 1;
+  ritualState.swipe.x = dx / d;
+  ritualState.swipe.y = dy / d;
+  // The strike lands slightly toward the side the stroke came from.
+  ritualState.impact.x = -0.08 * ritualState.swipe.x;
+  ritualState.impact.y = 0.07 * ritualState.swipe.y;
+}
+
+export function decayRitualKick(delta: number) {
+  if (ritualState.kick > 0)
+    ritualState.kick = Math.max(0, ritualState.kick - delta * 7);
 }
 
 /** Pointer position in NDC while she drags the key. */
@@ -109,13 +120,17 @@ function run(cmd: ReturnType<typeof reduceRitual>[1]) {
             if (autoChain) sendRitual({ type: 'auto' });
           },
         })
-        .to(s, { hammer: 1, duration: 0.45, ease: 'power3.in' })
+        // Wind-up, strike, impact, rebound, then the hammer withdraws.
+        .to(s, { hammer: -0.12, duration: 0.14, ease: 'power2.out' })
+        .to(s, { hammer: 1, duration: 0.32, ease: 'power4.in' })
         .call(() => {
           s.shatterAt = performance.now();
+          s.kick = 1;
           playChime(4);
         })
-        .to(s, { hammer: 0, duration: 0.5, ease: 'power2.out' })
-        .to({}, { duration: 0.4 });
+        .to(s, { hammer: 0.85, duration: 0.12, ease: 'power2.out' })
+        .to(s, { hammer: 0, duration: 0.45, ease: 'power2.inOut' }, '+=0.15')
+        .to({}, { duration: 0.3 });
       break;
     case 'returnKey':
       tween?.kill();
