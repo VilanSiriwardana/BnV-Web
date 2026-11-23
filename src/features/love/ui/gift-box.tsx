@@ -15,6 +15,7 @@ type Props = {
   label: string;
   opened: boolean;
   sealed: boolean;
+  sealedLabel?: string;
   onOpen: () => void;
   children: ReactNode;
 };
@@ -28,6 +29,7 @@ export function GiftBox({
   label,
   opened,
   sealed,
+  sealedLabel = 'Maybe next time…',
   onOpen,
   children,
 }: Props) {
@@ -92,7 +94,7 @@ export function GiftBox({
           opened
             ? 'opened'
             : sealed
-              ? 'sealed for next time'
+              ? sealedLabel
               : 'sealed. Hold or press Enter to open.'
         }`}
         data-state={state}
@@ -154,7 +156,7 @@ export function GiftBox({
         </svg>
       </button>
       <p className="text-small text-muted-foreground font-sans">
-        {sealed ? 'Maybe next time…' : label}
+        {sealed ? sealedLabel : label}
       </p>
       <div aria-live="polite" className="w-full">
         {opened && <div className="love-gift-card">{children}</div>}

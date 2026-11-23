@@ -38,7 +38,9 @@ export function AfterglowGifts({
       <p className="text-body text-muted-foreground mt-2">
         {gifts.mode === 'pick-one'
           ? 'Choose one. Hold it until the ribbon lets go.'
-          : 'Hold each one until the ribbon lets go.'}
+          : gifts.mode === 'sequence'
+            ? 'One at a time, in order. Hold each until the ribbon lets go.'
+            : 'Hold each one until the ribbon lets go.'}
       </p>
       <ul className="mt-10 grid justify-items-center gap-10 md:grid-cols-3">
         {gifts.items.map((g, i) => {
@@ -50,7 +52,19 @@ export function AfterglowGifts({
                 total={gifts.items.length}
                 label={g.label}
                 opened={isOpen}
-                sealed={!isOpen && pickedOne}
+                sealed={
+                  !isOpen &&
+                  (gifts.mode === 'sequence'
+                    ? gifts.items
+                        .slice(0, i)
+                        .some((p) => !opened.includes(p.id))
+                    : pickedOne)
+                }
+                sealedLabel={
+                  gifts.mode === 'sequence'
+                    ? 'Open the one before first'
+                    : undefined
+                }
                 onOpen={() => set.add(g.id)}
               >
                 <div className={card}>
@@ -128,7 +142,7 @@ function PlanCard({ title, plan }: { title: string; plan: Plan }) {
               )
             }
           >
-            <CalendarPlus aria-hidden />
+            <CalendarPlus aria-hidden className="text-primary" />
             Add to calendar
           </Button>
         )}
@@ -138,7 +152,7 @@ function PlanCard({ title, plan }: { title: string; plan: Plan }) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <MapPin aria-hidden />
+            <MapPin aria-hidden className="text-secondary" />
             Open in Maps
           </a>
         </Button>

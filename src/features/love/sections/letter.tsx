@@ -75,7 +75,7 @@ export function Letter({ title, letter }: Props) {
       gsap.set('[data-rod="bottom"]', { y: () => -half() });
       gsap.set('[data-letter-card]', { clipPath: 'inset(50% 0% 50% 0%)' });
       gsap.to('[data-scroll]', {
-        y: -6,
+        y: -3,
         duration: 3,
         ease: 'sine.inOut',
         repeat: -1,
@@ -190,7 +190,11 @@ export function Letter({ title, letter }: Props) {
       <div
         ref={root}
         data-letter-locked={letter.passphrase ? '' : undefined}
-        className="relative flex w-full flex-col items-center"
+        className={cn(
+          'relative flex w-full flex-col items-center',
+          !quiet &&
+            'min-h-[calc(100svh-12rem)] justify-center md:min-h-[calc(100svh-16rem)]',
+        )}
       >
         {!quiet && <LetterBackdrop />}
         <h2 id="letter-title" className={cn(sectionTitle, 'relative z-10')}>
@@ -201,9 +205,7 @@ export function Letter({ title, letter }: Props) {
           data-scroll
           className={cn(
             'z-10 mx-auto flex w-full max-w-2xl flex-col',
-            quiet
-              ? 'relative mt-12'
-              : 'absolute inset-x-4 top-1/2 h-[min(68svh,46rem)] w-auto -translate-y-1/2',
+            quiet ? 'relative mt-12' : 'relative mt-8 h-[min(62svh,44rem)]',
           )}
         >
           {!quiet && (
@@ -220,7 +222,7 @@ export function Letter({ title, letter }: Props) {
             data-lenis-prevent
             aria-hidden={!showOpen}
             className={cn(
-              'love-parchment relative min-h-0 flex-1 overflow-y-auto px-8 text-left md:px-14',
+              'love-parchment relative min-h-0 flex-1 overflow-y-auto text-left',
               quiet ? 'rounded-lg' : '-my-3',
               !showOpen && 'invisible',
             )}
@@ -230,7 +232,7 @@ export function Letter({ title, letter }: Props) {
               className="relative min-h-full pt-10 pb-12 md:pt-12 md:pb-14"
             >
               <ParchmentFrame />
-              <div className="relative mx-auto flex max-w-[60ch] flex-col gap-5 text-[1.15rem] leading-relaxed text-pretty break-words md:text-[1.25rem]">
+              <div className="relative mx-auto flex max-w-[60ch] flex-col gap-5 px-10 text-[1.15rem] leading-relaxed text-pretty break-words md:px-16 md:text-[1.25rem]">
                 {letter.salutation && (
                   <p
                     data-letter-p
@@ -273,7 +275,7 @@ export function Letter({ title, letter }: Props) {
                 data-letter-hint
                 className="text-gold sticky bottom-8 left-1/2 block h-0 w-fit -translate-x-1/2 animate-bounce motion-reduce:animate-none"
               >
-                <ChevronDown className="size-5" />
+                <ChevronDown className="text-gold size-5" />
               </span>
             )}
           </article>

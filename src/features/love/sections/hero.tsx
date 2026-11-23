@@ -44,7 +44,7 @@ export function Hero({ name, sub }: { name: string; sub: string }) {
         aria-hidden
         className="text-primary absolute bottom-10 left-1/2 -translate-x-1/2"
       >
-        <Heart className="size-4" />
+        <Heart className="text-secondary fill-secondary/40 size-4" />
       </div>
     </LoveSection>
   );

@@ -24,6 +24,11 @@ export const site: LoveSiteConfig = {
     reasonsHint: 'Turn the ring, or let the scroll turn it for you.',
     skyHint: 'Join our stars, one memory to the next.',
     skyDone: 'It was always a heart.',
+    skyReveal: [
+      'Every moment with you was a star.',
+      "I didn't know I was drawing you a heart.",
+      'It was always you.',
+    ],
     blowHint: "I'll listen for your breath. Nothing is recorded or sent.",
     // TODO(owner): Afterglow copy (Phase 10 placeholder).
     afterglowTitle: 'Afterglow',
@@ -334,7 +339,7 @@ export const site: LoveSiteConfig = {
   // never a home address; startsAt needs an explicit offset.
   afterglow: {
     gifts: {
-      mode: 'pick-one',
+      mode: 'sequence',
       items: [
         {
           id: 'gift-song',
@@ -363,6 +368,8 @@ export const site: LoveSiteConfig = {
         },
       ],
     },
+    openWhenIntro:
+      "Open any of these whenever you need them. I'm always here, and you are never too much. You matter to me more than I know how to say, every single day.",
     openWhen: [
       {
         id: 'note-miss',
@@ -395,7 +402,6 @@ export const site: LoveSiteConfig = {
           'Our first Christmas. I hope there is something warm in your hands and something silly on the radio.',
           'Thank you for being the best gift of my year.',
         ],
-        unlockAt: '2026-12-25T00:00:00+05:30',
       },
     ],
     secret: {

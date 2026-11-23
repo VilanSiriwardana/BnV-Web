@@ -1,7 +1,7 @@
 'use client';
 
 import gsap from 'gsap';
-import { Mic } from 'lucide-react';
+import { Mic, X } from 'lucide-react';
 import {
   type ReactNode,
   useCallback,
@@ -60,6 +60,27 @@ export function Wish({
   const timer = useRef<gsap.core.Tween | null>(null);
   const [phase, setPhase] = useState<Phase>('idle');
   const [writing, setWriting] = useState(false);
+  const writeToggle = useRef<HTMLButtonElement>(null);
+  const writePanel = useRef<HTMLDivElement>(null);
+  const closeWriting = useCallback(() => {
+    setWriting(false);
+    writeToggle.current?.focus();
+  }, []);
+  useEffect(() => {
+    if (!writing) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && closeWriting();
+    const onDown = (e: PointerEvent) => {
+      const t = e.target as Node;
+      if (!writePanel.current?.contains(t) && !writeToggle.current?.contains(t))
+        setWriting(false);
+    };
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('pointerdown', onDown);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('pointerdown', onDown);
+    };
+  }, [writing, closeWriting]);
   const fieldId = useId();
   const ringGradient = `wish-ring-${fieldId.replace(/[^a-z0-9]/gi, '')}`;
   const snuff = candleMode && !quiet;
@@ -294,7 +315,7 @@ export function Wish({
                   disabled={blow.status === 'starting'}
                   onClick={() => void blow.start()}
                 >
-                  <Mic aria-hidden />
+                  <Mic aria-hidden className="text-secondary" />
                   Use my microphone to blow
                 </Button>
                 <p className="text-small font-sans opacity-70">{blowHint}</p>
@@ -326,6 +347,7 @@ export function Wish({
           </Button>
         )}
         <Button
+          ref={writeToggle}
           variant="love-link"
           size="inline"
           aria-expanded={writing}
@@ -337,7 +359,18 @@ export function Wish({
         </Button>
         {writing && (
           // Never stored or sent (Tech Stack §9.3): uncontrolled, no name, no form.
-          <div className="love-parchment relative mt-3 w-full max-w-sm rounded-lg p-4 text-left max-md:fixed max-md:inset-x-0 max-md:bottom-0 max-md:z-30 max-md:max-w-none max-md:rounded-b-none max-md:pb-[max(1rem,env(safe-area-inset-bottom))]">
+          <div
+            ref={writePanel}
+            className="love-parchment relative mt-3 w-full max-w-sm rounded-lg p-4 pt-12 text-left max-md:fixed max-md:inset-x-0 max-md:bottom-0 max-md:z-30 max-md:max-w-none max-md:rounded-b-none max-md:pb-[max(1rem,env(safe-area-inset-bottom))]"
+          >
+            <button
+              type="button"
+              onClick={closeWriting}
+              aria-label="Close"
+              className="focus-ring hover:bg-gold/20 text-secondary absolute top-1.5 right-1.5 grid size-10 place-items-center rounded-full transition-colors"
+            >
+              <X className="size-4" />
+            </button>
             <Textarea
               id={fieldId}
               aria-label="Your wish"

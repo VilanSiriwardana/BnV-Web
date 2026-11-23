@@ -27,7 +27,7 @@ const STRIKE_BOOST = 0.15;
 let boost = 0;
 
 const baseGlow = () =>
-  HEART_PATH[section].glow + (section === 'timeline' ? boost : 0);
+  (HEART_PATH[section].glow + (section === 'timeline' ? boost : 0)) * 1.25;
 const reduced = () =>
   typeof window !== 'undefined' &&
   window.matchMedia(REDUCED_MOTION_QUERY).matches;

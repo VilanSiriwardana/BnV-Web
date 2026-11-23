@@ -41,7 +41,7 @@ export function LetterBackdrop() {
     <div
       aria-hidden
       // Covers the whole sticky stage (offset by the section padding) with soft edges: no seam.
-      className="pointer-events-none absolute -top-24 left-1/2 h-svh w-screen -translate-x-1/2 overflow-hidden [mask-image:linear-gradient(transparent,#000_12%,#000_88%,transparent)] md:-top-32"
+      className="pointer-events-none absolute inset-x-0 -top-24 h-svh overflow-hidden [mask-image:linear-gradient(transparent,#000_12%,#000_88%,transparent)] md:-top-32"
     >
       <div className="love-grain absolute inset-0" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_55%,color-mix(in_oklab,var(--gold)_10%,transparent),transparent_70%)]" />
@@ -73,31 +73,29 @@ export function LetterBackdrop() {
   );
 }
 
+// Corner flourish growing out of the inner border line (8 px in); the borders round with the same radius.
 function Curl({ className }: { className: string }) {
   return (
     <svg
       aria-hidden
       viewBox="0 0 64 64"
-      className={`text-gold absolute size-12 md:size-16 ${className}`}
+      className={`text-gold absolute size-16 overflow-visible ${className}`}
     >
       <path
-        d="M4 60 C 4 30, 14 12, 36 8 C 50 6, 58 14, 54 24 C 50 33, 38 30, 40 22 C 42 16, 50 18, 48 22"
+        d="M8 58 C10 36, 20 18, 40 13 C51 10, 56 20, 49 26 C43 31, 35 26, 39 20"
         fill="none"
         stroke="currentColor"
-        strokeWidth="1.6"
+        strokeWidth="1.4"
         strokeLinecap="round"
       />
       <path
-        d="M10 60 C 12 44, 18 34, 28 30"
+        d="M58 8 C46 9, 34 12, 27 17"
         fill="none"
         stroke="currentColor"
         strokeWidth="1"
         strokeLinecap="round"
       />
-      <path
-        d="M58 58 m-3 0 a3 3 0 1 0 6 0 a3 3 0 1 0 -6 0"
-        fill="currentColor"
-      />
+      <circle cx="22" cy="22" r="1.8" fill="currentColor" />
     </svg>
   );
 }
@@ -107,12 +105,12 @@ export function ParchmentFrame() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0">
       <div className="love-grain absolute inset-0 rounded-[inherit]" />
-      <div className="border-gold/70 absolute inset-2 rounded-md border-2 md:inset-3" />
-      <div className="border-gold/50 absolute inset-4 rounded-sm border md:inset-5" />
-      <Curl className="top-3 left-3" />
-      <Curl className="top-3 right-3 -scale-x-100" />
-      <Curl className="bottom-3 left-3 -scale-y-100" />
-      <Curl className="right-3 bottom-3 -scale-100" />
+      <div className="border-gold/70 absolute inset-2 rounded-[2rem] border-2 md:inset-3" />
+      <div className="border-gold/50 absolute inset-4 rounded-[1.5rem] border md:inset-5" />
+      <Curl className="top-2 left-2 md:top-3 md:left-3" />
+      <Curl className="top-2 right-2 -scale-x-100 md:top-3 md:right-3" />
+      <Curl className="bottom-2 left-2 -scale-y-100 md:bottom-3 md:left-3" />
+      <Curl className="right-2 bottom-2 -scale-100 md:right-3 md:bottom-3" />
       <div className="absolute top-0 right-10 flex h-24 w-8 flex-col items-center md:right-16 md:h-28">
         <div className="bg-secondary w-full flex-1 shadow-[inset_-3px_0_0_color-mix(in_oklab,var(--gold)_60%,transparent)]" />
         <div className="border-t-secondary size-0 border-x-[16px] border-t-[12px] border-x-transparent" />

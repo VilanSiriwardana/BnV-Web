@@ -28,6 +28,7 @@ type Props = {
   stars: Star[];
   hint: string;
   done: string;
+  reveal: string[];
   slug: string;
   quiet: boolean;
 };
@@ -41,7 +42,14 @@ const OUTLINE = (() => {
 })();
 
 // Romance Additions F3. `linked` counts finished links: star i joins i + 1, the last closes to 0.
-export function SkyConstellation({ stars, hint, done, slug, quiet }: Props) {
+export function SkyConstellation({
+  stars,
+  hint,
+  done,
+  reveal,
+  slug,
+  quiet,
+}: Props) {
   const n = stars.length;
   const pos = useMemo(() => skyStarLayout(n), [n]);
   const box = useRef<HTMLDivElement>(null);
@@ -144,8 +152,14 @@ export function SkyConstellation({ stars, hint, done, slug, quiet }: Props) {
 
   return (
     <div data-sky className="relative w-full">
-      <p id={hintId} className="text-small font-sans tracking-wide opacity-80">
-        {complete ? done : hint}
+      <p
+        id={hintId}
+        className={cn(
+          'text-small font-sans tracking-wide transition-opacity duration-700',
+          complete ? 'opacity-0' : 'opacity-80',
+        )}
+      >
+        {hint}
       </p>
       <div
         ref={box}
@@ -154,16 +168,19 @@ export function SkyConstellation({ stars, hint, done, slug, quiet }: Props) {
         <svg
           aria-hidden
           viewBox="0 0 100 100"
-          className="absolute inset-0 size-full overflow-visible"
+          className={cn(
+            'absolute inset-0 size-full overflow-visible transition-[filter] duration-1000',
+            complete && 'drop-shadow-[0_0_6px_var(--gold)]',
+          )}
         >
           <path
             d={OUTLINE}
             fill="none"
             className={cn(
-              'stroke-gold transition-opacity duration-1000',
-              complete ? 'opacity-40' : 'opacity-0',
+              'stroke-gold transition-opacity duration-[1600ms]',
+              complete ? 'opacity-70' : 'opacity-0',
             )}
-            strokeWidth={0.3}
+            strokeWidth={0.4}
           />
           {Array.from({ length: Math.min(linked, n) }, (_, i) => (
             <SkyLine key={i} a={pos[i]} b={pos[(i + 1) % n]} instant={quiet} />
@@ -223,7 +240,8 @@ export function SkyConstellation({ stars, hint, done, slug, quiet }: Props) {
                 <span
                   aria-hidden
                   className={cn(
-                    'text-gold-text pointer-events-none absolute top-1/2 hidden -translate-y-1/2 font-sans text-xs whitespace-nowrap md:block',
+                    'text-gold-text pointer-events-none absolute top-1/2 hidden -translate-y-1/2 font-sans text-xs whitespace-nowrap transition-opacity duration-700 md:block',
+                    complete && 'opacity-0',
                     p.x > 50
                       ? 'left-full ml-1 text-left'
                       : 'right-full mr-1 text-right',
@@ -241,13 +259,33 @@ export function SkyConstellation({ stars, hint, done, slug, quiet }: Props) {
         aria-hidden
         className="text-gold-text mt-3 min-h-[2.5em] font-sans text-xs md:hidden"
       >
-        {linked > 0 && (
+        {linked > 0 && !complete && (
           <>
             {latest.title}
             <span className="block opacity-70">{latest.date}</span>
           </>
         )}
       </p>
+      {complete && (
+        <div className="mt-2 flex flex-col items-center gap-2">
+          {[...reveal, done].map((text, i, all) => (
+            <p
+              key={text}
+              className={cn(
+                'animate-in fade-in slide-in-from-bottom-2 fill-mode-both duration-1000 motion-reduce:animate-none',
+                i === all.length - 1
+                  ? 'font-display text-gold-text mt-2 text-2xl md:text-3xl'
+                  : 'text-body-lg text-foreground/85 italic',
+              )}
+              style={{
+                animationDelay: quiet ? undefined : `${600 + i * 1400}ms`,
+              }}
+            >
+              {text}
+            </p>
+          ))}
+        </div>
+      )}
       <p aria-live="polite" className="sr-only">
         {announce}
       </p>

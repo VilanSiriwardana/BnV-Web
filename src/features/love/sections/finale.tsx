@@ -78,7 +78,7 @@ export function Finale({
           className="mt-6"
           onClick={onReplay}
         >
-          <RotateCcw aria-hidden />
+          <RotateCcw aria-hidden className="text-gold" />
           Replay our story
         </Button>
         <div className="mt-4 flex flex-col items-center gap-3">

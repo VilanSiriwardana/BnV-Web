@@ -33,7 +33,7 @@ export function MusicToggle() {
       transition={{ duration: duration.fast, ease: ease.standard }}
       className="border-border bg-surface/80 text-foreground focus-ring fixed top-4 right-4 z-20 flex size-11 items-center justify-center rounded-md border backdrop-blur-sm"
     >
-      <Icon aria-hidden className="size-5" />
+      <Icon aria-hidden className="text-primary size-5" />
     </motion.button>
   );
 }

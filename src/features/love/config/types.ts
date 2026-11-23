@@ -30,6 +30,7 @@ export type LoveSiteConfig = {
     reasonsHint?: string;
     skyHint?: string;
     skyDone?: string;
+    skyReveal?: string[];
     blowHint?: string;
     afterglowTitle?: string;
     afterglowIntro?: string;
@@ -65,7 +66,7 @@ export type LoveSiteConfig = {
   finale?: { spell?: { line1?: string; line2?: string } };
   afterglow?: {
     gifts?: {
-      mode: 'pick-one' | 'open-all';
+      mode: 'pick-one' | 'open-all' | 'sequence';
       items: {
         id: string;
         label: string;
@@ -86,6 +87,7 @@ export type LoveSiteConfig = {
       paragraphs: string[];
       unlockAt?: string;
     }[];
+    openWhenIntro?: string;
     secret?: { title: string; paragraphs: string[]; photo?: PhotoRef };
   };
   hidden?: { hint: string };

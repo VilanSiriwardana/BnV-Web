@@ -132,6 +132,7 @@
 /* Love Site (/love/[slug]) — night-only aliases (all-night theme, 2026-11-13). Mirrors the .dark token block above
    and Brand §41.6; update together. --depth deepens the night (Love Site Experience §3.1). */
 [data-love-root] {
+  overflow-x: clip;
   --depth: 0;
   --love-aurora-lav: color-mix(in oklab, var(--night-primary) 14%, transparent);
   --love-aurora-gold: color-mix(in oklab, var(--night-gold) 10%, transparent);
@@ -702,6 +703,19 @@
 
   ::-webkit-scrollbar-track {
     background: transparent;
+  }
+
+  ::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  /* Love Site: the ProgressHeart rail is the scrollbar; hide the native one (inner scrollers keep theirs). */
+  html:has([data-love-root]) {
+    scrollbar-width: none;
+  }
+
+  html:has([data-love-root])::-webkit-scrollbar {
+    display: none;
   }
 
   ::-webkit-scrollbar-thumb {

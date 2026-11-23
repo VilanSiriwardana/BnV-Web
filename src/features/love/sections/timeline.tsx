@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { Heart } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 import { focusRing } from '@/components/ui/styles';
 import { cn } from '@/lib/utils/cn';
@@ -16,6 +17,7 @@ import {
 import { LovePhoto } from './love-photo';
 import { LoveSection, labelText, sectionTitle } from './love-section';
 import { HiddenHeart } from '../ui/hidden-heart';
+import { NoteDialog, type NoteContent } from '../ui/note-dialog';
 
 type Item = LoveSiteConfig['timeline'][number];
 type Props = { title: string; items: Item[] };
@@ -67,6 +69,17 @@ export function Timeline({ title, items }: Props) {
 function ThreadStage({ items }: { items: Item[] }) {
   const layer = useRef<HTMLDivElement>(null);
   const { scrollTo } = useLoveScroll();
+  const [active, setActive] = useState<NoteContent | null>(null);
+  const [returnTo, setReturnTo] = useState<HTMLElement | null>(null);
+  const open = (t: Item, el: HTMLElement) => {
+    setReturnTo(el);
+    setActive({
+      label: t.date,
+      title: t.title,
+      paragraphs: [t.text],
+      photo: t.photo,
+    });
+  };
 
   // Node and card positions follow the active path; recomputed on resize.
   useEffect(() => {
@@ -155,12 +168,30 @@ function ThreadStage({ items }: { items: Item[] }) {
               data-node
               data-ui
               aria-label={`${t.date}: ${t.title}`}
-              onClick={() => goTo(i)}
+              onClick={(e) =>
+                e.currentTarget.hasAttribute('data-chip')
+                  ? open(t, e.currentTarget)
+                  : goTo(i)
+              }
               className={cn(
                 'group absolute grid size-11 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full',
                 focusRing,
               )}
             >
+              <span
+                aria-hidden
+                className="border-gold bg-surface pointer-events-none absolute bottom-full mb-1 grid size-11 scale-50 place-items-center overflow-hidden rounded-full border-2 opacity-0 shadow-[0_0_14px_-2px_var(--gold)] transition-[opacity,scale] duration-500 ease-out group-data-[chip]:scale-100 group-data-[chip]:opacity-100 group-hover:group-data-[chip]:scale-110"
+              >
+                {t.photo ? (
+                  <LovePhoto
+                    photo={t.photo}
+                    sizes="2.75rem"
+                    className="size-full object-cover"
+                  />
+                ) : (
+                  <Heart className="text-gold fill-gold/40 size-4" />
+                )}
+              </span>
               <span
                 data-node-dot
                 className="border-gold bg-background group-data-[lit]:bg-gold size-3.5 rounded-full border-2 transition-colors"
@@ -179,7 +210,7 @@ function ThreadStage({ items }: { items: Item[] }) {
               data-card
               data-featured={t.featured ? 'true' : undefined}
               className={cn(
-                'border-gold/25 bg-surface invisible absolute flex gap-4 overflow-hidden rounded-lg border p-4 text-left opacity-0',
+                'border-gold/25 bg-surface invisible absolute flex gap-4 overflow-hidden rounded-lg border p-4 text-left opacity-0 shadow-[0_8px_32px_-12px_var(--gold)]',
                 'max-md:right-4 max-md:bottom-6 max-md:left-14 max-md:max-h-[38svh] md:w-80',
                 t.featured && 'border-gold',
               )}
@@ -198,10 +229,21 @@ function ThreadStage({ items }: { items: Item[] }) {
                   {t.text}
                 </p>
               </div>
+              <button
+                type="button"
+                aria-label={`Read ${t.title}`}
+                onClick={(e) => open(t, e.currentTarget)}
+                className={cn('absolute inset-0 rounded-lg', focusRing)}
+              />
             </article>
           </li>
         ))}
       </ol>
+      <NoteDialog
+        note={active}
+        onClose={() => setActive(null)}
+        returnFocusTo={returnTo}
+      />
     </div>
   );
 }

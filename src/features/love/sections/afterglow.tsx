@@ -42,7 +42,11 @@ export function Afterglow({ site, onReplay }: Props) {
       <div className="mt-24 flex w-full flex-col items-center gap-32">
         {room.gifts && <AfterglowGifts slug={site.slug} gifts={room.gifts} />}
         {room.openWhen && room.openWhen.length > 0 && (
-          <AfterglowNotes slug={site.slug} notes={room.openWhen} />
+          <AfterglowNotes
+            slug={site.slug}
+            notes={room.openWhen}
+            intro={room.openWhenIntro}
+          />
         )}
         {room.secret && (
           <AfterglowSecret
@@ -60,7 +64,7 @@ export function Afterglow({ site, onReplay }: Props) {
           That’s everything, for now. — {site.sender.name}
         </p>
         <Button variant="love-primary" size="lg" onClick={onReplay}>
-          <RotateCcw aria-hidden />
+          <RotateCcw aria-hidden className="text-gold" />
           Replay our story
         </Button>
       </div>

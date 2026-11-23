@@ -27,7 +27,6 @@ attribute vec4 aSeed;
 attribute vec3 aColor;
 uniform float uTime;
 uniform float uRelease;
-uniform float uDrift;
 uniform vec3 uOrigin;
 uniform vec2 uSpan;
 uniform float uMobile;
@@ -44,14 +43,17 @@ mat3 rot(float a, float b) {
 void main() {
   vec3 p = position;
   p.z += p.x * p.x * 2.5; // gently curved petal
-  float t = uTime * uDrift;
+  float t = uTime;
   float spawn = smoothstep(0.0, 1.0, clamp(uRelease * 1.25 - aSeed.w * 0.25, 0.0, 1.0));
 
+  float fall = mod(aSeed.y * uSpan.y - t * (0.18 + aSeed.w * 0.12), uSpan.y);
   vec3 drift = vec3(
     (aSeed.x - 0.5) * uSpan.x + sin(t * 0.5 + aSeed.w * 6.28) * 0.35,
-    mod(aSeed.y * uSpan.y - t * (0.18 + aSeed.w * 0.12), uSpan.y) - uSpan.y * 0.5,
+    fall - uSpan.y * 0.5,
     (aSeed.z - 0.5) * 3.0
   );
+  // Fade at the loop seam so a wrapping petal never pops.
+  float seam = smoothstep(0.0, 0.08, fall / uSpan.y) * smoothstep(1.0, 0.92, fall / uSpan.y);
   vec3 base = mix(uOrigin, drift, spawn);
   vec3 world = base + rot(t * (0.6 + aSeed.w) + aSeed.w * 6.28, t * 0.4 + aSeed.x * 6.28) * p;
 
@@ -60,7 +62,7 @@ void main() {
   // Romance Additions §9.2: dim petals behind the Bloom text (left third; lower third on phones).
   vec2 ndc = gl_Position.xy / gl_Position.w;
   float textZone = mix(smoothstep(-0.1, -0.3, ndc.x), smoothstep(-0.2, -0.45, ndc.y), uMobile);
-  vAlpha = spawn * mix(1.0, 0.4, textZone);
+  vAlpha = spawn * spawn * seam * mix(1.0, 0.4, textZone);
   vUv = uv;
 }
 `;
@@ -104,7 +106,6 @@ export function Petals({ tier }: { tier: Tier }) {
         uniforms: {
           uTime: { value: 0 },
           uRelease: { value: 0 },
-          uDrift: { value: 1 },
           uOrigin: { value: new Vector3() },
           uSpan: { value: [8, 7] },
           uMobile: { value: 0 },
@@ -113,6 +114,7 @@ export function Petals({ tier }: { tier: Tier }) {
     [],
   );
   const materialRef = useRef(material);
+  const drift = useRef(1);
 
   useEffect(() => {
     const root = document.querySelector<HTMLElement>('[data-love-root]');
@@ -141,22 +143,29 @@ export function Petals({ tier }: { tier: Tier }) {
     if (!mesh) return;
     mesh.visible = heart.petalRelease > 0.001;
     if (!mesh.visible) return;
-    u.uTime.value += delta;
-    u.uMobile.value = state.size.width < 768 ? 1 : 0;
-    u.uRelease.value = heart.petalRelease;
-    u.uDrift.value = MathUtils.damp(
-      u.uDrift.value,
+    // Integrate the audio-driven speed into the clock; scaling the clock itself made petals jump.
+    drift.current = MathUtils.damp(
+      drift.current,
       1 + audio.bands.mid * 0.3,
       2,
       delta,
     );
+    u.uTime.value += delta * drift.current;
+    u.uMobile.value = state.size.width < 768 ? 1 : 0;
+    u.uRelease.value = heart.petalRelease;
     const vp = state.viewport.getCurrentViewport(
       state.camera,
       origin.set(0, 0, 0),
     );
     const w = ndcToWorld(heart.ndc, vp);
     u.uOrigin.value.set(w.x, w.y, 0);
-    u.uSpan.value = [vp.width * 1.1, vp.height * 1.3];
+    // Span only follows real resizes; tiny per-frame changes (mobile URL bar) shifted every petal.
+    const [sw, sh] = u.uSpan.value as number[];
+    if (
+      Math.abs(sw - vp.width * 1.1) > 0.5 ||
+      Math.abs(sh - vp.height * 1.3) > 0.5
+    )
+      u.uSpan.value = [vp.width * 1.1, vp.height * 1.3];
   });
 
   if (count === 0) return null;

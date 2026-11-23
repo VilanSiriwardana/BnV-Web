@@ -113,7 +113,7 @@ export function NoteDialog({ note, onClose, returnFocusTo }: Props) {
                     focusRing,
                   )}
                 >
-                  <XIcon className="size-4" />
+                  <XIcon className="text-secondary size-4" />
                   <span className="sr-only">Close</span>
                 </DialogPrimitive.Close>
               </motion.div>

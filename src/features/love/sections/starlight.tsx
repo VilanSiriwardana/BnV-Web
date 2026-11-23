@@ -23,20 +23,21 @@ type Props = {
   line: string;
   hint: string;
   done: string;
+  reveal: string[];
   slug: string;
   memories: LoveSiteConfig['memories'];
 };
 
 // All-night theme + Our sky (F3): the line opens the stage under the aurora, then she joins eight
 // memory stars into a heart (story.ts buildStarlight). Calm: the finished constellation and the list.
-export function Starlight({ line, hint, done, slug, memories }: Props) {
+export function Starlight({ line, hint, done, reveal, slug, memories }: Props) {
   const quiet = useQuiet();
   const stars = memories.slice(0, SKY_STARS);
   return (
     <LoveSection
       id="starlight"
       depth={1}
-      stage="220vh"
+      stage="320vh"
       className="flex min-h-svh flex-col items-center justify-center"
     >
       <div
@@ -74,6 +75,7 @@ export function Starlight({ line, hint, done, slug, memories }: Props) {
           stars={stars}
           hint={hint}
           done={done}
+          reveal={reveal}
           slug={slug}
           quiet={quiet}
         />

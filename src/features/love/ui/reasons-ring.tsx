@@ -216,7 +216,7 @@ export function ReasonsRing({ items }: { items: string[] }) {
           aria-label="Previous reason"
           onClick={() => go(-1)}
         >
-          <ChevronLeft aria-hidden />
+          <ChevronLeft aria-hidden className="text-gold" />
         </Button>
         <p
           aria-live="polite"
@@ -236,7 +236,7 @@ export function ReasonsRing({ items }: { items: string[] }) {
           aria-label="Next reason"
           onClick={() => go(1)}
         >
-          <ChevronRight aria-hidden />
+          <ChevronRight aria-hidden className="text-gold" />
         </Button>
       </div>
     </div>

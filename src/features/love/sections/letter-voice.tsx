@@ -102,7 +102,7 @@ export function LetterVoice({ src, transcript, label, open }: Props) {
             strokeDashoffset={RING_C * (1 - state.progress)}
           />
         </svg>
-        <Icon aria-hidden className="size-4" />
+        <Icon aria-hidden className="text-gold size-4" />
         {text}
       </Button>
       <Button

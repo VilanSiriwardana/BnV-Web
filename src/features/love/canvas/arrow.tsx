@@ -3,10 +3,14 @@
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  AdditiveBlending,
+  CanvasTexture,
   DoubleSide,
   type Group,
   MeshBasicMaterial,
   QuadraticBezierCurve3,
+  Shape,
+  ShapeGeometry,
   Vector3,
 } from 'three';
 
@@ -18,7 +22,7 @@ import { readTokenColors } from './token-colors';
 const SHAFT = 1.2;
 const TRAIL_EVERY = 0.05;
 const LENGTH = 0.16; // arrow length as a fraction of the viewport height
-const GLOW = 2.5; // pushes the gold above the Bloom threshold
+const GLOW = 4.2; // well above the Bloom threshold: the arrow outshines the heart
 const start = new Vector3();
 const control = new Vector3();
 const point = new Vector3();
@@ -49,7 +53,57 @@ function ArrowFlight() {
       toneMapped: false,
     });
   }, []);
-  useEffect(() => () => material.dispose(), [material]);
+  // Fletching sits dimmer than the head so only one end reads as the point.
+  const feather = useMemo(
+    () =>
+      new MeshBasicMaterial({
+        color: material.color.clone().multiplyScalar(0.45),
+        side: DoubleSide,
+        transparent: true,
+        opacity: 0.85,
+        toneMapped: false,
+      }),
+    [material],
+  );
+  const vane = useMemo(() => {
+    const v = new Shape();
+    v.moveTo(0, 0);
+    v.lineTo(-0.3, 0);
+    v.lineTo(-0.38, 0.13);
+    v.lineTo(-0.1, 0.05);
+    v.closePath();
+    return new ShapeGeometry(v);
+  }, []);
+  const halo = useMemo(() => {
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = 64;
+    const ctx = cv.getContext('2d');
+    if (ctx) {
+      const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+      g.addColorStop(0, 'rgba(255,236,190,1)');
+      g.addColorStop(0.35, 'rgba(230,190,110,0.45)');
+      g.addColorStop(1, 'rgba(230,190,110,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, 64, 64);
+    }
+    return new MeshBasicMaterial({
+      map: new CanvasTexture(cv),
+      transparent: true,
+      depthWrite: false,
+      blending: AdditiveBlending,
+      toneMapped: false,
+    });
+  }, []);
+  useEffect(
+    () => () => {
+      material.dispose();
+      feather.dispose();
+      vane.dispose();
+      halo.map?.dispose();
+      halo.dispose();
+    },
+    [material, feather, vane, halo],
+  );
 
   useFrame((state, delta) => {
     const g = group.current;
@@ -81,7 +135,7 @@ function ArrowFlight() {
       lastTrail.current += delta;
       if (t > 0.05 && lastTrail.current > TRAIL_EVERY) {
         lastTrail.current = 0;
-        emitSparks(1, point, { speed: 0.25, life: 0.7 });
+        emitSparks(2, point, { speed: 0.3, life: 0.9 });
       }
     }
     prev.current = t;
@@ -90,29 +144,34 @@ function ArrowFlight() {
   // Built along +x with the head at the origin so the tip lands exactly on the heart.
   return (
     <group ref={group} visible={false}>
+      <mesh material={halo} position={[-0.12, 0, -0.01]}>
+        <planeGeometry args={[0.9, 0.9]} />
+      </mesh>
+      <mesh material={halo} position={[-SHAFT / 2, 0, -0.01]}>
+        <planeGeometry args={[SHAFT, 0.22]} />
+      </mesh>
       <mesh
         material={material}
-        position={[-SHAFT / 2, 0, 0]}
+        position={[-(SHAFT + 0.3) / 2, 0, 0]}
         rotation={[0, 0, Math.PI / 2]}
       >
-        <cylinderGeometry args={[0.035, 0.035, SHAFT, 8]} />
+        <cylinderGeometry args={[0.022, 0.022, SHAFT - 0.3, 8]} />
       </mesh>
       <mesh
         material={material}
-        position={[-0.12, 0, 0]}
+        position={[-0.17, 0, 0]}
         rotation={[0, 0, -Math.PI / 2]}
       >
-        <coneGeometry args={[0.1, 0.24, 12]} />
+        <coneGeometry args={[0.12, 0.34, 16]} />
       </mesh>
-      {[0.45, -0.45].map((tilt) => (
+      {[1, -1].map((side) => (
         <mesh
-          key={tilt}
-          material={material}
-          position={[-SHAFT + 0.12, Math.sign(tilt) * 0.06, 0]}
-          rotation={[0, 0, tilt]}
-        >
-          <planeGeometry args={[0.3, 0.14]} />
-        </mesh>
+          key={side}
+          geometry={vane}
+          material={feather}
+          position={[-SHAFT + 0.4, 0, 0]}
+          scale={[1, side, 1]}
+        />
       ))}
     </group>
   );

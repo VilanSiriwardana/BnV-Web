@@ -144,6 +144,7 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
           line={site.copy.starlightLine}
           hint={site.copy.skyHint ?? 'Join the stars, one to the next.'}
           done={site.copy.skyDone ?? 'It was always a heart.'}
+          reveal={site.copy.skyReveal ?? []}
           slug={site.slug}
           memories={site.memories}
         />

@@ -120,11 +120,21 @@ const buildBloom: SectionBuilder = (root, mobile) => {
   const line = bloom.querySelector<HTMLElement>('[data-bloom-line]');
   const words = line ? buildBloomWords(line) : null;
 
+  // Petals drift in ahead of the burst so they never appear all at once.
+  ScrollTrigger.create({
+    trigger: bloom,
+    start: 'top 85%',
+    once: true,
+    onEnter: () => {
+      if (heart.petalRelease < 1)
+        gsap.to(heart, { petalRelease: 1, duration: 3.5, ease: 'power2.out' });
+    },
+  });
   ScrollTrigger.create({
     trigger: bloom,
     start: 'top 60%',
     onEnter: () => {
-      director.play('burstReform', { petals: true });
+      director.play('burstReform');
       words?.restart();
     },
     onEnterBack: () => director.settle(),
@@ -285,17 +295,30 @@ const buildTimeline: SectionBuilder = (root, mobile) => {
   const endPose = poseFor(mobile ? 'starlight' : 'memories', mobile);
   const scale = mobile ? 0.26 : 0.3;
   let len = 0;
+  let dash = 0;
   let ctm: DOMMatrix | null = null;
   let last = -1;
   let armed = true;
+  let collapse: gsap.core.Tween | null = null;
 
   // CTM as it is while the stage is stuck at the top (stable during the whole scrub).
   const measure = () => {
     len = path.getTotalLength();
     ctm = path.getScreenCTM();
-    if (ctm) ctm.f -= stage.getBoundingClientRect().top;
-    path.style.strokeDasharray = `${len}`;
-    path.style.strokeDashoffset = `${len}`;
+    // non-scaling-stroke dashes are in screen px, so measure the on-screen length (else the thread breaks into dashes).
+    dash = 0;
+    if (ctm) {
+      let prev: DOMPoint | null = null;
+      for (let k = 0; k <= 200; k++) {
+        const q = path.getPointAtLength((k / 200) * len).matrixTransform(ctm);
+        if (prev) dash += Math.hypot(q.x - prev.x, q.y - prev.y);
+        prev = q;
+      }
+      ctm.f -= stage.getBoundingClientRect().top;
+    }
+    dash = Math.ceil(dash || len) + 2;
+    path.style.strokeDasharray = `${dash} ${dash}`;
+    path.style.strokeDashoffset = `${dash}`;
   };
   measure();
 
@@ -311,23 +334,39 @@ const buildTimeline: SectionBuilder = (root, mobile) => {
         overwrite: 'auto',
       });
       n.toggleAttribute('data-lit', j <= i);
+      n.toggleAttribute('data-chip', j < i);
       if (j === i) n.setAttribute('aria-current', 'step');
       else n.removeAttribute('aria-current');
     });
+    // The reached memory shows in full, then folds into a photo chip on its node (tap to reopen).
     cards.forEach((c, j) => {
       const state =
         j === i
-          ? { autoAlpha: 1, y: 0 }
+          ? { autoAlpha: 1, y: 0, scale: 1 }
           : j < i
-            ? { autoAlpha: mobile ? 0 : 0.4, y: 0 }
-            : { autoAlpha: 0, y: 24 };
+            ? { autoAlpha: 0, y: 0, scale: 0.6 }
+            : { autoAlpha: 0, y: 24, scale: 1 };
       gsap.to(c, {
         ...state,
-        duration: 0.4,
-        ease: 'power2.out',
+        duration: j < i ? 0.5 : 0.4,
+        ease: j < i ? 'power2.in' : 'power2.out',
         overwrite: 'auto',
       });
     });
+    collapse?.kill();
+    const card = cards[i];
+    const node = nodes[i];
+    if (card && node)
+      collapse = gsap.delayedCall(2.6, () => {
+        gsap.to(card, {
+          autoAlpha: 0,
+          scale: 0.6,
+          duration: 0.5,
+          ease: 'power2.in',
+          overwrite: 'auto',
+        });
+        node.toggleAttribute('data-chip', true);
+      });
     if (forward && i >= 0 && i !== featured) {
       director.play('glowUp');
       director.play('pulse');
@@ -342,7 +381,7 @@ const buildTimeline: SectionBuilder = (root, mobile) => {
     onUpdate: (self) => {
       const p = self.progress;
       const tp = threadProgress(p);
-      path.style.strokeDashoffset = `${len * (1 - tp)}`;
+      path.style.strokeDashoffset = `${dash * (1 - tp)}`;
       const tip = svgPointToNdc(path, len, tp, ctm);
       const into = Math.min(1, p / INTRO);
       const out = Math.max(0, (p - OUTRO) / (1 - OUTRO));
@@ -413,12 +452,13 @@ const buildStarlight: SectionBuilder = (root, mobile) => {
     );
   ScrollTrigger.create({
     trigger: el,
-    start: 'top top',
+    // Starts before the pin so the stars greet her earlier; the taller stage holds the heart longer.
+    start: 'top 40%',
     end: 'bottom bottom',
     onUpdate: ({ progress: p }) => {
-      const showLine = p < 0.35;
+      const showLine = p < 0.18;
       if (showLine !== lineOn) fade(line, (lineOn = showLine));
-      const showSky = p >= 0.25;
+      const showSky = p >= 0.12;
       if (showSky !== skyOn) fade(sky, (skyOn = showSky));
     },
     onLeave: () => el.dispatchEvent(new Event(SKY_COMPLETE_EVENT)),
@@ -653,8 +693,6 @@ const buildLetter: SectionBuilder = (root) => {
     const r = seal.getBoundingClientRect();
     heart.ndc.x = ((r.left + r.width / 2) / window.innerWidth) * 2 - 1;
     heart.ndc.y = -(((r.top + r.height / 2) / window.innerHeight) * 2 - 1);
-    // §19.4: scrolling the seal past the viewport centre opens the letter (never with a passphrase).
-    if (r.top + r.height / 2 < window.innerHeight / 2) fire();
   };
   const autoOpens = !el.querySelector('[data-letter-locked]');
   let fired = false;
@@ -679,6 +717,15 @@ const buildLetter: SectionBuilder = (root) => {
       director.play('dockToSeal', {
         scale: seal ? sealScale(seal.offsetWidth) : 0.3,
       });
+    },
+  });
+  // §19.4: scrolling past the middle of the pinned letter opens it (never with a passphrase).
+  ScrollTrigger.create({
+    trigger: el,
+    start: 'top top',
+    end: 'bottom bottom',
+    onUpdate: ({ progress }) => {
+      if (progress >= 0.5) fire();
     },
   });
   gsap.utils

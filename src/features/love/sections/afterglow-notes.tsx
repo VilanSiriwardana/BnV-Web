@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useSyncExternalStore } from 'react';
+import { useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils/cn';
 
@@ -18,22 +18,16 @@ type Note = NonNullable<
 >[number];
 
 const HOLD_MS = 900;
-const noSubscribe = () => () => {};
-// Minute resolution keeps the snapshot stable between renders.
-const readNow = () => Math.floor(Date.now() / 60_000) * 60_000;
-const serverZero = () => 0;
-const day = new Intl.DateTimeFormat(undefined, {
-  day: 'numeric',
-  month: 'short',
-});
 
 // Romance Additions F8: sealed scrolls; hold the seal (click in Calm), the note opens on parchment.
 export function AfterglowNotes({
   slug,
   notes,
+  intro,
 }: {
   slug: string;
   notes: Note[];
+  intro?: string;
 }) {
   const set = progressSet(slug, 'notes');
   const opened = usePersistedSet(set);
@@ -48,6 +42,11 @@ export function AfterglowNotes({
       <p className={`${labelText} mt-2`} aria-live="polite">
         {opened.length} of {notes.length} opened
       </p>
+      {intro && (
+        <p className="text-body-lg text-foreground/85 mx-auto mt-6 max-w-xl text-pretty italic">
+          {intro}
+        </p>
+      )}
       <ul className="mt-10 grid gap-6 sm:grid-cols-2">
         {notes.map((n) => (
           <li key={n.id}>
@@ -88,18 +87,16 @@ function Scroll({
   const quiet = useQuiet();
   const button = useRef<HTMLButtonElement>(null);
   const [progress, setProgress] = useState(0);
-  const unlockAt = note.unlockAt ? new Date(note.unlockAt) : null;
-  const now = useSyncExternalStore(noSubscribe, readNow, serverZero);
-  // Server render treats every dated note as locked; the client corrects it after hydration.
-  const locked = unlockAt !== null && unlockAt.getTime() > (now || Infinity);
 
   const open = () => {
     setProgress(0);
     if (!opened) void director.play('noteOpen');
     if (button.current) onOpen(button.current);
+    // The hold stays "done" after completing; reset so the note can be opened again.
+    queueMicrotask(reset);
   };
 
-  const { handlers, complete } = useHold({
+  const { handlers, complete, reset } = useHold({
     duration: HOLD_MS,
     onProgress: setProgress,
     onComplete: open,
@@ -114,25 +111,21 @@ function Scroll({
         type="button"
         {...handlers}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' && !e.repeat && !locked) {
+          if (e.key === 'Enter' && !e.repeat) {
             e.preventDefault();
             complete();
             return;
           }
           handlers.onKeyDown(e);
         }}
-        disabled={locked}
         aria-label={
-          locked && now
-            ? `${note.label}. Opens on ${day.format(unlockAt!)}`
-            : opened
-              ? `${note.label}. Read again`
-              : `${note.label}. Sealed. Hold or press Enter to open.`
+          opened
+            ? `${note.label}. Read again`
+            : `${note.label}. Sealed. Hold or press Enter to open.`
         }
         className={cn(
           'focus-ring relative grid size-22 touch-none place-items-center rounded-full select-none',
           opened ? 'text-gold' : 'text-primary',
-          locked && 'opacity-50',
         )}
         style={{ transform: `scale(${1 + progress * 0.08})` }}
       >
@@ -146,13 +139,7 @@ function Scroll({
         <TinyHeart className="size-8" />
       </button>
       <p className="text-small text-muted-foreground font-sans">
-        {locked && now
-          ? `Opens on ${day.format(unlockAt!)}`
-          : locked
-            ? 'Sealed'
-            : opened
-              ? 'Opened'
-              : 'Sealed'}
+        {opened ? 'Opened' : 'Hold to open'}
       </p>
     </div>
   );

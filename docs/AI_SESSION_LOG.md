@@ -950,3 +950,22 @@ Implemented M28–M33 in the order M28 → M32 → M29 → M31 → M30 → M33:
 - `tsc --noEmit`, `eslint src/features/love`, Prettier clean.
 - Vitest: 32 files, 141 tests pass. `next build` passes.
 - Not yet checked in a browser or on devices (M37).
+
+## 2026-11-23 — Love Site polish pass (blueprint 049)
+
+- Hydration: `skyStarLayout` rounds star positions to 2 decimals.
+- Overflow: letter backdrop no longer `w-screen`; `[data-love-root]` gets `overflow-x: clip`; scrollbar arrow buttons hidden (styled vertical scrollbar kept).
+- Petals: audio speed integrated into the clock (no idle jumps), seam fade, span only updates on real resizes, gentle 3.5 s release at Bloom `top 85%`.
+- Letter: title + scroll in normal flow (was centred on the title box), idle float 3 px, auto-open at 50 % pin progress.
+- Starlight: stage 320vh, reveal starts at `top 40%`; completion fades labels, glows the outline and plays `copy.skyReveal` lines.
+- Timeline: thread dash measured in screen px (fixes broken-looking spiral); cards fold into photo chips on nodes after 2.6 s, chips/cards open `NoteDialog`.
+- Afterglow: gifts `mode: 'sequence'`; open-when notes never date-locked + `openWhenIntro`; hint clue chips; wish panel close (X, Escape, outside tap).
+- Glow: heart base ×1.25, arrow GLOW 4.2. Coloured Lucide UI icons.
+- Not done: heart-formation-on-first-load bug (needs browser repro); arrow halo sprite skipped (GLOW bump only).
+
+## 2026-11-23 — Love follow-ups (blueprint 050)
+
+- Open-when notes re-open with one tap (`useHold` reset after each open).
+- Letter frame hugs the paper edge (padding moved from the article to the text), rounded borders, corner curls grow from the inner border.
+- Native scrollbar hidden on the love route; ProgressHeart rail is the scrollbar.
+- Arrow: thinner shaft, single larger head, dim swept-back fletching, additive glow halo, denser trail.
