@@ -39,6 +39,7 @@ import {
 } from '../engine/gallery-textures';
 import { TIERS, type Tier } from '../engine/tiers';
 import { mirrorTexture, oldMapTexture } from './gallery-surfaces';
+import { CURSOR_POINTER } from '../ui/cursor-svgs';
 import { projectRadius, projectToScreen } from './projection';
 
 const { damp } = MathUtils;
@@ -302,7 +303,7 @@ export function GalleryFrames({ curve, slots, photos, tier }: Props) {
     if (inspectWeight() > 0) return;
     e.stopPropagation();
     galleryState.hovered = k;
-    document.body.style.cursor = 'pointer';
+    document.body.style.cursor = CURSOR_POINTER;
   };
   const out = (k: number) => () => {
     if (galleryState.hovered === k) galleryState.hovered = -1;

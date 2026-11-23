@@ -27,6 +27,7 @@ import {
 } from './orb-shaders';
 import { projectRadius, projectToScreen } from './projection';
 import { readTokenColors } from './token-colors';
+import { CURSOR_POINTER } from '../ui/cursor-svgs';
 
 const SHELL_R = 0.8;
 const HIT_R = 1.1; // larger than the shell: ≥ 44 px projected whenever an orb is near
@@ -157,7 +158,7 @@ function Orbs({ items, textures }: { items: Memory[]; textures: Texture[] }) {
     if (!memoriesState.active || e.pointerType !== 'mouse') return;
     e.stopPropagation();
     memoriesState.hovered = i;
-    document.body.style.cursor = 'pointer';
+    document.body.style.cursor = CURSOR_POINTER;
   };
   const out = (i: number) => () => {
     if (memoriesState.hovered === i) memoriesState.hovered = -1;

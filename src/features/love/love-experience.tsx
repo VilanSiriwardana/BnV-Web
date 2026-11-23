@@ -31,6 +31,7 @@ import { CalmModeToggle } from './ui/calm-mode-toggle';
 import { FoundChip } from './ui/found-chip';
 import { LoveSlugContext } from './ui/hidden-heart';
 import { MusicToggle } from './ui/music-toggle';
+import { LoveCursor } from './ui/love-cursor';
 import { LoveScrollbar } from './ui/love-scrollbar';
 
 // Client-only 3D chunk (Tech Stack §5.1): never in shop bundles, never server-rendered.
@@ -115,6 +116,7 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
       data-love-motion={quiet ? undefined : ''}
       className="bg-background text-foreground min-h-svh"
     >
+      <LoveCursor />
       <a
         href="#letter"
         className="bg-primary text-label text-primary-foreground focus-ring sr-only rounded-md px-4 py-2 font-sans focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50"
