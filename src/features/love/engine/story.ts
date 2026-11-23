@@ -268,6 +268,13 @@ const buildMemories: SectionBuilder = (root, mobile) => {
       { cameraZ: RAIL_START_Z, depth: 0 },
       { cameraZ: end, depth: end - RAIL_START_Z, ...scrub, duration: 0.88 },
       0.12,
+    )
+    // The rail carries the camera past the petals, so they fold away before it starts.
+    .fromTo(
+      heart,
+      { petalRelease: 1 },
+      { petalRelease: 0, ...scrub, duration: 0.12 },
+      0,
     );
 
   // Rail hand-off: the Timeline is a flat stage, so the camera returns home (heart.tsx snaps).
@@ -324,6 +331,28 @@ const buildTimeline: SectionBuilder = (root, mobile) => {
     path.style.strokeDashoffset = `${dash}`;
   };
   measure();
+
+  // Petals return born from the heart (the shader spawns them at its position).
+  gsap.fromTo(
+    heart,
+    { petalRelease: 0 },
+    {
+      petalRelease: 1,
+      immediateRender: false,
+      ease: 'power1.out',
+      scrollTrigger: {
+        trigger: el,
+        start: 'top top',
+        end: '+=40%',
+        scrub: 0.8,
+      },
+    },
+  );
+  ScrollTrigger.create({
+    trigger: el,
+    start: 'top top',
+    onEnter: () => director.play('glowUp'),
+  });
 
   gsap.set(cards, { autoAlpha: 0, y: 24 });
   gsap.set(dots, { scale: 0.6 });

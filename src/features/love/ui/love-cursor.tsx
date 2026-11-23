@@ -4,7 +4,12 @@ import gsap from 'gsap';
 import { useEffect, useRef } from 'react';
 
 import { useQuiet } from '../engine/use-quiet';
-import { CURSOR_DEFAULT, CURSOR_POINTER } from './cursor-svgs';
+import {
+  CURSOR_DEFAULT,
+  CURSOR_GRAB,
+  CURSOR_GRABBING,
+  CURSOR_POINTER,
+} from './cursor-svgs';
 
 export function LoveCursor() {
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -20,6 +25,9 @@ export function LoveCursor() {
     style.textContent = [
       `[data-love-root]{cursor:${CURSOR_DEFAULT}}`,
       `[data-love-root] a,[data-love-root] button,[data-love-root] [role="button"],[data-love-root] .cursor-pointer{cursor:${CURSOR_POINTER}}`,
+      `[data-love-root] [role="scrollbar"]{cursor:${CURSOR_POINTER}}`,
+      `[data-love-root] [data-scroll-thumb]{cursor:${CURSOR_GRAB}}`,
+      `[data-love-root] [role="scrollbar"]:active,[data-love-root] [data-scroll-thumb]:active{cursor:${CURSOR_GRABBING}}`,
     ].join('');
     document.head.appendChild(style);
     return () => {

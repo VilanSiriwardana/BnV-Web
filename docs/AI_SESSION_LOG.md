@@ -1059,3 +1059,13 @@ Implemented M28–M33 in the order M28 → M32 → M29 → M31 → M30 → M33:
 ### Verification
 
 - `tsc --noEmit`, eslint (love) clean; Vitest love suite 32 files, 133 tests pass (new inflated-geometry tests). Not checked visually in a browser.
+
+## 2026-11-23 — Love Site: heart-born petals, face-first hammer, custom grab cursor (blueprint 057)
+
+- `engine/story.ts`: petals fade out early in the Memories rail (the dolly carried the camera past them, and the Timeline camera snap made them pop back). They scrub back in on Timeline entry from the heart's position, with a `glowUp` cue.
+- `canvas/gallery-ritual.tsx`: hammer orientation is an explicit basis. The head's long axis follows the swipe so a face strikes, and the head is offset by half its width so the face lands on `IMPACT`.
+- `ui/cursor-svgs.ts`: `CURSOR_GRAB` / `CURSOR_GRABBING` gold fist cursors. `ui/love-cursor.tsx` applies them to the scrollbar thumb and track; `ui/love-scrollbar.tsx` drops the native `cursor-grab` classes.
+
+### Verification
+
+- `tsc --noEmit` and eslint (love) clean. Not checked visually in a browser.

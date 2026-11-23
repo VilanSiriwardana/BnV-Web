@@ -102,7 +102,7 @@ export function LoveScrollbar() {
       </div>
       <span
         data-scroll-thumb
-        className="absolute left-1/2 grid size-11 -translate-x-1/2 -translate-y-1/2 cursor-grab place-items-center opacity-0 transition-opacity duration-500 group-data-active/bar:opacity-100 active:cursor-grabbing md:size-6 md:opacity-100"
+        className="absolute left-1/2 grid size-11 -translate-x-1/2 -translate-y-1/2 place-items-center opacity-0 transition-opacity duration-500 group-data-active/bar:opacity-100 md:size-6 md:opacity-100"
         style={{ top: 'calc(var(--progress, 0) * 100%)' }}
       >
         <TinyHeart className="text-gold size-5 drop-shadow-[0_0_6px_var(--love-aurora-gold)] transition-transform group-hover/bar:scale-110" />

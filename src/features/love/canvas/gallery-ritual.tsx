@@ -18,6 +18,7 @@ import {
   MeshPhysicalMaterial,
   MeshStandardMaterial,
   PlaneGeometry,
+  Matrix4,
   Plane,
   type Points,
   PointsMaterial,
@@ -49,15 +50,16 @@ const CASE = { x: -0.86, y: 1.2, z: 0.85, w: 0.34, h: 0.26, d: 0.3 };
 const PEDESTAL_H = 1.05;
 const HAMMER_LEN = 0.55;
 // Blueprint 055: the strike follows her stroke — the head starts on the stroke's start side and
-// leads along it into the pane, the handle pointing ahead toward its end.
+// leads face-first along it into the pane, the handle trailing to the side.
 const IMPACT = new Vector3(CASE.x, CASE.y + 0.03, CASE.z + CASE.d / 2 + 0.07);
 const REACH = 0.6;
-const UP = new Vector3(0, 1, 0);
 const swingDir = new Vector3();
 const swingFrom = new Vector3();
 const swingVia = new Vector3();
-const handleDir = new Vector3();
-const swingQuat = new Quaternion();
+const headSide = new Vector3();
+const headFwd = new Vector3();
+const swingBasis = new Matrix4();
+const HEAD_HALF = 0.11;
 const hammerAt = (dir: Vector3, t: number, out: Vector3) => {
   swingFrom.copy(IMPACT).addScaledVector(dir, -REACH);
   swingFrom.z += 0.15;
@@ -309,10 +311,16 @@ export function GalleryRitual({ curve, tier }: Props) {
       // Wind-up pulls back against the stroke before the strike.
       const pull = Math.max(0, -s.hammer) / 0.12;
       h.position.addScaledVector(swingDir, -pull * 0.1);
-      handleDir
-        .set(swingDir.x, swingDir.y, 0.5 * (1 - along) + 0.2 * pull)
+      // Face-first: the head's long axis follows the stroke so its face lands on IMPACT.
+      h.position.addScaledVector(swingDir, -HEAD_HALF);
+      headSide
+        .set(-swingDir.y, swingDir.x, 0.5 * (1 - along) + 0.2 * pull)
         .normalize();
-      h.quaternion.copy(swingQuat.setFromUnitVectors(UP, handleDir));
+      headFwd.crossVectors(swingDir, headSide).normalize();
+      headSide.crossVectors(headFwd, swingDir);
+      h.quaternion.setFromRotationMatrix(
+        swingBasis.makeBasis(swingDir, headSide, headFwd),
+      );
     }
 
     // Key: resting on the velvet, held under her finger, drifting home, or sliding into the lock.
@@ -519,7 +527,7 @@ export function GalleryRitual({ curve, tier }: Props) {
         raycast={none}
       />
 
-      {/* Sledgehammer: origin at the head, handle pointing ahead along her stroke */}
+      {/* Sledgehammer: origin at the head, face leading along her stroke, handle trailing */}
       <group ref={hammer} visible={false}>
         <mesh
           geometry={handle}

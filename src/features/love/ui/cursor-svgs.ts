@@ -41,8 +41,35 @@ const handSvg = `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' 
 <rect x='52.2' y='28' width='2.2' height='7' rx='1.1' fill='#fffbe6' opacity='.6'/>
 </svg>`;
 
+const fist = (
+  curl: number,
+) => `<rect x='17' y='${18 + curl}' width='11' height='${24 - curl}' rx='5.5'/>
+<rect x='27' y='${17 + curl}' width='10' height='${25 - curl}' rx='5'/>
+<rect x='36' y='${19 + curl}' width='9' height='${23 - curl}' rx='4.5'/>
+<rect x='44' y='${22 + curl}' width='9' height='${21 - curl}' rx='4.5'/>
+<rect x='6' y='30' width='12' height='22' rx='6' transform='rotate(-32 12 40)'/>
+<rect x='14' y='33' width='42' height='27' rx='10'/>`;
+
+const grabSvg = (
+  curl: number,
+) => `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 64 64'>
+<defs>
+<linearGradient id='h' x1='0' y1='0' x2='.8' y2='1'><stop offset='0' stop-color='#ffe9a0'/><stop offset='.25' stop-color='#e8b83a'/><stop offset='.65' stop-color='#b8861c'/><stop offset='1' stop-color='#6e4a0c'/></linearGradient>
+<radialGradient id='s' cx='.35' cy='.3' r='.7'><stop offset='0' stop-color='#fff4c8' stop-opacity='.55'/><stop offset='1' stop-color='#fff4c8' stop-opacity='0'/></radialGradient>
+</defs>
+<g fill='#241b2e' stroke='#241b2e' stroke-width='4' stroke-linejoin='round'>${fist(curl)}</g>
+<g fill='url(#h)'>${fist(curl)}</g>
+<rect x='14' y='33' width='42' height='27' rx='10' fill='url(#s)'/>
+<g stroke='#7a520e' stroke-width='1.5' stroke-linecap='round' fill='none'>
+<path d='M27.5 ${24 + curl}V36'/><path d='M36.5 ${25 + curl}V36.5'/><path d='M44.5 ${28 + curl}V37'/>
+</g>
+<rect x='20' y='${21 + curl}' width='2.6' height='${10 - curl / 2}' rx='1.3' fill='#fffbe6' opacity='.8'/>
+</svg>`;
+
 const toCursor = (svg: string, x: number, y: number, fallback: string) =>
   `url("data:image/svg+xml,${encodeURIComponent(svg.replace(/\n/g, ''))}") ${x} ${y}, ${fallback}`;
 
 export const CURSOR_DEFAULT = toCursor(arrowSvg, 2, 2, 'auto');
 export const CURSOR_POINTER = toCursor(handSvg, 14, 2, 'pointer');
+export const CURSOR_GRAB = toCursor(grabSvg(0), 16, 16, 'grab');
+export const CURSOR_GRABBING = toCursor(grabSvg(6), 16, 16, 'grabbing');
