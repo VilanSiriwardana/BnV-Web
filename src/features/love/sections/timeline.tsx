@@ -37,13 +37,12 @@ const DESKTOP_PATH = toPath(
     return [50 + Math.cos(a) * 44 * r, 52 + Math.sin(a) * 38 * r];
   }),
 );
+// Mobile: a calm serpentine whose crests land alternately left/right of centre at each node,
+// keeping amplitude clear of the edges so the date labels sit below without crowding the thread.
 const MOBILE_PATH = toPath(
   Array.from({ length: STEPS + 1 }, (_, i) => {
     const t = i / STEPS;
-    return [
-      50 + 38 * Math.sin(t * Math.PI * 2 * 1.25 - Math.PI / 2),
-      4 + t * 54,
-    ];
+    return [50 + 28 * Math.sin(t * Math.PI * 5), 6 + t * 54];
   }),
 );
 const MOBILE_QUERY = '(max-width: 767px)';
@@ -98,7 +97,6 @@ function ThreadStage({ items }: { items: Item[] }) {
         const pt = path.getPointAtLength(NODE_FRACTIONS[i] * len);
         node.style.left = `${pt.x}%`;
         node.style.top = `${pt.y}%`;
-        node.dataset.side = pt.x > 50 ? 'right' : 'left';
         const card = cards[i];
         if (!card) return;
         card.style.left = mobile
@@ -180,7 +178,7 @@ function ThreadStage({ items }: { items: Item[] }) {
             >
               <span
                 aria-hidden
-                className="border-gold bg-surface pointer-events-none absolute bottom-full mb-1 grid size-11 scale-50 place-items-center overflow-hidden rounded-full border-2 opacity-0 shadow-[0_0_14px_-2px_var(--gold)] transition-[opacity,scale] duration-500 ease-out group-data-[chip]:scale-100 group-data-[chip]:opacity-100 group-hover:group-data-[chip]:scale-110"
+                className="border-gold bg-surface pointer-events-none absolute bottom-full mb-1 grid size-11 scale-50 place-items-center overflow-hidden rounded-full border-2 opacity-0 shadow-[0_0_14px_-2px_var(--gold)] transition-[opacity,scale] duration-500 ease-out group-data-[chip]:pointer-events-auto group-data-[chip]:scale-100 group-data-[chip]:opacity-100 group-hover:group-data-[chip]:scale-110"
               >
                 {t.photo ? (
                   <LovePhoto
@@ -200,7 +198,7 @@ function ThreadStage({ items }: { items: Item[] }) {
                 aria-hidden
                 className={cn(
                   labelText,
-                  'absolute top-full mt-1 whitespace-nowrap max-md:top-1/2 max-md:left-full max-md:mt-0 max-md:ml-1 max-md:-translate-y-1/2 max-md:group-data-[side=right]:right-full max-md:group-data-[side=right]:left-auto max-md:group-data-[side=right]:mr-1',
+                  'absolute top-full mt-1 whitespace-nowrap max-md:left-1/2 max-md:mt-1.5 max-md:-translate-x-1/2 max-md:text-[0.625rem] max-md:tracking-[0.12em]',
                 )}
               >
                 {t.date}

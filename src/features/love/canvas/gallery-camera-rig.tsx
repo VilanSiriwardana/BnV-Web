@@ -20,7 +20,10 @@ import { decayRitualKick, ritualState } from '../engine/gallery-ritual';
 import { galleryState } from '../engine/gallery-state';
 
 const { damp, lerp } = MathUtils;
-const WALK_FOV = 55;
+// Narrow (portrait) screens widen the walk view so the doorway and both corridor walls stay in frame.
+const walkFov = (aspect: number) => (aspect < 1 ? 70 : 55);
+// ...and pull the walk camera back a touch so the keyhole glass box and side walls clear the edges.
+const walkPullback = (aspect: number) => (aspect < 1 ? 1.4 : 0);
 // Narrow (portrait) screens widen the inspect view so a frame fits inside the corridor width.
 const inspectFov = (aspect: number) => (aspect < 1 ? 62 : 48);
 const STORY_FOV = 45; // love-canvas.tsx camera
@@ -29,6 +32,7 @@ const lookA = new Vector3();
 const posB = new Vector3();
 const lookB = new Vector3();
 const kickOffset = new Vector3();
+const backOff = new Vector3();
 
 type Props = {
   curve: CatmullRomCurve3;
@@ -48,7 +52,10 @@ export function GalleryCameraRig({ curve, order, sizes }: Props) {
     const slot = order[index];
     if (index < 0 || !slot) {
       walkPose(curve, smooth.current, pos, look);
-      return WALK_FOV;
+      const pull = walkPullback(aspect);
+      if (pull)
+        pos.addScaledVector(backOff.subVectors(pos, look).normalize(), pull);
+      return walkFov(aspect);
     }
     const s = sizes[index] ?? { w: 1, h: 1 };
     const fov = inspectFov(aspect);
