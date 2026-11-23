@@ -40,6 +40,8 @@ const none = () => null;
 /** Keyhole centre in door-group space (right leaf, closed), and its outward normal is +z. */
 export const KEYHOLE_LOCAL = { x: 0.12, y: 1.02, z: 0.05 };
 const LEVER_Y = 1.2;
+/** The key and keyhole read larger than life so they are clear from 2.6 m. */
+export const KEY_SCALE = 1.5;
 
 // Ornate escutcheon plate with a keyhole cut through it (circle + slot).
 function escutcheonShape() {
@@ -184,7 +186,7 @@ export function GalleryDoorway({ curve }: { curve: CatmullRomCurve3 }) {
   useFrame(() => {
     const open = ritualState.door;
     levers.current.forEach((l, i) => {
-      if (l) l.rotation.z = (i === 0 ? -1 : 1) * 0.55 * ritualState.keyTurn;
+      if (l) l.rotation.z = (i === 0 ? 1 : -1) * 0.55 * ritualState.keyTurn;
     });
     // Once in the lock the key rides on the right leaf and turns with it.
     const k = lockedKey.current;
@@ -310,11 +312,8 @@ export function GalleryDoorway({ curve }: { curve: CatmullRomCurve3 }) {
         </group>
         {dir === -1 && (
           <group
-            position={[
-              -(LEAF_W / 2 - 0.12),
-              KEYHOLE_LOCAL.y,
-              0.03,
-            ]}
+            position={[-(LEAF_W / 2 - 0.12), KEYHOLE_LOCAL.y, 0.03]}
+            scale={KEY_SCALE}
           >
             <mesh
               geometry={escutcheon}

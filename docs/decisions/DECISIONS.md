@@ -630,7 +630,7 @@ Each decision should include:
   - The masonry and lightbox stay as the quiet, static and no-WebGL path.
 - Alternatives: Blender GLB corridor with baked light (deferred); Spline (rejected); a second canvas (rejected); a horizontal filmstrip, Improvement Report G6 (superseded).
 - Consequences: One more camera writer to keep in step with story handoffs; a pinned scroll of about 650 vh.
-- Amendment (blueprint 052, 2026-11-23): the first 15 % of the stage is a scrubbed entrance (procedural royal double doors open inward, "Welcome, {name}" and three lines fade in and out); the camera waits, scroll is never locked. The walk has no sway, so the separate comfort toggle was removed.
+- Amendment (blueprints 052–053, 2026-11-23): arriving forward at the gallery locks scroll at the door (Lenis stopped, touch-none overlay) until an unlock ritual opens it: swipe to swing a gold hammer and shatter a glass case, drag the gold key to the keyhole, the key turns, the doors open over about 2 s (motion exception), then scroll unlocks. Escape hatches: Break the glass / Use the key buttons, Open it for me after 20 s, Exit gallery. Done once per visit (session.galleryUnlocked, cleared by Replay). The walk has no sway, so the comfort toggle was removed; the stage is 550 vh.
 - Related Documents:
   - [../references/love-site/phases/Phase-12-Gallery-Walk.md](../references/love-site/phases/Phase-12-Gallery-Walk.md)
 

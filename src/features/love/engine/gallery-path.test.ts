@@ -74,27 +74,3 @@ describe('gallery path', () => {
     expect(slots.filter((s) => s.kind === 'photo')).toHaveLength(9);
   });
 });
-
-describe('gallery entrance', () => {
-  it('holds the walk at 0 during the entrance and round-trips', async () => {
-    const { ENTRANCE, walkProgress, stageProgress } =
-      await import('./gallery-path');
-    expect(walkProgress(0)).toBe(0);
-    expect(walkProgress(ENTRANCE)).toBe(0);
-    expect(walkProgress(1)).toBe(1);
-    for (const w of [0, 0.25, 0.5, 1])
-      expect(walkProgress(stageProgress(w))).toBeCloseTo(w);
-  });
-
-  it('opens the doors monotonically, fully before the walk', async () => {
-    const { ENTRANCE, doorOpen } = await import('./gallery-path');
-    let last = -1;
-    for (let i = 0; i <= 50; i++) {
-      const d = doorOpen((i / 50) * ENTRANCE);
-      expect(d).toBeGreaterThanOrEqual(last);
-      last = d;
-    }
-    expect(doorOpen(0)).toBe(0);
-    expect(doorOpen(ENTRANCE * 0.7)).toBe(1);
-  });
-});

@@ -20,6 +20,7 @@ import { GalleryCameraRig } from './gallery-camera-rig';
 import { GalleryCorridor } from './gallery-corridor';
 import { GalleryFrames } from './gallery-frames';
 import { GalleryLights } from './gallery-lights';
+import { GalleryRitual } from './gallery-ritual';
 
 /** Gilded border on both sides, metres (gallery-frames.tsx BORDER × 2). */
 const FRAME_EDGE = 0.18;
@@ -63,6 +64,7 @@ export function GalleryWalk({ tier, gallery, galleryEnd }: Props) {
           tier={tier}
         />
         <GalleryLights curve={curve} slots={slots} tier={tier} />
+        <GalleryRitual curve={curve} tier={tier} />
       </group>
       <GalleryCameraRig curve={curve} order={order} sizes={sizes} />
     </>

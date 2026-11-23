@@ -45,6 +45,11 @@ describe('stepTier', () => {
     expect(TIERS.low.galleryLights).toBeGreaterThanOrEqual(1);
   });
 
+  it('breaks the gallery glass into fewer shards on low', () => {
+    expect(TIERS.low.galleryShards).toBeLessThan(TIERS.high.galleryShards);
+    expect(TIERS.low.gallerySparkle).toBe(false);
+  });
+
   it('keeps bloom off on low', () => {
     expect(TIERS.low.bloom).toBe('off');
   });

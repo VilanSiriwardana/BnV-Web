@@ -22,6 +22,8 @@ export const TIERS = {
     galleryCompanion: true,
     galleryResident: 6,
     galleryHiRes: true,
+    galleryShards: 32,
+    gallerySparkle: true,
   },
   mid: {
     particles: 8000,
@@ -39,6 +41,8 @@ export const TIERS = {
     galleryCompanion: true,
     galleryResident: 5,
     galleryHiRes: false,
+    galleryShards: 32,
+    gallerySparkle: true,
   },
   low: {
     particles: 3000,
@@ -56,6 +60,8 @@ export const TIERS = {
     galleryCompanion: false,
     galleryResident: 4,
     galleryHiRes: false,
+    galleryShards: 16,
+    gallerySparkle: false,
   },
   static: {
     particles: 0,
@@ -73,6 +79,8 @@ export const TIERS = {
     galleryCompanion: false,
     galleryResident: 0,
     galleryHiRes: false,
+    galleryShards: 0,
+    gallerySparkle: false,
   },
 } as const satisfies Record<
   Tier,
@@ -92,6 +100,8 @@ export const TIERS = {
     galleryCompanion: boolean;
     galleryResident: number;
     galleryHiRes: boolean;
+    galleryShards: number;
+    gallerySparkle: boolean;
   }
 >;
 

@@ -3,6 +3,7 @@ export const session = {
   wishDone: false,
   finalePlayed: false,
   replayArmed: false, // true after Replay until the hero weave has played again
+  galleryUnlocked: false, // gallery door ritual done this visit (blueprint 053)
 };
 
 // Dispatched on #letter by story.ts buildLetter when she scrolls on without opening it.
@@ -25,5 +26,6 @@ export function resetSession() {
   session.wishDone = false;
   session.finalePlayed = false;
   session.replayArmed = true;
+  session.galleryUnlocked = false;
   listeners.forEach((fn) => fn());
 }

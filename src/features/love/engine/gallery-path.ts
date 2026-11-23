@@ -172,21 +172,3 @@ export function progressForSlot(slot: FrameSlot, length: number) {
   const before = slot.kind === 'end' ? 0 : 2.2 / length;
   return Math.min(Math.max((slot.t - before) / WALK_END, 0), 1);
 }
-
-/** Share of the stage spent at the door (blueprint 052): the camera waits while the doors open. */
-export const ENTRANCE = 0.15;
-
-/** Raw stage progress → walk progress (0 throughout the entrance). */
-export function walkProgress(raw: number) {
-  return MathUtils.clamp((raw - ENTRANCE) / (1 - ENTRANCE), 0, 1);
-}
-
-/** Walk progress → raw stage progress (inverse of walkProgress). */
-export function stageProgress(walk: number) {
-  return ENTRANCE + MathUtils.clamp(walk, 0, 1) * (1 - ENTRANCE);
-}
-
-/** Door opening 0..1 for raw stage progress: fully open well before the walk starts. */
-export function doorOpen(raw: number) {
-  return MathUtils.smoothstep(raw, 0, ENTRANCE * 0.65);
-}

@@ -11,6 +11,7 @@ describe('resetSession', () => {
       wishDone: false,
       finalePlayed: false,
       replayArmed: true,
+      galleryUnlocked: false,
     });
   });
 

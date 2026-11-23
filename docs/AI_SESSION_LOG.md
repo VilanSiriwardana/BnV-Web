@@ -1024,3 +1024,15 @@ Implemented M28–M33 in the order M28 → M32 → M29 → M31 → M30 → M33:
 
 - `tsc --noEmit`, eslint (love) clean; Vitest 35 files, 158 tests pass.
 - Headless Chrome screenshots: closed doors + welcome, opening doors, lines after the welcome, glide through, Exit gallery visible. Not checked on real devices.
+
+## 2026-11-23 — Gallery door unlock ritual (blueprint 053)
+
+- `engine/gallery-ritual-core.ts` (pure state machine, tested), `engine/gallery-ritual.ts` (runtime: Lenis stop on forward arrival, one GSAP tween per step, chimes, `session.galleryUnlocked`, `exitGalleryRitual`, `resetGalleryRitual` on leave/Replay), `engine/glass-fracture.ts` (jittered-grid shards + motion, tested).
+- Canvas: `gallery-ritual.tsx` (pedestal left of the doors, glass case without transmission, CPU-updated shard mesh, sparkle points, sledgehammer, key with drag/return/insert poses, screen projections), `gallery-key.ts` (merged key geometry), doorway lever handles, keyhole escutcheon and a leaf-mounted key that turns and swings with the door.
+- UI: `ui/gallery-ritual-overlay.tsx` (wheel/touch blocked, swipe across the case, drag to the keyhole, pulsing target ring, prompts, Break the glass / Use the key / Exit gallery, Open it for me after 20 s); welcome plays on arrival and rises away. Scrubbed entrance (`ENTRANCE`, `walkProgress`, `doorOpen`, floating lines, `galleryLines`) removed; `copy.galleryRitual` added; tiers `galleryShards`, `gallerySparkle`.
+- Deviation: walk progress is not gated on the unlock (scroll is locked at 0 during the ritual anyway; gating would freeze the camera when returning from below after an exit). The arrival snaps 2 px inside the stage so the trigger stays active.
+
+### Verification
+
+- `tsc --noEmit`, eslint (love) clean; Vitest 37 files, 165 tests pass.
+- Headless Chrome with real CDP mouse input: scroll stays put under wheel input while locked; a mouse swipe across the case swings the hammer and advances to "Carefully take the key…"; a far drop returns the key; Use the key inserts, turns and opens the doors; wheel scroll works afterwards. Not checked on real devices or with a real touch drag into the keyhole.

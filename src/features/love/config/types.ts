@@ -22,8 +22,8 @@ export type LoveSiteConfig = {
     galleryTitle: string;
     /** Gallery entrance pop-up; default "Welcome, {recipient}". */
     galleryWelcome?: string;
-    /** Lines that float up and fade at the gallery door (default three lines). */
-    galleryLines?: string[];
+    /** Gallery door unlock prompts: swipe the glass, take the key, place it (defaults in the overlay). */
+    galleryRitual?: [string, string, string];
     danceTitle: string;
     danceLine: string;
     wishPrompt: string;

@@ -17,8 +17,14 @@ import {
   createSlots,
   inspectOrder,
   progressForSlot,
-  stageProgress,
 } from '../engine/gallery-path';
+import type { RitualMode } from '../engine/gallery-ritual-core';
+import {
+  bindGalleryRitual,
+  exitGalleryRitual,
+  onGalleryRitual,
+  ritualState,
+} from '../engine/gallery-ritual';
 import {
   clearFocusedFrame,
   galleryPhotos,
@@ -28,6 +34,7 @@ import {
 import { useLoveScroll } from '../engine/scroll-engine';
 import { useQuiet } from '../engine/use-quiet';
 import { GalleryInspect } from '../ui/gallery-controls';
+import { GalleryRitualOverlay } from '../ui/gallery-ritual-overlay';
 import { GalleryLightbox } from '../ui/lightbox';
 import { HiddenHeart } from '../ui/hidden-heart';
 import { HIDDEN_GALLERY_TILE } from '../ui/hidden-heart-placements';
@@ -41,14 +48,9 @@ type Props = {
   /** Recipient name for the entrance welcome. */
   name: string;
   welcome?: string;
-  lines?: string[];
+  /** Unlock ritual prompts: swipe, take the key, place it. */
+  ritual?: [string, string, string];
 };
-
-const DEFAULT_LINES = [
-  'Twelve moments, hung with love',
-  "Walk slowly, she's in every frame",
-  'Tap a frame to step closer',
-];
 
 // Phase 12: with motion the section is a tall sticky stage and the canvas draws the corridor walk
 // (story.ts buildGallery). Quiet (Calm, reduced motion, static tier) keeps the masonry + lightbox.
@@ -66,7 +68,7 @@ function GalleryWalkStage({
   galleryEnd,
   name,
   welcome,
-  lines = DEFAULT_LINES,
+  ritual: ritualPrompts,
 }: Props) {
   const { scrollTo, stop, start } = useLoveScroll();
   const photos = useMemo(
@@ -80,6 +82,7 @@ function GalleryWalkStage({
     );
   }, [gallery.length]);
   const [state, setState] = useState<DirectorState>(galleryDirectorState);
+  const [ritual, setRitual] = useState<RitualMode>(() => ritualState.mode);
   const twins = useRef<(HTMLButtonElement | null)[]>([]);
   const opener = useRef<HTMLElement | null>(null);
   const ring = useRef<HTMLDivElement>(null);
@@ -92,6 +95,20 @@ function GalleryWalkStage({
       }),
     [photos.length, stop, start, scrollTo],
   );
+
+  useEffect(
+    () =>
+      bindGalleryRitual({
+        io: { stop, start, scrollTo: (y) => scrollTo(y, { immediate: true }) },
+      }),
+    [stop, start, scrollTo],
+  );
+  useEffect(() => onGalleryRitual(setRitual), []);
+
+  const exit = () => {
+    if (ritual !== 'idle' && ritual !== 'open') exitGalleryRitual();
+    scrollTo('#dance');
+  };
 
   // React state changes once per move, never per frame. Focus returns to the twin on close.
   useEffect(
@@ -135,11 +152,11 @@ function GalleryWalkStage({
     if (!section) return;
     const top = section.getBoundingClientRect().top + window.scrollY;
     const travel = section.offsetHeight - window.innerHeight;
-    scrollTo(top + stageProgress(stops[k] ?? 0) * travel, { duration: 0.8 });
+    scrollTo(top + (stops[k] ?? 0) * travel, { duration: 0.8 });
   };
 
   return (
-    <LoveSection id="gallery" depth={0.5} stage="650vh" className="min-h-svh">
+    <LoveSection id="gallery" depth={0.5} stage="550vh" className="min-h-svh">
       <div className="pointer-events-none absolute inset-0 grid place-items-center px-4">
         <span
           aria-hidden
@@ -153,16 +170,6 @@ function GalleryWalkStage({
           {welcome ?? `Welcome, ${name}`}
           <span className="sr-only">. {title}</span>
         </h2>
-        {lines.map((line) => (
-          <p
-            key={line}
-            data-gallery-line
-            aria-hidden
-            className="text-h3 text-gold-text col-start-1 row-start-1 text-center font-serif text-balance italic opacity-0"
-          >
-            {line}
-          </p>
-        ))}
       </div>
 
       <ul className="sr-only">
@@ -196,16 +203,25 @@ function GalleryWalkStage({
       />
 
       <HiddenHeart id="gallery" className="absolute right-6 bottom-24" />
-      <button
-        type="button"
-        data-gallery-exit
-        onClick={() => scrollTo('#dance')}
-        className="focus-ring glass text-foreground border-gold/40 hover:border-gold text-small absolute right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] flex h-11 items-center gap-2 rounded-full border px-5 font-sans opacity-0 transition-colors focus-visible:opacity-100"
-      >
-        <DoorOpenIcon aria-hidden className="text-gold size-4" />
-        Exit gallery
-      </button>
+      {(ritual === 'idle' || ritual === 'open') && (
+        <button
+          type="button"
+          data-gallery-exit
+          onClick={exit}
+          className="focus-ring glass text-foreground border-gold/40 hover:border-gold text-small absolute right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] flex h-11 items-center gap-2 rounded-full border px-5 font-sans transition-colors"
+        >
+          <DoorOpenIcon aria-hidden className="text-gold size-4" />
+          Exit gallery
+        </button>
+      )}
 
+      {ritual !== 'idle' && ritual !== 'open' && (
+        <GalleryRitualOverlay
+          mode={ritual}
+          prompts={ritualPrompts}
+          onExit={exit}
+        />
+      )}
       {state.mode !== 'walk' && (
         <GalleryInspect state={state} photos={photos} />
       )}
