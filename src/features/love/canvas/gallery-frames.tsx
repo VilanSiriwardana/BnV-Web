@@ -213,7 +213,7 @@ export function GalleryFrames({ curve, slots, photos, tier }: Props) {
   function updateResidency() {
     const keep = residentWindow(
       order.map((s) => s.t),
-      galleryState.progress * WALK_END,
+      galleryState.walk * WALK_END,
       TIERS[tier].galleryResident,
       inspectIndex(),
     );

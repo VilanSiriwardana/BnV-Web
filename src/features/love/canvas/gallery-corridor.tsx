@@ -1,27 +1,22 @@
 'use client';
 
-import { useFrame } from '@react-three/fiber';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
-  AdditiveBlending,
   BufferGeometry,
   type CatmullRomCurve3,
   DoubleSide,
   Float32BufferAttribute,
-  type Mesh,
-  type MeshBasicMaterial,
   MeshStandardMaterial,
   Vector3,
 } from 'three';
 
 import { GALLERY_DIMS, frameAt } from '../engine/gallery-path';
-import { galleryState } from '../engine/gallery-state';
-import { glowTexture, surfaceTexture } from './gallery-surfaces';
+import { GalleryDoorway } from './gallery-doorway';
+import { surfaceTexture } from './gallery-surfaces';
 
 const SAMPLES = 96;
 const HALF = GALLERY_DIMS.width / 2;
 const H = GALLERY_DIMS.height;
-const DOOR_T = 0.012;
 
 type Edge = [offset: number, y: number];
 
@@ -126,7 +121,7 @@ export function GalleryCorridor({ curve }: { curve: CatmullRomCurve3 }) {
         )),
       )}
       <EndWall curve={curve} />
-      <Doorway curve={curve} />
+      <GalleryDoorway curve={curve} />
     </>
   );
 }
@@ -135,7 +130,7 @@ const p = new Vector3();
 const n = new Vector3();
 const tangent = new Vector3();
 
-function placeAcross(curve: CatmullRomCurve3, t: number) {
+export function placeAcross(curve: CatmullRomCurve3, t: number) {
   frameAt(curve, t, p, n);
   curve.getTangentAt(t, tangent);
   return { position: p.clone(), yaw: Math.atan2(-tangent.x, -tangent.z) };
@@ -148,54 +143,5 @@ function EndWall({ curve }: { curve: CatmullRomCurve3 }) {
       <planeGeometry args={[GALLERY_DIMS.width, H]} />
       <meshStandardMaterial color="#3d1830" roughness={0.9} side={DoubleSide} />
     </mesh>
-  );
-}
-
-// FR-13: a wood-and-gold door frame just ahead of the start, with warm light filling the opening
-// that fades as she steps through.
-function Doorway({ curve }: { curve: CatmullRomCurve3 }) {
-  const { position, yaw } = useMemo(() => placeAcross(curve, DOOR_T), [curve]);
-  const glow = useMemo(() => glowTexture(), []);
-  const light = useRef<Mesh>(null);
-  useEffect(() => () => glow.dispose(), [glow]);
-
-  useFrame(() => {
-    const mesh = light.current;
-    if (!mesh) return;
-    const o = Math.max(0, 1 - galleryState.progress / 0.035);
-    (mesh.material as MeshBasicMaterial).opacity = o * 0.9;
-    mesh.visible = o > 0;
-  });
-
-  const post = (x: number) => (
-    <mesh position={[x, 1.2, 0]}>
-      <boxGeometry args={[0.22, 2.4, 0.18]} />
-      <meshStandardMaterial color="#2e1a12" roughness={0.5} />
-    </mesh>
-  );
-  return (
-    <group position={[position.x, 0, position.z]} rotation={[0, yaw, 0]}>
-      {post(-HALF + 0.11)}
-      {post(HALF - 0.11)}
-      <mesh position={[0, 2.55, 0]}>
-        <boxGeometry args={[GALLERY_DIMS.width, 0.3, 0.2]} />
-        <meshStandardMaterial
-          color="#c9a24a"
-          metalness={0.85}
-          roughness={0.35}
-        />
-      </mesh>
-      <mesh ref={light} position={[0, 1.2, -0.05]}>
-        <planeGeometry args={[GALLERY_DIMS.width - 0.44, 2.4]} />
-        <meshBasicMaterial
-          map={glow}
-          color="#ffe3b0"
-          transparent
-          depthWrite={false}
-          blending={AdditiveBlending}
-          toneMapped={false}
-        />
-      </mesh>
-    </group>
   );
 }

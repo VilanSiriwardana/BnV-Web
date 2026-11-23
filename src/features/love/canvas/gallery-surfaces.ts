@@ -191,3 +191,75 @@ export function glowTexture() {
     c.fillRect(0, 0, 128, 128);
   });
 }
+
+// Door panels (blueprint 052): gilt filigree on aubergine lacquer — border, corner scrolls and a
+// central lozenge with a heart.
+export function filigreeTexture() {
+  return canvas(512, (c) => {
+    c.fillStyle = '#3a1430';
+    c.fillRect(0, 0, 512, 512);
+    const g = c.createRadialGradient(256, 256, 40, 256, 256, 360);
+    g.addColorStop(0, 'rgba(120,40,90,0.35)');
+    g.addColorStop(1, 'rgba(0,0,0,0.35)');
+    c.fillStyle = g;
+    c.fillRect(0, 0, 512, 512);
+
+    c.strokeStyle = '#d9b45e';
+    c.lineCap = 'round';
+    c.lineWidth = 6;
+    c.strokeRect(28, 28, 456, 456);
+    c.lineWidth = 2;
+    c.strokeRect(44, 44, 424, 424);
+
+    // Corner scrolls.
+    c.lineWidth = 3;
+    for (const [x, y, sx, sy] of [
+      [44, 44, 1, 1],
+      [468, 44, -1, 1],
+      [44, 468, 1, -1],
+      [468, 468, -1, -1],
+    ]) {
+      c.save();
+      c.translate(x, y);
+      c.scale(sx, sy);
+      c.beginPath();
+      c.moveTo(0, 70);
+      c.bezierCurveTo(20, 40, 40, 20, 70, 0);
+      c.moveTo(14, 56);
+      c.arc(30, 46, 16, Math.PI, Math.PI * 2.6);
+      c.moveTo(56, 14);
+      c.arc(46, 30, 16, -Math.PI / 2, Math.PI * 1.1);
+      c.stroke();
+      c.restore();
+    }
+
+    // Central lozenge with a heart.
+    c.lineWidth = 3;
+    c.beginPath();
+    c.moveTo(256, 150);
+    c.lineTo(340, 256);
+    c.lineTo(256, 362);
+    c.lineTo(172, 256);
+    c.closePath();
+    c.stroke();
+    c.beginPath();
+    c.ellipse(256, 256, 120, 150, 0, 0, Math.PI * 2);
+    c.lineWidth = 1.5;
+    c.stroke();
+    c.fillStyle = '#e2c06c';
+    c.beginPath();
+    c.moveTo(256, 290);
+    c.bezierCurveTo(206, 250, 222, 212, 256, 232);
+    c.bezierCurveTo(290, 212, 306, 250, 256, 290);
+    c.fill();
+
+    // Scroll vines between the corners.
+    c.lineWidth = 2;
+    for (const y of [120, 392]) {
+      c.beginPath();
+      for (let x = 110; x <= 402; x += 2)
+        c.lineTo(x, y + Math.sin((x - 110) / 18) * 10);
+      c.stroke();
+    }
+  });
+}

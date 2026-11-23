@@ -5,6 +5,8 @@ import { CatmullRomCurve3, MathUtils, Vector3 } from 'three';
 export const GALLERY_DIMS = { width: 2.4, height: 3, eye: 1.6 } as const;
 /** World offset of the corridor: far behind the story camera so the heart scene never shows. */
 export const GALLERY_ORIGIN = new Vector3(0, -GALLERY_DIMS.eye, -400);
+/** The entrance door stands this far along the curve (about 2.6 m ahead of the start). */
+export const DOOR_T = 0.09;
 /** The camera stops this far along the curve so the end frame stays ahead of it. */
 export const WALK_END = 0.92;
 const LOOK_AHEAD = 0.04;
@@ -54,7 +56,7 @@ export type FrameSlot = {
 
 // 16 wall slots alternate sides; four of them are decor, spread so neither wall clusters them.
 const DECOR_AT = new Set([3, 7, 10, 14]);
-const SLOT_START = 0.07;
+const SLOT_START = 0.15; // first frame sits past the entrance door (DOOR_T)
 const SLOT_END = 0.88;
 
 export function createSlots(photos = 12): FrameSlot[] {
@@ -169,4 +171,22 @@ export function inspectPose(
 export function progressForSlot(slot: FrameSlot, length: number) {
   const before = slot.kind === 'end' ? 0 : 2.2 / length;
   return Math.min(Math.max((slot.t - before) / WALK_END, 0), 1);
+}
+
+/** Share of the stage spent at the door (blueprint 052): the camera waits while the doors open. */
+export const ENTRANCE = 0.15;
+
+/** Raw stage progress → walk progress (0 throughout the entrance). */
+export function walkProgress(raw: number) {
+  return MathUtils.clamp((raw - ENTRANCE) / (1 - ENTRANCE), 0, 1);
+}
+
+/** Walk progress → raw stage progress (inverse of walkProgress). */
+export function stageProgress(walk: number) {
+  return ENTRANCE + MathUtils.clamp(walk, 0, 1) * (1 - ENTRANCE);
+}
+
+/** Door opening 0..1 for raw stage progress: fully open well before the walk starts. */
+export function doorOpen(raw: number) {
+  return MathUtils.smoothstep(raw, 0, ENTRANCE * 0.65);
 }

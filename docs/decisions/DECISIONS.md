@@ -629,7 +629,8 @@ Each decision should include:
   - Motion exception: walk-to-frame camera tweens may exceed the 400 ms UI token (about 0.9–1.2 s).
   - The masonry and lightbox stay as the quiet, static and no-WebGL path.
 - Alternatives: Blender GLB corridor with baked light (deferred); Spline (rejected); a second canvas (rejected); a horizontal filmstrip, Improvement Report G6 (superseded).
-- Consequences: One more camera writer to keep in step with story handoffs; a pinned scroll of about 550 vh.
+- Consequences: One more camera writer to keep in step with story handoffs; a pinned scroll of about 650 vh.
+- Amendment (blueprint 052, 2026-11-23): the first 15 % of the stage is a scrubbed entrance (procedural royal double doors open inward, "Welcome, {name}" and three lines fade in and out); the camera waits, scroll is never locked. The walk has no sway, so the separate comfort toggle was removed.
 - Related Documents:
   - [../references/love-site/phases/Phase-12-Gallery-Walk.md](../references/love-site/phases/Phase-12-Gallery-Walk.md)
 

@@ -7,7 +7,8 @@ export type FrameScreen = { x: number; y: number; r: number; visible: boolean };
 
 export const galleryState = {
   active: false, // corridor visible
-  progress: 0, // 0..1 along the walk, written by ScrollTrigger
+  progress: 0, // raw stage progress 0..1 (entrance, then walk), written by ScrollTrigger
+  walk: 0, // walk progress 0..1 (gallery-path.ts walkProgress)
   cameraOwner: 'story' as CameraOwner,
   /** Set when the gallery hands the camera back; the rig restores rotation and fov once. */
   releasePending: false,
@@ -20,8 +21,6 @@ export const galleryState = {
   blend: 0,
   hovered: -1,
   focused: -1,
-  /** Comfort control: no sway. Separate from Calm mode. */
-  comfort: false,
   screen: [] as FrameScreen[], // projected frame centre + radius per inspect index, CSS px
 };
 
@@ -44,10 +43,6 @@ export function setFocusedFrame(k: number) {
 
 export function clearFocusedFrame(k?: number) {
   if (k === undefined || galleryState.focused === k) galleryState.focused = -1;
-}
-
-export function setGalleryComfort(on: boolean) {
-  galleryState.comfort = on;
 }
 
 export function claimCamera() {

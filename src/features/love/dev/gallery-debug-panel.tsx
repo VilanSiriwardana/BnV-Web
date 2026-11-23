@@ -12,10 +12,11 @@ export default function GalleryDebugPanel() {
 
   useEffect(() => {
     const id = window.setInterval(() => {
-      const { cameraOwner, active, progress, from, to, blend } = galleryState;
+      const { cameraOwner, active, progress, walk, from, to, blend } =
+        galleryState;
       setRead(
         `owner ${cameraOwner} · active ${active}
-progress ${progress.toFixed(3)} · inspect ${from}→${to} @ ${blend.toFixed(2)}`,
+progress ${progress.toFixed(3)} · walk ${walk.toFixed(3)} · inspect ${from}→${to} @ ${blend.toFixed(2)}`,
       );
     }, 200);
     return () => window.clearInterval(id);

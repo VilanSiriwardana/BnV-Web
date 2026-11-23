@@ -23,7 +23,6 @@ const WALK_FOV = 55;
 // Narrow (portrait) screens widen the inspect view so a frame fits inside the corridor width.
 const inspectFov = (aspect: number) => (aspect < 1 ? 62 : 48);
 const STORY_FOV = 45; // love-canvas.tsx camera
-const SWAY = 0.02; // metres
 const posA = new Vector3();
 const lookA = new Vector3();
 const posB = new Vector3();
@@ -47,7 +46,6 @@ export function GalleryCameraRig({ curve, order, sizes }: Props) {
     const slot = order[index];
     if (index < 0 || !slot) {
       walkPose(curve, smooth.current, pos, look);
-      if (!galleryState.comfort) pos.y += Math.sin(smooth.current * 60) * SWAY;
       return WALK_FOV;
     }
     const s = sizes[index] ?? { w: 1, h: 1 };
@@ -69,8 +67,8 @@ export function GalleryCameraRig({ curve, order, sizes }: Props) {
     }
     // Entering (or re-entering) jumps straight to the current scroll spot: never fly in.
     smooth.current = owned.current
-      ? damp(smooth.current, galleryState.progress, 6, delta)
-      : galleryState.progress;
+      ? damp(smooth.current, galleryState.walk, 3.5, delta)
+      : galleryState.walk;
     owned.current = true;
 
     const { from, to, blend } = galleryState;

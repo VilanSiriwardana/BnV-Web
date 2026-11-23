@@ -1012,3 +1012,15 @@ Implemented M28–M33 in the order M28 → M32 → M29 → M31 → M30 → M33:
 - `tsc --noEmit`, eslint (love + lightbox) clean; Vitest 35 files, 156 tests pass.
 - Headless Chrome (SwiftShader, low tier, 1280×800): walk renders, twin opens frame, Next works, Esc closes, scroll identical before/after, focus returns to twin, no console errors. Later fixes (title fade, inspect fit, end glow timing) not re-screenshotted.
 - Not checked: real devices, 375px, high/mid tier look, iOS tap.
+
+## 2026-11-23 — Gallery entrance and smooth glide (blueprint 052)
+
+- Rig: sway removed, damp 6 → 3.5; Steady camera toggle and `galleryState.comfort` removed.
+- Entrance: `ENTRANCE = 0.15`, `walkProgress` / `stageProgress` / `doorOpen` (tested); `galleryState.walk` drives the camera, residency, lights and companion; stage 650vh. `canvas/gallery-doorway.tsx`: fluted pilasters, gold pediment with heart crest, aubergine lacquer leaves with filigree panels and ring handles, swinging 105° inward; light spill fades once through. Door moved to `DOOR_T = 0.09` (2.6 m) so it fills the view; first frame slot moved to 0.15.
+- Section: "Welcome, {recipient}" heading (Cinzel display) pops in, then `copy.galleryLines` (three defaults) rise and fade one by one; "Exit gallery" glass pill with gold edge fades in after the entrance.
+- Motes use a round glow map; companion heart appears only after the door.
+
+### Verification
+
+- `tsc --noEmit`, eslint (love) clean; Vitest 35 files, 158 tests pass.
+- Headless Chrome screenshots: closed doors + welcome, opening doors, lines after the welcome, glide through, Exit gallery visible. Not checked on real devices.

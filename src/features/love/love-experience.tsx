@@ -160,6 +160,9 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
           title={site.copy.galleryTitle}
           photos={site.gallery}
           galleryEnd={site.galleryEnd}
+          name={name}
+          welcome={site.copy.galleryWelcome}
+          lines={site.copy.galleryLines}
         />
         <Dance title={site.copy.danceTitle} line={site.copy.danceLine} />
         <Reasons

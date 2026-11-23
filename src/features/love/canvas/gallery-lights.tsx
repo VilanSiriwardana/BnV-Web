@@ -12,6 +12,7 @@ import {
   Fog,
   type InstancedMesh,
   type Mesh,
+  MathUtils,
   MeshBasicMaterial,
   Object3D,
   PlaneGeometry,
@@ -250,7 +251,7 @@ function CameraLights({
   // Allocated once at the high count; lower tiers switch the extras off (no shader recompiles).
   const lights = useRef<(PointLight | null)[]>([]);
   useFrame(() => {
-    const at = galleryState.progress * WALK_END;
+    const at = galleryState.walk * WALK_END;
     lights.current.forEach((l, i) => {
       if (!l) return;
       l.intensity = galleryState.active && i < count ? 7 : 0;
@@ -297,7 +298,7 @@ function EndGlow({ curve, glow }: { curve: CatmullRomCurve3; glow: Texture }) {
     [spot, exit],
   );
   useFrame(() => {
-    const t = Math.max(0, (galleryState.progress - 0.93) / 0.07);
+    const t = Math.max(0, (galleryState.walk - 0.93) / 0.07);
     const mesh = exitRef.current;
     if (!mesh) return;
     const m = mesh.material as MeshBasicMaterial;
@@ -335,7 +336,9 @@ function Motes({ curve, count }: { curve: CatmullRomCurve3; count: number }) {
     geo.setAttribute('position', new BufferAttribute(pos, 3));
     const mat = new PointsMaterial({
       color: WARM,
-      size: 0.022,
+      size: 0.03,
+      map: glowTexture(),
+      alphaTest: 0.01,
       transparent: true,
       opacity: 0.7,
       depthWrite: false,
@@ -346,6 +349,7 @@ function Motes({ curve, count }: { curve: CatmullRomCurve3; count: number }) {
   useEffect(
     () => () => {
       parts.geo.dispose();
+      parts.mat.map?.dispose();
       parts.mat.dispose();
     },
     [parts],
@@ -397,12 +401,15 @@ function Companion({ curve }: { curve: CatmullRomCurve3 }) {
     const mesh = ref.current;
     if (!mesh) return;
     const t = clock.elapsedTime;
-    const at = Math.min(galleryState.progress * WALK_END + 0.07, 0.985);
+    const at = Math.min(galleryState.walk * WALK_END + 0.07, 0.985);
     curve.getPointAt(at, mesh.position);
     mesh.position.y = GALLERY_DIMS.eye + 0.35 + Math.sin(t * 1.4) * 0.05;
     mesh.rotation.set(0, t * 0.6, 0);
     const pulse = 1 + 0.45 * Math.sin(Math.PI * inspectWeight());
-    mesh.scale.setScalar(0.06 * pulse);
+    // Appears once she is through the door, so it never floats in front of it.
+    const through = MathUtils.smoothstep(galleryState.walk, 0.1, 0.16);
+    mesh.visible = through > 0;
+    mesh.scale.setScalar(0.06 * pulse * through);
   });
   return (
     <mesh

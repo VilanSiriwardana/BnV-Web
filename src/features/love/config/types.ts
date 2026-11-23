@@ -20,6 +20,10 @@ export type LoveSiteConfig = {
     timelineTitle: string;
     starlightLine: string;
     galleryTitle: string;
+    /** Gallery entrance pop-up; default "Welcome, {recipient}". */
+    galleryWelcome?: string;
+    /** Lines that float up and fade at the gallery door (default three lines). */
+    galleryLines?: string[];
     danceTitle: string;
     danceLine: string;
     wishPrompt: string;

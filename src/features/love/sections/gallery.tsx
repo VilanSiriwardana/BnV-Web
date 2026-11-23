@@ -1,5 +1,6 @@
 'use client';
 
+import { DoorOpenIcon } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { PhotoRef } from '../config';
@@ -16,13 +17,13 @@ import {
   createSlots,
   inspectOrder,
   progressForSlot,
+  stageProgress,
 } from '../engine/gallery-path';
 import {
   clearFocusedFrame,
   galleryPhotos,
   galleryState,
   setFocusedFrame,
-  setGalleryComfort,
 } from '../engine/gallery-state';
 import { useLoveScroll } from '../engine/scroll-engine';
 import { useQuiet } from '../engine/use-quiet';
@@ -30,12 +31,24 @@ import { GalleryInspect } from '../ui/gallery-controls';
 import { GalleryLightbox } from '../ui/lightbox';
 import { HiddenHeart } from '../ui/hidden-heart';
 import { HIDDEN_GALLERY_TILE } from '../ui/hidden-heart-placements';
-import { labelText, LoveSection, sectionTitle } from './love-section';
+import { LoveSection, sectionTitle } from './love-section';
 import { LovePhoto } from './love-photo';
 
-type Props = { title: string; photos: PhotoRef[]; galleryEnd?: PhotoRef };
+type Props = {
+  title: string;
+  photos: PhotoRef[];
+  galleryEnd?: PhotoRef;
+  /** Recipient name for the entrance welcome. */
+  name: string;
+  welcome?: string;
+  lines?: string[];
+};
 
-const COMFORT_KEY = 'love:gallery-comfort';
+const DEFAULT_LINES = [
+  'Twelve moments, hung with love',
+  "Walk slowly, she's in every frame",
+  'Tap a frame to step closer',
+];
 
 // Phase 12: with motion the section is a tall sticky stage and the canvas draws the corridor walk
 // (story.ts buildGallery). Quiet (Calm, reduced motion, static tier) keeps the masonry + lightbox.
@@ -47,7 +60,14 @@ export function Gallery(props: Props) {
   );
 }
 
-function GalleryWalkStage({ title, photos: gallery, galleryEnd }: Props) {
+function GalleryWalkStage({
+  title,
+  photos: gallery,
+  galleryEnd,
+  name,
+  welcome,
+  lines = DEFAULT_LINES,
+}: Props) {
   const { scrollTo, stop, start } = useLoveScroll();
   const photos = useMemo(
     () => galleryPhotos(gallery, galleryEnd),
@@ -60,8 +80,6 @@ function GalleryWalkStage({ title, photos: gallery, galleryEnd }: Props) {
     );
   }, [gallery.length]);
   const [state, setState] = useState<DirectorState>(galleryDirectorState);
-  const [opened, setOpened] = useState(false);
-  const [comfort, setComfort] = useState(false);
   const twins = useRef<(HTMLButtonElement | null)[]>([]);
   const opener = useRef<HTMLElement | null>(null);
   const ring = useRef<HTMLDivElement>(null);
@@ -80,31 +98,13 @@ function GalleryWalkStage({ title, photos: gallery, galleryEnd }: Props) {
     () =>
       onGalleryDirector((next) => {
         setState(next);
-        if (next.mode !== 'walk') setOpened(true);
-        else if (opener.current) {
+        if (next.mode === 'walk' && opener.current) {
           opener.current.focus({ preventScroll: true });
           opener.current = null;
         }
       }),
     [],
   );
-
-  // Comfort control (FR-15): steady camera, independent of Calm mode. Session-scoped like love:calm.
-  useEffect(() => {
-    try {
-      const on = sessionStorage.getItem(COMFORT_KEY) === '1';
-      setGalleryComfort(on);
-      setComfort(on); // eslint-disable-line react-hooks/set-state-in-effect
-    } catch {}
-  }, []);
-  const toggleComfort = () => {
-    const on = !comfort;
-    setGalleryComfort(on);
-    setComfort(on);
-    try {
-      sessionStorage.setItem(COMFORT_KEY, on ? '1' : '0');
-    } catch {}
-  };
 
   // Focus ring follows the projected frame (no React state per frame), as in memories.tsx.
   useEffect(() => {
@@ -135,27 +135,35 @@ function GalleryWalkStage({ title, photos: gallery, galleryEnd }: Props) {
     if (!section) return;
     const top = section.getBoundingClientRect().top + window.scrollY;
     const travel = section.offsetHeight - window.innerHeight;
-    scrollTo(top + (stops[k] ?? 0) * travel, { duration: 0.8 });
+    scrollTo(top + stageProgress(stops[k] ?? 0) * travel, { duration: 0.8 });
   };
 
   return (
-    <LoveSection id="gallery" depth={0.5} stage="550vh" className="min-h-svh">
-      <h2
-        id="gallery-title"
-        data-gallery-intro
-        className={`${sectionTitle} pointer-events-none`}
-      >
-        {title}
-      </h2>
-      {!opened && (
-        <p
-          data-gallery-intro
-          className={`${labelText} pointer-events-none mt-3`}
+    <LoveSection id="gallery" depth={0.5} stage="650vh" className="min-h-svh">
+      <div className="pointer-events-none absolute inset-0 grid place-items-center px-4">
+        <span
           aria-hidden
+          className="bg-scrim/60 col-start-1 row-start-1 size-[min(80vw,36rem)] rounded-full blur-3xl"
+        />
+        <h2
+          id="gallery-title"
+          data-gallery-welcome
+          className="text-display text-gold-text col-start-1 row-start-1 text-center text-balance opacity-0 drop-shadow-[0_0_24px_var(--love-aurora-gold)]"
         >
-          Walk on, and tap a frame to look closer
-        </p>
-      )}
+          {welcome ?? `Welcome, ${name}`}
+          <span className="sr-only">. {title}</span>
+        </h2>
+        {lines.map((line) => (
+          <p
+            key={line}
+            data-gallery-line
+            aria-hidden
+            className="text-h3 text-gold-text col-start-1 row-start-1 text-center font-serif text-balance italic opacity-0"
+          >
+            {line}
+          </p>
+        ))}
+      </div>
 
       <ul className="sr-only">
         {photos.map((p, k) => (
@@ -188,23 +196,15 @@ function GalleryWalkStage({ title, photos: gallery, galleryEnd }: Props) {
       />
 
       <HiddenHeart id="gallery" className="absolute right-6 bottom-24" />
-      <div className="absolute inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] flex items-center justify-between gap-2">
-        <button
-          type="button"
-          aria-pressed={comfort}
-          onClick={toggleComfort}
-          className="focus-ring text-small text-muted-foreground hover:text-foreground aria-pressed:text-gold-text rounded-md px-3 py-2 font-sans"
-        >
-          Steady camera
-        </button>
-        <button
-          type="button"
-          onClick={() => scrollTo('#dance')}
-          className="focus-ring text-small text-muted-foreground hover:text-foreground rounded-md px-3 py-2 font-sans"
-        >
-          Skip gallery
-        </button>
-      </div>
+      <button
+        type="button"
+        data-gallery-exit
+        onClick={() => scrollTo('#dance')}
+        className="focus-ring glass text-foreground border-gold/40 hover:border-gold text-small absolute right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] flex h-11 items-center gap-2 rounded-full border px-5 font-sans opacity-0 transition-colors focus-visible:opacity-100"
+      >
+        <DoorOpenIcon aria-hidden className="text-gold size-4" />
+        Exit gallery
+      </button>
 
       {state.mode !== 'walk' && (
         <GalleryInspect state={state} photos={photos} />

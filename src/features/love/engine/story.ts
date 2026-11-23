@@ -9,6 +9,7 @@ import { candle } from './candle-state';
 import { dance } from './dance-state';
 import { reasons } from './reasons-state';
 import { resetGalleryDirector } from './gallery-director';
+import { ENTRANCE, walkProgress } from './gallery-path';
 import { claimCamera, galleryState, releaseCamera } from './gallery-state';
 import { heart } from './heart-state';
 import { memoriesState } from './memories-state';
@@ -498,22 +499,48 @@ const buildGallery: SectionBuilder = (root, mobile) => {
     )
     .fromTo(heart, { scale: from.scale }, { scale: to.scale, ...scrub }, 0);
 
-  // The title and hint greet her at the door, then fade so the hall is clear.
-  gsap.fromTo(
-    el.querySelectorAll('[data-gallery-intro]'),
-    { autoAlpha: 1 },
-    {
-      autoAlpha: 0,
-      ease: 'none',
-      immediateRender: false,
+  // Blueprint 052 entrance: while the doors open (raw progress 0..ENTRANCE) the welcome pops in,
+  // the lines drift up and fade one by one, then Exit gallery appears. Scrubbed, so it reverses.
+  const lines = el.querySelectorAll('[data-gallery-line]');
+  const welcome = el.querySelector('[data-gallery-welcome]');
+  const exit = el.querySelector('[data-gallery-exit]');
+  const entrance = gsap
+    .timeline({
+      defaults: { ease: 'none' },
       scrollTrigger: {
         trigger: el,
         start: 'top top',
-        end: '6% top',
-        scrub: true,
+        end: () => `+=${(el.offsetHeight - window.innerHeight) * ENTRANCE}`,
+        scrub: 0.6,
+        invalidateOnRefresh: true,
       },
-    },
-  );
+    })
+    .fromTo(
+      welcome,
+      { autoAlpha: 0, scale: 0.86, filter: 'blur(10px)' },
+      {
+        autoAlpha: 1,
+        scale: 1,
+        filter: 'blur(0px)',
+        duration: 0.25,
+        ease: 'back.out(1.6)',
+      },
+      0,
+    )
+    .to(welcome, { autoAlpha: 0, y: -40, duration: 0.12 }, 0.3)
+    .fromTo(exit, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.08 }, 0.92);
+  // One line at a time after the welcome: rise in, hold, drift up and fade.
+  lines.forEach((line, i) => {
+    const at = 0.44 + i * 0.16;
+    entrance
+      .fromTo(
+        line,
+        { autoAlpha: 0, y: 24 },
+        { autoAlpha: 1, y: 0, duration: 0.06 },
+        at,
+      )
+      .to(line, { autoAlpha: 0, y: -28, duration: 0.06 }, at + 0.1);
+  });
 
   ScrollTrigger.create({
     trigger: el,
@@ -521,6 +548,7 @@ const buildGallery: SectionBuilder = (root, mobile) => {
     end: 'bottom bottom',
     onUpdate: (self) => {
       galleryState.progress = self.progress;
+      galleryState.walk = walkProgress(self.progress);
     },
     onToggle: (self) => (self.isActive ? claimCamera() : leaveGallery()),
   });
