@@ -18,6 +18,18 @@ export const SECTION_IDS = [
 ] as const;
 export type SectionId = (typeof SECTION_IDS)[number];
 
+// Blueprint 062: sections are split between petals and ambient mini-hearts.
+// Listed sections show petals (dim controls opacity); unlisted show ambient hearts only.
+export const PETAL_SECTIONS: Partial<Record<SectionId, { dim: number }>> = {
+  bloom: { dim: 0 },
+  memories: { dim: 0 },
+  timeline: { dim: 0 },
+  starlight: { dim: 0.3 },
+  reasons: { dim: 0.6 },
+  letter: { dim: 0.35 },
+  finale: { dim: 0 },
+};
+
 export type HeartPose = { x: number; y: number; scale: number };
 type PathEntry = {
   desktop: HeartPose;
@@ -113,12 +125,11 @@ export function poseFor(section: SectionId, mobile: boolean): HeartPose {
 // Hero intro: the weave ends this far below the pose, then floats up with the title.
 export const HERO_RISE = 0.14;
 
-export const WISH_STAR_NDC = { x: 0, y: 0 };
-// The heart rests below the star and rises to it as she holds.
-export const WISH_REST = { y: -0.45, scale: 0.35 };
-export const WISH_TOP = { y: -0.05, scale: 0.5 };
-// Blowing lifts the heart only part of the way; wishMerge takes it the rest.
-export const WISH_BLOW_TOP = { y: -0.15, scale: 0.42 };
+// Blueprint 062: moved up so the candle sits inside the medallion, not over the DOM controls.
+export const WISH_STAR_NDC = { x: 0, y: 0.18 };
+export const WISH_REST = { y: -0.2, scale: 0.35 };
+export const WISH_TOP = { y: 0.13, scale: 0.5 };
+export const WISH_BLOW_TOP = { y: 0.03, scale: 0.42 };
 
 // Our sky (F3): the heart waits low while she connects the stars, then rises into the shape
 // (HEART_PATH.starlight, via skyHeartIn).

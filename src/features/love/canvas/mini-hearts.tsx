@@ -289,6 +289,7 @@ const ambient = Array.from({ length: AMBIENT }, (_, i) => ({
   color: i % 3,
 }));
 
+// Blueprint 062: sections are split between petals and ambient hearts (heart-path PETAL_SECTIONS).
 const ambientIdle = () =>
   heart.petalRelease < 0.01 &&
   !document.hidden &&
@@ -351,7 +352,7 @@ export function AmbientHearts({ tier }: { tier: Tier }) {
       if (now > o.start + o.life) respawn(o, now);
       const k = Math.min(1, Math.max(0, (now - o.start) / o.life));
       const fade = active
-        ? smoothstep(k, 0, 0.2) * (1 - smoothstep(k, 0.7, 1))
+        ? smoothstep(k, 0, 0.2) * (1 - smoothstep(k, 0.7, 1)) * heart.ambientIn
         : 0;
       dummy.position.set(
         (o.x * vp.width) / 2,

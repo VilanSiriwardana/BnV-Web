@@ -10,6 +10,7 @@ import {
 } from './heart-director-core';
 import {
   HEART_PATH,
+  PETAL_SECTIONS,
   isMobileViewport,
   poseFor,
   type SectionId,
@@ -57,24 +58,40 @@ function burst(
     { glow: 0.3, duration: 1.1, ease: 'power3.out' },
     '<',
   );
-  if (opts.petals)
-    tl.fromTo(
-      heart,
-      { petalRelease: 0 },
-      { petalRelease: 1, duration: 2, ease: 'power1.out' },
-      '<',
-    );
+  // Blueprint 062: petals always scatter with the heart burst.
+  tl.fromTo(
+    heart,
+    { petalGather: 1 },
+    { petalGather: 0, duration: 1.1, ease: 'power3.out' },
+    '<',
+  );
+  if (opts.petals || heart.petalRelease > 0.01)
+    tl.set(heart, { petalRelease: 1 }, at);
 }
 
-function reform(tl: gsap.core.Timeline) {
+function reform(tl: gsap.core.Timeline, gatherPetals = true) {
   tl.to(heart, { burst: 0, duration: 1.6, ease: 'power2.inOut' }, '>')
     .to(
       heart,
       { glow: baseGlow() + 0.25, duration: 1.6, ease: 'power2.inOut' },
       '<',
     )
+    // Blueprint 063: petals gather and STAY gathered. Caller decides whether to scatter.
+    .to(
+      heart,
+      {
+        petalGather: gatherPetals ? 1 : 0,
+        duration: 1.6,
+        ease: 'power2.inOut',
+      },
+      '<',
+    )
     .to(heart, { glow: baseGlow(), duration: 0.8, ease: 'power2.inOut' });
   pulse(tl, '<');
+}
+
+function scatterPetals(tl: gsap.core.Timeline, at: number | string = '>') {
+  tl.to(heart, { petalGather: 0, duration: 0.9, ease: 'power3.out' }, at);
 }
 
 // Experience §3.5 durations and eases. Unbuilt events (later phases) play a pulse for now.
@@ -151,7 +168,8 @@ function build(event: HeartEvent, opts: PlayOptions, tl: gsap.core.Timeline) {
     case 'burstReform':
       burst(tl, opts);
       tl.to({}, { duration: 0.5 });
-      reform(tl);
+      // Bloom: the heart reforms, released petals keep falling.
+      reform(tl, !opts.petals);
       return;
     case 'arrowStrike':
       arrowStrike(tl);
@@ -179,6 +197,7 @@ function build(event: HeartEvent, opts: PlayOptions, tl: gsap.core.Timeline) {
       tl.call(() => void launchConfetti(0.5), [], '<');
       tl.to({}, { duration: 0.5 });
       reform(tl);
+      scatterPetals(tl);
       return;
     case 'finaleSpell':
       finaleSpell(tl);
@@ -294,13 +313,18 @@ function candleOut(tl: gsap.core.Timeline) {
 function arrowStrike(tl: gsap.core.Timeline) {
   boost = STRIKE_BOOST;
   const glow = baseGlow();
-  tl.to(heart, { glow: glow - 0.15, flinch: -0.03, duration: 0.2 }, 0)
+  // Blueprint 063: petals sense the arrow before it appears — shiver starts at t+0.
+  tl.to(heart, { petalShiver: 1, duration: 1.0, ease: 'power1.in' }, 0)
+    .to(heart, { glow: glow - 0.15, flinch: -0.03, duration: 0.2 }, 0)
     .fromTo(
       heart,
       { arrow: 0 },
       { arrow: 1, duration: 0.9, ease: 'power1.in' },
       0.2,
     )
+    // Blueprint 063: petals shrink into heart before impact.
+    .to(heart, { petalGather: 1, duration: 0.35, ease: 'power2.in' }, 0.6)
+    .to(heart, { petalShiver: 0, duration: 0.1 }, 1.1)
     .to(heart, { flinch: -0.08, duration: 0.08, ease: 'power2.out' }, 1.1)
     .to(heart, { flinch: 0.06, duration: 0.22, ease: 'power2.out' })
     .to(heart, { flinch: 0, duration: 0.3, ease: 'power2.inOut' })
@@ -321,7 +345,8 @@ function arrowStrike(tl: gsap.core.Timeline) {
     .set(heart, { arrow: 0 }, 1.45);
   burst(tl, {}, 1.4);
   tl.to({}, { duration: 0.5 });
-  reform(tl);
+  // Timeline: petals were absorbed before impact; the blast sends them falling again.
+  reform(tl, false);
 }
 
 // Experience §12 wishMerge (≈ 4 s): flash, burst with confetti, reform; the message is DOM-side.
@@ -332,6 +357,7 @@ function wishMerge(tl: gsap.core.Timeline, at = 0) {
   burst(tl, {}, at + 0.3);
   tl.to({}, { duration: 0.2 });
   reform(tl);
+  scatterPetals(tl);
   tl.to(heart, { star: 1, starHold: 0, duration: 0.6 }, '<');
 }
 
@@ -354,6 +380,9 @@ function toBaseline() {
     flinch: 0,
     shine: 0,
     starHold: 0,
+    petalGather: 0,
+    petalShiver: 0,
+    petalAbsorb: 0,
     // Blueprint 060 follow-up: on the finale, scroll owns the spell; never kill its scrub.
     ...(section === 'finale' ? {} : { spell: 0, spellB: 0 }),
     gold: HEART_PATH[section].gold,
@@ -384,6 +413,30 @@ export const director = {
   current: core.current,
   setBaseline(id: SectionId) {
     section = id;
+    // Blueprint 062: petal sections own petalRelease; bloom waits for the burst to set it.
+    const entry = PETAL_SECTIONS[id];
+    if (id !== 'bloom')
+      gsap.to(heart, {
+        petalRelease: entry ? 1 : 0,
+        petalDim: entry?.dim ?? 0,
+        petalAbsorb: 0,
+        duration: 0.6,
+        overwrite: 'auto',
+      });
+    else
+      gsap.to(heart, {
+        petalDim: 0,
+        petalAbsorb: 0,
+        duration: 0.6,
+        overwrite: 'auto',
+      });
+    // Timeline: petals parked in the heart (Memories end) shoot back out.
+    gsap.to(heart, {
+      petalGather: 0,
+      duration: id === 'timeline' ? 1.1 : 0.6,
+      ease: id === 'timeline' ? 'power3.out' : 'power1.out',
+      overwrite: 'auto',
+    });
   },
   baseline: () => section,
   resetBoost() {

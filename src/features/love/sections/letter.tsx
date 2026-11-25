@@ -357,11 +357,13 @@ export function Letter({ title, letter }: Props) {
   );
 }
 
-// Blueprint 061: each line is inked left to right while the quill rides the edge.
+// Blueprint 062: each line is inked left to right while the quill rides the edge.
+// Positions are measured relative to [data-letter-sheet] via getBoundingClientRect.
 function writeLetter(scope: HTMLElement | null, card: HTMLElement | null) {
   const tl = gsap.timeline();
   if (!scope) return tl;
   const quill = scope.querySelector<HTMLElement>('[data-letter-quill]');
+  const sheet = scope.querySelector<HTMLElement>('[data-letter-sheet]');
   const blocks = gsap.utils.toArray<HTMLElement>('[data-letter-p]', scope);
   const split = SplitText.create(
     scope.querySelectorAll('[data-letter-write]'),
@@ -389,7 +391,18 @@ function writeLetter(scope: HTMLElement | null, card: HTMLElement | null) {
         ease: 'power2.out',
       });
   };
-  if (quill) tl.set(quill, { autoAlpha: 1, yPercent: -100 });
+  // Measure against the quill's own container (it scrolls with the card); the nib is bottom-left.
+  const pos = (line: HTMLElement) => {
+    const r = line.getBoundingClientRect();
+    const box = (quill?.offsetParent as HTMLElement | null) ?? sheet;
+    const b = box ? box.getBoundingClientRect() : { left: 0, top: 0 };
+    return {
+      x0: r.left - b.left,
+      x1: r.right - b.left,
+      y: r.bottom - b.top - (quill?.offsetHeight ?? 48) + r.height * 0.15,
+    };
+  };
+  if (quill) tl.set(quill, { autoAlpha: 1, yPercent: 0, x: 0, y: 0 });
   blocks.forEach((b) => {
     if (!b.hasAttribute('data-letter-write')) {
       tl.to(b, { autoAlpha: 1, duration: 0.4 });
@@ -403,19 +416,24 @@ function writeLetter(scope: HTMLElement | null, card: HTMLElement | null) {
           0.8,
           (line.textContent?.length ?? 0) * 0.016,
         );
-        const y = line.offsetTop + line.offsetHeight * 0.85;
-        tl.call(() => follow(line)).to(line, {
-          clipPath: 'inset(0% 0% 0% 0%)',
-          duration: d,
-          ease: 'none',
-        });
+        tl.call(() => follow(line));
+        // Pen lands on the line, then rides the ink edge in step with the reveal.
+        if (quill)
+          tl.call(() => {
+            const p = pos(line);
+            gsap
+              .timeline()
+              .to(quill, { x: p.x0, y: p.y - 6, duration: 0.12 })
+              .to(quill, { y: p.y, duration: 0.08 })
+              .to(quill, { x: p.x1, duration: d, ease: 'none' });
+          });
+        tl.to(
+          line,
+          { clipPath: 'inset(0% 0% 0% 0%)', duration: d, ease: 'none' },
+          '+=0.2',
+        );
         if (!quill) return;
         tl.fromTo(
-          quill,
-          { x: line.offsetLeft, y },
-          { x: line.offsetLeft + line.offsetWidth, duration: d, ease: 'none' },
-          '<',
-        ).fromTo(
           quill,
           { rotation: -5 },
           {

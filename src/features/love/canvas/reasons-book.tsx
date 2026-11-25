@@ -178,6 +178,8 @@ export function ReasonsBook({ tier, items }: { tier: Tier; items: string[] }) {
   const book = useRef<Group>(null);
   const reveal = useRef(0);
   const turns = useRef<number[]>([]);
+  const coverTurn = useRef(0);
+  const backTurn = useRef(0);
   const n = items.length;
   const res = tier === 'high' ? 768 : 512;
 
@@ -282,8 +284,27 @@ export function ReasonsBook({ tier, items }: { tier: Tier; items: string[] }) {
     g.scale.setScalar(fit * (0.85 + reveal.current * 0.15));
     g.position.y = -viewH * 0.08 - (1 - reveal.current) * 0.3;
 
-    const target = reasons.progress * Math.max(0, n - 1);
+    const p = reasons.progress;
+    // Blueprint 062: the cover opens first, pages turn in the middle, back cover closes last.
+    const openGoal = MathUtils.smoothstep(p, 0.0, 0.06);
+    coverTurn.current = MathUtils.damp(coverTurn.current, openGoal, 6, delta);
+    const closeGoal = MathUtils.smoothstep(p, 0.93, 1.0);
+    backTurn.current = MathUtils.damp(backTurn.current, closeGoal, 6, delta);
+    const inner = MathUtils.clamp((p - 0.08) / 0.82, 0, 1);
+    const target = inner * Math.max(0, n - 1);
     book.current?.children.forEach((child) => {
+      if (child.userData.role === 'cover') {
+        child.rotation.y = -Math.PI * coverTurn.current;
+        child.position.z =
+          MathUtils.lerp(n + 1, 0, coverTurn.current) * GAP + 0.01;
+        return;
+      }
+      if (child.userData.role === 'back') {
+        child.rotation.y = -Math.PI * (1 - backTurn.current);
+        child.position.z =
+          MathUtils.lerp(0, n + 1, backTurn.current) * GAP - 0.01;
+        return;
+      }
       const k = child.userData.leaf as number | undefined;
       if (k === undefined) return;
       const goal = MathUtils.smoothstep(target - k, 0.3, 0.7);
@@ -326,6 +347,17 @@ export function ReasonsBook({ tier, items }: { tier: Tier; items: string[] }) {
           position={[0, 0, 0.005]}
           raycast={none}
         />
+        {/* Blueprint 062: front cover, hinged at x=0, opens by rotating -PI */}
+        <group userData={{ role: 'cover' }}>
+          <mesh geometry={kit.page} material={kit.board} raycast={none} />
+          <mesh
+            geometry={kit.page}
+            material={kit.edge}
+            scale={[1, 1, 0.01]}
+            position={[0, 0, -0.005]}
+            raycast={none}
+          />
+        </group>
         {kit.leaves.map((m, k) => (
           <mesh
             key={k}
@@ -335,6 +367,17 @@ export function ReasonsBook({ tier, items }: { tier: Tier; items: string[] }) {
             raycast={none}
           />
         ))}
+        {/* Blueprint 062: back cover, starts at -PI (open), closes to 0 */}
+        <group userData={{ role: 'back' }}>
+          <mesh geometry={kit.page} material={kit.board} raycast={none} />
+          <mesh
+            geometry={kit.page}
+            material={kit.edge}
+            scale={[1, 1, 0.01]}
+            position={[0, 0, 0.005]}
+            raycast={none}
+          />
+        </group>
       </group>
     </group>,
     camera,

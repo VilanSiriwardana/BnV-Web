@@ -131,31 +131,12 @@ const buildBloom: SectionBuilder = (root, mobile) => {
   const line = bloom.querySelector<HTMLElement>('[data-bloom-line]');
   const words = line ? buildBloomWords(line) : null;
 
-  // Blueprint 061: the only petal owner. Fade in at Bloom, out before the Memories rail.
-  const memories = root.querySelector<HTMLElement>('#memories');
-  gsap
-    .timeline({
-      scrollTrigger: {
-        trigger: bloom,
-        start: 'top 85%',
-        ...(memories
-          ? { endTrigger: memories, end: 'top top' }
-          : { end: 'bottom top' }),
-        scrub: 0.8,
-      },
-    })
-    .fromTo(
-      heart,
-      { petalRelease: 0 },
-      { petalRelease: 1, duration: 0.15, immediateRender: false },
-    )
-    .to(heart, { petalRelease: 1, duration: 0.75, ease: 'none' })
-    .to(heart, { petalRelease: 0, duration: 0.1, ease: 'power1.in' });
+  // Blueprint 062: the director owns petalRelease now; bloom's burst releases them.
   ScrollTrigger.create({
     trigger: bloom,
     start: 'top 60%',
     onEnter: () => {
-      director.play('burstReform');
+      director.play('burstReform', { petals: true });
       words?.restart();
     },
     onEnterBack: () => director.settle(),
@@ -287,6 +268,35 @@ const buildMemories: SectionBuilder = (root, mobile) => {
       { cameraZ: end, depth: end - RAIL_START_Z, ...scrub, duration: 0.88 },
       0.12,
     );
+
+  // Blueprint 063: petals absorb to screen edges as memories float in.
+  gsap
+    .timeline({
+      scrollTrigger: {
+        trigger: el,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.8,
+      },
+    })
+    .to(
+      heart,
+      { petalGather: 0, duration: 0.08, immediateRender: false, ease: 'none' },
+      0,
+    )
+    .to(
+      heart,
+      {
+        petalAbsorb: 1,
+        duration: 0.15,
+        immediateRender: false,
+        ease: 'power1.out',
+      },
+      0,
+    )
+    .to(heart, { petalAbsorb: 1, duration: 0.7, ease: 'none' })
+    .set(heart, { petalGather: 1 })
+    .to(heart, { petalAbsorb: 0, duration: 0.14, ease: 'none' });
 
   // Rail hand-off: the Timeline is a flat stage, so the camera returns home (heart.tsx snaps).
   ScrollTrigger.create({

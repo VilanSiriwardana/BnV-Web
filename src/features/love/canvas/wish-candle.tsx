@@ -183,6 +183,9 @@ export function WishCandle({ tier }: { tier: Tier }) {
       point.set(0, 0, 0),
     );
     const w = ndcToWorld(WISH_STAR_NDC, vp);
+    // Blueprint 062: scale the cake to fit inside the medallion ring.
+    const cakeH = UPPER.y + UPPER.h / 2;
+    g.scale.setScalar(Math.min(1, (vp.height * 0.18) / cakeH));
     g.position.set(w.x, w.y, 0.05);
   });
 

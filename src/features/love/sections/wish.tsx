@@ -163,7 +163,7 @@ export function Wish({
           'flex flex-col items-center',
           quiet
             ? 'mt-10'
-            : 'pointer-events-none absolute inset-0 justify-center',
+            : 'pointer-events-none absolute inset-0 justify-start gap-5 pt-[12svh]',
         )}
       >
         {/* The whole medallion is the hold target; its centre stays clear so the 3D star shows. */}
@@ -172,7 +172,7 @@ export function Wish({
           {...handlers}
           disabled={busy}
           aria-describedby={`${fieldId}-hint`}
-          className="focus-ring pointer-events-auto relative grid size-[min(70vw,20rem)] touch-none place-items-center rounded-full select-none disabled:cursor-default"
+          className="focus-ring pointer-events-auto relative grid size-[min(62vw,18rem)] touch-none place-items-center rounded-full select-none disabled:cursor-default"
         >
           <span
             aria-hidden
@@ -248,86 +248,84 @@ export function Wish({
               )))}
           <span className="sr-only">Make a wish</span>
         </button>
-        <p
-          ref={pill}
-          id={`${fieldId}-hint`}
-          className="group text-label border-gold/40 bg-surface pointer-events-auto mt-5 flex items-center gap-2 rounded-full border px-4 py-1.5 font-sans"
-        >
-          <span aria-hidden className="text-gold-text">
-            ☝
-          </span>
-          {quiet ? (
-            candleMode ? (
-              'Tap the candle'
-            ) : (
-              'Tap the star'
-            )
-          ) : (
-            <>
-              <span className="group-data-holding:hidden">
-                {snuff ? 'Hold the candle' : 'Press and hold'}
-              </span>
-              <span className="hidden group-data-holding:inline">
-                Keep holding…
-              </span>
-            </>
-          )}
-        </p>
-        {!quiet && !busy && (
-          <Button
-            variant="love-link"
-            size="inline"
-            onClick={complete}
-            className="pointer-events-auto mt-3"
+        {/* Blueprint 062: grouped controls under the ring */}
+        <div className="pointer-events-auto flex flex-col items-center gap-3">
+          <p
+            ref={pill}
+            id={`${fieldId}-hint`}
+            className="group text-label border-gold/40 bg-surface flex items-center gap-2 rounded-full border px-4 py-1.5 font-sans"
           >
-            Or tap once
-          </Button>
-        )}
-        {snuff && blow.supported && !busy && (
-          <div className="pointer-events-auto mt-4 flex max-w-xs flex-col items-center gap-2">
-            {blow.status === 'listening' ? (
-              <p
-                role="status"
-                className="text-label text-gold-text flex items-center gap-2 font-sans"
-              >
-                <span
-                  aria-hidden
-                  className="bg-gold size-2 animate-pulse rounded-full motion-reduce:animate-none"
-                />
-                Listening… blow gently
-                <Button
-                  variant="love-link"
-                  size="inline"
-                  onClick={() => blow.stop()}
-                >
-                  Stop
-                </Button>
-              </p>
-            ) : blow.status === 'denied' ? (
-              <p role="status" className="text-small font-sans opacity-80">
-                No problem, just hold the candle.
-              </p>
+            <span aria-hidden className="text-gold-text">
+              ☝
+            </span>
+            {quiet ? (
+              candleMode ? (
+                'Tap the candle'
+              ) : (
+                'Tap the star'
+              )
             ) : (
               <>
-                <Button
-                  variant="love-ghost"
-                  size="sm"
-                  disabled={blow.status === 'starting'}
-                  onClick={() => void blow.start()}
-                >
-                  <Mic aria-hidden className="text-secondary" />
-                  Use my microphone to blow
-                </Button>
-                <p className="text-small font-sans opacity-70">{blowHint}</p>
+                <span className="group-data-holding:hidden">
+                  {snuff ? 'Hold the candle' : 'Press and hold'}
+                </span>
+                <span className="hidden group-data-holding:inline">
+                  Keep holding…
+                </span>
               </>
             )}
-          </div>
-        )}
+          </p>
+          {!quiet && !busy && (
+            <Button variant="love-link" size="inline" onClick={complete}>
+              Or tap once
+            </Button>
+          )}
+          {snuff && blow.supported && !busy && (
+            <div className="flex max-w-xs flex-col items-center gap-2">
+              {blow.status === 'listening' ? (
+                <p
+                  role="status"
+                  className="text-label text-gold-text flex items-center gap-2 font-sans"
+                >
+                  <span
+                    aria-hidden
+                    className="bg-gold size-2 animate-pulse rounded-full motion-reduce:animate-none"
+                  />
+                  Listening… blow gently
+                  <Button
+                    variant="love-link"
+                    size="inline"
+                    onClick={() => blow.stop()}
+                  >
+                    Stop
+                  </Button>
+                </p>
+              ) : blow.status === 'denied' ? (
+                <p role="status" className="text-small font-sans opacity-80">
+                  No problem, just hold the candle.
+                </p>
+              ) : (
+                <>
+                  <Button
+                    variant="love-ghost"
+                    size="sm"
+                    disabled={blow.status === 'starting'}
+                    onClick={() => void blow.start()}
+                  >
+                    <Mic aria-hidden className="text-secondary" />
+                    Use my microphone to blow
+                  </Button>
+                  <p className="text-small font-sans opacity-70">{blowHint}</p>
+                </>
+              )}
+            </div>
+          )}
+        </div>
       </div>
       <div
         className={cn(
           'flex flex-col items-center px-4',
-          quiet ? 'mt-8' : 'absolute inset-x-0 bottom-10 md:bottom-16',
+          quiet ? 'mt-8' : 'mt-2',
         )}
       >
         <p

@@ -49,6 +49,8 @@ export function playHeroIntro(
   director.setBaseline('hero');
   const pose = poseFor('hero', isMobileViewport());
   heart.scale = pose.scale;
+  gsap.killTweensOf(heart, 'ambientIn');
+  heart.ambientIn = 0;
   const title = root.querySelector<HTMLElement>('[data-hero-title]');
   const fades = root.querySelectorAll<HTMLElement>('[data-hero-fade]');
   const cue = root.querySelector<HTMLElement>('[data-hero-cue]');
@@ -56,11 +58,13 @@ export function playHeroIntro(
   if (calm) {
     Object.assign(heart.ndc, { x: pose.x, y: pose.y });
     heart.form = 1;
+    heart.ambientIn = 1;
     return;
   }
   if (window.matchMedia(REDUCED_MOTION_QUERY).matches) {
     Object.assign(heart.ndc, { x: pose.x, y: pose.y });
     director.play('ribbonWeave');
+    heart.ambientIn = 1;
     gsap.fromTo(
       [title, ...fades, cue],
       { autoAlpha: 0 },
@@ -99,7 +103,9 @@ export function playHeroIntro(
       { autoAlpha: 1, y: 0, duration: 0.4 },
       4.2,
     )
-    .fromTo(cue, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, 5);
+    .fromTo(cue, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, 5)
+    // Ambient hearts wait for the intro to finish, then ease in.
+    .to(heart, { ambientIn: 1, duration: 1.6, ease: 'sine.inOut' }, 5.4);
   // Hide the copy before the first frame so nothing flashes before the intro reaches it.
   intro.progress(0.0001).progress(0);
   if (cue?.firstElementChild)

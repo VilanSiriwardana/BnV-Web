@@ -16,7 +16,12 @@ export const heart = {
   roll: 0, // scrubbed hero tilt (radians)
   idleScale: 0, // additive idle breathing (kept apart from director tweens)
   idleGlow: 0,
-  petalRelease: 0, // 0..1 petal spawn progress (Bloom)
+  petalRelease: 0, // 0..1 petals present (Blueprint 062: director owns this)
+  petalGather: 0, // 0 = falling free, 1 = pulled into the heart
+  petalShiver: 0, // 0..1 vibration (arrow flight)
+  petalDim: 0, // 0..1 dim petals in busy sections
+  petalAbsorb: 0, // 0..1 petals fly out of the screen toward the viewer (Memories)
+  ambientIn: 0, // 0..1 ambient hearts allowed (eases in after the hero intro)
   cameraZ: 6, // scrubbed camera dolly
   cameraShake: 0, // camera jitter amplitude (world units), arrow hit
   lean: { x: 0, y: 0 }, // additive NDC offset toward a hovered/focused orb (≤ 0.15)
