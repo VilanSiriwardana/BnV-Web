@@ -18,6 +18,8 @@ import {
   setRitualPointer,
   setRitualSwipe,
 } from '../engine/gallery-ritual';
+import { galleryState } from '../engine/gallery-state';
+import { REDUCED_MOTION_QUERY } from '../engine/motion-prefs';
 
 if (typeof window !== 'undefined')
   gsap.registerPlugin(SplitText, DrawSVGPlugin);
@@ -148,13 +150,45 @@ export function GalleryRitualOverlay({
         { scale: 0, duration: 0.4, ease: 'back.out(3)' },
         '<0.3',
       )
-      .to(
-        root,
-        { y: '-30svh', scale: 0.55, duration: 0.9, ease: 'power2.inOut' },
-        '+=1.2',
-      );
+      .add(() => seat(), '+=1.2');
+    // Blueprint 061: fly onto the arch, then hand over to the in-scene plaque (gallery-doorway.tsx).
+    let flight: gsap.core.Timeline | null = null;
+    const seat = () => {
+      const plaque = galleryState.welcome;
+      if (!plaque.ready || plaque.w < 8) {
+        flight = gsap.timeline().to(root, {
+          y: '-30svh',
+          scale: 0.55,
+          duration: 0.9,
+          ease: 'power2.inOut',
+        });
+        return;
+      }
+      const name = root.querySelector<HTMLElement>('[data-welcome-name]');
+      const r = root.getBoundingClientRect();
+      const nameW = name?.offsetWidth || r.width;
+      const scale = Math.min(1, (plaque.w * 0.62) / nameW);
+      flight = gsap
+        .timeline()
+        .to(root, {
+          x: () => galleryState.welcome.x - (r.left + r.width / 2),
+          y: () => galleryState.welcome.y - (r.top + r.height / 2),
+          scale,
+          duration: 0.9,
+          ease: 'power2.inOut',
+        })
+        .to(galleryState.welcome, { seat: 1, duration: 0.4 }, '-=0.1')
+        .to(root, { autoAlpha: 0, duration: 0.4 }, '<');
+    };
+    if (window.matchMedia(REDUCED_MOTION_QUERY).matches) {
+      tl.kill();
+      galleryState.welcome.seat = 1;
+      gsap.set(root, { autoAlpha: 0 });
+    }
     return () => {
       tl.kill();
+      flight?.kill();
+      galleryState.welcome.seat = 0;
       word.revert();
       name.revert();
       gsap.to(root, {

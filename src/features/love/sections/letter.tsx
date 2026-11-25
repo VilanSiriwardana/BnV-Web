@@ -2,6 +2,7 @@
 
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
+import { SplitText } from 'gsap/SplitText';
 import {
   type FormEvent,
   useCallback,
@@ -27,10 +28,13 @@ import { useHold } from '../hooks/use-hold';
 import {
   HeartDivider,
   LetterBackdrop,
+  LetterQuill,
   ParchmentFrame,
 } from './letter-ornaments';
 import { labelText, LoveSection, sectionTitle } from './love-section';
 import { HiddenHeart } from '../ui/hidden-heart';
+
+if (typeof window !== 'undefined') gsap.registerPlugin(SplitText);
 
 const HOLD_MS = 1200;
 type Props = { title: string; letter: LoveSiteConfig['letter'] };
@@ -121,18 +125,7 @@ export function Letter({ title, letter }: Props) {
           },
           0.35,
         )
-        .fromTo(
-          '[data-letter-p]',
-          { autoAlpha: 0, y: 12 },
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.6,
-            stagger: 0.35,
-            ease: 'power2.out',
-          },
-          1.6,
-        );
+        .add(writeLetter(root.current, card.current), 1.6);
     })();
   }, [quiet, contextSafe]);
 
@@ -233,9 +226,11 @@ export function Letter({ title, letter }: Props) {
             >
               <ParchmentFrame />
               <div className="relative mx-auto flex max-w-[60ch] flex-col gap-5 px-10 text-[1.15rem] leading-relaxed text-pretty break-words md:px-16 md:text-[1.25rem]">
+                {!quiet && <LetterQuill />}
                 {letter.salutation && (
                   <p
                     data-letter-p
+                    data-letter-write
                     className="font-display text-[1.4rem] md:text-[1.6rem]"
                   >
                     {letter.salutation}
@@ -244,6 +239,7 @@ export function Letter({ title, letter }: Props) {
                 {first && (
                   <p
                     data-letter-p
+                    data-letter-write
                     className="first-letter:font-display first-letter:text-gold-text first-letter:float-left first-letter:mr-2 first-letter:text-[3.4em] first-letter:leading-[0.85]"
                   >
                     {first}
@@ -253,7 +249,7 @@ export function Letter({ title, letter }: Props) {
                   <HeartDivider />
                 </div>
                 {rest.map((p, i) => (
-                  <p key={i} data-letter-p>
+                  <p key={i} data-letter-p data-letter-write>
                     {p}
                   </p>
                 ))}
@@ -359,4 +355,80 @@ export function Letter({ title, letter }: Props) {
       </div>
     </LoveSection>
   );
+}
+
+// Blueprint 061: each line is inked left to right while the quill rides the edge.
+function writeLetter(scope: HTMLElement | null, card: HTMLElement | null) {
+  const tl = gsap.timeline();
+  if (!scope) return tl;
+  const quill = scope.querySelector<HTMLElement>('[data-letter-quill]');
+  const blocks = gsap.utils.toArray<HTMLElement>('[data-letter-p]', scope);
+  const split = SplitText.create(
+    scope.querySelectorAll('[data-letter-write]'),
+    { type: 'lines' },
+  );
+  gsap.set(split.lines, {
+    width: 'fit-content',
+    clipPath: 'inset(0% 100% 0% 0%)',
+  });
+  blocks.forEach((b) =>
+    gsap.set(b, {
+      autoAlpha: b.hasAttribute('data-letter-write') ? 1 : 0,
+      y: 0,
+    }),
+  );
+  const follow = (line: HTMLElement) => {
+    const c = card;
+    if (!c) return;
+    const over =
+      line.getBoundingClientRect().bottom - c.getBoundingClientRect().bottom;
+    if (over > -48)
+      gsap.to(c, {
+        scrollTop: c.scrollTop + over + c.clientHeight * 0.35,
+        duration: 0.5,
+        ease: 'power2.out',
+      });
+  };
+  if (quill) tl.set(quill, { autoAlpha: 1, yPercent: -100 });
+  blocks.forEach((b) => {
+    if (!b.hasAttribute('data-letter-write')) {
+      tl.to(b, { autoAlpha: 1, duration: 0.4 });
+      return;
+    }
+    (split.lines as HTMLElement[])
+      .filter((l) => b.contains(l))
+      .forEach((line) => {
+        const d = gsap.utils.clamp(
+          0.35,
+          0.8,
+          (line.textContent?.length ?? 0) * 0.016,
+        );
+        const y = line.offsetTop + line.offsetHeight * 0.85;
+        tl.call(() => follow(line)).to(line, {
+          clipPath: 'inset(0% 0% 0% 0%)',
+          duration: d,
+          ease: 'none',
+        });
+        if (!quill) return;
+        tl.fromTo(
+          quill,
+          { x: line.offsetLeft, y },
+          { x: line.offsetLeft + line.offsetWidth, duration: d, ease: 'none' },
+          '<',
+        ).fromTo(
+          quill,
+          { rotation: -5 },
+          {
+            rotation: 4,
+            duration: d / 4,
+            repeat: 3,
+            yoyo: true,
+            ease: 'sine.inOut',
+          },
+          '<',
+        );
+      });
+  });
+  if (quill) tl.to(quill, { autoAlpha: 0, duration: 0.4 });
+  return tl.call(() => split.revert());
 }

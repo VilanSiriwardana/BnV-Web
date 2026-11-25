@@ -129,6 +129,7 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
           memories={site.memories}
           gallery={site.gallery}
           galleryEnd={site.galleryEnd}
+          reasons={site.reasons}
           onContextLost={() => setTier('static')}
           onDecline={stepDown}
           onIncline={stepUp}

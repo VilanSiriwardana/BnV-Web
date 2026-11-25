@@ -1069,3 +1069,14 @@ Implemented M28–M33 in the order M28 → M32 → M29 → M31 → M30 → M33:
 ### Verification
 
 - `tsc --noEmit` and eslint (love) clean. Not checked visually in a browser.
+
+## 2026-11-25: Blueprint 061 (screen-locked petals, welcome arch plaque, quill letter, Reasons book)
+
+- `canvas/petals.tsx`: petals live in camera space (portal into the camera); span from the frustum on resize only; alpha/size fade, no heart-origin spawn. `engine/story.ts`: one scrubbed petal owner (Bloom → top of Memories); removed the memories, timeline and wish-approach `petalRelease` writers.
+- `canvas/gallery-doorway.tsx` `WelcomePlaque` + `galleryState.welcome`; `ui/gallery-ritual-overlay.tsx` flies the DOM welcome onto the plaque and cross-fades (fallback: old rise).
+- `sections/letter.tsx` `writeLetter`: SplitText lines inked left to right with `LetterQuill` (`letter-ornaments.tsx`).
+- `canvas/reasons-book.tsx`: 3D page-turning book driven by `reasons.progress`; `sections/reasons.tsx` book stage + sr-only buttons; low/static tiers keep `ReasonsRing`, calm keeps the list.
+
+### Verification
+
+- `tsc --noEmit`, eslint (love) and vitest (love, 135 tests) pass. Not checked visually in a browser.

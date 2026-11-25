@@ -22,6 +22,8 @@ export const galleryState = {
   hovered: -1,
   focused: -1,
   screen: [] as FrameScreen[], // projected frame centre + radius per inspect index, CSS px
+  /** Blueprint 061: the arch plaque's projected centre and width (CSS px), and its fade-in 0..1. */
+  welcome: { x: 0, y: 0, w: 0, ready: false, seat: 0 },
 };
 
 /** 0 = walking, 1 = fully on a frame. */

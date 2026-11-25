@@ -1,10 +1,11 @@
 'use client';
 
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import {
   AdditiveBlending,
   BoxGeometry,
+  CanvasTexture,
   Color,
   ExtrudeGeometry,
   type Group,
@@ -14,6 +15,7 @@ import {
   MeshStandardMaterial,
   PlaneGeometry,
   Shape,
+  SRGBColorSpace,
   Path,
   SphereGeometry,
   TubeGeometry,
@@ -29,6 +31,8 @@ import { placeAcross } from './gallery-corridor';
 import { createKeyGeometry } from './gallery-key';
 import { filigreeTexture, glowTexture } from './gallery-surfaces';
 import { inflatedHeartGeometry } from './mini-hearts';
+import { projectToScreen } from './projection';
+import { readTokenColors } from './token-colors';
 
 const W = GALLERY_DIMS.width;
 const PILASTER = 0.22;
@@ -363,6 +367,7 @@ export function GalleryDoorway({ curve }: { curve: CatmullRomCurve3 }) {
         scale={[0.96, 1, 0.5]}
         raycast={none}
       />
+      <WelcomePlaque />
       <mesh
         geometry={crest}
         material={gold}
@@ -390,5 +395,121 @@ export function GalleryDoorway({ curve }: { curve: CatmullRomCurve3 }) {
         raycast={none}
       />
     </group>
+  );
+}
+
+const PLAQUE_W = 1.3;
+const PLAQUE_H = 0.32;
+/** Blueprint 061: the welcome plaque sits on the arch face, under the crest. */
+export const PLAQUE_LOCAL = { x: 0, y: 2.66, z: 0.32 };
+const edgeL = new Vector3();
+const edgeR = new Vector3();
+
+// The DOM welcome (gallery-ritual-overlay.tsx) flies here, then this plaque fades in and stays.
+function WelcomePlaque() {
+  const ref = useRef<Mesh>(null);
+  const camera = useThree((s) => s.camera);
+  const size = useThree((s) => s.size);
+  const kit = useMemo(() => {
+    const el = document.createElement('canvas');
+    el.width = 1024;
+    el.height = Math.round((1024 * PLAQUE_H) / PLAQUE_W);
+    const t = new CanvasTexture(el);
+    t.colorSpace = SRGBColorSpace;
+    t.anisotropy = 4;
+    const m = new MeshBasicMaterial({
+      map: t,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+      toneMapped: false,
+    });
+    return { texture: t, material: m };
+  }, []);
+  const kitRef = useRef(kit);
+  const { texture, material } = kit;
+
+  useEffect(() => {
+    let live = true;
+    const paint = () => {
+      const cv = kitRef.current.texture.image as HTMLCanvasElement;
+      const c = cv.getContext('2d');
+      const word = document.querySelector<HTMLElement>(
+        '#gallery [data-welcome-word]',
+      );
+      const name = document.querySelector<HTMLElement>(
+        '#gallery [data-welcome-name]',
+      );
+      const root = document.querySelector<HTMLElement>('[data-love-root]');
+      if (!c || !name || !live) return;
+      const gold = root
+        ? readTokenColors(root).gold.night
+        : new Color('#d4ad55');
+      const hex = `#${gold.getHexString()}`;
+      const { width: w, height: h } = cv;
+      c.clearRect(0, 0, w, h);
+      c.textAlign = 'center';
+      c.textBaseline = 'middle';
+      c.fillStyle = hex;
+      c.shadowColor = hex;
+      c.shadowBlur = 18;
+      const wordText = word?.textContent?.trim() ?? '';
+      if (wordText) {
+        c.font = `500 ${h * 0.2}px ${getComputedStyle(word!).fontFamily}`;
+        c.letterSpacing = `${h * 0.08}px`;
+        c.fillText(wordText.toUpperCase(), w / 2, h * 0.22);
+        c.letterSpacing = '0px';
+      }
+      c.font = `italic 400 ${h * 0.56}px ${getComputedStyle(name).fontFamily}`;
+      c.fillText(
+        name.textContent?.trim() ?? '',
+        w / 2,
+        h * (wordText ? 0.64 : 0.5),
+      );
+      kitRef.current.texture.needsUpdate = true;
+    };
+    void document.fonts.ready.then(paint);
+    return () => {
+      live = false;
+    };
+  }, [texture]);
+
+  useEffect(
+    () => () => {
+      texture.dispose();
+      material.dispose();
+      galleryState.welcome.ready = false;
+    },
+    [texture, material],
+  );
+
+  useFrame(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    const seat = galleryState.welcome.seat;
+    kitRef.current.material.opacity = seat;
+    mesh.visible = seat > 0.001;
+    if (!galleryState.active) return;
+    mesh.localToWorld(edgeL.set(-PLAQUE_W / 2, 0, 0));
+    mesh.localToWorld(edgeR.set(PLAQUE_W / 2, 0, 0));
+    const a = projectToScreen(edgeL, camera, size);
+    const b = projectToScreen(edgeR, camera, size);
+    const wl = galleryState.welcome;
+    wl.x = (a.x + b.x) / 2;
+    wl.y = (a.y + b.y) / 2;
+    wl.w = Math.hypot(b.x - a.x, b.y - a.y);
+    wl.ready = a.visible && b.visible;
+  });
+
+  return (
+    <mesh
+      ref={ref}
+      material={material}
+      position={[PLAQUE_LOCAL.x, PLAQUE_LOCAL.y, PLAQUE_LOCAL.z]}
+      raycast={none}
+      visible={false}
+    >
+      <planeGeometry args={[PLAQUE_W, PLAQUE_H]} />
+    </mesh>
   );
 }

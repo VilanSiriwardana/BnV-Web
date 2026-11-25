@@ -21,6 +21,7 @@ import { DanceDuo } from './dance-duo';
 import { GalleryWalk } from './gallery-walk';
 import { AmbientHearts, MiniHearts } from './mini-hearts';
 import { Petals } from './petals';
+import { ReasonsBook } from './reasons-book';
 import { ShockRing } from './shock-ring';
 import { Sparks } from './sparks';
 import { WishStar } from './wish-star';
@@ -32,6 +33,8 @@ type Props = {
   memories: LoveSiteConfig['memories'];
   gallery: LoveSiteConfig['gallery'];
   galleryEnd?: LoveSiteConfig['galleryEnd'];
+  /** Blueprint 061: Twelve Reasons book pages. */
+  reasons?: string[];
   onDecline: () => void;
   onIncline: () => void;
   debug?: boolean;
@@ -49,6 +52,7 @@ export default function LoveCanvas({
   memories,
   gallery,
   galleryEnd,
+  reasons,
   onDecline,
   onIncline,
   debug,
@@ -100,6 +104,9 @@ export default function LoveCanvas({
         <MemoryOrbs tier={tier} memories={memories} />
       </Suspense>
       <GalleryWalk tier={tier} gallery={gallery} galleryEnd={galleryEnd} />
+      {tier !== 'low' && reasons && reasons.length > 0 && (
+        <ReasonsBook tier={tier} items={reasons} />
+      )}
       <ShockRing />
       <Sparks />
       <Arrow />

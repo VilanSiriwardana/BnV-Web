@@ -131,16 +131,26 @@ const buildBloom: SectionBuilder = (root, mobile) => {
   const line = bloom.querySelector<HTMLElement>('[data-bloom-line]');
   const words = line ? buildBloomWords(line) : null;
 
-  // Petals drift in ahead of the burst so they never appear all at once.
-  ScrollTrigger.create({
-    trigger: bloom,
-    start: 'top 85%',
-    once: true,
-    onEnter: () => {
-      if (heart.petalRelease < 1)
-        gsap.to(heart, { petalRelease: 1, duration: 3.5, ease: 'power2.out' });
-    },
-  });
+  // Blueprint 061: the only petal owner. Fade in at Bloom, out before the Memories rail.
+  const memories = root.querySelector<HTMLElement>('#memories');
+  gsap
+    .timeline({
+      scrollTrigger: {
+        trigger: bloom,
+        start: 'top 85%',
+        ...(memories
+          ? { endTrigger: memories, end: 'top top' }
+          : { end: 'bottom top' }),
+        scrub: 0.8,
+      },
+    })
+    .fromTo(
+      heart,
+      { petalRelease: 0 },
+      { petalRelease: 1, duration: 0.15, immediateRender: false },
+    )
+    .to(heart, { petalRelease: 1, duration: 0.75, ease: 'none' })
+    .to(heart, { petalRelease: 0, duration: 0.1, ease: 'power1.in' });
   ScrollTrigger.create({
     trigger: bloom,
     start: 'top 60%',
@@ -276,13 +286,6 @@ const buildMemories: SectionBuilder = (root, mobile) => {
       { cameraZ: RAIL_START_Z, depth: 0 },
       { cameraZ: end, depth: end - RAIL_START_Z, ...scrub, duration: 0.88 },
       0.12,
-    )
-    // The rail carries the camera past the petals, so they fold away before it starts.
-    .fromTo(
-      heart,
-      { petalRelease: 1 },
-      { petalRelease: 0, ...scrub, duration: 0.12 },
-      0,
     );
 
   // Rail hand-off: the Timeline is a flat stage, so the camera returns home (heart.tsx snaps).
@@ -340,22 +343,6 @@ const buildTimeline: SectionBuilder = (root, mobile) => {
   };
   measure();
 
-  // Petals return born from the heart (the shader spawns them at its position).
-  gsap.fromTo(
-    heart,
-    { petalRelease: 0 },
-    {
-      petalRelease: 1,
-      immediateRender: false,
-      ease: 'power1.out',
-      scrollTrigger: {
-        trigger: el,
-        start: 'top top',
-        end: '+=40%',
-        scrub: 0.8,
-      },
-    },
-  );
   ScrollTrigger.create({
     trigger: el,
     start: 'top top',
@@ -483,13 +470,7 @@ const buildStarlight: SectionBuilder = (root, mobile) => {
       { x: wait.x, y: wait.y, ...scrub },
       0,
     )
-    .fromTo(heart, { scale: 0.3 }, { scale: wait.scale, ...scrub }, 0)
-    .fromTo(
-      heart,
-      { petalRelease: 1 },
-      { petalRelease: 0, ...scrub, duration: 0.5 },
-      0,
-    );
+    .fromTo(heart, { scale: 0.3 }, { scale: wait.scale, ...scrub }, 0);
   ScrollTrigger.create({
     trigger: el,
     // Starts before the pin so the stars greet her earlier; the taller stage holds the heart longer.

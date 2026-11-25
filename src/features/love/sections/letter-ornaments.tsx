@@ -133,3 +133,31 @@ export function HeartDivider() {
     </div>
   );
 }
+
+// Blueprint 061: the feather that rides the writing edge (nib at bottom-left; story in letter.tsx).
+export function LetterQuill() {
+  return (
+    <svg
+      aria-hidden
+      data-letter-quill
+      viewBox="0 0 40 48"
+      className="text-gold pointer-events-none invisible absolute top-0 left-0 z-10 h-12 w-10 origin-bottom-left drop-shadow-[0_2px_4px_color-mix(in_oklab,var(--gold)_45%,transparent)]"
+    >
+      <path
+        d="M2 46 C 10 34, 18 22, 38 2 C 34 14, 28 26, 12 38 C 9 40, 6 43, 2 46 Z"
+        fill="currentColor"
+        fillOpacity="0.28"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M2 46 L 30 12 M 12 36 l 4 -8 M 18 29 l 5 -8 M 24 22 l 5 -7"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="0.9"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
