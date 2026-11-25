@@ -41,6 +41,8 @@ export const ritualState = {
 
 const listeners = new Set<(m: RitualMode) => void>();
 let io: GalleryIO | null = null;
+// Blueprint 060: her own drop only pushes the key in; Help keeps the full travel.
+let byHand = false;
 let tween: gsap.core.Animation | null = null;
 let autoChain = false;
 
@@ -63,6 +65,7 @@ export const ritualDone = () => session.galleryUnlocked;
 
 export function sendRitual(e: RitualEvent) {
   if (e.type === 'arrive' && session.galleryUnlocked) return;
+  if (e.type === 'release' || e.type === 'auto') byHand = e.type === 'release';
   if (e.type === 'auto') autoChain = true;
   const [mode, cmd] = reduceRitual(ritualState.mode, e);
   if (mode === ritualState.mode && !cmd) return;
@@ -140,10 +143,11 @@ function run(cmd: ReturnType<typeof reduceRitual>[1]) {
     case 'insert':
       tween?.kill();
       s.keyReturn = 0;
+      if (byHand) s.keyIn = 0.6;
       tween = gsap.to(s, {
         keyIn: 1,
-        duration: 0.6,
-        ease: 'power2.inOut',
+        duration: byHand ? 0.25 : 0.6,
+        ease: byHand ? 'power2.in' : 'power2.inOut',
         onComplete: done('insertDone'),
       });
       break;
@@ -159,13 +163,9 @@ function run(cmd: ReturnType<typeof reduceRitual>[1]) {
       });
       break;
     case 'open':
-      tween = gsap.to(s, {
-        door: 1,
-        duration: 2,
-        delay: 0.15,
-        ease: 'power2.inOut',
-        onComplete: done('openDone'),
-      });
+      // Blueprint 059: the latch gives a little, then her scroll opens the doors (story.ts).
+      tween = gsap.to(s, { door: 0.04, duration: 0.35, ease: 'back.out(3)' });
+      io?.start();
       break;
     case 'unlock':
       tween = null;
@@ -173,6 +173,22 @@ function run(cmd: ReturnType<typeof reduceRitual>[1]) {
       session.galleryUnlocked = true;
       io?.start();
       break;
+  }
+}
+
+/** Blueprint 059: scroll through the door stretch (0..1) eases the doors open; full = unlocked. */
+export function scrubGalleryDoor(amount: number) {
+  if (ritualState.mode !== 'opening') return;
+  const to = Math.max(0.04, Math.min(amount, 1));
+  tween = gsap.to(ritualState, {
+    door: to,
+    duration: 1.4,
+    ease: 'sine.out',
+    overwrite: true,
+  });
+  if (to >= 1) {
+    playChime(4);
+    sendRitual({ type: 'openDone' });
   }
 }
 
@@ -189,6 +205,7 @@ export function exitGalleryRitual() {
 
 /** Section left, story rebuilt or Replay: drop a half-done ritual and never leave scroll locked. */
 export function resetGalleryRitual() {
+  byHand = false;
   const wasLocked = ritualState.mode !== 'idle' && ritualState.mode !== 'open';
   tween?.kill();
   tween = null;

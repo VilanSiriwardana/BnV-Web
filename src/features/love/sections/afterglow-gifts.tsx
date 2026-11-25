@@ -112,18 +112,32 @@ function PlanCard({ title, plan }: { title: string; plan: Plan }) {
 
   const maps = plan.mapsQuery ?? plan.place;
   return (
-    <div className="border-gold/30 mt-4 border-t pt-4">
+    <div className="border-gold/50 relative mt-5 border-t-2 border-dashed pt-5">
+      <span
+        aria-hidden
+        className="bg-background absolute -top-3 -left-8 size-6 rounded-full"
+      />
+      <span
+        aria-hidden
+        className="bg-background absolute -top-3 -right-8 size-6 rounded-full"
+      />
       <p className={labelText}>{when.format(start)}</p>
       <p className="text-body mt-1 font-semibold">{plan.place}</p>
       {plan.note && (
         <p className="text-small text-muted-foreground mt-1">{plan.note}</p>
       )}
       <p className="font-display text-h4 text-gold-text mt-3" aria-live="off">
-        {left.state === 'future'
-          ? `${left.days}d ${left.hours}h ${left.minutes}m to go`
-          : left.state === 'today'
-            ? "It's today. I'll see you there."
-            : 'We did this one. More to come.'}
+        {left.state === 'future' ? (
+          <Countdown
+            days={left.days}
+            hours={left.hours}
+            minutes={left.minutes}
+          />
+        ) : left.state === 'today' ? (
+          "It's today. I'll see you there."
+        ) : (
+          'We did this one. More to come.'
+        )}
       </p>
       <div className="mt-4 flex flex-wrap gap-3">
         {left.state !== 'past' && (
@@ -158,5 +172,66 @@ function PlanCard({ title, plan }: { title: string; plan: Plan }) {
         </Button>
       </div>
     </div>
+  );
+}
+
+// Blueprint 059: odometer digits that roll to each new value (CSS transform, no per-tick React work).
+function Countdown({
+  days,
+  hours,
+  minutes,
+}: {
+  days: number;
+  hours: number;
+  minutes: number;
+}) {
+  return (
+    <span className="inline-flex items-baseline gap-1.5">
+      <span className="sr-only">
+        {days} days {hours} hours {minutes} minutes to go
+      </span>
+      <Rolling value={days} unit="d" />
+      <Rolling value={hours} unit="h" pad />
+      <Rolling value={minutes} unit="m" pad />
+      <span aria-hidden className="ml-1">
+        to go
+      </span>
+    </span>
+  );
+}
+
+function Rolling({
+  value,
+  unit,
+  pad,
+}: {
+  value: number;
+  unit: string;
+  pad?: boolean;
+}) {
+  const digits = String(value)
+    .padStart(pad ? 2 : 1, '0')
+    .split('');
+  return (
+    <span aria-hidden className="inline-flex items-baseline">
+      {digits.map((d, i) => (
+        <span
+          key={digits.length - i}
+          className="relative inline-block h-[1.15em] w-[0.62em] overflow-hidden"
+        >
+          <span
+            className="absolute inset-x-0 top-0 flex flex-col transition-transform duration-700 ease-[cubic-bezier(0.2,0.7,0.3,1)] motion-reduce:transition-none"
+            style={{ transform: `translateY(${-Number(d) * 1.15}em)` }}
+          >
+            {Array.from({ length: 10 }, (_, n) => (
+              <span key={n} className="h-[1.15em] leading-[1.15em]">
+                {n}
+              </span>
+            ))}
+          </span>
+        </span>
+      ))}
+      <span className="text-gold-text/80 ml-0.5 text-[0.7em]">{unit}</span>
+    </span>
   );
 }

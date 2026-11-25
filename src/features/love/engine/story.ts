@@ -1,7 +1,9 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { SplitText } from 'gsap/SplitText';
 
-import { director } from './heart-director';
+import { launchConfetti } from './confetti-state';
+import { buildFinaleSpell, director } from './heart-director';
 import { replayHeroWeave } from './hero-intro';
 import { LETTER_OPEN_EVENT, session, SKY_COMPLETE_EVENT } from './session';
 import { poseFor, type SectionId, SKY_WAIT, WISH_REST } from './heart-path';
@@ -9,7 +11,13 @@ import { candle } from './candle-state';
 import { dance } from './dance-state';
 import { reasons } from './reasons-state';
 import { resetGalleryDirector } from './gallery-director';
-import { arriveAtDoor, resetGalleryRitual } from './gallery-ritual';
+import { GALLERY_DOOR_SPAN, walkFromStage } from './gallery-path';
+import {
+  arriveAtDoor,
+  resetGalleryRitual,
+  ritualState,
+  scrubGalleryDoor,
+} from './gallery-ritual';
 import { claimCamera, galleryState, releaseCamera } from './gallery-state';
 import { heart } from './heart-state';
 import { memoriesState } from './memories-state';
@@ -535,7 +543,12 @@ const buildGallery: SectionBuilder = (root, mobile) => {
     end: 'bottom bottom',
     onUpdate: (self) => {
       galleryState.progress = self.progress;
-      galleryState.walk = self.progress;
+      // Blueprint 059: the first stretch of the stage opens the doors, then the walk begins.
+      scrubGalleryDoor(self.progress / GALLERY_DOOR_SPAN);
+      galleryState.walk =
+        session.galleryUnlocked || ritualState.mode === 'open'
+          ? walkFromStage(self.progress)
+          : 0;
     },
     // Blueprint 053: arriving forward locks scroll at the door until the unlock ritual opens it.
     onToggle: (self) => {
@@ -776,13 +789,25 @@ const buildFinale: SectionBuilder = (root, mobile) => {
     immediateRender: false,
     scrollTrigger,
   });
+  // Blueprint 059: the stage pins and her scroll spells the name, then "I love you".
+  const spell = buildFinaleSpell(
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: el,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 2.2,
+      },
+    }),
+  );
+  const at = spell.labels.iloveyou / spell.duration();
   ScrollTrigger.create({
     trigger: el,
-    start: 'top 60%',
+    start: () => `top+=${at * (el.offsetHeight - window.innerHeight)} top`,
     onEnter: () => {
       if (session.finalePlayed) return;
       session.finalePlayed = true;
-      director.play('finaleSpell');
+      void launchConfetti(0.5);
     },
   });
 };
@@ -826,7 +851,62 @@ const buildAfterglow: SectionBuilder = (root, mobile) => {
         stagger: 0.08,
       }),
   });
-  return () => gsap.set(items, { clearProps: 'opacity,visibility,transform' });
+  // Blueprint 059: the aurora drifts slower than the page; the title inks in; each room's
+  // heading draws a gold underline as it arrives.
+  const aurora = el.querySelector<HTMLElement>('[data-love-aurora]');
+  if (aurora)
+    gsap.fromTo(
+      aurora,
+      { yPercent: -12 },
+      {
+        yPercent: 18,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: el,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true,
+        },
+      },
+    );
+  const title = el.querySelector<HTMLElement>('#afterglow-title');
+  let split: SplitText | null = null;
+  if (title) {
+    split = SplitText.create(title, { type: 'chars' });
+    gsap.from(split.chars, {
+      yPercent: 60,
+      opacity: 0,
+      filter: 'blur(8px)',
+      duration: 0.9,
+      ease: 'power3.out',
+      stagger: 0.035,
+      scrollTrigger: { trigger: title, start: 'top 85%', once: true },
+    });
+  }
+  const headings = el.querySelectorAll<HTMLElement>('h3');
+  gsap.set(headings, {
+    backgroundImage: 'linear-gradient(var(--gold), var(--gold))',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: '50% 100%',
+    backgroundSize: '0% 1px',
+    paddingBottom: 6,
+  });
+  headings.forEach((h) =>
+    gsap.to(h, {
+      backgroundSize: '60% 1px',
+      duration: 1.2,
+      ease: 'power2.inOut',
+      scrollTrigger: { trigger: h, start: 'top 80%', once: true },
+    }),
+  );
+  return () => {
+    split?.revert();
+    gsap.set(items, { clearProps: 'opacity,visibility,transform' });
+    gsap.set(headings, {
+      clearProps:
+        'backgroundImage,backgroundRepeat,backgroundPosition,backgroundSize,paddingBottom',
+    });
+  };
 };
 
 const sections = [

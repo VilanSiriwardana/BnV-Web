@@ -1,11 +1,10 @@
 'use client';
 
-import { Heart } from 'lucide-react';
-
 import { tapHeart } from '../engine/hero-intro';
 import { QuietHeart } from '../ui/static-heart';
 import { LoveSection, proseColumn } from './love-section';
 import { HiddenHeart } from '../ui/hidden-heart';
+import { ScrollCue } from '../ui/scroll-cue';
 
 export function Hero({ name, sub }: { name: string; sub: string }) {
   return (
@@ -42,9 +41,9 @@ export function Hero({ name, sub }: { name: string; sub: string }) {
       <div
         data-hero-cue
         aria-hidden
-        className="text-primary absolute bottom-10 left-1/2 -translate-x-1/2"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2"
       >
-        <Heart className="text-secondary fill-secondary/40 size-4" />
+        <ScrollCue label="Keep scrolling" />
       </div>
     </LoveSection>
   );

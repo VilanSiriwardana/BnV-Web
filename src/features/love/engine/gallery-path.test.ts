@@ -3,6 +3,9 @@ import { describe, expect, it } from 'vitest';
 
 import {
   GALLERY_DIMS,
+  GALLERY_DOOR_SPAN,
+  stageFromWalk,
+  walkFromStage,
   WALK_END,
   createGalleryCurve,
   createSlots,
@@ -72,5 +75,17 @@ describe('gallery path', () => {
   it('handles fewer photos (config allows 9)', () => {
     const slots = createSlots(9);
     expect(slots.filter((s) => s.kind === 'photo')).toHaveLength(9);
+  });
+});
+
+describe('door stretch mapping (blueprint 059)', () => {
+  it('keeps the walk at 0 through the door stretch, then spans 0..1', () => {
+    expect(walkFromStage(0)).toBe(0);
+    expect(walkFromStage(GALLERY_DOOR_SPAN)).toBe(0);
+    expect(walkFromStage(1)).toBe(1);
+  });
+  it('stageFromWalk inverts walkFromStage', () => {
+    for (const w of [0, 0.25, 0.5, 1])
+      expect(walkFromStage(stageFromWalk(w))).toBeCloseTo(w);
   });
 });

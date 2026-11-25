@@ -254,6 +254,26 @@ function finaleSpell(tl: gsap.core.Timeline) {
   pulse(tl, 9.7);
 }
 
+/** Blueprint 059: the finale spell as a scroll-scrubbed timeline with one label per word. */
+export function buildFinaleSpell(tl: gsap.core.Timeline) {
+  const ease = 'sine.inOut';
+  return tl
+    .addLabel('start', 0)
+    .fromTo(
+      heart,
+      { spell: 0, spellB: 0 },
+      { spell: 1, duration: 2.4, ease, immediateRender: false },
+      0.4,
+    )
+    .addLabel('buwi', 2.8)
+    .to(heart, { spellB: 1, duration: 2.4, ease }, 4)
+    .addLabel('iloveyou', 6.4)
+    .to(heart, { spell: 0, duration: 2.4, ease }, 7.8)
+    .set(heart, { spellB: 0 }, 10.2)
+    .addLabel('heart', 10.2)
+    .to({}, { duration: 1 }, 10.2);
+}
+
 // Romance Additions F5: the flame snuffs, smoke rises, the star ignites, then wishMerge.
 function candleOut(tl: gsap.core.Timeline) {
   tl.to(
@@ -334,8 +354,8 @@ function toBaseline() {
     flinch: 0,
     shine: 0,
     starHold: 0,
-    spell: 0,
-    spellB: 0,
+    // Blueprint 060 follow-up: on the finale, scroll owns the spell; never kill its scrub.
+    ...(section === 'finale' ? {} : { spell: 0, spellB: 0 }),
     gold: HEART_PATH[section].gold,
     duration: 0.3,
     ease: 'power2.out',

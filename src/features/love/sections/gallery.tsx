@@ -17,6 +17,7 @@ import {
   createSlots,
   inspectOrder,
   progressForSlot,
+  stageFromWalk,
 } from '../engine/gallery-path';
 import type { RitualMode } from '../engine/gallery-ritual-core';
 import {
@@ -35,6 +36,7 @@ import { useLoveScroll } from '../engine/scroll-engine';
 import { useQuiet } from '../engine/use-quiet';
 import { GalleryInspect } from '../ui/gallery-controls';
 import { GalleryRitualOverlay } from '../ui/gallery-ritual-overlay';
+import { ScrollCue } from '../ui/scroll-cue';
 import { GalleryLightbox } from '../ui/lightbox';
 import { HiddenHeart } from '../ui/hidden-heart';
 import { HIDDEN_GALLERY_TILE } from '../ui/hidden-heart-placements';
@@ -154,11 +156,11 @@ function GalleryWalkStage({
     if (!section) return;
     const top = section.getBoundingClientRect().top + window.scrollY;
     const travel = section.offsetHeight - window.innerHeight;
-    scrollTo(top + (stops[k] ?? 0) * travel, { duration: 0.8 });
+    scrollTo(top + stageFromWalk(stops[k] ?? 0) * travel, { duration: 0.8 });
   };
 
   return (
-    <LoveSection id="gallery" depth={0.5} stage="550vh" className="min-h-svh">
+    <LoveSection id="gallery" depth={0.5} stage="700vh" className="min-h-svh">
       <div className="pointer-events-none absolute inset-0 grid place-items-center px-4">
         <div
           data-gallery-welcome
@@ -254,6 +256,13 @@ function GalleryWalkStage({
           mode={ritual}
           prompts={ritualPrompts}
           onExit={exit}
+        />
+      )}
+      {ritual === 'opening' && (
+        <ScrollCue
+          role="status"
+          label="Scroll to open the doors"
+          className="animate-in fade-in slide-in-from-bottom-2 absolute bottom-[max(5rem,env(safe-area-inset-bottom))] left-1/2 z-30 -translate-x-1/2 duration-700 motion-reduce:animate-none"
         />
       )}
       {state.mode !== 'walk' && (

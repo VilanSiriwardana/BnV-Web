@@ -5,6 +5,7 @@ import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
 import { SplitText } from 'gsap/SplitText';
 import { DoorOpenIcon, HammerIcon, KeyRoundIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { cn } from '@/lib/utils/cn';
 
 import {
   isWaiting,
@@ -74,7 +75,7 @@ export function GalleryRitualOverlay({
   // Wheel and touch never scroll the page underneath (Lenis is stopped too).
   useEffect(() => {
     const el = overlay.current;
-    if (!el) return;
+    if (!el || mode === 'opening') return;
     const stop = (e: Event) => e.preventDefault();
     el.addEventListener('wheel', stop, { passive: false });
     el.addEventListener('touchmove', stop, { passive: false });
@@ -82,7 +83,7 @@ export function GalleryRitualOverlay({
       el.removeEventListener('wheel', stop);
       el.removeEventListener('touchmove', stop);
     };
-  }, []);
+  }, [mode]);
 
   // Welcome (blueprint 054): light blooms, flourishes draw in, WELCOME letters rise, the name lifts
   // in letter by letter, a foil shimmer passes, a heart pops; then it rises to the top.
@@ -221,8 +222,13 @@ export function GalleryRitualOverlay({
   return (
     <div
       ref={overlay}
-      data-lenis-prevent
-      className="pointer-events-auto fixed inset-0 z-20 touch-none select-none"
+      data-lenis-prevent={mode === 'opening' ? undefined : true}
+      className={cn(
+        'fixed inset-0 z-20 select-none',
+        mode === 'opening'
+          ? 'pointer-events-none'
+          : 'pointer-events-auto touch-none',
+      )}
       onPointerDown={(e) => {
         if ((e.target as Element).closest('button')) return;
         start.current = { x: e.clientX, y: e.clientY };
@@ -295,14 +301,27 @@ export function GalleryRitualOverlay({
             aria-hidden
             className={`flex flex-col items-center gap-1 ${failCount ? 'love-ritual-shake' : 'love-ritual-prompt'}`}
           >
-            <p className="bg-scrim/70 text-gold-text text-h3 rounded-full px-5 py-2 text-center font-serif text-balance italic">
-              {prompts[prompt]}
-            </p>
-            {failCount > 0 && (
-              <p className="text-small text-muted-foreground font-sans">
-                {HINTS[prompt]}
+            <div className="glass border-gold/40 flex max-w-sm flex-col items-center gap-1.5 rounded-2xl border px-5 py-3 shadow-[0_0_32px_-12px_var(--gold)]">
+              <span className="flex items-center gap-1.5">
+                {[0, 1, 2].map((i) => (
+                  <span
+                    key={i}
+                    className={cn(
+                      'h-1 rounded-full transition-all duration-500',
+                      i === prompt ? 'bg-gold w-5' : 'bg-gold/30 w-1.5',
+                    )}
+                  />
+                ))}
+              </span>
+              <p className="text-gold-text text-h4 text-center font-serif text-balance italic">
+                {prompts[prompt]}
               </p>
-            )}
+              {failCount > 0 && (
+                <p className="text-small text-muted-foreground border-gold/20 w-full border-t pt-1.5 text-center font-sans">
+                  {HINTS[prompt]}
+                </p>
+              )}
+            </div>
           </div>
         )}
         <div className="flex flex-wrap items-center justify-center gap-2">

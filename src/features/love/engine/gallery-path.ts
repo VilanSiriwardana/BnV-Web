@@ -172,3 +172,12 @@ export function progressForSlot(slot: FrameSlot, length: number) {
   const before = slot.kind === 'end' ? 0 : 2.2 / length;
   return Math.min(Math.max((slot.t - before) / WALK_END, 0), 1);
 }
+
+/** Blueprint 059: share of the gallery stage scroll spent opening the doors before the walk. */
+export const GALLERY_DOOR_SPAN = 0.2;
+/** Stage scroll progress (0..1) → walk progress; the door stretch maps to walk 0. */
+export const walkFromStage = (p: number) =>
+  MathUtils.clamp((p - GALLERY_DOOR_SPAN) / (1 - GALLERY_DOOR_SPAN), 0, 1);
+/** Walk progress → stage scroll progress (inverse of walkFromStage). */
+export const stageFromWalk = (w: number) =>
+  GALLERY_DOOR_SPAN + MathUtils.clamp(w, 0, 1) * (1 - GALLERY_DOOR_SPAN);

@@ -843,8 +843,27 @@
     animation: love-gift-float 4.5s ease-in-out infinite;
   }
 
+  [data-love-motion] .love-scroll-dot {
+    animation: love-scroll-dot 1.6s ease-in-out infinite;
+  }
+
   [data-love-motion] .love-hidden-twinkle {
     animation: love-twinkle 4s ease-in-out infinite;
+  }
+}
+
+@keyframes love-scroll-dot {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0;
   }
 }
 

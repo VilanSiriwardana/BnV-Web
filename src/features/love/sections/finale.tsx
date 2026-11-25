@@ -43,7 +43,7 @@ export function Finale({
     <LoveSection
       id="finale"
       depth={0.5}
-      stage="100vh"
+      stage="480vh"
       className="flex min-h-svh flex-col items-center justify-end pb-[10svh]"
     >
       <div
