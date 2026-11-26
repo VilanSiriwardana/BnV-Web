@@ -3,7 +3,7 @@
 import gsap from 'gsap';
 import { useEffect, useState } from 'react';
 
-import { reasons } from '../engine/reasons-state';
+import { bookPhase, bookProgressFor, reasons } from '../engine/reasons-state';
 import { useLoveScroll } from '../engine/scroll-engine';
 import { useTier } from '../engine/tier-provider';
 import { useQuiet } from '../engine/use-quiet';
@@ -58,7 +58,7 @@ function ReasonsBookStage({ items }: { items: string[] }) {
   useEffect(() => {
     let last = -1;
     const tick = () => {
-      const p = Math.round(reasons.progress * Math.max(0, n - 1));
+      const p = bookPhase(reasons.progress, n).page;
       if (p !== last) setPage((last = p));
     };
     gsap.ticker.add(tick);
@@ -70,17 +70,18 @@ function ReasonsBookStage({ items }: { items: string[] }) {
     if (!section) return;
     const top = section.getBoundingClientRect().top + window.scrollY;
     const travel = section.offsetHeight - window.innerHeight;
-    scrollTo(top + (i / Math.max(1, n - 1)) * travel, { duration: 0.8 });
+    scrollTo(top + bookProgressFor(i, n) * travel, { duration: 0.8 });
   };
 
   return (
     <div className="flex w-full flex-col items-center">
-      <div aria-hidden className="h-[min(56svh,30rem)] w-full" />
+      <div aria-hidden className="h-[min(68svh,38rem)] w-full" />
+      {/* Blueprint 065: no count until the cover has opened. */}
       <p
         aria-live="polite"
-        className="text-gold-text mt-4 font-sans text-sm tracking-[0.2em]"
+        className={`text-gold-text mt-4 font-sans text-sm tracking-[0.2em] transition-opacity duration-500 ${page === 0 ? 'opacity-0' : ''}`}
       >
-        {pad2(page)} / {pad2(n - 1)}
+        {pad2(Math.max(0, page - 1))} / {pad2(n - 1)}
       </p>
       <ol className="sr-only">
         {items.map((text, i) => (

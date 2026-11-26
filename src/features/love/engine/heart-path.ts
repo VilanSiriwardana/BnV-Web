@@ -25,7 +25,6 @@ export const PETAL_SECTIONS: Partial<Record<SectionId, { dim: number }>> = {
   memories: { dim: 0 },
   timeline: { dim: 0 },
   starlight: { dim: 0.3 },
-  reasons: { dim: 0.6 },
   letter: { dim: 0.35 },
   finale: { dim: 0 },
 };

@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { type CSSProperties, useEffect, useRef, useState } from 'react';
 
 import { audio } from '../engine/audio-engine';
 import { useMotionPrefs } from '../engine/motion-prefs';
@@ -9,6 +9,28 @@ import { useLoveScroll } from '../engine/scroll-engine';
 import { useTier } from '../engine/tier-provider';
 
 const LOAD_TIMEOUT_MS = 6000;
+const HEART_D =
+  'M50 88 C 20 66, 4 48, 4 28 C 4 13, 15 4, 28 4 C 38 4, 46 10, 50 19 C 54 10, 62 4, 72 4 C 85 4, 96 13, 96 28 C 96 48, 80 66, 50 88 Z';
+// Blueprint 065: fixed seeds so server and client render the same ambient hearts.
+const AMBIENT = Array.from({ length: 14 }, (_, i) => {
+  const r = (k: number) =>
+    (((Math.sin((i + 1) * 12.9898 * k) * 43758.5453) % 1) + 1) % 1;
+  return {
+    left: `${4 + r(1) * 92}%`,
+    size: 10 + Math.round(r(2) * 16),
+    dur: `${10 + r(3) * 8}s`,
+    delay: `${-r(4) * 14}s`,
+    sway: `${Math.round((r(5) - 0.5) * 60)}px`,
+  };
+});
+const rise = (delay: number, calm: boolean) =>
+  calm
+    ? { initial: false as const }
+    : {
+        initial: { opacity: 0, y: 12 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.9, delay, ease: 'easeOut' as const },
+      };
 const RING_R = 54;
 const RING_C = 2 * Math.PI * RING_R;
 
@@ -107,14 +129,51 @@ export function Gate({ name, musicSrc, sceneReady, onEnter }: Props) {
             aria-hidden
             className="love-gate-halo pointer-events-none absolute top-[12%] left-1/2 size-[min(90vw,34rem)] -translate-x-1/2 rounded-full"
           />
+          {!calm && (
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 overflow-hidden"
+            >
+              {AMBIENT.map((h, i) => (
+                <svg
+                  key={i}
+                  viewBox="0 0 100 92"
+                  className="love-gate-heart"
+                  style={
+                    {
+                      left: h.left,
+                      width: h.size,
+                      '--dur': h.dur,
+                      '--delay': h.delay,
+                      '--sway': h.sway,
+                    } as CSSProperties
+                  }
+                >
+                  <path d={HEART_D} fill="currentColor" />
+                </svg>
+              ))}
+            </div>
+          )}
           <div className="relative z-10 my-auto flex w-full max-w-xl flex-col items-center py-6">
-            <h2
+            <motion.p
+              {...rise(0.1, calm)}
+              className="text-label text-foreground/70 font-sans tracking-[0.3em] uppercase"
+            >
+              A birthday story
+            </motion.p>
+            <motion.h2
+              {...rise(0.3, calm)}
               id="gate-title"
-              className="font-display text-gold-text mb-10 text-[clamp(2.6rem,8vw,4.2rem)] leading-tight"
+              className="font-display love-gate-shimmer mt-3 text-[clamp(2.6rem,8vw,4.2rem)] leading-tight"
             >
               For {name}
-            </h2>
-            <div className="relative">
+            </motion.h2>
+            <motion.span
+              {...rise(0.5, calm)}
+              aria-hidden
+              className="via-gold/70 mt-4 mb-10 h-px w-24 bg-gradient-to-r from-transparent to-transparent"
+            />
+            <motion.div {...rise(0.7, calm)} className="relative">
               <div
                 aria-hidden
                 className="text-gold-text absolute right-[calc(100%-2.5rem)] bottom-[calc(100%-1.75rem)] flex w-32 flex-col items-start sm:w-40 md:top-1/2 md:right-auto md:bottom-auto md:left-[calc(100%+0.5rem)] md:-translate-y-1/2"
@@ -207,20 +266,23 @@ export function Gate({ name, musicSrc, sceneReady, onEnter }: Props) {
                     </radialGradient>
                   </defs>
                   <path
-                    d="M50 88 C 20 66, 4 48, 4 28 C 4 13, 15 4, 28 4 C 38 4, 46 10, 50 19 C 54 10, 62 4, 72 4 C 85 4, 96 13, 96 28 C 96 48, 80 66, 50 88 Z"
+                    d={HEART_D}
                     fill="url(#gate-heart)"
                     stroke="var(--gold)"
                     strokeWidth="2"
                   />
                 </svg>
               </motion.button>
-            </div>
+            </motion.div>
             <p aria-live="polite" className="sr-only">
               {ready ? '' : 'Getting ready…'}
             </p>
-            <p className="font-body text-foreground/80 mt-6 text-[clamp(1.1rem,4vw,1.4rem)] italic">
+            <motion.p
+              {...rise(1, calm)}
+              className="font-body text-foreground/80 mt-6 text-[clamp(1.1rem,4vw,1.4rem)] italic"
+            >
               A story waiting to unfold.
-            </p>
+            </motion.p>
           </div>
         </motion.div>
       )}

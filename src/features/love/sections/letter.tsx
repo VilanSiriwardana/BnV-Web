@@ -394,12 +394,14 @@ function writeLetter(scope: HTMLElement | null, card: HTMLElement | null) {
   // Measure against the quill's own container (it scrolls with the card); the nib is bottom-left.
   const pos = (line: HTMLElement) => {
     const r = line.getBoundingClientRect();
-    const box = (quill?.offsetParent as HTMLElement | null) ?? sheet;
+    // Blueprint 066: an SVG has no offsetParent; measure against the column it is positioned in.
+    const box = quill?.parentElement ?? sheet;
     const b = box ? box.getBoundingClientRect() : { left: 0, top: 0 };
+    const qh = quill?.getBoundingClientRect().height || 48;
     return {
       x0: r.left - b.left,
       x1: r.right - b.left,
-      y: r.bottom - b.top - (quill?.offsetHeight ?? 48) + r.height * 0.15,
+      y: r.top - b.top + r.height * 0.78 - qh,
     };
   };
   if (quill) tl.set(quill, { autoAlpha: 1, yPercent: 0, x: 0, y: 0 });
@@ -416,35 +418,35 @@ function writeLetter(scope: HTMLElement | null, card: HTMLElement | null) {
           0.8,
           (line.textContent?.length ?? 0) * 0.016,
         );
-        tl.call(() => follow(line));
-        // Pen lands on the line, then rides the ink edge in step with the reveal.
+        // Blueprint 065: the nib is driven by the ink reveal itself, so they can never drift apart.
+        let p = { x0: 0, x1: 0, y: 0 };
+        const glyphs = Math.max(1, line.textContent?.length ?? 1);
+        tl.call(() => {
+          follow(line);
+          p = pos(line);
+        });
         if (quill)
-          tl.call(() => {
-            const p = pos(line);
-            gsap
-              .timeline()
-              .to(quill, { x: p.x0, y: p.y - 6, duration: 0.12 })
-              .to(quill, { y: p.y, duration: 0.08 })
-              .to(quill, { x: p.x1, duration: d, ease: 'none' });
+          tl.to(quill, {
+            x: () => p.x0,
+            y: () => p.y,
+            duration: 0.2,
+            ease: 'power2.inOut',
           });
-        tl.to(
-          line,
-          { clipPath: 'inset(0% 0% 0% 0%)', duration: d, ease: 'none' },
-          '+=0.2',
-        );
-        if (!quill) return;
-        tl.fromTo(
-          quill,
-          { rotation: -5 },
-          {
-            rotation: 4,
-            duration: d / 4,
-            repeat: 3,
-            yoyo: true,
-            ease: 'sine.inOut',
+        else tl.to({}, { duration: 0.2 });
+        tl.to(line, {
+          clipPath: 'inset(0% 0% 0% 0%)',
+          duration: d,
+          ease: 'none',
+          onUpdate(this: gsap.core.Tween) {
+            if (!quill) return;
+            const k = this.progress();
+            gsap.set(quill, {
+              x: p.x0 + (p.x1 - p.x0) * k,
+              y: p.y - Math.abs(Math.sin(k * glyphs * Math.PI)) * 2.5,
+              rotation: -8 + Math.sin(k * glyphs * Math.PI) * 4,
+            });
           },
-          '<',
-        );
+        });
       });
   });
   if (quill) tl.to(quill, { autoAlpha: 0, duration: 0.4 });

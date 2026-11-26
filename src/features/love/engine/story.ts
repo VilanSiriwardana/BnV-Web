@@ -294,9 +294,9 @@ const buildMemories: SectionBuilder = (root, mobile) => {
       },
       0,
     )
-    .to(heart, { petalAbsorb: 1, duration: 0.7, ease: 'none' })
-    .set(heart, { petalGather: 1 })
-    .to(heart, { petalAbsorb: 0, duration: 0.14, ease: 'none' });
+    .to(heart, { petalAbsorb: 1, duration: 0.66, ease: 'none' })
+    // Blueprint 065: parked in the heart (no swap); Timeline bursts them back out.
+    .to(heart, { petalGather: 1, duration: 0.18, ease: 'none' });
 
   // Rail hand-off: the Timeline is a flat stage, so the camera returns home (heart.tsx snaps).
   ScrollTrigger.create({
@@ -434,9 +434,11 @@ const buildTimeline: SectionBuilder = (root, mobile) => {
         last = i;
       }
       if (pastLastNode(tp) && armed) armed = !director.interrupt('arrowStrike');
-      if (tp < LAST_NODE && !armed) {
+      if (tp < LAST_NODE - 0.03 && !armed) {
         armed = true;
         director.resetBoost();
+        // Blueprint 066: back above the strike, petals burst out of the heart again.
+        director.setBaseline('timeline');
       }
     },
   });
@@ -639,9 +641,26 @@ const buildReasons: SectionBuilder = (root, mobile) => {
       reasons.active = isActive;
     },
   });
+  // Blueprint 066: once unpinned, the closed book scrolls away with the section.
+  ScrollTrigger.create({
+    trigger: el,
+    start: 'bottom bottom',
+    end: 'bottom top',
+    onUpdate: ({ progress }) => {
+      reasons.exit = progress * window.innerHeight;
+    },
+    onToggle: ({ isActive }) => {
+      reasons.leaving = isActive;
+    },
+    onLeaveBack: () => {
+      reasons.exit = 0;
+    },
+  });
   return () => {
     reasons.progress = 0;
     reasons.active = false;
+    reasons.leaving = false;
+    reasons.exit = 0;
   };
 };
 
@@ -675,8 +694,9 @@ const buildWish: SectionBuilder = (root) => {
         duration: 0.6,
         overwrite: 'auto',
       });
+      // Blueprint 065: with the candle lit, the heart waits hidden and rises from the smoke.
       gsap.to(heart, {
-        scale: WISH_REST.scale,
+        scale: candleMode && candle.out < 1 ? 0.001 : WISH_REST.scale,
         duration: 0.6,
         overwrite: 'auto',
       });

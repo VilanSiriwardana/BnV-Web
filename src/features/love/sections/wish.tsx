@@ -90,6 +90,11 @@ export function Wish({
       ring.current.style.strokeDashoffset = `${RING_C * (1 - p)}`;
     pill.current?.toggleAttribute('data-holding', p > 0 && p < 1);
     if (MERGING.has(director.current())) return;
+    // Blueprint 065: the hidden heart stays hidden while the candle burns.
+    if (candle.visible > 0 && candle.out < 1) {
+      candle.blow = p * 0.6;
+      return;
+    }
     heart.starHold = p;
     heart.ndc.y = lerp(WISH_REST.y, WISH_TOP.y, p);
     heart.scale = lerp(WISH_REST.scale, WISH_TOP.scale, p);
@@ -113,7 +118,7 @@ export function Wish({
     candle.blow = b;
     if (ring.current)
       ring.current.style.strokeDashoffset = `${RING_C * (1 - b)}`;
-    if (MERGING.has(director.current())) return;
+    if (MERGING.has(director.current()) || candle.out < 1) return;
     heart.ndc.y = lerp(WISH_REST.y, WISH_BLOW_TOP.y, b);
     heart.scale = lerp(WISH_REST.scale, WISH_BLOW_TOP.scale, b);
   }, []);
@@ -137,7 +142,13 @@ export function Wish({
     session.wishDone = false;
     reset();
     candle.out = 0;
-    if (snuff) gsap.to(heart, { star: 0, duration: 0.4, overwrite: 'auto' });
+    if (snuff)
+      gsap.to(heart, {
+        star: 0,
+        scale: 0.001,
+        duration: 0.4,
+        overwrite: 'auto',
+      });
     candle.blow = 0;
     if (ring.current) ring.current.style.strokeDashoffset = `${RING_C}`;
     setPhase('idle');
@@ -150,10 +161,7 @@ export function Wish({
 
   return (
     <LoveSection id="wish" depth={1} stage="200vh" className="bg-surface">
-      <p className="text-label text-gold-text font-sans tracking-[0.2em] uppercase">
-        Make a wish
-      </p>
-      <h2 id="wish-title" className={cn(sectionTitle, 'mt-3')}>
+      <h2 id="wish-title" className={sectionTitle}>
         {prompt}, <span className="text-primary">{name}</span>.
       </h2>
       <div
@@ -163,7 +171,7 @@ export function Wish({
           'flex flex-col items-center',
           quiet
             ? 'mt-10'
-            : 'pointer-events-none absolute inset-0 justify-start gap-5 pt-[12svh]',
+            : 'pointer-events-none absolute inset-0 justify-start gap-8 pt-[14svh]',
         )}
       >
         {/* The whole medallion is the hold target; its centre stays clear so the 3D star shows. */}
@@ -389,27 +397,49 @@ export function Wish({
 // Calm / static (F5): a flat candle; one click blows it out (opacity only, no mic).
 function FlatCandle({ lit }: { lit: boolean }) {
   return (
-    <svg aria-hidden viewBox="0 0 40 64" className="h-20 w-12">
+    // Blueprint 065: a flat birthday cake with one candle.
+    <svg aria-hidden viewBox="0 0 64 72" className="h-24 w-20">
       <path
-        d="M20 4 C26 14 26 20 20 24 C14 20 14 14 20 4 Z"
+        d="M32 4 C37 12 37 17 32 20 C27 17 27 12 32 4 Z"
         className="fill-gold transition-opacity duration-500"
         style={{ opacity: lit ? 1 : 0 }}
       />
       <rect
-        x="17"
-        y="26"
-        width="6"
-        height="22"
-        rx="1.5"
+        x="30"
+        y="22"
+        width="4"
+        height="14"
+        rx="1"
         className="fill-gold/70"
       />
       <rect
-        x="4"
-        y="48"
-        width="32"
+        x="14"
+        y="36"
+        width="36"
         height="12"
         rx="3"
         className="fill-primary/60"
+      />
+      <path
+        d="M14 40 q4.5 5 9 0 q4.5 5 9 0 q4.5 5 9 0 q4.5 5 9 0"
+        className="stroke-foreground/70 fill-none"
+        strokeWidth="1.5"
+      />
+      <rect
+        x="6"
+        y="48"
+        width="52"
+        height="16"
+        rx="3"
+        className="fill-secondary/60"
+      />
+      <rect
+        x="4"
+        y="64"
+        width="56"
+        height="3"
+        rx="1.5"
+        className="fill-gold/60"
       />
     </svg>
   );

@@ -34,6 +34,9 @@ uniform float uGather;
 uniform float uShiver;
 uniform float uDim;
 uniform float uAbsorb;
+uniform float uBurstAge;
+uniform float uSwirl;
+uniform vec2 uBurstOrigin;
 varying vec3 vColor;
 varying float vAlpha;
 varying vec2 vUv;
@@ -48,13 +51,14 @@ void main() {
   vec3 p = position;
   p.z += p.x * p.x * 2.5;
   float t = uTime;
-  float d = aSeed.w * 0.5;
-  float grow = smoothstep(d, d + 0.5, uRelease);
+  // Blueprint 065: petals are born from the burst: spray out of the heart, then join the fall.
+  // Blueprint 066: no stagger, so the spray leaves with the heart burst.
+  float age = uBurstAge;
+  float grow = step(0.001, uRelease) * smoothstep(0.0, 0.15, age);
 
   // Blueprint 062: gather shrinks petals toward the heart.
   // Every petal reaches the heart at full gather (staggered by seed), then dissolves into it.
   float g = smoothstep(0.0, 1.0, clamp(uGather * 1.3 - aSeed.w * 0.3, 0.0, 1.0));
-  grow = max(grow, step(0.001, uRelease) * (1.0 - g));
   p *= mix(mix(0.3, 1.0, grow), 0.15, g);
 
   float fall = mod(aSeed.y * uSpan.y - t * (0.18 + aSeed.w * 0.12), uSpan.y);
@@ -63,20 +67,34 @@ void main() {
     fall - uSpan.y * 0.5,
     (aSeed.z - 0.5) * 2.0
   );
+  float ang = aSeed.x * 6.2832 + aSeed.z * 1.7;
+  vec2 dir = normalize(vec2(cos(ang), sin(ang) * 0.8 + 0.35));
+  float a0 = max(age, 0.0);
+  // Same curve and duration as the heart burst (power3.out, 1.1 s).
+  float e = 1.0 - pow(1.0 - clamp(a0 / 1.1, 0.0, 1.0), 3.0);
+  float drop = max(a0 - 0.6, 0.0);
+  vec2 spray = uBurstOrigin + dir * (1.2 + aSeed.y * 1.6) * e - vec2(0.0, 0.18 * drop * drop);
+  float k = smoothstep(1.1, 2.6, a0);
+  base = mix(vec3(spray, 0.0), base, k);
+  float born = 1.0 - k;
   // Blueprint 062: pull toward the heart origin when gathered.
   vec3 core = vec3(uOrigin + (aSeed.xy - 0.5) * 0.12, 0.0);
+  // Blueprint 066: the heart inhales: petals spiral in, fastest near the core.
+  float sw = g * (1.0 - g) * 4.0 * uSwirl * (2.5 + aSeed.w * 2.0);
+  vec2 rel = base.xy - core.xy;
+  base.xy = core.xy + mat2(cos(sw), sin(sw), -sin(sw), cos(sw)) * rel;
   base = mix(base, core, g);
   // Spray outward while leaving (or entering) the heart, so petals read as shot from it.
   base.xy += normalize(base.xy - core.xy + vec2(1e-4)) * sin(g * 3.1416) * 0.8;
   // Blueprint 062: shiver during the arrow flight.
-  base.xy += uShiver * 0.04 * vec2(sin(t * 55.0 + aSeed.x * 40.0), cos(t * 61.0 + aSeed.y * 40.0));
+  base.xy += uShiver * 0.015 * vec2(sin(t * 55.0 + aSeed.x * 40.0), cos(t * 61.0 + aSeed.y * 40.0));
   // Memories: petals fly out of the screen toward the viewer (like the orbs), staggered by seed.
   float a = smoothstep(0.0, 1.0, clamp(uAbsorb * 2.0 - aSeed.z, 0.0, 1.0));
   vec3 outward = vec3(base.xy * 1.2 + vec2(0.0, -0.4), 3.7);
   base = mix(base, outward, a);
 
   float seam = smoothstep(0.0, 0.08, fall / uSpan.y) * smoothstep(1.0, 0.92, fall / uSpan.y);
-  seam = mix(seam, 1.0, g);
+  seam = mix(seam, 1.0, max(g, born));
   vec3 local = base + rot(t * (0.6 + aSeed.w) + aSeed.w * 6.28, t * 0.4 + aSeed.x * 6.28) * p;
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(local, 1.0);
@@ -138,6 +156,9 @@ export function Petals({ tier }: { tier: Tier }) {
           uShiver: { value: 0 },
           uDim: { value: 0 },
           uAbsorb: { value: 0 },
+          uBurstAge: { value: 100 },
+          uSwirl: { value: 0 },
+          uBurstOrigin: { value: [0, 0] },
         },
       }),
     [],
@@ -146,6 +167,9 @@ export function Petals({ tier }: { tier: Tier }) {
   const drift = useRef(1);
   const span = useRef<[number, number]>([8, 7]);
   const origin = useRef<[number, number]>([0, 0]);
+  const burstId = useRef(heart.petalBurstId);
+  const burstAge = useRef(100);
+  const burstOrigin = useRef<[number, number]>([0, 0]);
 
   // A camera child renders only while the camera is in the scene graph.
   useEffect(() => {
@@ -191,7 +215,16 @@ export function Petals({ tier }: { tier: Tier }) {
   useFrame((_, delta) => {
     const mesh = ref.current;
     if (!mesh) return;
-    mesh.visible = heart.petalRelease > 0.001;
+    const s = span.current;
+    if (burstId.current !== heart.petalBurstId) {
+      burstId.current = heart.petalBurstId;
+      burstAge.current = 0;
+      burstOrigin.current = [
+        (heart.petalBurstAt.x * s[0]) / 1.1 / 2,
+        (heart.petalBurstAt.y * s[1]) / 1.3 / 2,
+      ];
+    } else burstAge.current = Math.min(100, burstAge.current + delta);
+    mesh.visible = heart.petalRelease > 0.001 && heart.petalGather < 0.999;
     if (!mesh.visible) return;
     // Integrate the audio-driven speed into the clock; scaling the clock itself made petals jump.
     drift.current = MathUtils.damp(
@@ -203,8 +236,9 @@ export function Petals({ tier }: { tier: Tier }) {
     const u = materialRef.current.uniforms;
     u.uTime.value += delta * drift.current;
     u.uRelease.value = heart.petalRelease;
+    u.uBurstAge.value = burstAge.current;
+    u.uBurstOrigin.value = burstOrigin.current;
     // Blueprint 062: damp the origin so gathered petals track the heart smoothly.
-    const s = span.current;
     const tx = (heart.ndc.x * s[0]) / 1.1 / 2;
     const ty = (heart.ndc.y * s[1]) / 1.3 / 2;
     origin.current[0] = MathUtils.damp(origin.current[0], tx, 8, delta);
@@ -212,6 +246,7 @@ export function Petals({ tier }: { tier: Tier }) {
     u.uOrigin.value = origin.current;
     u.uGather.value = heart.petalGather;
     u.uShiver.value = heart.petalShiver;
+    u.uSwirl.value = heart.petalShiver;
     u.uDim.value = heart.petalDim;
     u.uAbsorb.value = heart.petalAbsorb;
   });

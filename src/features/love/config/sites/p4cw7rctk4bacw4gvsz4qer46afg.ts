@@ -308,13 +308,13 @@ export const site: LoveSiteConfig = {
     // Draft by Claude for the owner to rewrite in his own words before release.
     salutation: 'My dearest Buwi,',
     paragraphs: [
-      'Happy birthday, my love. Of all the days in the year, this is the one I am most grateful for, because it is the day the world got you, and somehow, one day, so did I.',
-      'I still remember how ordinary everything felt before you, and how quietly that changed. A conversation that did not want to end became a habit, and the habit became the best part of every day.',
-      'You make the small things golden: the late-night talks, the silly songs, the way you laugh before you finish your own jokes. You are my calm on loud days and my favourite noise on quiet ones.',
-      'Thank you for your patience, your warmth, and the way you believe in me even when I forget to. Every memory on this page is a little piece of the life we are building, and I would choose every one of them again.',
-      'Here is to another year of you: may it be gentle, bright, and full of everything you wish for. I will be right beside you for all of it, holding your hand through every spin and every dip.',
+      'Happy birthday, baby! 🥳 Out of every day in the year, this one is my favourite, because it’s the day the world got you. And then somehow, one day, I got you too 🥹',
+      'Honestly, life felt pretty ordinary before you 🙂‍↔️ Then one chat just refused to end, it turned into a habit, and now that habit is the best part of my day, every day 🥰',
+      'You make the tiniest things feel special: the late-night talks, the silly songs, the way you start laughing before you even finish your own joke 😋 You’re my calm on loud days and my favourite noise on quiet ones 💗',
+      'Thank you for being so patient with me, for being so warm, and for believing in me even when I forget to 😮‍💨 Every memory on this page is a little piece of us, and I’d pick every single one again, no question 😚',
+      'So here’s to another year of you, my little fairy 🧚🏻‍♀️ I hope it’s soft, bright, and full of everything you wish for 🦄 I’ll be right next to you for all of it, holding your hand through every spin and every dip (and yes, you still look way too good doing it 🥵).',
     ],
-    signoff: 'Forever and always yours,',
+    signoff: 'Yours, always and forever 😘',
   },
   // TODO(owner): credit text required before release (ADR-0030).
   music: { src: '/audio/wedding-background.mp3', credit: '' },
@@ -369,47 +369,47 @@ export const site: LoveSiteConfig = {
       ],
     },
     openWhenIntro:
-      "Open any of these whenever you need them. I'm always here, and you are never too much. You matter to me more than I know how to say, every single day.",
+      'Open these whenever you need them, okay? I’m always here, and you’re never too much 🥹 You matter to me more than I can put into words, every single day 💗',
     openWhen: [
       {
         id: 'note-miss',
         label: 'Open when you miss me',
         paragraphs: [
-          'Close your eyes for a second. I am probably thinking about you right now too.',
-          'Distance is only the time between one hug and the next. I am already counting.',
+          'Close your eyes for a sec. I’m probably thinking about you right now too 😚',
+          'Distance is just the time between one hug and the next, and I’m already counting 🥰',
         ],
       },
       {
         id: 'note-sleep',
         label: 'Open when you can’t sleep',
         paragraphs: [
-          'Breathe in for four, out for six. Imagine my hand on your back, slow and steady.',
-          'Tomorrow can wait. You are safe, you are loved, and you are doing better than you think.',
+          'Breathe in for four, out for six 😮‍💨 Pretend my hand is on your back, slow and steady.',
+          'Tomorrow can wait. You’re safe, you’re loved, and you’re doing so much better than you think 💗',
         ],
       },
       {
         id: 'note-hard-day',
         label: 'Open on a hard day',
         paragraphs: [
-          'Whatever happened today does not change who you are: kind, brave and wonderfully stubborn.',
-          'Call me. Or don’t, and just read this twice. Either way, I am on your side.',
+          'Whatever happened today doesn’t change who you are: kind, brave and adorably stubborn 🙂‍↔️',
+          'Call me. Or don’t, and just read this twice. Either way, I’m always on your side 😘',
         ],
       },
       {
         id: 'note-christmas',
         label: 'Open on Christmas morning',
         paragraphs: [
-          'Our first Christmas. I hope there is something warm in your hands and something silly on the radio.',
-          'Thank you for being the best gift of my year.',
+          'Our first Christmas together 🥳 I hope there’s something warm in your hands and something silly on the radio 😋',
+          'Thank you for being the best gift of my whole year 🦄',
         ],
       },
     ],
     secret: {
       title: 'You found every heart',
       paragraphs: [
-        'I hid five little hearts because I knew you would look closely. You always do.',
-        'That is one of my favourite things about you: you notice the small things, and you make me feel seen.',
-        'One year ago this was just the beginning. Here is to every hidden thing we still get to find together.',
+        'I hid five little hearts because I knew you’d look closely. You always do 🧚🏻‍♀️',
+        'That’s one of my favourite things about you: you notice the small stuff, and you make me feel so seen 🥹',
+        'A year ago this was just the beginning. Here’s to every hidden thing we still get to find together 💗',
       ],
     },
   },

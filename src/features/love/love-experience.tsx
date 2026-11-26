@@ -49,6 +49,9 @@ const GalleryDebugPanel =
     ? dynamic(() => import('./dev/gallery-debug-panel'), { ssr: false })
     : null;
 
+// Blueprint 065: a refresh always starts the story from the top.
+if (typeof window !== 'undefined') history.scrollRestoration = 'manual';
+
 const noSubscribe = () => () => {};
 const readDebug = () =>
   new URLSearchParams(window.location.search).has('debug');
@@ -102,6 +105,7 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
 
   useGSAP(
     () => {
+      window.scrollTo(0, 0);
       const cleanup = buildStory(rootRef.current!, { quiet, tier });
       document.fonts.ready.then(() => ScrollTrigger.refresh());
       return cleanup;

@@ -14,6 +14,7 @@ import {
   isMobileViewport,
   poseFor,
   type SectionId,
+  WISH_REST,
 } from './heart-path';
 import { heart } from './heart-state';
 import { REDUCED_MOTION_QUERY } from './motion-prefs';
@@ -58,15 +59,54 @@ function burst(
     { glow: 0.3, duration: 1.1, ease: 'power3.out' },
     '<',
   );
-  // Blueprint 062: petals always scatter with the heart burst.
-  tl.fromTo(
-    heart,
-    { petalGather: 1 },
-    { petalGather: 0, duration: 1.1, ease: 'power3.out' },
-    '<',
+  // Blueprint 065: petals are born from the burst and spray out of the heart.
+  const release = opts.petals || heart.petalRelease > 0.01;
+  tl.call(
+    () => {
+      if (!release && heart.petalRelease < 0.01) return;
+      sprayPetals();
+    },
+    [],
+    at,
   );
-  if (opts.petals || heart.petalRelease > 0.01)
-    tl.set(heart, { petalRelease: 1 }, at);
+}
+
+function sprayPetals() {
+  heart.petalBurstAt.x = heart.ndc.x;
+  heart.petalBurstAt.y = heart.ndc.y;
+  heart.petalBurstId++;
+  heart.petalRelease = 1;
+  heart.petalGather = 0;
+  heart.petalAbsorb = 0;
+}
+
+// Blueprint 065: petals only leave by sinking into the heart, never by fading out.
+function petalsOut(duration = 1.1) {
+  if (heart.petalRelease < 0.01) return;
+  if (reduced()) {
+    gsap.set(heart, { petalRelease: 0, petalGather: 0 });
+    return;
+  }
+  gsap.to(heart, {
+    petalGather: 1,
+    duration,
+    ease: 'power2.in',
+    overwrite: 'auto',
+    onComplete: () => {
+      heart.petalRelease = 0;
+    },
+  });
+}
+
+// Blueprint 065: petals only arrive with a burst out of the heart.
+function petalsIn() {
+  if (heart.petalRelease > 0.01 && heart.petalGather < 0.99) {
+    gsap.to(heart, { petalGather: 0, duration: 0.6, overwrite: 'auto' });
+    return;
+  }
+  gsap.killTweensOf(heart, 'petalGather');
+  sprayPetals();
+  if (!core.isBusy()) core.play('pulse');
 }
 
 function reform(tl: gsap.core.Timeline, gatherPetals = true) {
@@ -91,7 +131,7 @@ function reform(tl: gsap.core.Timeline, gatherPetals = true) {
 }
 
 function scatterPetals(tl: gsap.core.Timeline, at: number | string = '>') {
-  tl.to(heart, { petalGather: 0, duration: 0.9, ease: 'power3.out' }, at);
+  tl.call(() => void (heart.petalRelease > 0.01 && sprayPetals()), [], at);
 }
 
 // Experience §3.5 durations and eases. Unbuilt events (later phases) play a pulse for now.
@@ -305,6 +345,13 @@ function candleOut(tl: gsap.core.Timeline) {
     { star: 1, duration: 0.8, ease: 'power2.out' },
     0.6,
   );
+  // Blueprint 065: the heart rises out of the smoke.
+  tl.fromTo(
+    heart,
+    { scale: 0.001 },
+    { scale: WISH_REST.scale, duration: 1.1, ease: 'power2.out' },
+    0.5,
+  );
   wishMerge(tl, 2);
 }
 
@@ -313,39 +360,52 @@ function candleOut(tl: gsap.core.Timeline) {
 function arrowStrike(tl: gsap.core.Timeline) {
   boost = STRIKE_BOOST;
   const glow = baseGlow();
-  // Blueprint 063: petals sense the arrow before it appears — shiver starts at t+0.
-  tl.to(heart, { petalShiver: 1, duration: 1.0, ease: 'power1.in' }, 0)
-    .to(heart, { glow: glow - 0.15, flinch: -0.03, duration: 0.2 }, 0)
+  const scale = heart.scale;
+  // Blueprint 066: the heart inhales the petals (a slow spiral) before the arrow flies.
+  const INHALE = 1.8;
+  const hit = INHALE + 0.7;
+  tl.to(heart, { petalShiver: 1, duration: 1.2, ease: 'sine.in' }, 0)
+    .to(heart, { petalGather: 1, duration: INHALE, ease: 'power2.inOut' }, 0)
+    .to(
+      heart,
+      {
+        scale: scale * 1.08,
+        glow: glow + 0.25,
+        duration: 1.6,
+        ease: 'sine.inOut',
+      },
+      0,
+    )
+    .to(heart, { flinch: -0.03, duration: 0.2 }, INHALE - 0.4)
     .fromTo(
       heart,
       { arrow: 0 },
       { arrow: 1, duration: 0.9, ease: 'power1.in' },
-      0.2,
+      INHALE - 0.2,
     )
-    // Blueprint 063: petals shrink into heart before impact.
-    .to(heart, { petalGather: 1, duration: 0.35, ease: 'power2.in' }, 0.6)
-    .to(heart, { petalShiver: 0, duration: 0.1 }, 1.1)
-    .to(heart, { flinch: -0.08, duration: 0.08, ease: 'power2.out' }, 1.1)
+    .to(heart, { petalShiver: 0, duration: 0.1 }, hit)
+    .to(heart, { scale, duration: 0.3, ease: 'power2.out' }, hit)
+    .to(heart, { flinch: -0.08, duration: 0.08, ease: 'power2.out' }, hit)
     .to(heart, { flinch: 0.06, duration: 0.22, ease: 'power2.out' })
     .to(heart, { flinch: 0, duration: 0.3, ease: 'power2.inOut' })
     .fromTo(
       heart,
       { ring: 0 },
       { ring: 1, duration: 0.8, ease: 'power2.out' },
-      1.1,
+      hit,
     )
-    .to(heart, { glow: glow * 2, duration: 0.04 }, 1.1)
-    .to(heart, { glow, duration: 0.08 }, 1.14)
+    .to(heart, { glow: glow * 2, duration: 0.04 }, hit)
+    .to(heart, { glow, duration: 0.08 }, hit + 0.04)
     .fromTo(
       heart,
       { cameraShake: 0.015 },
       { cameraShake: 0, duration: 0.25, ease: 'power2.out' },
-      1.1,
+      hit,
     )
-    .set(heart, { arrow: 0 }, 1.45);
-  burst(tl, {}, 1.4);
+    .set(heart, { arrow: 0 }, hit + 0.35);
+  // Impact: hearts and petals burst out together.
+  burst(tl, {}, hit);
   tl.to({}, { duration: 0.5 });
-  // Timeline: petals were absorbed before impact; the blast sends them falling again.
   reform(tl, false);
 }
 
@@ -380,9 +440,7 @@ function toBaseline() {
     flinch: 0,
     shine: 0,
     starHold: 0,
-    petalGather: 0,
     petalShiver: 0,
-    petalAbsorb: 0,
     // Blueprint 060 follow-up: on the finale, scroll owns the spell; never kill its scrub.
     ...(section === 'finale' ? {} : { spell: 0, spellB: 0 }),
     gold: HEART_PATH[section].gold,
@@ -413,30 +471,17 @@ export const director = {
   current: core.current,
   setBaseline(id: SectionId) {
     section = id;
-    // Blueprint 062: petal sections own petalRelease; bloom waits for the burst to set it.
+    // Blueprint 065: petal sections burst petals out of the heart; others absorb them back in.
+    // Bloom waits for its own burst; Memories owns its scrubbed absorb.
     const entry = PETAL_SECTIONS[id];
-    if (id !== 'bloom')
-      gsap.to(heart, {
-        petalRelease: entry ? 1 : 0,
-        petalDim: entry?.dim ?? 0,
-        petalAbsorb: 0,
-        duration: 0.6,
-        overwrite: 'auto',
-      });
-    else
-      gsap.to(heart, {
-        petalDim: 0,
-        petalAbsorb: 0,
-        duration: 0.6,
-        overwrite: 'auto',
-      });
-    // Timeline: petals parked in the heart (Memories end) shoot back out.
     gsap.to(heart, {
-      petalGather: 0,
-      duration: id === 'timeline' ? 1.1 : 0.6,
-      ease: id === 'timeline' ? 'power3.out' : 'power1.out',
+      petalDim: entry?.dim ?? 0,
+      duration: 0.6,
       overwrite: 'auto',
     });
+    if (id === 'bloom' || id === 'memories') return;
+    if (entry) petalsIn();
+    else petalsOut();
   },
   baseline: () => section,
   resetBoost() {

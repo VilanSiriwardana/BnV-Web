@@ -17,7 +17,7 @@ import {
   type Texture,
 } from 'three';
 
-import { reasons } from '../engine/reasons-state';
+import { bookPhase, reasons } from '../engine/reasons-state';
 import { smallSrc } from '../engine/gallery-textures';
 import type { Tier } from '../engine/tiers';
 import { pad2 } from '../ui/reasons-ring';
@@ -30,6 +30,7 @@ const PAGE_H = 1.85;
 const DEPTH = 5;
 const GAP = 0.0025;
 const none = () => null;
+const BOARD = '#3a1430';
 
 const photoSrc = (i: number) =>
   `/images/prototype/love-gallery-${String((i % 12) + 1).padStart(2, '0')}.webp`;
@@ -125,6 +126,36 @@ function paintReason(
   t.needsUpdate = true;
 }
 
+// Blueprint 065: the closed front cover, readable before the first turn.
+function paintCover(t: Texture, p: Palette, board: string, font: string) {
+  const cv = t.image as HTMLCanvasElement;
+  const c = cv.getContext('2d');
+  if (!c) return;
+  const { width: w, height: h } = cv;
+  const g = c.createLinearGradient(0, 0, w, h);
+  g.addColorStop(0, board);
+  g.addColorStop(1, '#22091c');
+  c.fillStyle = g;
+  c.fillRect(0, 0, w, h);
+  c.strokeStyle = p.gold;
+  c.lineWidth = w * 0.008;
+  c.strokeRect(w * 0.07, w * 0.07, w * 0.86, h - w * 0.14);
+  c.lineWidth = w * 0.003;
+  c.strokeRect(w * 0.1, w * 0.1, w * 0.8, h - w * 0.2);
+  c.fillStyle = p.gold;
+  c.textAlign = 'center';
+  c.font = `500 ${w * 0.035}px ${font}`;
+  c.letterSpacing = `${w * 0.012}px`;
+  c.fillText('TWELVE REASONS', w / 2, h * 0.3);
+  c.letterSpacing = '0px';
+  c.font = `italic 400 ${w * 0.13}px ${font}`;
+  c.fillText('Why I', w / 2, h * 0.46);
+  c.fillText('love you', w / 2, h * 0.46 + w * 0.15);
+  c.font = `${w * 0.09}px ${font}`;
+  c.fillText('♥', w / 2, h * 0.78);
+  t.needsUpdate = true;
+}
+
 function paintPhoto(t: Texture, img: HTMLImageElement | null, p: Palette) {
   const cv = t.image as HTMLCanvasElement;
   const c = cv.getContext('2d');
@@ -205,9 +236,26 @@ export function ReasonsBook({ tier, items }: { tier: Tier; items: string[] }) {
     const leftPage = new PlaneGeometry(PAGE_W, PAGE_H);
     leftPage.translate(-PAGE_W / 2, 0, 0);
     const left = new MeshBasicMaterial({ map: photo[0], toneMapped: false });
-    const board = new MeshBasicMaterial({ color: '#3a1430' });
+    const board = new MeshBasicMaterial({ color: BOARD });
     const edge = new MeshBasicMaterial({ color: '#d4ad55' });
+    const coverTex = pageCanvas(res);
+    const coverInside = pageCanvas(res);
+    // Blueprint 066: the cover bends and turns like a page, its inside face visible mid-flip.
+    const coverLeaf = new ShaderMaterial({
+      vertexShader: vertex,
+      fragmentShader: fragment,
+      side: DoubleSide,
+      uniforms: {
+        uFront: { value: coverTex },
+        uBack: { value: coverInside },
+        uBend: { value: 0 },
+        uShade: { value: 1 },
+      },
+    });
     return {
+      coverTex,
+      coverInside,
+      coverLeaf,
       text,
       photo,
       leaves,
@@ -235,6 +283,16 @@ export function ReasonsBook({ tier, items }: { tier: Tier; items: string[] }) {
     const stops: (() => void)[] = [];
     void document.fonts.ready.then(() => {
       if (!live) return;
+      paintCover(kit.coverTex, palette, BOARD, font);
+      const inside = (kit.coverInside.image as HTMLCanvasElement).getContext(
+        '2d',
+      );
+      if (inside)
+        paintFrame(inside, {
+          ...palette,
+          bg: BOARD,
+        });
+      kit.coverInside.needsUpdate = true;
       items.forEach((t, i) => paintReason(kit.text[i], i, t, palette, font));
       kit.photo.forEach((tex, i) => {
         paintPhoto(tex, null, palette);
@@ -254,9 +312,13 @@ export function ReasonsBook({ tier, items }: { tier: Tier; items: string[] }) {
 
   useEffect(
     () => () => {
-      [...kit.text, ...kit.photo].forEach((t) => t.dispose());
+      [...kit.text, ...kit.photo, kit.coverTex, kit.coverInside].forEach((t) =>
+        t.dispose(),
+      );
       kit.leaves.forEach((m) => m.dispose());
-      [kit.left, kit.board, kit.edge].forEach((m) => m.dispose());
+      [kit.left, kit.board, kit.edge, kit.coverLeaf].forEach((m) =>
+        m.dispose(),
+      );
       [kit.page, kit.leftPage, kit.box, kit.spine].forEach((g) => g.dispose());
     },
     [kit],
@@ -267,8 +329,8 @@ export function ReasonsBook({ tier, items }: { tier: Tier; items: string[] }) {
     if (!g) return;
     reveal.current = MathUtils.damp(
       reveal.current,
-      reasons.active ? 1 : 0,
-      5,
+      reasons.active || reasons.leaving ? 1 : 0,
+      8,
       delta,
     );
     g.visible = reveal.current > 0.01;
@@ -277,43 +339,53 @@ export function ReasonsBook({ tier, items }: { tier: Tier; items: string[] }) {
     const viewH = 2 * DEPTH * Math.tan(MathUtils.degToRad(fov) / 2);
     const viewW = viewH * (size.width / Math.max(1, size.height));
     const fit = Math.min(
-      1,
-      (viewW * 0.9) / (PAGE_W * 2 + 0.2),
-      (viewH * 0.55) / PAGE_H,
+      1.25,
+      (viewW * 0.95) / (PAGE_W * 2 + 0.2),
+      (viewH * 0.72) / PAGE_H,
     );
-    g.scale.setScalar(fit * (0.85 + reveal.current * 0.15));
-    g.position.y = -viewH * 0.08 - (1 - reveal.current) * 0.3;
+    g.scale.setScalar(fit * (0.92 + reveal.current * 0.08));
+    g.position.y =
+      -viewH * 0.1 + (reasons.exit * viewH) / Math.max(1, size.height);
 
-    const p = reasons.progress;
-    // Blueprint 062: the cover opens first, pages turn in the middle, back cover closes last.
-    const openGoal = MathUtils.smoothstep(p, 0.0, 0.06);
-    coverTurn.current = MathUtils.damp(coverTurn.current, openGoal, 6, delta);
-    const closeGoal = MathUtils.smoothstep(p, 0.93, 1.0);
-    backTurn.current = MathUtils.damp(backTurn.current, closeGoal, 6, delta);
-    const inner = MathUtils.clamp((p - 0.08) / 0.82, 0, 1);
-    const target = inner * Math.max(0, n - 1);
-    book.current?.children.forEach((child) => {
-      if (child.userData.role === 'cover') {
-        child.rotation.y = -Math.PI * coverTurn.current;
-        child.position.z =
-          MathUtils.lerp(n + 1, 0, coverTurn.current) * GAP + 0.01;
+    // Blueprint 065: cover first, one leaf per segment, then the whole book folds shut and stays.
+    const ph = bookPhase(reasons.progress, n);
+    coverTurn.current = MathUtils.damp(coverTurn.current, ph.cover, 6, delta);
+    backTurn.current = MathUtils.damp(backTurn.current, ph.close, 6, delta);
+    const fold = 1 - MathUtils.smootherstep(backTurn.current, 0, 1);
+    const open = coverTurn.current * fold;
+    const bk = book.current;
+    if (!bk) return;
+    bk.position.x = (-PAGE_W / 2) * (1 - open);
+    bk.children.forEach((child) => {
+      const role = child.userData.role;
+      if (role === 'frame') {
+        const extra = child.userData.extra as number;
+        child.scale.x = PAGE_W * (1 + open) + extra;
+        child.position.x = (PAGE_W / 2) * (1 - open);
         return;
       }
-      if (child.userData.role === 'back') {
-        child.rotation.y = -Math.PI * (1 - backTurn.current);
+      if (role === 'left') {
+        child.scale.x = Math.max(0.001, open);
+        return;
+      }
+      if (role === 'cover') {
+        child.rotation.y = -Math.PI * open;
+        const lift = Math.sin(Math.PI * open);
         child.position.z =
-          MathUtils.lerp(0, n + 1, backTurn.current) * GAP - 0.01;
+          MathUtils.lerp(n + 1, 0, open) * GAP + 0.01 + lift * 0.06;
+        kit.coverLeaf.uniforms.uBend.value = lift * 0.45;
+        kit.coverLeaf.uniforms.uShade.value = 1 - lift * 0.2;
+        return;
+      }
+      if (role === 'back') {
+        child.position.z = -0.01;
         return;
       }
       const k = child.userData.leaf as number | undefined;
       if (k === undefined) return;
-      const goal = MathUtils.smoothstep(target - k, 0.3, 0.7);
-      const t = (turns.current[k] = MathUtils.damp(
-        turns.current[k] ?? 0,
-        goal,
-        6,
-        delta,
-      ));
+      const goal = MathUtils.smoothstep(ph.turned - k, 0.3, 0.7);
+      turns.current[k] = MathUtils.damp(turns.current[k] ?? 0, goal, 6, delta);
+      const t = turns.current[k] * fold;
       child.rotation.y = -Math.PI * t;
       child.position.z = MathUtils.lerp(n - k, k, t) * GAP + 0.01;
       const u = kit.leaves[k].uniforms;
@@ -327,6 +399,7 @@ export function ReasonsBook({ tier, items }: { tier: Tier; items: string[] }) {
     <group ref={group} position={[0, 0, -DEPTH]} visible={false}>
       <group ref={book} rotation={[-0.32, 0, 0]}>
         <mesh
+          userData={{ role: 'frame', extra: 0.16 }}
           geometry={kit.box}
           material={kit.edge}
           position={[0, 0, -0.05]}
@@ -334,6 +407,7 @@ export function ReasonsBook({ tier, items }: { tier: Tier; items: string[] }) {
           raycast={none}
         />
         <mesh
+          userData={{ role: 'frame', extra: 0.1 }}
           geometry={kit.box}
           material={kit.board}
           position={[0, 0, -0.02]}
@@ -342,21 +416,15 @@ export function ReasonsBook({ tier, items }: { tier: Tier; items: string[] }) {
         />
         <mesh geometry={kit.spine} material={kit.edge} raycast={none} />
         <mesh
+          userData={{ role: 'left' }}
           geometry={kit.leftPage}
           material={kit.left}
           position={[0, 0, 0.005]}
           raycast={none}
         />
-        {/* Blueprint 062: front cover, hinged at x=0, opens by rotating -PI */}
+        {/* Blueprint 065: front cover with its title, hinged at x=0, opens by rotating -PI */}
         <group userData={{ role: 'cover' }}>
-          <mesh geometry={kit.page} material={kit.board} raycast={none} />
-          <mesh
-            geometry={kit.page}
-            material={kit.edge}
-            scale={[1, 1, 0.01]}
-            position={[0, 0, -0.005]}
-            raycast={none}
-          />
+          <mesh geometry={kit.page} material={kit.coverLeaf} raycast={none} />
         </group>
         {kit.leaves.map((m, k) => (
           <mesh

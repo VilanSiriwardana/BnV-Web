@@ -55,34 +55,38 @@ void main() {
 }
 `;
 
-// Cake particles: the heart's soft sprite style.
+// Blueprint 065: a solid, softly lit cake tier (or striped candle) instead of loose particles.
 export const cakeVertex = /* glsl */ `
-attribute vec4 aRand;
-uniform float uPR;
-uniform float uTime;
-varying vec4 vRand;
+varying vec3 vN;
+varying vec3 vP;
 void main() {
-  vec3 p = position;
-  p.y += 0.01 * sin(uTime * 1.3 + aRand.w * 6.28);
-  vec4 mv = modelViewMatrix * vec4(p, 1.0);
-  gl_PointSize = min(aRand.y * uPR * (20.0 / -mv.z), 5.0 * uPR);
-  gl_Position = projectionMatrix * mv;
-  vRand = aRand;
+  vN = normalize(normal);
+  vP = position;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
 
 export const cakeFragment = /* glsl */ `
-uniform vec3 uColorLav;
-uniform vec3 uColorGold;
-uniform vec3 uColorRose;
+uniform vec3 uBase;
+uniform vec3 uFrost;
+uniform vec3 uTrim;
+uniform float uHalf;
+uniform float uStripe;
 uniform float uVisible;
-varying vec4 vRand;
+varying vec3 vN;
+varying vec3 vP;
 void main() {
-  float d = length(gl_PointCoord - 0.5);
-  if (d > 0.5) discard;
-  float a = smoothstep(0.5, 0.0, d);
-  // vRand.z: 0 = lower tier (lavender), 1 = upper tier (gold), 2 = rim trim (rose).
-  vec3 col = vRand.z < 0.5 ? uColorLav : vRand.z < 1.5 ? uColorGold : uColorRose;
-  gl_FragColor = vec4(min(col * 0.9, vec3(0.75)), a * a * 0.5 * uVisible);
+  float light = 0.55 + 0.45 * max(0.0, dot(vN, normalize(vec3(-0.35, 0.8, 0.6))));
+  float ang = atan(vP.z, vP.x);
+  // Frosting: the top plus a scalloped drip band down the side.
+  float drip = uHalf - (0.18 + 0.1 * abs(sin(ang * 7.0))) * uHalf * 2.0 * 0.35;
+  float frost = max(step(0.6, vN.y), step(drip, vP.y));
+  vec3 col = mix(uBase, uFrost, frost);
+  // Gold trim at the base.
+  col = mix(col, uTrim, step(vP.y, -uHalf + uHalf * 0.12) * (1.0 - step(0.6, abs(vN.y))));
+  // Candle: diagonal stripes.
+  col = mix(col, uTrim, uStripe * step(0.5, fract((vP.y * 14.0 + ang * 0.6))));
+  gl_FragColor = vec4(col * light, uVisible);
+  #include <colorspace_fragment>
 }
 `;

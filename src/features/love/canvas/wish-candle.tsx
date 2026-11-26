@@ -4,9 +4,8 @@ import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import {
   AdditiveBlending,
-  BufferAttribute,
-  BufferGeometry,
   Color,
+  CylinderGeometry,
   type Group,
   MeshBasicMaterial,
   NormalBlending,
@@ -25,40 +24,35 @@ import {
   quadVertex,
   smokeFragment,
 } from './candle-shaders';
-import { mulberry32 } from './heart-geometry';
 import { readTokenColors } from './token-colors';
 
 // Cake layout (world units, relative to the flame's base at the wish-star point).
 const LOWER = { y: -0.78, h: 0.24, r: 0.55 };
 const UPPER = { y: -0.52, h: 0.2, r: 0.4 };
 const STICK = { y: -0.3, h: 0.3, w: 0.05 };
+// Blueprint 065: a slight downward look so the frosted tops read as a cake.
+const TILT = 0.32;
 
-function cakeAttributes(count: number) {
-  const rand = mulberry32(21);
-  const pos = new Float32Array(count * 3);
-  const aRand = new Float32Array(count * 4);
-  for (let i = 0; i < count; i++) {
-    const upper = rand() < 0.42;
-    const tier = upper ? UPPER : LOWER;
-    const rim = rand() < 0.14;
-    const a = rand() * Math.PI * 2;
-    // Front-facing shell plus a filled top: reads as a cylinder from the camera.
-    const top = !rim && rand() < 0.3;
-    const r = top ? tier.r * Math.sqrt(rand()) : tier.r;
-    const y = rim
-      ? tier.y + tier.h / 2
-      : top
-        ? tier.y + tier.h / 2
-        : tier.y + (rand() - 0.5) * tier.h;
-    pos[i * 3] = Math.cos(a) * r;
-    pos[i * 3 + 1] = y;
-    pos[i * 3 + 2] = Math.sin(a) * r * 0.35;
-    aRand[i * 4] = rand();
-    aRand[i * 4 + 1] = 0.6 + rand() * 0.8;
-    aRand[i * 4 + 2] = rim ? 2 : upper ? 1 : 0;
-    aRand[i * 4 + 3] = rand();
-  }
-  return { pos, aRand };
+function tierMaterial(
+  base: Color,
+  frost: Color,
+  trim: Color,
+  half: number,
+  stripe = 0,
+) {
+  return new ShaderMaterial({
+    vertexShader: cakeVertex,
+    fragmentShader: cakeFragment,
+    transparent: true,
+    uniforms: {
+      uBase: { value: base },
+      uFrost: { value: frost },
+      uTrim: { value: trim },
+      uHalf: { value: half },
+      uStripe: { value: stripe },
+      uVisible: { value: 0 },
+    },
+  });
 }
 
 // Romance Additions F5: cake, candle, flame and smoke at the wish-star point. Mounted by
@@ -66,7 +60,8 @@ function cakeAttributes(count: number) {
 export function WishCandle({ tier }: { tier: Tier }) {
   const group = useRef<Group>(null);
   const point = useMemo(() => new Vector3(), []);
-  const count = TIERS[tier].cakeParticles;
+  // Low tiers keep the flat cake (two tinted planes).
+  const solid = TIERS[tier].cakeParticles > 0;
 
   const parts = useMemo(() => {
     const root = document.querySelector<HTMLElement>('[data-love-root]');
@@ -75,6 +70,7 @@ export function WishCandle({ tier }: { tier: Tier }) {
     const lav = c?.primary.night ?? new Color('#b9a3e3');
     const rose = c?.secondary.night ?? new Color('#e8a0b4');
     const ivory = c?.foreground.night ?? new Color('#fff');
+    const cream = ivory.clone().lerp(rose, 0.18);
     const quad = new PlaneGeometry(1, 1);
     const flame = new ShaderMaterial({
       vertexShader: quadVertex,
@@ -105,12 +101,6 @@ export function WishCandle({ tier }: { tier: Tier }) {
         uVisible: { value: 0 },
       },
     });
-    const stick = new MeshBasicMaterial({
-      color: gold,
-      transparent: true,
-      opacity: 0,
-    });
-    // Low tier: flat cake (two tinted planes) instead of particles.
     const flatLower = new MeshBasicMaterial({
       color: lav,
       transparent: true,
@@ -121,34 +111,40 @@ export function WishCandle({ tier }: { tier: Tier }) {
       transparent: true,
       opacity: 0,
     });
-    const cakeMaterial = new ShaderMaterial({
-      vertexShader: cakeVertex,
-      fragmentShader: cakeFragment,
+    const flatStick = new MeshBasicMaterial({
+      color: gold,
       transparent: true,
-      depthWrite: false,
-      blending: AdditiveBlending,
-      uniforms: {
-        uPR: { value: 1 },
-        uTime: { value: 0 },
-        uVisible: { value: 0 },
-        uColorLav: { value: lav },
-        uColorGold: { value: gold },
-        uColorRose: { value: rose },
-      },
+      opacity: 0,
     });
-    return { quad, flame, smoke, stick, flatLower, flatUpper, cakeMaterial };
+    const lowerMat = tierMaterial(
+      rose.clone().multiplyScalar(0.75),
+      cream,
+      gold,
+      LOWER.h / 2,
+    );
+    const upperMat = tierMaterial(
+      lav.clone().multiplyScalar(0.8),
+      cream,
+      gold,
+      UPPER.h / 2,
+    );
+    const stickMat = tierMaterial(cream, cream, rose, STICK.h / 2, 1);
+    return {
+      quad,
+      lowerGeo: new CylinderGeometry(LOWER.r, LOWER.r, LOWER.h, 48),
+      upperGeo: new CylinderGeometry(UPPER.r, UPPER.r, UPPER.h, 48),
+      stickGeo: new CylinderGeometry(STICK.w / 2, STICK.w / 2, STICK.h, 16),
+      flame,
+      smoke,
+      flatLower,
+      flatUpper,
+      flatStick,
+      lowerMat,
+      upperMat,
+      stickMat,
+    };
   }, []);
 
-  const cake = useMemo(() => {
-    if (!count) return null;
-    const { pos, aRand } = cakeAttributes(count);
-    const g = new BufferGeometry();
-    g.setAttribute('position', new BufferAttribute(pos, 3));
-    g.setAttribute('aRand', new BufferAttribute(aRand, 4));
-    return g;
-  }, [count]);
-
-  useEffect(() => () => cake?.dispose(), [cake]);
   useEffect(
     () => () => Object.values(parts).forEach((p) => p.dispose()),
     [parts],
@@ -171,11 +167,11 @@ export function WishCandle({ tier }: { tier: Tier }) {
     su.uTime.value = fu.uTime.value;
     su.uOut.value = candle.out;
     su.uVisible.value = v;
-    const cu = p.cakeMaterial.uniforms;
-    cu.uTime.value = fu.uTime.value;
-    cu.uPR.value = state.gl.getPixelRatio();
-    cu.uVisible.value = v;
-    p.stick.opacity = v;
+    for (const m of [p.lowerMat, p.upperMat, p.stickMat]) {
+      m.uniforms.uVisible.value = v;
+      m.depthWrite = v > 0.99;
+    }
+    p.flatStick.opacity = v;
     p.flatLower.opacity = v * 0.55;
     p.flatUpper.opacity = v * 0.55;
     const vp = state.viewport.getCurrentViewport(
@@ -184,27 +180,41 @@ export function WishCandle({ tier }: { tier: Tier }) {
     );
     const w = ndcToWorld(WISH_STAR_NDC, vp);
     // Blueprint 062: scale the cake to fit inside the medallion ring.
-    const cakeH = UPPER.y + UPPER.h / 2;
-    g.scale.setScalar(Math.min(1, (vp.height * 0.18) / cakeH));
-    g.position.set(w.x, w.y, 0.05);
+    // Blueprint 065: full height, cake base to flame tip (was negative, which mirrored the cake).
+    const cakeH = 0.36 - (LOWER.y - LOWER.h / 2);
+    const s = Math.min(1, (vp.height * 0.24) / cakeH);
+    g.scale.setScalar(s);
+    g.position.set(w.x, w.y + s * 0.25, 0.05);
   });
 
   return (
     <group ref={group} visible={false}>
-      <mesh
-        geometry={parts.quad}
-        material={parts.stick}
-        position={[0, STICK.y, 0]}
-        scale={[STICK.w, STICK.h, 1]}
-      />
-      {cake ? (
-        <points
-          geometry={cake}
-          material={parts.cakeMaterial}
-          frustumCulled={false}
-        />
+      {solid ? (
+        <group rotation={[TILT, 0, 0]}>
+          <mesh
+            geometry={parts.lowerGeo}
+            material={parts.lowerMat}
+            position={[0, LOWER.y, 0]}
+          />
+          <mesh
+            geometry={parts.upperGeo}
+            material={parts.upperMat}
+            position={[0, UPPER.y, 0]}
+          />
+          <mesh
+            geometry={parts.stickGeo}
+            material={parts.stickMat}
+            position={[0, STICK.y, 0]}
+          />
+        </group>
       ) : (
         <>
+          <mesh
+            geometry={parts.quad}
+            material={parts.flatStick}
+            position={[0, STICK.y, 0]}
+            scale={[STICK.w, STICK.h, 1]}
+          />
           <mesh
             geometry={parts.quad}
             material={parts.flatLower}

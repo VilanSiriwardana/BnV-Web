@@ -26,7 +26,7 @@ export function activeNode(
 
 // The arrow strikes just after the heart leaves the last node (the birthdate).
 export const LAST_NODE = NODE_FRACTIONS[NODE_FRACTIONS.length - 1];
-export const ARROW_AFTER = 0.04;
+export const ARROW_AFTER = 0.005; // Blueprint 066: the inhale fills the lead-in
 
 export function pastLastNode(thread: number) {
   return thread >= LAST_NODE + ARROW_AFTER;
