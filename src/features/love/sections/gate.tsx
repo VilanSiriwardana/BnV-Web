@@ -1,12 +1,24 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { type CSSProperties, useEffect, useRef, useState } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import {
+  type CSSProperties,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+
+import { Button } from '@/components/ui/button';
 
 import { audio } from '../engine/audio-engine';
+import { playChime } from '../engine/chime';
 import { useMotionPrefs } from '../engine/motion-prefs';
 import { useLoveScroll } from '../engine/scroll-engine';
 import { useTier } from '../engine/tier-provider';
+import { useHold } from '../hooks/use-hold';
 
 const LOAD_TIMEOUT_MS = 6000;
 const HEART_D =
@@ -23,16 +35,13 @@ const AMBIENT = Array.from({ length: 14 }, (_, i) => {
     sway: `${Math.round((r(5) - 0.5) * 60)}px`,
   };
 });
-const rise = (delay: number, calm: boolean) =>
-  calm
-    ? { initial: false as const }
-    : {
-        initial: { opacity: 0, y: 12 },
-        animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.9, delay, ease: 'easeOut' as const },
-      };
-const RING_R = 54;
-const RING_C = 2 * Math.PI * RING_R;
+const GATE_HOLD_MS = 1400;
+const GATE_REST_SEP = 0.5;
+const GATE_LOAD_SEP = 0.62;
+const GATE_QUIET_SEP = 0.2;
+const GATE_IDLE_NUDGE_MS = 4000;
+const GATE_REFRESH_MS = 650;
+const isHoldKey = (key: string) => key === ' ' || key === 'Enter';
 
 type Props = {
   name: string;
@@ -41,19 +50,51 @@ type Props = {
   sceneReady: boolean;
   /** Seed centre in NDC: the ribbons' meeting point. */
   onEnter: (seed: { x: number; y: number }) => void;
+  eyebrow?: string;
+  hint?: string;
 };
 
-// Experience §5: a fixed overlay. No scroll and no sound until the tap.
-export function Gate({ name, musicSrc, sceneReady, onEnter }: Props) {
+// Experience §5 (Blueprint 072, Two Lights): a fixed overlay. No scroll and no sound until the
+// press; holding brings the two lights together and the merge point seeds the ribbon weave.
+export function Gate({
+  name,
+  musicSrc,
+  sceneReady,
+  onEnter,
+  eyebrow,
+  hint,
+}: Props) {
   const [open, setOpen] = useState(true);
   const [timedOut, setTimedOut] = useState(false);
 
   const { calm } = useMotionPrefs();
   const { tier, setTier } = useTier();
-  const { start, stop } = useLoveScroll();
+  const { start, stop, scrollTo, resize } = useLoveScroll();
+  const rootRef = useRef<HTMLDivElement>(null);
   const seedRef = useRef<HTMLDivElement>(null);
   const enteringRef = useRef(false);
+  const engagedRef = useRef(false);
+  const audioRef = useRef(false);
+  const sepState = useRef({ v: 1 });
+  const sepTween = useRef<gsap.core.Tween | null>(null);
   const ready = sceneReady || timedOut;
+
+  const setSep = useCallback((v: number) => {
+    sepState.current.v = v;
+    rootRef.current?.style.setProperty('--sep', String(v));
+  }, []);
+
+  const tweenSep = useCallback(
+    (to: number, vars: gsap.TweenVars) => {
+      sepTween.current?.kill();
+      sepTween.current = gsap.to(sepState.current, {
+        v: to,
+        ...vars,
+        onUpdate: () => setSep(sepState.current.v),
+      });
+    },
+    [setSep],
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -76,6 +117,34 @@ export function Gate({ name, musicSrc, sceneReady, onEnter }: Props) {
       setTier('low');
   }, [timedOut, sceneReady, tier, setTier]);
 
+  // Intro drift (1 → load → rest) and one idle nudge; GSAP only writes --sep.
+  useEffect(() => {
+    if (calm) {
+      sepTween.current?.kill();
+      setSep(GATE_QUIET_SEP);
+      return;
+    }
+    if (engagedRef.current) return;
+    if (!ready) {
+      setSep(1);
+      tweenSep(GATE_LOAD_SEP, { duration: 5, ease: 'sine.out' });
+      return;
+    }
+    tweenSep(GATE_REST_SEP, { duration: 1.2, ease: 'power2.out' });
+    const id = window.setTimeout(() => {
+      if (engagedRef.current) return;
+      tweenSep(GATE_REST_SEP - 0.05, {
+        duration: 0.6,
+        yoyo: true,
+        repeat: 1,
+        ease: 'sine.inOut',
+      });
+    }, GATE_IDLE_NUDGE_MS);
+    return () => window.clearTimeout(id);
+  }, [calm, ready, setSep, tweenSep]);
+
+  useEffect(() => () => void sepTween.current?.kill(), []);
+
   function enter() {
     if (!ready || !open || enteringRef.current) return;
     enteringRef.current = true;
@@ -89,6 +158,8 @@ export function Gate({ name, musicSrc, sceneReady, onEnter }: Props) {
         }
       : { x: 0, y: 0 };
     setOpen(false);
+    // A restored scroll position would leave the weave off-screen.
+    scrollTo(0, { immediate: true, force: true });
     start();
     try {
       onEnter(seed);
@@ -96,38 +167,66 @@ export function Gate({ name, musicSrc, sceneReady, onEnter }: Props) {
       // The page is still usable if the optional 3D entrance cannot start.
       console.error('Love site entrance animation failed', error);
     }
+    // Re-measure once the overlay has faded (fonts and layout may have settled under it).
+    window.setTimeout(() => {
+      resize();
+      ScrollTrigger.refresh();
+    }, GATE_REFRESH_MS);
   }
 
-  const shown = ready ? 100 : 35;
+  const { handlers } = useHold({
+    duration: GATE_HOLD_MS,
+    completeOnClick: calm,
+    onProgress: (p) => {
+      if (!calm) setSep(GATE_REST_SEP * (1 - p * p));
+    },
+    onComplete: () => {
+      seedRef.current?.classList.add('love-gate-merge');
+      playChime(0);
+      enter();
+    },
+  });
+
+  // First real gesture: hide the hint and unlock audio synchronously (a timer is not a gesture).
+  function engage() {
+    if (!ready || enteringRef.current) return false;
+    if (!engagedRef.current) {
+      engagedRef.current = true;
+      if (rootRef.current) rootRef.current.dataset.engaged = '';
+      sepTween.current?.kill();
+    }
+    if (!audioRef.current) {
+      audioRef.current = true;
+      audio.start(musicSrc);
+    }
+    return true;
+  }
+
+  function tapOnce() {
+    if (!engage()) return;
+    if (calm) return enter();
+    tweenSep(0, { duration: 0.5, ease: 'power1.in', onComplete: enter });
+  }
 
   return (
     <AnimatePresence>
       {open && (
         <motion.div
+          ref={rootRef}
           role="dialog"
           aria-modal
           aria-labelledby="gate-title"
           aria-busy={!ready}
+          data-quiet={calm ? 'true' : undefined}
+          data-lenis-prevent
           initial={false}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="love-gate text-foreground fixed inset-0 z-40 flex flex-col items-center overflow-hidden px-6 text-center"
+          className="love-gate text-foreground fixed inset-0 z-40 flex min-h-svh flex-col items-center overflow-hidden px-6 text-center"
         >
           <div
             aria-hidden
-            className="love-gate-frame pointer-events-none absolute inset-4 rounded-[1.5rem] sm:inset-7"
-          />
-          <div
-            aria-hidden
-            className="love-gate-frame-inner pointer-events-none absolute inset-6 rounded-[1.25rem] sm:inset-10"
-          />
-          <div
-            aria-hidden
             className="love-grain pointer-events-none absolute inset-0"
-          />
-          <div
-            aria-hidden
-            className="love-gate-halo pointer-events-none absolute top-[12%] left-1/2 size-[min(90vw,34rem)] -translate-x-1/2 rounded-full"
           />
           {!calm && (
             <div
@@ -154,135 +253,71 @@ export function Gate({ name, musicSrc, sceneReady, onEnter }: Props) {
               ))}
             </div>
           )}
-          <div className="relative z-10 my-auto flex w-full max-w-xl flex-col items-center py-6">
-            <motion.p
-              {...rise(0.1, calm)}
-              className="text-label text-foreground/70 font-sans tracking-[0.3em] uppercase"
-            >
-              A birthday story
-            </motion.p>
-            <motion.h2
-              {...rise(0.3, calm)}
-              id="gate-title"
-              className="font-display love-gate-shimmer mt-3 text-[clamp(2.6rem,8vw,4.2rem)] leading-tight"
-            >
-              For {name}
-            </motion.h2>
-            <motion.span
-              {...rise(0.5, calm)}
-              aria-hidden
-              className="via-gold/70 mt-4 mb-10 h-px w-24 bg-gradient-to-r from-transparent to-transparent"
-            />
-            <motion.div {...rise(0.7, calm)} className="relative">
-              <div
-                aria-hidden
-                className="text-gold-text absolute right-[calc(100%-2.5rem)] bottom-[calc(100%-1.75rem)] flex w-32 flex-col items-start sm:w-40 md:top-1/2 md:right-auto md:bottom-auto md:left-[calc(100%+0.5rem)] md:-translate-y-1/2"
-              >
-                <span className="font-body -rotate-6 text-[clamp(1.4rem,5vw,1.8rem)] italic">
-                  Tap this
-                </span>
-                <svg
-                  viewBox="0 0 120 70"
-                  className="-mt-1 ml-6 w-24 sm:w-28 md:ml-0 md:-scale-x-100"
-                >
-                  <motion.path
-                    d="M 8 6 C 30 40, 62 58, 104 56"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    initial={{ pathLength: calm ? 1 : 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{
-                      duration: 1.2,
-                      delay: 0.4,
-                      ease: 'easeInOut',
-                    }}
-                  />
-                  <motion.path
-                    d="M 94 47 L 106 56 L 93 64"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    initial={{ opacity: calm ? 1 : 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.3, delay: 1.5 }}
-                  />
-                </svg>
-              </div>
-              <motion.button
-                type="button"
-                autoFocus
-                aria-label={ready ? 'Begin' : 'Getting ready'}
-                aria-disabled={!ready}
-                onClick={enter}
-                animate={calm || !ready ? undefined : { scale: [1, 1.04, 1] }}
-                transition={{
-                  duration: 2.4,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-                className="focus-ring relative grid size-40 cursor-pointer place-items-center rounded-full sm:size-48"
-              >
-                <span
-                  aria-hidden
-                  className="border-gold/30 absolute inset-2 rounded-full border"
-                />
-                <svg
-                  aria-hidden
-                  viewBox="0 0 120 120"
-                  className={`absolute inset-0 size-full -rotate-90 ${ready || calm ? '' : '[animation-duration:2.4s] motion-safe:animate-spin'}`}
-                >
-                  <circle
-                    cx="60"
-                    cy="60"
-                    r={RING_R}
-                    fill="none"
-                    strokeWidth="1"
-                    className="stroke-primary transition-[stroke-dashoffset,opacity] duration-500"
-                    strokeDasharray={RING_C}
-                    strokeDashoffset={RING_C * (1 - shown / 100)}
-                    opacity={ready ? 0 : 0.6}
-                  />
-                </svg>
-                <div
-                  ref={seedRef}
-                  aria-hidden
-                  data-love-seed={calm ? undefined : ''}
-                  className="absolute size-28 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--gold)_55%,transparent)_0%,color-mix(in_oklab,var(--primary)_35%,transparent)_40%,transparent_72%)] blur-md"
-                />
-                <svg
-                  aria-hidden
-                  viewBox="0 0 100 92"
-                  className="relative w-20 drop-shadow-[0_0_18px_var(--gold)] sm:w-24"
-                >
-                  <defs>
-                    <radialGradient id="gate-heart" cx="40%" cy="35%" r="75%">
-                      <stop offset="0%" stopColor="var(--gold)" />
-                      <stop offset="45%" stopColor="var(--primary)" />
-                      <stop offset="100%" stopColor="var(--secondary)" />
-                    </radialGradient>
-                  </defs>
-                  <path
-                    d={HEART_D}
-                    fill="url(#gate-heart)"
-                    stroke="var(--gold)"
-                    strokeWidth="2"
-                  />
-                </svg>
-              </motion.button>
-            </motion.div>
-            <p aria-live="polite" className="sr-only">
-              {ready ? '' : 'Getting ready…'}
+          <span aria-hidden className="love-gate-line love-gate-line--t" />
+          <span aria-hidden className="love-gate-line love-gate-line--r" />
+          <span aria-hidden className="love-gate-line love-gate-line--b" />
+          <span aria-hidden className="love-gate-line love-gate-line--l" />
+          <div className="relative z-10 mt-[14svh] flex w-full max-w-xl flex-col items-center">
+            <p className="love-gate-eyebrow love-gate-rise text-label text-foreground/70 font-sans tracking-[0.3em] uppercase">
+              {eyebrow ?? 'Made for you'}
             </p>
-            <motion.p
-              {...rise(1, calm)}
-              className="font-body text-foreground/80 mt-6 text-[clamp(1.1rem,4vw,1.4rem)] italic"
+            <h2
+              id="gate-title"
+              className="font-display love-gate-rise mt-3 text-[clamp(2.6rem,8vw,4.2rem)] leading-tight"
             >
+              <span className="love-gate-shimmer">For {name}</span>
+            </h2>
+            <p className="font-body text-foreground/80 love-gate-rise mt-4 text-[clamp(1.1rem,4vw,1.4rem)] italic [animation-delay:.4s]">
               A story waiting to unfold.
-            </motion.p>
+            </p>
+          </div>
+          <div aria-hidden className="love-gate-halo-soft" />
+          <div
+            aria-hidden
+            className="love-gate-light love-gate-light--lavender"
+          >
+            <span />
+          </div>
+          <div aria-hidden className="love-gate-light love-gate-light--gold">
+            <span />
+          </div>
+          <button
+            type="button"
+            autoFocus
+            aria-label={ready ? 'Begin' : 'Getting ready'}
+            aria-disabled={!ready}
+            aria-describedby="gate-instr"
+            className="peer absolute inset-0 z-20 cursor-pointer touch-none bg-transparent outline-none"
+            {...handlers}
+            onPointerDown={(e) => {
+              if (engage()) handlers.onPointerDown(e);
+            }}
+            onKeyDown={(e) => {
+              if (isHoldKey(e.key) && !e.repeat && !engage()) {
+                e.preventDefault();
+                return;
+              }
+              handlers.onKeyDown(e);
+            }}
+          />
+          <div
+            ref={seedRef}
+            aria-hidden
+            className="love-gate-core peer-focus-visible:outline-gold rounded-full peer-focus-visible:outline-2 peer-focus-visible:outline-offset-8"
+          />
+          <p id="gate-instr" className="sr-only">
+            Press and hold to bring the two lights together, or tap once.
+          </p>
+          <p aria-live="polite" className="sr-only">
+            {ready ? '' : 'Getting ready…'}
+          </p>
+          <div className="love-gate-hint absolute bottom-[12svh] z-30 flex flex-col items-center gap-1">
+            <p className="font-body text-foreground/70 italic">
+              {hint ?? 'Press and hold'}
+            </p>
+            <Button variant="love-link" size="inline" onClick={tapOnce}>
+              Or tap once
+            </Button>
           </div>
         </motion.div>
       )}

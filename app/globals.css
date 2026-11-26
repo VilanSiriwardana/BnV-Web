@@ -161,17 +161,17 @@
 
 /* The gate uses the Love Site's night palette before the story begins. */
 [data-love-root] .love-gate {
+  /* Same near-black night as the story, with only a faint glow behind the lights and a vignette. */
   background:
     radial-gradient(
-      ellipse 58% 42% at 50% 33%,
-      color-mix(in oklab, var(--night-primary) 12%, transparent),
-      color-mix(in oklab, var(--night-primary) 5%, transparent) 40%,
-      transparent 72%
+      ellipse 120% 90% at 50% 50%,
+      transparent 45%,
+      color-mix(in oklab, black 55%, transparent) 100%
     ),
     radial-gradient(
-      ellipse 46% 35% at 94% 88%,
-      color-mix(in oklab, var(--night-gold) 12%, transparent),
-      transparent 78%
+      ellipse 34% 24% at 50% 50%,
+      color-mix(in oklab, var(--night-primary) 5%, transparent),
+      transparent 70%
     ),
     var(--night-background);
 }
@@ -262,6 +262,176 @@
   }
   [data-love-root] .love-gate-shimmer {
     animation: none;
+  }
+}
+
+/* Blueprint 072: Two Lights gate. GSAP writes --sep (0 merged, 1 apart) on the root. */
+[data-love-root] .love-gate {
+  --sep: 1;
+  --gate-reach: min(34vw, 18rem);
+}
+[data-love-root] .love-gate-light {
+  position: fixed;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  translate: -50% -50%;
+}
+[data-love-root] .love-gate-light > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    var(--c) 0 35%,
+    color-mix(in oklab, var(--c) 35%, transparent) 50%,
+    transparent 72%
+  );
+  box-shadow:
+    0 0 24px 6px color-mix(in oklab, var(--c) 55%, transparent),
+    0 0 90px 30px color-mix(in oklab, var(--c) 22%, transparent);
+  animation: love-gate-drift 5.5s ease-in-out infinite;
+}
+[data-love-root] .love-gate-light--lavender {
+  --c: var(--primary);
+  left: calc(50% - var(--sep) * var(--gate-reach));
+}
+[data-love-root] .love-gate-light--gold {
+  --c: var(--gold);
+  left: calc(50% + var(--sep) * var(--gate-reach));
+}
+[data-love-root] .love-gate-light--gold > span {
+  animation-duration: 7s;
+  animation-direction: reverse;
+}
+@keyframes love-gate-drift {
+  0%,
+  100% {
+    transform: translateY(-6px);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+[data-love-root] .love-gate-core {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  translate: -50% -50%;
+  background: radial-gradient(
+    circle,
+    var(--gold) 0 30%,
+    color-mix(in oklab, var(--primary) 60%, transparent) 55%,
+    transparent 75%
+  );
+  opacity: calc(1 - var(--sep) * 2);
+  pointer-events: none;
+}
+[data-love-root] .love-gate-halo-soft {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: min(70vw, 26rem);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--primary) 18%, transparent),
+    transparent 65%
+  );
+  opacity: calc((1 - var(--sep)) * 0.8);
+  pointer-events: none;
+}
+[data-love-root] .love-gate-merge {
+  animation: love-gate-merge 300ms ease-out forwards;
+}
+@keyframes love-gate-merge {
+  to {
+    transform: scale(2.4);
+    filter: brightness(1.8);
+  }
+}
+[data-love-root] .love-gate-line {
+  position: absolute;
+  background: color-mix(in oklab, var(--gold) 60%, transparent);
+  pointer-events: none;
+  animation: love-gate-draw 0.9s ease-out backwards;
+}
+[data-love-root] .love-gate-line--t,
+[data-love-root] .love-gate-line--b {
+  left: 12px;
+  right: 12px;
+  height: 1px;
+  --draw: scaleX(0);
+}
+[data-love-root] .love-gate-line--r,
+[data-love-root] .love-gate-line--l {
+  top: 12px;
+  bottom: 12px;
+  width: 1px;
+  --draw: scaleY(0);
+}
+[data-love-root] .love-gate-line--t {
+  top: 12px;
+  transform-origin: left;
+  animation-delay: 0.6s;
+}
+[data-love-root] .love-gate-line--r {
+  right: 12px;
+  transform-origin: top;
+  animation-delay: 1.1s;
+}
+[data-love-root] .love-gate-line--b {
+  bottom: 12px;
+  transform-origin: right;
+  animation-delay: 1.6s;
+}
+[data-love-root] .love-gate-line--l {
+  left: 12px;
+  transform-origin: bottom;
+  animation-delay: 2.1s;
+}
+@keyframes love-gate-draw {
+  from {
+    transform: var(--draw);
+  }
+}
+[data-love-root] .love-gate-rise {
+  animation: love-gate-rise 1.6s ease-out 0.2s backwards;
+}
+@keyframes love-gate-rise {
+  from {
+    opacity: 0;
+    filter: blur(12px);
+  }
+}
+[data-love-root] .love-gate-hint {
+  animation: love-gate-fade 0.8s ease-out 4s backwards;
+  transition: opacity 0.4s ease;
+}
+@keyframes love-gate-fade {
+  from {
+    opacity: 0;
+  }
+}
+[data-love-root] .love-gate-eyebrow {
+  transition: opacity 0.4s ease;
+}
+[data-love-root]
+  .love-gate[data-engaged]
+  :is(.love-gate-hint, .love-gate-eyebrow) {
+  opacity: 0;
+}
+[data-love-root] .love-gate[data-quiet='true'] :is(*, *::before) {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-love-root] .love-gate :is(*, *::before) {
+    animation: none !important;
   }
 }
 

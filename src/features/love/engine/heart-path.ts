@@ -41,8 +41,8 @@ type PathEntry = {
 // Resting pose at the end of each section. Mobile rule: top 30 % or bottom-right while text shows.
 export const HEART_PATH: Record<SectionId, PathEntry> = {
   hero: {
-    desktop: { x: 0, y: 0.05, scale: 1 },
-    mobile: { x: 0, y: 0.25, scale: 0.9 },
+    desktop: { x: 0, y: 0.22, scale: 1 },
+    mobile: { x: 0, y: 0.36, scale: 0.9 },
     gold: 0,
     // Matches the intro glow (heart-state) so nothing brightens once the intro settles.
     glow: 0.4,

@@ -7,6 +7,8 @@ export const site: LoveSiteConfig = {
   sender: { name: 'Vilan' },
   birthday: '2026-11-29',
   copy: {
+    gateEyebrow: 'Made for you',
+    gateHint: 'Press and hold',
     heroSub: 'Some lights find each other.',
     bloomLine: 'Every moment with you opens like this.',
     memoriesHint: 'Touch a memory.',

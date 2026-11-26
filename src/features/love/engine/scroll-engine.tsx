@@ -75,6 +75,10 @@ export function useLoveScroll() {
 
   const stop = useCallback(() => lenis?.stop(), [lenis]);
   const start = useCallback(() => lenis?.start(), [lenis]);
+  const resize = useCallback(() => lenis?.resize(), [lenis]);
 
-  return useMemo(() => ({ scrollTo, stop, start }), [scrollTo, stop, start]);
+  return useMemo(
+    () => ({ scrollTo, stop, start, resize }),
+    [scrollTo, stop, start, resize],
+  );
 }

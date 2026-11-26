@@ -156,6 +156,14 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
         />
         <Memories hint={site.copy.memoriesHint} memories={site.memories} />
         <Timeline title={site.copy.timelineTitle} items={site.timeline} />
+        <Starlight
+          line={site.copy.starlightLine}
+          hint={site.copy.skyHint ?? 'Join the stars, one to the next.'}
+          done={site.copy.skyDone ?? 'It was always a heart.'}
+          reveal={site.copy.skyReveal ?? []}
+          slug={site.slug}
+          memories={site.memories}
+        />
         <Gallery
           title={site.copy.galleryTitle}
           photos={site.gallery}
@@ -165,14 +173,7 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
           plaque={site.copy.galleryPlaque}
           ritual={site.copy.galleryRitual}
         />
-        <Starlight
-          line={site.copy.starlightLine}
-          hint={site.copy.skyHint ?? 'Join the stars, one to the next.'}
-          done={site.copy.skyDone ?? 'It was always a heart.'}
-          reveal={site.copy.skyReveal ?? []}
-          slug={site.slug}
-          memories={site.memories}
-        />
+
         <Dance title={site.copy.danceTitle} line={site.copy.danceLine} />
         <Reasons
           title={site.copy.reasonsTitle ?? 'Reasons'}
@@ -201,6 +202,8 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
       <Gate
         name={name}
         musicSrc={site.music.src}
+        eyebrow={site.copy.gateEyebrow}
+        hint={site.copy.gateHint}
         sceneReady={canvasReady || !showCanvas}
         onEnter={(seed) => {
           setEntered(true);

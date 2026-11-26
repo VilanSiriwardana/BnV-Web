@@ -16,7 +16,6 @@ import {
   type SectionId,
   WISH_REST,
 } from './heart-path';
-import { requestGalleryReveal } from './gallery-reveal';
 import { heart } from './heart-state';
 import { REDUCED_MOTION_QUERY } from './motion-prefs';
 
@@ -409,9 +408,7 @@ function arrowStrike(tl: gsap.core.Timeline) {
       hit,
     )
     .set(heart, { arrow: 0, burstScale: 1.35 }, hit)
-    .call(() => spawnTapHearts(10), [], hit)
-    // Blueprint 071: the blast opens the heart-iris onto the gallery door.
-    .call(() => requestGalleryReveal(), [], hit + 0.25);
+    .call(() => spawnTapHearts(10), [], hit);
   burst(tl, {}, hit);
   tl.to({}, { duration: 0.5 });
   reform(tl, false);

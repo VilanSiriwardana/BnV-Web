@@ -1080,3 +1080,25 @@ Implemented M28–M33 in the order M28 → M32 → M29 → M31 → M30 → M33:
 ### Verification
 
 - `tsc --noEmit`, eslint (love) and vitest (love, 135 tests) pass. Not checked visually in a browser.
+
+## 2026-11-26: Blueprint 072 (Two Lights gate, Lenis handoff)
+
+- `sections/gate.tsx`: Gate rebuilt as two lights joined by press-and-hold (`useHold`, 1.4 s). `--sep` is written by hold progress; GSAP only for intro drift and an idle nudge. Removed frame, arrow, ring, heart button and halo; ambient hearts kept. Audio starts on first press. Seed now measured from the merge core.
+- Lenis: scroll reset to top before `start()`, and `resize()` + `ScrollTrigger.refresh()` 650 ms after entry. `engine/scroll-engine.tsx` `useLoveScroll` exposes `resize`.
+- Config: optional `copy.gateEyebrow` / `copy.gateHint`, passed to Gate from `love-experience.tsx`. `app/globals.css`: additive `love-gate-*` rules (old frame/halo rules left as dead code).
+- Owner TODO: "A story waiting to unfold." is still a placeholder in `gate.tsx`.
+
+### Verification
+
+- `tsc --noEmit`, eslint (changed files) and vitest (39 files, 177 tests) pass. Full `npm run lint` ran out of memory (V8 crash), so it was run on the changed files only. Not checked on devices or in a browser.
+
+## 2026-11-26: Blueprint 073 (Starlight before Gallery, scrubbed gallery entry)
+
+- Order is Timeline → Starlight → Gallery → Dance again (`love-experience.tsx`, `story.ts` `sections`). This reverts the order change from blueprint 071.
+- `story.ts`: Starlight starts from the Timeline pose; `buildGallery` restores the pre-071 approach scrub (Starlight pose → gallery pose, `top bottom` → `top 20%`); Dance starts from the gallery pose.
+- `heart-director.ts` `arrowStrike`: no longer calls `requestGalleryReveal`. `HeartIris` / `gallery-reveal.ts` are now dormant (cleanup later).
+- Guidebook §4 already lists this order; no doc edit needed.
+
+### Verification
+
+- `tsc --noEmit`, eslint (changed files) and vitest (love: 33 files, 140 tests) pass. Not checked in a browser.

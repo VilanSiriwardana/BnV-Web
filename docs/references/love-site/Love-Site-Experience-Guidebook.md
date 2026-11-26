@@ -372,17 +372,18 @@ Positions are converted to world units with the live viewport at the heart's dep
 
 **Intent:** a hush before the show; the user gesture that unlocks audio; the loading screen for the 3D chunk.
 
-**As built** (`sections/gate.tsx`):
+**As built** (`sections/gate.tsx`, Blueprint 072 "Two Lights"):
 
-- A modal (`aria-modal`) full-viewport night composition with a **double gold frame**, canvas grain and a slow breathing halo (scale 1 → 1.04, 2.4 s).
-- Title "For {name}" above; one line below, "A story waiting to unfold."
-- The centre is a **glowing heart that is the button** (`aria-label` "Begin", or "Getting ready" while loading; `autoFocus`; Enter/Space work). It pulses at about 72 bpm (CSS `love-seed-pulse`, 833 ms).
-- Script text **"Tap this"** with a hand-drawn gold arrow that draws in (1.2 s, 0.4 s delay); top-left of the heart on phones, to its right from `md` up so it never meets the title.
-- Loading: a thin ring (r 54) spins around the heart; "Getting ready…" for screen readers only; the button uses `aria-disabled`. Readiness comes from the canvas `onCreated`; after **6 s** it continues anyway and drops high/mid to the low tier.
-- On tap, in order: start audio (synchronously in the gesture) → capture the heart's NDC as the seed → fade out over 600 ms → `lenis.start()` → trigger `ribbonWeave` from the seed.
-- Reduced motion: no breathing; arrow shown already drawn.
+- A modal (`aria-modal`, `data-lenis-prevent`) full-viewport night composition: canvas grain, the 14 ambient rising hearts, and four 1 px gold hairlines that draw in clockwise (0.6–2.1 s).
+- Text: small caps `copy.gateEyebrow` (default "Made for you"), "For {name}" (blur-rise, shimmer), then "A story waiting to unfold." (placeholder; the owner should replace it with a personal line).
+- Two lights, lavender (`--primary`) and gold (`--gold`), sit apart at viewport centre. Their spacing is one CSS variable, `--sep`, on the gate root. GSAP drifts it 1 → 0.62 while loading and → 0.5 when ready, plus one idle nudge after 4 s.
+- The control is one transparent full-screen `<button>` (`aria-label` "Begin"/"Getting ready", `aria-disabled` while loading, `autoFocus`). **Press and hold** (`useHold`, 1.4 s) pulls the lights together; `useHold` progress writes `--sep` directly, and early release eases back. The focus ring shows on the merge core. Hint `copy.gateHint` (default "Press and hold") and an "Or tap once" link fade in at 4 s and hide on first press.
+- Audio starts on the first press (synchronously in the gesture), so the music fades in during the hold. On merge: core flash, `playChime(0)`, then the unchanged entry: seed NDC from the merge core → 600 ms fade → Lenis scroll reset to top (`immediate`, `force`) → `lenis.start()` → `onEnter` (ribbon weave). 650 ms later Lenis `resize()` and `ScrollTrigger.refresh()` re-measure.
+- Loading: "Getting ready…" for screen readers; after **6 s** it continues anyway and drops high/mid to the low tier.
+- Removed: double frame, "Tap this" and arrow, loading ring, heart button and breathing halo.
+- Quiet / reduced motion: static lights (`--sep` 0.2), no CSS animations, a single tap enters.
 
-**Acceptance:** no scroll and no audio before the tap; missing audio does not block; LCP is the gate text/heart.
+**Acceptance:** no scroll and no audio before the first press; missing audio does not block; LCP is the gate text; the weave starts from screen centre; the page starts at the top after entry.
 
 ---
 

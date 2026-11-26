@@ -24,6 +24,8 @@ export function HeartIris() {
     let safety: gsap.core.Tween | null = null;
     const finish = () => {
       gsap.set(root.current, { autoAlpha: 0 });
+      // Closed again, so the next scrubbed veil (story.ts buildGallery) is solid night.
+      hole.current?.setAttribute('transform', 'scale(0)');
       endGalleryReveal();
     };
     const off = onGalleryReveal(() => {
@@ -85,13 +87,14 @@ export function HeartIris() {
     <div
       ref={root}
       aria-hidden
+      data-gallery-veil
       className="pointer-events-none invisible fixed inset-0 z-40 opacity-0"
     >
       <svg className="h-full w-full">
         <defs>
           <mask id="love-heart-iris" maskUnits="userSpaceOnUse">
             <rect width="100%" height="100%" fill="white" />
-            <g ref={hole}>
+            <g ref={hole} transform="scale(0)">
               <path d={HEART} fill="black" />
             </g>
           </mask>

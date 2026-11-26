@@ -20,6 +20,10 @@ export type LoveSiteConfig = {
     timelineTitle: string;
     starlightLine: string;
     galleryTitle: string;
+    /** Gate small-caps line; default "Made for you". */
+    gateEyebrow?: string;
+    /** Gate hold hint; default "Press and hold". */
+    gateHint?: string;
     /** Gallery entrance pop-up; default "Welcome, {recipient}". */
     galleryWelcome?: string;
     /** Blueprint 067: heading painted on the gallery door arch. */
