@@ -18,19 +18,18 @@ import {
   setRitualPointer,
   setRitualSwipe,
 } from '../engine/gallery-ritual';
-import { galleryState } from '../engine/gallery-state';
 import { REDUCED_MOTION_QUERY } from '../engine/motion-prefs';
 
 if (typeof window !== 'undefined')
   gsap.registerPlugin(SplitText, DrawSVGPlugin);
 
 export const DEFAULT_RITUAL_PROMPTS: [string, string, string] = [
-  'Swing across the glass, Buwi',
+  'Swing down onto the glass, Buwi',
   'Carefully take the key…',
   'Now place it in the lock',
 ];
 const HINTS = [
-  'Try one long stroke across the glass',
+  'Try one long stroke down through the glass',
   'Bring the key right up to the keyhole',
   'Bring the key right up to the keyhole',
 ];
@@ -50,7 +49,7 @@ type Props = {
 };
 
 // Blueprints 053–054: while the gallery door is locked this layer takes every pointer, wheel and
-// touch (scroll stays locked until the doors open). A diagonal swipe swings the hammer; drag the
+// touch (scroll stays locked until the doors open). A downward swipe swings the hammer; drag the
 // key to the lock. The step buttons appear after 3 misses or when she taps Help.
 export function GalleryRitualOverlay({
   mode,
@@ -100,7 +99,7 @@ export function GalleryRitualOverlay({
     const word = new SplitText(q('[data-welcome-word]'), { type: 'chars' });
     const name = new SplitText(q('[data-welcome-name]'), { type: 'chars' });
     const tl = gsap
-      .timeline()
+      .timeline({ paused: true })
       .set(root, { autoAlpha: 1, y: 0, scale: 1 })
       .fromTo(
         q('[data-welcome-bloom]'),
@@ -150,45 +149,22 @@ export function GalleryRitualOverlay({
         { scale: 0, duration: 0.4, ease: 'back.out(3)' },
         '<0.3',
       )
-      .add(() => seat(), '+=1.2');
-    // Blueprint 061: fly onto the arch, then hand over to the in-scene plaque (gallery-doorway.tsx).
-    let flight: gsap.core.Timeline | null = null;
-    const seat = () => {
-      const plaque = galleryState.welcome;
-      if (!plaque.ready || plaque.w < 8) {
-        flight = gsap.timeline().to(root, {
-          y: '-30svh',
-          scale: 0.55,
-          duration: 0.9,
-          ease: 'power2.inOut',
-        });
-        return;
-      }
-      const name = root.querySelector<HTMLElement>('[data-welcome-name]');
-      const r = root.getBoundingClientRect();
-      const nameW = name?.offsetWidth || r.width;
-      const scale = Math.min(1, (plaque.w * 0.62) / nameW);
-      flight = gsap
-        .timeline()
-        .to(root, {
-          x: () => galleryState.welcome.x - (r.left + r.width / 2),
-          y: () => galleryState.welcome.y - (r.top + r.height / 2),
-          scale,
-          duration: 0.9,
-          ease: 'power2.inOut',
-        })
-        .to(galleryState.welcome, { seat: 1, duration: 0.4 }, '-=0.1')
-        .to(root, { autoAlpha: 0, duration: 0.4 }, '<');
-    };
+      // Blueprint 067: hold, then fade as she walks through the doors.
+      .to(
+        root,
+        { autoAlpha: 0, y: -24, duration: 0.8, ease: 'power1.in' },
+        '+=0.6',
+      );
+    // Blueprint 067: the welcome is scrubbed by the doors opening (scroll), not played on a timer.
+    const tick = () =>
+      void tl.progress(gsap.utils.clamp(0, 1, ritualState.door * 1.15));
     if (window.matchMedia(REDUCED_MOTION_QUERY).matches) {
       tl.kill();
-      galleryState.welcome.seat = 1;
       gsap.set(root, { autoAlpha: 0 });
-    }
+    } else gsap.ticker.add(tick);
     return () => {
+      gsap.ticker.remove(tick);
       tl.kill();
-      flight?.kill();
-      galleryState.welcome.seat = 0;
       word.revert();
       name.revert();
       gsap.to(root, {
@@ -200,7 +176,7 @@ export function GalleryRitualOverlay({
     };
   }, []);
 
-  // The touch ring marks the next target; the diagonal arrow shows the stroke over the case.
+  // The touch ring marks the next target; the downward arrow shows the stroke over the case.
   useEffect(() => {
     const draw = gsap.fromTo(
       arrow.current?.querySelectorAll('path') ?? [],
@@ -297,8 +273,9 @@ export function GalleryRitualOverlay({
         if (length < ATTEMPT_PX) return;
         const across =
           distanceToSegment(s.case, from, e) <= Math.max(60, s.case.r * 1.6);
-        if (!across || length < SWIPE_PX) return fail();
-        setRitualSwipe(dx, dy);
+        const down = dy > 0 && dy >= Math.abs(dx) * 0.6;
+        if (!across || !down || length < SWIPE_PX) return fail();
+        setRitualSwipe();
         sendRitual({ type: 'swipe' });
       }}
     >
@@ -318,8 +295,8 @@ export function GalleryRitualOverlay({
         strokeLinejoin="round"
         className="text-gold pointer-events-none fixed top-0 left-0 opacity-0 drop-shadow-[0_0_6px_var(--love-aurora-gold)]"
       >
-        <path d="M12 12 C30 22 60 52 84 84" strokeDasharray="5 6" />
-        <path d="M70 86 L86 86 L86 70" />
+        <path d="M50 8 C56 30 56 60 50 86" strokeDasharray="5 6" />
+        <path d="M40 76 L50 88 L60 76" />
       </svg>
 
       <p className="sr-only" aria-live="polite">
@@ -364,7 +341,7 @@ export function GalleryRitualOverlay({
               type="button"
               className={pill}
               onClick={() => {
-                setRitualSwipe(1, 1);
+                setRitualSwipe();
                 sendRitual({ type: 'swipe' });
               }}
             >

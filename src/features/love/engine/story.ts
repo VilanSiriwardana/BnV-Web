@@ -29,7 +29,8 @@ import {
   INTRO,
   LAST_NODE,
   OUTRO,
-  pastLastNode,
+  pastSpiral,
+  STRIKE_AT,
   threadProgress,
 } from './timeline-progress';
 import type { Tier } from './tiers';
@@ -433,12 +434,19 @@ const buildTimeline: SectionBuilder = (root, mobile) => {
         activate(i, i > last);
         last = i;
       }
-      if (pastLastNode(tp) && armed) armed = !director.interrupt('arrowStrike');
+      // Blueprint 067: over the last stretch the petals stream into the heart as she scrolls.
+      if (armed && !director.isBusy() && tp >= LAST_NODE) {
+        const flow = Math.min(1, (tp - LAST_NODE) / (STRIKE_AT - LAST_NODE));
+        heart.petalGather = flow * 0.85;
+        heart.petalShiver = flow;
+      }
+      if (pastSpiral(tp) && armed) armed = !director.interrupt('arrowStrike');
       if (tp < LAST_NODE - 0.03 && !armed) {
         armed = true;
+        heart.petalShiver = 0;
         director.resetBoost();
         // Blueprint 066: back above the strike, petals burst out of the heart again.
-        director.setBaseline('timeline');
+        director.petalsIn();
       }
     },
   });

@@ -13,6 +13,7 @@ export const site: LoveSiteConfig = {
     timelineTitle: 'How we got here',
     starlightLine: 'And the stars keep coming out for us.',
     galleryTitle: 'Us, in daylight',
+    galleryPlaque: 'Our Gallery',
     danceTitle: 'My favourite dance partner',
     danceLine:
       'Every spin is better with your hand in mine, and I will always be there to catch the dip.',

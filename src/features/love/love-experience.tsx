@@ -169,6 +169,7 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
           galleryEnd={site.galleryEnd}
           name={name}
           welcome={site.copy.galleryWelcome}
+          plaque={site.copy.galleryPlaque}
           ritual={site.copy.galleryRitual}
         />
         <Dance title={site.copy.danceTitle} line={site.copy.danceLine} />

@@ -54,7 +54,9 @@ function burst(
   opts: PlayOptions,
   at: number | string = '>',
 ) {
-  tl.to(heart, { burst: 1, duration: 1.1, ease: 'power3.out' }, at).to(
+  // Blueprint 070: petals spray at the burst's start, not after it.
+  const pos = at === '>' ? tl.duration() : at;
+  tl.to(heart, { burst: 1, duration: 1.1, ease: 'power3.out' }, pos).to(
     heart,
     { glow: 0.3, duration: 1.1, ease: 'power3.out' },
     '<',
@@ -67,7 +69,7 @@ function burst(
       sprayPetals();
     },
     [],
-    at,
+    pos,
   );
 }
 
@@ -110,7 +112,11 @@ function petalsIn() {
 }
 
 function reform(tl: gsap.core.Timeline, gatherPetals = true) {
-  tl.to(heart, { burst: 0, duration: 1.6, ease: 'power2.inOut' }, '>')
+  tl.to(
+    heart,
+    { burst: 0, burstScale: 1, duration: 1.6, ease: 'power2.inOut' },
+    '>',
+  )
     .to(
       heart,
       { glow: baseGlow() + 0.25, duration: 1.6, ease: 'power2.inOut' },
@@ -361,27 +367,26 @@ function arrowStrike(tl: gsap.core.Timeline) {
   boost = STRIKE_BOOST;
   const glow = baseGlow();
   const scale = heart.scale;
-  // Blueprint 066: the heart inhales the petals (a slow spiral) before the arrow flies.
-  const INHALE = 1.8;
-  const hit = INHALE + 0.7;
-  tl.to(heart, { petalShiver: 1, duration: 1.2, ease: 'sine.in' }, 0)
-    .to(heart, { petalGather: 1, duration: INHALE, ease: 'power2.inOut' }, 0)
+  // Blueprint 067: scroll already streamed the petals in; the heart takes the last breath, the
+  // arrow flies in and one big blast sends hearts and petals out together.
+  const hit = 0.7;
+  tl.to(heart, { petalShiver: 1, duration: 0.2 }, 0)
+    .to(heart, { petalGather: 1, duration: 0.5, ease: 'power2.in' }, 0)
     .to(
       heart,
       {
         scale: scale * 1.08,
         glow: glow + 0.25,
-        duration: 1.6,
+        duration: 0.5,
         ease: 'sine.inOut',
       },
       0,
     )
-    .to(heart, { flinch: -0.03, duration: 0.2 }, INHALE - 0.4)
     .fromTo(
       heart,
       { arrow: 0 },
-      { arrow: 1, duration: 0.9, ease: 'power1.in' },
-      INHALE - 0.2,
+      { arrow: 1, duration: hit, ease: 'power1.in' },
+      0,
     )
     .to(heart, { petalShiver: 0, duration: 0.1 }, hit)
     .to(heart, { scale, duration: 0.3, ease: 'power2.out' }, hit)
@@ -398,12 +403,12 @@ function arrowStrike(tl: gsap.core.Timeline) {
     .to(heart, { glow, duration: 0.08 }, hit + 0.04)
     .fromTo(
       heart,
-      { cameraShake: 0.015 },
-      { cameraShake: 0, duration: 0.25, ease: 'power2.out' },
+      { cameraShake: 0.025 },
+      { cameraShake: 0, duration: 0.35, ease: 'power2.out' },
       hit,
     )
-    .set(heart, { arrow: 0 }, hit + 0.35);
-  // Impact: hearts and petals burst out together.
+    .set(heart, { arrow: 0, burstScale: 1.35 }, hit)
+    .call(() => spawnTapHearts(10), [], hit);
   burst(tl, {}, hit);
   tl.to({}, { duration: 0.5 });
   reform(tl, false);
@@ -441,6 +446,7 @@ function toBaseline() {
     shine: 0,
     starHold: 0,
     petalShiver: 0,
+    burstScale: 1,
     // Blueprint 060 follow-up: on the finale, scroll owns the spell; never kill its scrub.
     ...(section === 'finale' ? {} : { spell: 0, spellB: 0 }),
     gold: HEART_PATH[section].gold,
@@ -470,6 +476,7 @@ export const director = {
   isBusy: core.isBusy,
   current: core.current,
   setBaseline(id: SectionId) {
+    const changed = id !== section;
     section = id;
     // Blueprint 065: petal sections burst petals out of the heart; others absorb them back in.
     // Bloom waits for its own burst; Memories owns its scrubbed absorb.
@@ -479,11 +486,12 @@ export const director = {
       duration: 0.6,
       overwrite: 'auto',
     });
-    if (id === 'bloom' || id === 'memories') return;
+    if (!changed || id === 'bloom' || id === 'memories') return;
     if (entry) petalsIn();
     else petalsOut();
   },
   baseline: () => section,
+  petalsIn: () => petalsIn(),
   resetBoost() {
     boost = 0;
     if (!core.isBusy() && section === 'timeline')

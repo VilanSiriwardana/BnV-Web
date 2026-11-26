@@ -51,6 +51,8 @@ type Props = {
   /** Recipient name for the entrance welcome. */
   name: string;
   welcome?: string;
+  /** Blueprint 067: heading on the door arch. */
+  plaque?: string;
   /** Unlock ritual prompts: swipe, take the key, place it. */
   ritual?: [string, string, string];
 };
@@ -71,6 +73,7 @@ function GalleryWalkStage({
   galleryEnd,
   name,
   welcome,
+  plaque,
   ritual: ritualPrompts,
 }: Props) {
   const { scrollTo, stop, start } = useLoveScroll();
@@ -164,6 +167,7 @@ function GalleryWalkStage({
       <div className="pointer-events-none absolute inset-0 grid place-items-center px-4">
         <div
           data-gallery-welcome
+          data-gallery-plaque={plaque ?? 'Our Gallery'}
           className="relative flex flex-col items-center opacity-0 [perspective:600px]"
         >
           <span

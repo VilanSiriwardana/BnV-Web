@@ -31,3 +31,9 @@ export const ARROW_AFTER = 0.005; // Blueprint 066: the inhale fills the lead-in
 export function pastLastNode(thread: number) {
   return thread >= LAST_NODE + ARROW_AFTER;
 }
+
+/** Blueprint 067: the arrow strikes just after the heart leaves the spiral. */
+export const STRIKE_AT = 0.995;
+export function pastSpiral(thread: number) {
+  return thread >= STRIKE_AT;
+}

@@ -74,6 +74,7 @@ export function Heart({ tier, onTap, spell, children }: Props) {
       uniforms: {
         uForm: { value: heart.form },
         uBurst: { value: heart.burst },
+        uBurstScale: { value: 1 },
         uTime: { value: 0 },
         uPR: { value: 1 },
         uBeat: { value: 0 },
@@ -162,6 +163,7 @@ export function Heart({ tier, onTap, spell, children }: Props) {
     // Director tweens are already eased; a fast damp only removes sub-frame jitter.
     u.uForm.value = damp(u.uForm.value, heart.form, 20, delta);
     u.uBurst.value = damp(u.uBurst.value, heart.burst, 20, delta);
+    u.uBurstScale.value = heart.burstScale;
     u.uShine.value = heart.shine;
     u.uSpell.value = heart.spell;
     u.uSpellB.value = heart.spellB;

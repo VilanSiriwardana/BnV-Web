@@ -8,9 +8,8 @@ import {
   BufferAttribute,
   BufferGeometry,
   type CatmullRomCurve3,
-  CylinderGeometry,
   DoubleSide,
-  ExtrudeGeometry,
+  LatheGeometry,
   type Group,
   MathUtils,
   type Mesh,
@@ -24,7 +23,8 @@ import {
   PointsMaterial,
   Quaternion,
   Raycaster,
-  Shape,
+  TubeGeometry,
+  QuadraticBezierCurve3,
   Vector2,
   Vector3,
 } from 'three';
@@ -52,28 +52,20 @@ const HAMMER_LEN = 0.55;
 // Blueprint 055: the strike follows her stroke — the head starts on the stroke's start side and
 // leads face-first along it into the pane, the handle trailing to the side.
 const IMPACT = new Vector3(CASE.x, CASE.y + 0.03, CASE.z + CASE.d / 2 + 0.07);
-const REACH = 0.6;
 const swingDir = new Vector3();
-const swingFrom = new Vector3();
-const swingVia = new Vector3();
-const headSide = new Vector3();
-const headFwd = new Vector3();
+const planeN = new Vector3();
+const rest = new Vector3();
+const headOff = new Vector3();
+const probe = new Vector3();
+const motion = new Vector3();
+const pivot = new Vector3();
+const handleDir = new Vector3();
+const handleSide = new Vector3();
 const swingBasis = new Matrix4();
 const HEAD_HALF = 0.11;
-const hammerAt = (dir: Vector3, t: number, out: Vector3) => {
-  swingFrom.copy(IMPACT).addScaledVector(dir, -REACH);
-  swingFrom.z += 0.15;
-  swingVia.lerpVectors(swingFrom, IMPACT, 0.5);
-  swingVia.x += -dir.y * 0.08;
-  swingVia.y += dir.x * 0.08;
-  swingVia.z += 0.12;
-  const u = 1 - t;
-  return out
-    .copy(swingFrom)
-    .multiplyScalar(u * u)
-    .addScaledVector(swingVia, 2 * u * t)
-    .addScaledVector(IMPACT, t * t);
-};
+// Blueprint 068: chop arc (≈110°) and the extra wind-up (≈15°).
+const CHOP = 1.9;
+const WIND = 0.26;
 const SPARKS = 40;
 const KEY_REST = new Vector3(CASE.x, PEDESTAL_H + 0.03, CASE.z);
 const KEY_HOVER = new Vector3(KEYHOLE_LOCAL.x, KEYHOLE_LOCAL.y, 0.28);
@@ -170,27 +162,28 @@ export function GalleryRitual({ curve, tier }: Props) {
       blending: AdditiveBlending,
       toneMapped: false,
     });
-    const headShape = new Shape();
-    const r = 0.02;
-    const hw = 0.11;
-    const hh = 0.05;
-    headShape.moveTo(-hw + r, -hh);
-    headShape.lineTo(hw - r, -hh);
-    headShape.quadraticCurveTo(hw, -hh, hw, -hh + r);
-    headShape.lineTo(hw, hh - r);
-    headShape.quadraticCurveTo(hw, hh, hw - r, hh);
-    headShape.lineTo(-hw + r, hh);
-    headShape.quadraticCurveTo(-hw, hh, -hw, hh - r);
-    headShape.lineTo(-hw, -hh + r);
-    headShape.quadraticCurveTo(-hw, -hh, -hw + r, -hh);
-    const head = new ExtrudeGeometry(headShape, {
-      depth: 0.09,
-      bevelEnabled: true,
-      bevelSize: 0.008,
-      bevelThickness: 0.008,
-      bevelSegments: 3,
-    });
-    head.center();
+    // Blueprint 070: carved sledge head — flared striking faces, collar grooves, waisted body.
+    const headProfile = [
+      [0, -0.11],
+      [0.04, -0.11],
+      [0.046, -0.104],
+      [0.048, -0.092],
+      [0.036, -0.084],
+      [0.036, -0.074],
+      [0.042, -0.068],
+      [0.038, -0.04],
+      [0.036, 0],
+      [0.038, 0.04],
+      [0.042, 0.068],
+      [0.036, 0.074],
+      [0.036, 0.084],
+      [0.048, 0.092],
+      [0.046, 0.104],
+      [0.04, 0.11],
+      [0, 0.11],
+    ].map(([x, y]) => new Vector2(x, y));
+    const head = new LatheGeometry(headProfile, 28);
+    head.rotateZ(-Math.PI / 2);
     return {
       materials: {
         gold,
@@ -207,7 +200,17 @@ export function GalleryRitual({ curve, tier }: Props) {
       geo: {
         box: new BoxGeometry(1, 1, 1),
         plane: new PlaneGeometry(1, 1),
-        handle: new CylinderGeometry(0.014, 0.016, HAMMER_LEN, 10),
+        handle: new TubeGeometry(
+          new QuadraticBezierCurve3(
+            new Vector3(0, 0, 0),
+            new Vector3(0.06, HAMMER_LEN / 2, 0),
+            new Vector3(0, HAMMER_LEN, 0),
+          ),
+          24,
+          0.015,
+          10,
+          false,
+        ),
         head,
         key: createKeyGeometry(),
       },
@@ -305,21 +308,33 @@ export function GalleryRitual({ curve, tier }: Props) {
     if (h) {
       h.visible = s.mode === 'smashing';
       const along = MathUtils.clamp(s.hammer, 0, 1);
-      // Screen y points down; the door group's y points up.
-      swingDir.set(s.swipe.x, -s.swipe.y, 0).normalize();
-      hammerAt(swingDir, along, h.position);
-      // Wind-up pulls back against the stroke before the strike.
       const pull = Math.max(0, -s.hammer) / 0.12;
-      h.position.addScaledVector(swingDir, -pull * 0.1);
-      // Face-first: the head's long axis follows the stroke so its face lands on IMPACT.
-      h.position.addScaledVector(swingDir, -HEAD_HALF);
-      headSide
-        .set(-swingDir.y, swingDir.x, 0.5 * (1 - along) + 0.2 * pull)
-        .normalize();
-      headFwd.crossVectors(swingDir, headSide).normalize();
-      headSide.crossVectors(headFwd, swingDir);
+      // Blueprint 069: overhead strike — the head travels along her stroke; the handle trails to
+      // her hands above. Screen y points down; the door group's y points up.
+      // Blueprint 070: fixed overhead strike, top → bottom; the hands sit toward the doors.
+      swingDir.set(0, -1, 0);
+      planeN.set(0, 0, 1).applyAxisAngle(swingDir, -0.35);
+      rest.crossVectors(planeN, swingDir).normalize();
+      if (rest.x < 0) rest.negate();
+      // Head offset from the hands at impact; rotate so its motion at impact is along the stroke.
+      headOff.copy(rest).negate();
+      const raise =
+        probe.crossVectors(planeN, headOff).dot(swingDir) < 0 ? 1 : -1;
+      // The head's motion at impact leads its face into the glass.
+      motion.crossVectors(planeN, headOff).multiplyScalar(-raise).normalize();
+      pivot
+        .copy(IMPACT)
+        .addScaledVector(motion, -HEAD_HALF)
+        .addScaledVector(rest, HAMMER_LEN);
+      const theta = raise * (CHOP * (1 - along * along) + pull * WIND);
+      headOff.applyAxisAngle(planeN, theta);
+      h.position.copy(pivot).addScaledVector(headOff, HAMMER_LEN);
+      // Head axes: X = travel (flared face leads), Y = handle toward the hands.
+      handleDir.copy(headOff).negate();
+      motion.crossVectors(planeN, headOff).multiplyScalar(-raise).normalize();
+      handleSide.crossVectors(motion, handleDir);
       h.quaternion.setFromRotationMatrix(
-        swingBasis.makeBasis(swingDir, headSide, headFwd),
+        swingBasis.makeBasis(motion, handleDir, handleSide),
       );
     }
 
@@ -529,12 +544,7 @@ export function GalleryRitual({ curve, tier }: Props) {
 
       {/* Sledgehammer: origin at the head, face leading along her stroke, handle trailing */}
       <group ref={hammer} visible={false}>
-        <mesh
-          geometry={handle}
-          material={wood}
-          position={[0, HAMMER_LEN / 2, 0]}
-          raycast={none}
-        />
+        <mesh geometry={handle} material={wood} raycast={none} />
         <mesh geometry={head} material={gold} raycast={none} />
       </group>
     </group>

@@ -437,8 +437,9 @@ function WelcomePlaque() {
       const word = document.querySelector<HTMLElement>(
         '#gallery [data-welcome-word]',
       );
+      // Blueprint 067: the arch carries the gallery heading, not the welcome.
       const name = document.querySelector<HTMLElement>(
-        '#gallery [data-welcome-name]',
+        '#gallery [data-gallery-plaque]',
       );
       const root = document.querySelector<HTMLElement>('[data-love-root]');
       if (!c || !name || !live) return;
@@ -453,19 +454,15 @@ function WelcomePlaque() {
       c.fillStyle = hex;
       c.shadowColor = hex;
       c.shadowBlur = 18;
-      const wordText = word?.textContent?.trim() ?? '';
-      if (wordText) {
-        c.font = `500 ${h * 0.2}px ${getComputedStyle(word!).fontFamily}`;
-        c.letterSpacing = `${h * 0.08}px`;
-        c.fillText(wordText.toUpperCase(), w / 2, h * 0.22);
-        c.letterSpacing = '0px';
-      }
-      c.font = `italic 400 ${h * 0.56}px ${getComputedStyle(name).fontFamily}`;
+      const font = word ? getComputedStyle(word).fontFamily : 'serif';
+      c.font = `500 ${h * 0.42}px ${font}`;
+      c.letterSpacing = `${h * 0.06}px`;
       c.fillText(
-        name.textContent?.trim() ?? '',
+        (name.dataset.galleryPlaque ?? '').toUpperCase(),
         w / 2,
-        h * (wordText ? 0.64 : 0.5),
+        h * 0.52,
       );
+      c.letterSpacing = '0px';
       kitRef.current.texture.needsUpdate = true;
     };
     void document.fonts.ready.then(paint);
@@ -486,9 +483,8 @@ function WelcomePlaque() {
   useFrame(() => {
     const mesh = ref.current;
     if (!mesh) return;
-    const seat = galleryState.welcome.seat;
-    kitRef.current.material.opacity = seat;
-    mesh.visible = seat > 0.001;
+    kitRef.current.material.opacity = 1;
+    mesh.visible = true;
     if (!galleryState.active) return;
     mesh.localToWorld(edgeL.set(-PLAQUE_W / 2, 0, 0));
     mesh.localToWorld(edgeR.set(PLAQUE_W / 2, 0, 0));

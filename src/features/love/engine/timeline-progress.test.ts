@@ -4,6 +4,8 @@ import {
   activeNode,
   LAST_NODE,
   pastLastNode,
+  pastSpiral,
+  STRIKE_AT,
   nodeSectionProgress,
   threadProgress,
 } from './timeline-progress';
@@ -39,5 +41,13 @@ describe('pastLastNode', () => {
     expect(pastLastNode(LAST_NODE)).toBe(false);
     expect(pastLastNode(LAST_NODE + 0.05)).toBe(true);
     expect(pastLastNode(1)).toBe(true);
+  });
+});
+
+describe('pastSpiral', () => {
+  it('strikes only once the heart has left the spiral', () => {
+    expect(pastSpiral(0.9)).toBe(false);
+    expect(pastSpiral(STRIKE_AT)).toBe(true);
+    expect(pastSpiral(1)).toBe(true);
   });
 });

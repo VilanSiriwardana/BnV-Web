@@ -83,14 +83,12 @@ export function arriveAtDoor(stageTop: number) {
   sendRitual({ type: 'arrive' });
 }
 
-/** Direction of her stroke: the hammer swings along it and the shards follow it. */
-export function setRitualSwipe(dx: number, dy: number) {
-  const d = Math.hypot(dx, dy) || 1;
-  ritualState.swipe.x = dx / d;
-  ritualState.swipe.y = dy / d;
-  // The strike lands slightly toward the side the stroke came from.
-  ritualState.impact.x = -0.08 * ritualState.swipe.x;
-  ritualState.impact.y = 0.07 * ritualState.swipe.y;
+/** Blueprint 070: the overhead strike always lands top → bottom; shards burst downward. */
+export function setRitualSwipe() {
+  ritualState.swipe.x = 0;
+  ritualState.swipe.y = 1;
+  ritualState.impact.x = 0;
+  ritualState.impact.y = 0.07;
 }
 
 export function decayRitualKick(delta: number) {

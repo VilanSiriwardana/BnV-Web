@@ -23,6 +23,7 @@ export const heart = {
   petalAbsorb: 0, // 0..1 petals fly out of the screen toward the viewer (Memories)
   petalBurstId: 0, // Blueprint 065: bumped on each burst; petals spray from the heart
   petalBurstAt: { x: 0, y: 0 }, // heart NDC at that burst
+  burstScale: 1, // Blueprint 067: how far burst hearts scatter (arrow strike blasts wider)
   ambientIn: 0, // 0..1 ambient hearts allowed (eases in after the hero intro)
   cameraZ: 6, // scrubbed camera dolly
   cameraShake: 0, // camera jitter amplitude (world units), arrow hit

@@ -233,35 +233,28 @@ export function ReasonsBook({ tier, items }: { tier: Tier; items: string[] }) {
     );
     const page = new PlaneGeometry(PAGE_W, PAGE_H, 24, 1);
     page.translate(PAGE_W / 2, 0, 0);
-    const leftPage = new PlaneGeometry(PAGE_W, PAGE_H);
-    leftPage.translate(-PAGE_W / 2, 0, 0);
-    const left = new MeshBasicMaterial({ map: photo[0], toneMapped: false });
     const board = new MeshBasicMaterial({ color: BOARD });
     const edge = new MeshBasicMaterial({ color: '#d4ad55' });
     const coverTex = pageCanvas(res);
-    const coverInside = pageCanvas(res);
-    // Blueprint 066: the cover bends and turns like a page, its inside face visible mid-flip.
+    // Blueprint 067: a stiff board; title outside, the first photo inside (a real book's first spread).
     const coverLeaf = new ShaderMaterial({
       vertexShader: vertex,
       fragmentShader: fragment,
       side: DoubleSide,
       uniforms: {
         uFront: { value: coverTex },
-        uBack: { value: coverInside },
+        uBack: { value: photo[0] },
         uBend: { value: 0 },
         uShade: { value: 1 },
       },
     });
     return {
       coverTex,
-      coverInside,
       coverLeaf,
       text,
       photo,
       leaves,
       page,
-      leftPage,
-      left,
       board,
       edge,
       box: new BoxGeometry(1, 1, 1),
@@ -284,15 +277,6 @@ export function ReasonsBook({ tier, items }: { tier: Tier; items: string[] }) {
     void document.fonts.ready.then(() => {
       if (!live) return;
       paintCover(kit.coverTex, palette, BOARD, font);
-      const inside = (kit.coverInside.image as HTMLCanvasElement).getContext(
-        '2d',
-      );
-      if (inside)
-        paintFrame(inside, {
-          ...palette,
-          bg: BOARD,
-        });
-      kit.coverInside.needsUpdate = true;
       items.forEach((t, i) => paintReason(kit.text[i], i, t, palette, font));
       kit.photo.forEach((tex, i) => {
         paintPhoto(tex, null, palette);
@@ -312,14 +296,10 @@ export function ReasonsBook({ tier, items }: { tier: Tier; items: string[] }) {
 
   useEffect(
     () => () => {
-      [...kit.text, ...kit.photo, kit.coverTex, kit.coverInside].forEach((t) =>
-        t.dispose(),
-      );
+      [...kit.text, ...kit.photo, kit.coverTex].forEach((t) => t.dispose());
       kit.leaves.forEach((m) => m.dispose());
-      [kit.left, kit.board, kit.edge, kit.coverLeaf].forEach((m) =>
-        m.dispose(),
-      );
-      [kit.page, kit.leftPage, kit.box, kit.spine].forEach((g) => g.dispose());
+      [kit.board, kit.edge, kit.coverLeaf].forEach((m) => m.dispose());
+      [kit.page, kit.box, kit.spine].forEach((g) => g.dispose());
     },
     [kit],
   );
@@ -358,22 +338,14 @@ export function ReasonsBook({ tier, items }: { tier: Tier; items: string[] }) {
     bk.position.x = (-PAGE_W / 2) * (1 - open);
     bk.children.forEach((child) => {
       const role = child.userData.role;
-      if (role === 'frame') {
-        const extra = child.userData.extra as number;
-        child.scale.x = PAGE_W * (1 + open) + extra;
-        child.position.x = (PAGE_W / 2) * (1 - open);
-        return;
-      }
-      if (role === 'left') {
-        child.scale.x = Math.max(0.001, open);
-        return;
-      }
       if (role === 'cover') {
         child.rotation.y = -Math.PI * open;
         const lift = Math.sin(Math.PI * open);
         child.position.z =
-          MathUtils.lerp(n + 1, 0, open) * GAP + 0.01 + lift * 0.06;
-        kit.coverLeaf.uniforms.uBend.value = lift * 0.45;
+          // Closed: clear of the top leaf by the board's thickness; open: lowest on the left stack.
+          MathUtils.lerp(n + 1, 0, open) * GAP +
+          0.02 * (1 - open) +
+          lift * 0.06;
         kit.coverLeaf.uniforms.uShade.value = 1 - lift * 0.2;
         return;
       }
@@ -399,32 +371,41 @@ export function ReasonsBook({ tier, items }: { tier: Tier; items: string[] }) {
     <group ref={group} position={[0, 0, -DEPTH]} visible={false}>
       <group ref={book} rotation={[-0.32, 0, 0]}>
         <mesh
-          userData={{ role: 'frame', extra: 0.16 }}
           geometry={kit.box}
           material={kit.edge}
-          position={[0, 0, -0.05]}
-          scale={[PAGE_W * 2 + 0.16, PAGE_H + 0.16, 0.04]}
+          position={[PAGE_W / 2 + 0.04, 0, -0.05]}
+          scale={[PAGE_W + 0.08, PAGE_H + 0.16, 0.04]}
           raycast={none}
         />
         <mesh
-          userData={{ role: 'frame', extra: 0.1 }}
           geometry={kit.box}
           material={kit.board}
-          position={[0, 0, -0.02]}
-          scale={[PAGE_W * 2 + 0.1, PAGE_H + 0.1, 0.03]}
+          position={[PAGE_W / 2 + 0.025, 0, -0.02]}
+          scale={[PAGE_W + 0.05, PAGE_H + 0.1, 0.03]}
           raycast={none}
         />
         <mesh geometry={kit.spine} material={kit.edge} raycast={none} />
-        <mesh
-          userData={{ role: 'left' }}
-          geometry={kit.leftPage}
-          material={kit.left}
-          position={[0, 0, 0.005]}
-          raycast={none}
-        />
         {/* Blueprint 065: front cover with its title, hinged at x=0, opens by rotating -PI */}
         <group userData={{ role: 'cover' }}>
-          <mesh geometry={kit.page} material={kit.coverLeaf} raycast={none} />
+          <mesh
+            geometry={kit.box}
+            material={kit.board}
+            position={[PAGE_W / 2 + 0.025, 0, 0]}
+            scale={[PAGE_W + 0.05, PAGE_H + 0.1, 0.012]}
+            raycast={none}
+          />
+          <mesh
+            geometry={kit.page}
+            material={kit.coverLeaf}
+            position={[0, 0, 0.007]}
+            raycast={none}
+          />
+          <mesh
+            geometry={kit.page}
+            material={kit.coverLeaf}
+            position={[0, 0, -0.007]}
+            raycast={none}
+          />
         </group>
         {kit.leaves.map((m, k) => (
           <mesh

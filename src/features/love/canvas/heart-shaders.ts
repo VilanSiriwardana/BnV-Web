@@ -10,6 +10,7 @@ uniform float uSpell;
 uniform float uSpellB;
 uniform float uForm;
 uniform float uBurst;
+uniform float uBurstScale;
 uniform float uTime;
 uniform float uPR;
 uniform float uBeat;
@@ -36,7 +37,7 @@ void main() {
   float sp = smoothstep(0.0, 1.0, clamp((uSpell - aRand.x * 0.30) / 0.70, 0.0, 1.0));
   float sb = smoothstep(0.0, 1.0, clamp((uSpellB - aRand.w * 0.30) / 0.70, 0.0, 1.0));
   p = mix(p, mix(aTextA, aTextB, sb), sp);
-  p = mix(p, aScatter, b);
+  p = mix(p, aScatter * uBurstScale, b);
   p += 0.02 * vec3(sin(uTime * 0.7 + aRand.w * 6.28), cos(uTime * 0.6 + aRand.w * 4.0), 0.0);
   p *= 1.0 + uBeat * 0.04 * uBeatScale;
 
