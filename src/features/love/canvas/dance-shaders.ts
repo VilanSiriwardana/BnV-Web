@@ -1,25 +1,41 @@
-// Experience §19.6: the couple's particles blend between silhouette frames on the GPU (heart style).
+import { SHAPE_COUNT } from './dance-silhouettes';
+
+// Experience §19.6, blueprint 079: each particle sits at a fixed (u, v) on one shape of the live pose
+// (uShapes, packed by packShapes in dance-geometry.ts); pointOn mirrors the TypeScript version.
 export const danceVertex = /* glsl */ `
-attribute float aIndex;
+attribute float aShape;
+attribute vec2 aUV;
 attribute vec4 aRand;
 attribute vec2 aInfo;
-uniform sampler2D uFrames;
-uniform float uFrame;
-uniform int uRows;
+uniform vec4 uShapes[${SHAPE_COUNT * 3}];
 uniform float uTime;
 uniform float uPR;
 varying vec4 vRand;
 varying float vOwner;
 
+vec2 pointOn(int s, float u, float v) {
+  vec4 h = uShapes[s];
+  vec4 m = uShapes[s + 1];
+  vec4 n = uShapes[s + 2];
+  if (h.x < 0.5) {
+    float a = v * 6.2831853;
+    return h.yz + vec2(cos(a), sin(a)) * h.w * sqrt(u);
+  }
+  if (h.x < 1.5) {
+    vec2 d = m.xy - h.yz;
+    float len = max(length(d), 1e-6);
+    float w = (v * 2.0 - 1.0) * mix(h.w, m.z, u);
+    return h.yz + d * u + vec2(-d.y, d.x) / len * w;
+  }
+  vec2 top = mix(h.yz, m.xy, v);
+  vec2 bottom = mix(m.zw, n.xy, v);
+  vec2 p = mix(top, bottom, u);
+  p.y -= sin(v * 3.14159265) * h.w * u * u;
+  return p;
+}
+
 void main() {
-  int index = int(aIndex);
-  int row = index / 2048;
-  int column = index - row * 2048;
-  int first = int(floor(uFrame));
-  int second = min(first + 1, 31);
-  vec2 a = texelFetch(uFrames, ivec2(column, first * uRows + row), 0).xy;
-  vec2 b = texelFetch(uFrames, ivec2(column, second * uRows + row), 0).xy;
-  vec2 p = mix(a, b, fract(uFrame));
+  vec2 p = pointOn(int(aShape + 0.5) * 3, aUV.x, aUV.y);
   // Hair and skirt sway; everything shimmers a little like the heart.
   p.x += aInfo.y * 0.018 * sin(uTime * 1.6 + p.y * 4.0 + aRand.w * 2.0);
   p += 0.006 * vec2(sin(uTime * 0.9 + aRand.w * 6.28), cos(uTime * 0.8 + aRand.x * 6.28));

@@ -8,7 +8,8 @@ import { replayHeroWeave } from './hero-intro';
 import { LETTER_OPEN_EVENT, session, SKY_COMPLETE_EVENT } from './session';
 import { poseFor, type SectionId, SKY_WAIT, WISH_REST } from './heart-path';
 import { candle } from './candle-state';
-import { dance } from './dance-state';
+import { spawnTapHearts } from '../canvas/mini-hearts';
+import { BEAT_REARM, DANCE_BEATS, dance } from './dance-state';
 import { reasons } from './reasons-state';
 import { resetGalleryDirector } from './gallery-director';
 import { GALLERY_DOOR_SPAN, walkFromStage } from './gallery-path';
@@ -629,15 +630,25 @@ const buildDance: SectionBuilder = (root, mobile) => {
         overwrite: 'auto',
       }),
   });
-  let dipped = false;
+  // Blueprint 079: the dance beats, each re-armed once scroll drops back below it.
+  const armed = DANCE_BEATS.map(() => true);
+  const playBeat = (event: (typeof DANCE_BEATS)[number]['event']) => {
+    if (event === 'twirl') return director.play('shine');
+    if (event === 'dip') spawnTapHearts(6);
+    return director.play('pulse');
+  };
   ScrollTrigger.create({
     trigger: el,
     start: 'top top',
     end: 'bottom bottom',
     onUpdate: ({ progress }) => {
       dance.t = progress;
-      if (progress >= 0.95 && !dipped) dipped = director.play('pulse');
-      if (progress < 0.8) dipped = false;
+      DANCE_BEATS.forEach(({ at, event }, i) => {
+        if (armed[i] && progress >= at) {
+          armed[i] = false;
+          playBeat(event);
+        } else if (progress < at - BEAT_REARM) armed[i] = true;
+      });
     },
   });
   return () => {

@@ -1,21 +1,35 @@
-// Experience §19.6: scroll writes `t` (0..1) and `visible`; the canvas reads frameAt(t) per frame.
+import { KEYFRAMES } from '../canvas/dance-silhouettes';
+
+// Experience §19.6: scroll writes `t` (0..1) and `visible`; canvas/dance-duo.tsx reads poseAt(t) per frame.
 export const dance = { t: 0, visible: 0 };
 
-// Must match FRAME_COUNT in canvas/dance-silhouettes.ts (kept three-free here).
-export const DANCE_FRAME_COUNT = 48;
-export const KEYFRAME_COUNT = 12;
-// Share of each step spent holding the pose before easing to the next one.
-const HOLD = 0.3;
+// Blueprint 079: share of each step spent holding the pose, and the last part of the stage held on the dip.
+export const DANCE_HOLD = 0.25;
+export const DANCE_SLOW = 0.12;
 
+const clamp01 = (k: number) => Math.min(1, Math.max(0, k));
 const ease = (k: number) => k * k * (3 - 2 * k);
+const LAST = KEYFRAMES.length - 1;
 
-// 0..1 scroll → 0..47 frame position, pausing briefly on each keyframe.
-export function frameAt(t: number) {
-  const last = DANCE_FRAME_COUNT - 1;
-  const x = Math.min(1, Math.max(0, t)) * (KEYFRAME_COUNT - 1);
-  const i = Math.min(Math.floor(x), KEYFRAME_COUNT - 2);
-  const k = (x - i - HOLD) / (1 - HOLD);
-  return (
-    ((i + ease(Math.min(1, Math.max(0, k)))) * last) / (KEYFRAME_COUNT - 1)
-  );
+// 0..1 scroll → the keyframe pair and the eased blend between them.
+export function poseAt(t: number) {
+  const x = (clamp01(t / (1 - DANCE_SLOW)) || 0) * LAST;
+  const index = Math.min(Math.floor(x), LAST - 1);
+  const k = ease(clamp01((x - index - DANCE_HOLD) / (1 - DANCE_HOLD)));
+  return { index, k };
 }
+
+// Progress at which keyframe `i` is fully reached.
+export const keyAt = (i: number) => ((1 - DANCE_SLOW) * i) / LAST;
+
+// Close hold, twirl, dip (keyframes 2, 4 and the last).
+export const DANCE_BEATS = [
+  { at: keyAt(2), event: 'hold' },
+  { at: keyAt(4), event: 'twirl' },
+  { at: keyAt(LAST) + 0.02, event: 'dip' },
+] as const;
+export const BEAT_REARM = 0.1;
+
+// Frame-rate independent ease toward the scroll target.
+export const damp = (current: number, target: number, dt: number, rate = 8) =>
+  current + (target - current) * (1 - Math.exp(-rate * dt));

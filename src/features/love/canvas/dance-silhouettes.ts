@@ -36,8 +36,15 @@ const dir = (angle: number, face: number): Vec => [
 const from = (p: Vec, angle: number, face: number, len: number) =>
   add(p, scale(dir(angle, face), len));
 
-// Two-bone IK: the elbow/knee that reaches `target`, bending to the lower side.
-export function solveLimb(s: Vec, target: Vec, l1: number, l2: number) {
+// Two-bone IK: the elbow/knee that reaches `target`. `bend` picks a fixed side of the shoulder→target
+// line (blueprint 079), so the elbow never flips when the hand passes overhead.
+export function solveLimb(
+  s: Vec,
+  target: Vec,
+  l1: number,
+  l2: number,
+  bend = 1,
+) {
   const dx = target[0] - s[0];
   const dy = target[1] - s[1];
   const dist = Math.hypot(dx, dy) || 1e-6;
@@ -48,7 +55,7 @@ export function solveLimb(s: Vec, target: Vec, l1: number, l2: number) {
   const base = add(s, scale(u, a));
   const e1 = add(base, [-u[1] * h, u[0] * h]);
   const e2 = add(base, [u[1] * h, -u[0] * h]);
-  const elbow = e1[1] < e2[1] ? e1 : e2;
+  const elbow = bend > 0 ? e1 : e2;
   return { elbow, hand: add(s, scale(u, d)) };
 }
 
@@ -58,12 +65,13 @@ const limb = (
   l1: number,
   l2: number,
   r: [number, number, number],
+  bend: number,
 ): Shape[] => {
   const reach = Math.max(
     1,
     Math.hypot(target[0] - s[0], target[1] - s[1]) / (l1 + l2) + 0.001,
   );
-  const { elbow, hand } = solveLimb(s, target, l1 * reach, l2 * reach);
+  const { elbow, hand } = solveLimb(s, target, l1 * reach, l2 * reach, bend);
   return [
     { kind: 'capsule', a: s, b: elbow, ra: r[0], rb: r[1] },
     { kind: 'capsule', a: elbow, b: hand, ra: r[1], rb: r[2] },
@@ -102,7 +110,11 @@ type FrameSpec = {
   free: Vec | 'shoulder';
 };
 
-function build(spec: FrameSpec): Frame {
+// He faces +x, she faces −x: each keeps one elbow side (down and out for both).
+const HIS_BEND = -1;
+const HER_BEND = 1;
+
+export function buildPose(spec: FrameSpec): Frame {
   const m = spec.him;
   const hip: Vec = [m.x, 0.95 - (m.drop ?? 0)];
   const neck = from(hip, m.lean, 1, 0.56);
@@ -153,8 +165,22 @@ function build(spec: FrameSpec): Frame {
       },
       { kind: 'capsule', a: neck, b: head, ra: 0.06, rb: 0.06 },
     ],
-    hisArmJoined: limb(shoulder, hisJ, 0.31, 0.29, [0.055, 0.045, 0.035]),
-    hisArmWaist: limb(shoulder, waist, 0.31, 0.29, [0.055, 0.045, 0.035]),
+    hisArmJoined: limb(
+      shoulder,
+      hisJ,
+      0.31,
+      0.29,
+      [0.055, 0.045, 0.035],
+      HIS_BEND,
+    ),
+    hisArmWaist: limb(
+      shoulder,
+      waist,
+      0.31,
+      0.29,
+      [0.055, 0.045, 0.035],
+      HIS_BEND,
+    ),
     hisLegs: [
       { kind: 'capsule', a: hip, b: knee(m.front), ra: 0.085, rb: 0.06 },
       {
@@ -202,8 +228,22 @@ function build(spec: FrameSpec): Frame {
       { kind: 'capsule', a: herWaist, b: herHip, ra: 0.075, rb: 0.1 },
       { kind: 'capsule', a: herNeck, b: herHead, ra: 0.045, rb: 0.045 },
     ],
-    herArmJoined: limb(herShoulder, herJ, 0.28, 0.26, [0.04, 0.033, 0.026]),
-    herArmFree: limb(herShoulder, free, 0.28, 0.26, [0.04, 0.033, 0.026]),
+    herArmJoined: limb(
+      herShoulder,
+      herJ,
+      0.28,
+      0.26,
+      [0.04, 0.033, 0.026],
+      HER_BEND,
+    ),
+    herArmFree: limb(
+      herShoulder,
+      free,
+      0.28,
+      0.26,
+      [0.04, 0.033, 0.026],
+      HER_BEND,
+    ),
     herSkirt: [
       {
         kind: 'quad',
@@ -231,229 +271,147 @@ function build(spec: FrameSpec): Frame {
 }
 
 const LEG_STAND: Leg = [0.05, 0];
-const STRIDE_F: Leg = [0.35, 0.1];
-const STRIDE_B: Leg = [-0.3, -0.5];
 
-// Walk-in → hands join → hand on waist → under-arm turn (×2) → embrace → lean → dip.
+// Blueprint 079, after the reference stills: standing → hands join → close hold → hands rise →
+// twirl → turn completes → close hold → lunge → dip (hands released, her foot on the floor).
 export const KEYFRAMES: FrameSpec[] = [
   {
-    him: { x: -0.85, lean: 0.06, front: STRIDE_F, back: STRIDE_B },
-    her: { x: 0.85, lean: 0.06, hair: 0.25, hem: [0.05, -0.86], flare: 0.3 },
-    hisHand: [-0.42, 1.0],
-    herHand: [0.42, 1.0],
-    joined: [0, 1.05],
-    waist: [-0.78, 0.68],
-    free: [0.8, 0.66],
+    him: { x: -0.2, lean: 0.02, front: [0.04, 0], back: [-0.02, 0] },
+    her: { x: 0.2, lean: 0.02, hair: 0.1, hem: [0.02, -0.86], flare: 0.24 },
+    hisHand: [-0.18, 0.56],
+    herHand: [0.18, 0.54],
+    joined: [0, 1.0],
+    waist: [-0.24, 0.58],
+    free: [0.24, 0.56],
   },
   {
-    him: { x: -0.4, lean: 0.05, front: [0.2, 0.05], back: [-0.12, -0.2] },
-    her: { x: 0.4, lean: 0.04, hair: 0.15, hem: [0.03, -0.86], flare: 0.28 },
+    him: { x: -0.22, lean: 0.04, front: [0.08, 0], back: LEG_STAND },
+    her: { x: 0.22, lean: 0.03, hair: 0.12, hem: [0.02, -0.86], flare: 0.25 },
     hisHand: 'joined',
     herHand: 'joined',
-    joined: [0, 1.08],
-    waist: [-0.32, 0.68],
-    free: [0.36, 0.66],
+    joined: [0, 0.86],
+    waist: [-0.24, 0.58],
+    free: [0.24, 0.56],
   },
   {
-    him: {
-      x: -0.27,
-      lean: 0.06,
-      tilt: 0.1,
-      front: [0.15, 0.05],
-      back: LEG_STAND,
+    him: { x: -0.13, lean: 0.05, tilt: 0.12, front: [0.1, 0], back: LEG_STAND },
+    her: {
+      x: 0.13,
+      lean: 0.03,
+      tilt: -0.12,
+      hair: 0.15,
+      hem: [0.02, -0.86],
+      flare: 0.26,
     },
+    hisHand: 'joined',
+    herHand: 'joined',
+    joined: [0.02, 1.25],
+    waist: 'back',
+    free: 'shoulder',
+  },
+  {
+    him: { x: -0.17, lean: 0.03, front: [0.1, 0], back: LEG_STAND },
+    her: { x: 0.17, lean: 0.03, hair: 0.3, hem: [0, -0.85], flare: 0.32 },
+    hisHand: 'joined',
+    herHand: 'joined',
+    joined: [0.05, 1.62],
+    waist: 'back',
+    free: 'shoulder',
+  },
+  {
+    him: { x: -0.24, lean: 0.02, front: [0.1, 0], back: LEG_STAND },
     her: {
       x: 0.24,
-      lean: 0.03,
-      tilt: -0.1,
-      hair: 0.1,
-      hem: [0.02, -0.86],
-      flare: 0.28,
-    },
-    hisHand: 'joined',
-    herHand: 'joined',
-    joined: [-0.02, 1.38],
-    waist: 'back',
-    free: 'shoulder',
-  },
-  {
-    him: { x: -0.2, lean: 0, front: [0.12, 0], back: LEG_STAND },
-    her: {
-      x: 0.2,
       turn: -1,
-      lean: 0.02,
+      lean: 0.03,
       hair: 0.9,
       hem: [-0.12, -0.84],
-      flare: 0.4,
+      flare: 0.46,
     },
     hisHand: 'joined',
     herHand: 'joined',
-    joined: [0.12, 1.86],
-    waist: [-0.12, 0.7],
-    free: [0.62, 1.25],
+    joined: [0.08, 1.88],
+    waist: [-0.24, 0.6],
+    free: [0.62, 0.95],
   },
   {
-    him: { x: -0.22, lean: 0.02, front: [0.12, 0], back: LEG_STAND },
-    her: {
-      x: 0.22,
-      turn: 0,
-      lean: 0.04,
-      hair: 0.7,
-      hem: [0, -0.84],
-      flare: 0.4,
-    },
+    him: { x: -0.24, lean: 0.02, front: [0.1, 0], back: LEG_STAND },
+    her: { x: 0.22, lean: 0.03, hair: 0.4, hem: [0.04, -0.85], flare: 0.34 },
     hisHand: 'joined',
     herHand: 'joined',
-    joined: [0.1, 1.82],
-    waist: [-0.12, 0.7],
-    free: [0.6, 1.18],
-  },
-  {
-    him: { x: -0.2, lean: 0, front: [0.12, 0], back: LEG_STAND },
-    her: { x: 0.22, lean: 0.02, hair: 1.0, hem: [0.14, -0.84], flare: 0.42 },
-    hisHand: 'joined',
-    herHand: 'joined',
-    joined: [0.1, 1.84],
-    waist: [-0.12, 0.7],
-    free: [0.6, 1.2],
-  },
-  {
-    him: { x: -0.22, lean: 0.04, front: [0.12, 0], back: LEG_STAND },
-    her: {
-      x: 0.2,
-      turn: 0.3,
-      lean: 0.04,
-      hair: 0.45,
-      hem: [0, -0.85],
-      flare: 0.35,
-    },
-    hisHand: 'joined',
-    herHand: 'joined',
-    joined: [0.08, 1.55],
+    joined: [0.06, 1.5],
     waist: 'back',
     free: 'shoulder',
-  },
-  {
-    him: {
-      x: -0.22,
-      lean: 0.08,
-      tilt: 0.25,
-      front: [0.12, 0.05],
-      back: LEG_STAND,
-    },
-    her: {
-      x: 0.18,
-      lean: 0.05,
-      tilt: -0.2,
-      hair: 0.15,
-      hem: [0.03, -0.86],
-      flare: 0.3,
-    },
-    hisHand: 'joined',
-    herHand: 'joined',
-    joined: [0.0, 1.32],
-    waist: 'back',
-    free: 'shoulder',
-  },
-  {
-    him: {
-      x: -0.24,
-      drop: 0.06,
-      lean: 0.25,
-      tilt: 0.1,
-      front: [0.45, -0.1],
-      back: [-0.25, -0.4],
-    },
-    her: {
-      x: 0.22,
-      y: 0.88,
-      lean: -0.45,
-      tilt: -0.25,
-      hair: -0.1,
-      hem: [-0.08, -0.82],
-      flare: 0.32,
-    },
-    hisHand: 'joined',
-    herHand: 'joined',
-    joined: [0.42, 1.4],
-    waist: 'back',
-    free: 'shoulder',
-  },
-  // Dip in three gentle steps: lunge, half-dip, dip. They never pass through each other.
-  {
-    him: {
-      x: -0.18,
-      drop: 0.1,
-      lean: 0.3,
-      tilt: 0.12,
-      front: [0.7, 0],
-      back: [-0.35, -0.6],
-    },
-    her: {
-      x: 0.22,
-      y: 0.85,
-      lean: 0.2,
-      tilt: -0.1,
-      hair: 0.05,
-      hem: [0, -0.8],
-      flare: 0.33,
-      legUp: 0.2,
-    },
-    hisHand: 'joined',
-    herHand: 'joined',
-    joined: [0.3, 1.3],
-    waist: [0.25, 1.6],
-    free: [0.5, 0.9],
   },
   {
     him: {
       x: -0.12,
-      drop: 0.18,
-      lean: 0.4,
-      tilt: 0.14,
-      front: [0.95, 0.1],
-      back: [-0.45, -0.75],
+      lean: 0.06,
+      tilt: 0.2,
+      front: [0.12, 0.04],
+      back: LEG_STAND,
     },
     her: {
-      x: 0.15,
-      y: 0.8,
-      lean: 0.7,
-      tilt: 0,
-      hair: 0.05,
-      hem: [-0.15, -0.7],
-      flare: 0.35,
-      legUp: 0.6,
+      x: 0.12,
+      lean: 0.02,
+      tilt: -0.2,
+      hair: 0.15,
+      hem: [0.02, -0.86],
+      flare: 0.27,
     },
     hisHand: 'joined',
     herHand: 'joined',
-    joined: [0.05, 0.9],
-    waist: [0.45, 1.85],
-    free: [0.2, 0.45],
+    joined: [0.02, 1.25],
+    waist: 'back',
+    free: 'shoulder',
   },
   {
     him: {
-      x: -0.08,
-      drop: 0.22,
-      lean: 0.45,
-      tilt: 0.15,
-      front: [1.1, 0.15],
-      back: [-0.5, -0.85],
+      x: -0.14,
+      drop: 0.08,
+      lean: 0.12,
+      front: [0.45, -0.15],
+      back: [-0.3, -0.3],
     },
     her: {
-      x: 0.08,
-      y: 0.75,
-      lean: 1.2,
-      tilt: 0.05,
-      hair: 0.05,
-      hem: [-0.3, -0.55],
-      flare: 0.36,
-      legUp: 1,
+      x: 0.16,
+      y: 0.89,
+      lean: -0.25,
+      tilt: -0.15,
+      hair: -0.1,
+      hem: [0.1, -0.82],
+      flare: 0.32,
     },
     hisHand: 'joined',
     herHand: 'joined',
-    joined: [-0.15, 0.55],
-    waist: [0.6, 2.0],
-    free: [-0.1, 0.12],
+    joined: [0.1, 1.72],
+    waist: 'back',
+    free: 'shoulder',
+  },
+  {
+    him: {
+      x: -0.1,
+      drop: 0.18,
+      lean: 0.18,
+      tilt: 0.15,
+      front: [0.9, 0.1],
+      back: [-0.55, -0.55],
+    },
+    her: {
+      x: 0.2,
+      y: 0.82,
+      lean: -0.72,
+      tilt: -0.4,
+      hair: -0.4,
+      hem: [0.28, -0.74],
+      flare: 0.4,
+      legUp: 0.08,
+    },
+    hisHand: [-0.78, 1.28],
+    herHand: [0.95, 1.2],
+    joined: [0.3, 1.3],
+    waist: 'back',
+    free: 'shoulder',
   },
 ];
 
@@ -512,18 +470,8 @@ export function interpolateSpec(
   };
 }
 
-export function buildFrames(n = 32): Frame[] {
-  return Array.from({ length: n }, (_, i) => {
-    const x = (i / (n - 1)) * (KEYFRAMES.length - 1);
-    const index = Math.min(Math.floor(x), KEYFRAMES.length - 2);
-    const t = x - index;
-    const eased = t * t * (3 - 2 * t);
-    return build(
-      interpolateSpec(KEYFRAMES[index], KEYFRAMES[index + 1], eased),
-    );
-  });
-}
-
-export const DANCE_FRAMES: Frame[] = buildFrames(48);
-export const FRAME_COUNT = DANCE_FRAMES.length;
-export const DIP_FRAME = FRAME_COUNT - 1;
+// Every pose has the same shapes in the same order (the GPU indexes them globally).
+export const SHAPE_COUNT = Object.values(buildPose(KEYFRAMES[0])).reduce(
+  (n, shapes) => n + shapes.length,
+  0,
+);

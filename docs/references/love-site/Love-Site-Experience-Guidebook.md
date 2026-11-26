@@ -496,14 +496,14 @@ Positions are converted to world units with the live viewport at the heart's dep
 
 **As built** (`sections/dance.tsx`, `canvas/dance-silhouettes.ts`, `canvas/dance-geometry.ts`, `canvas/dance-shaders.ts`, `canvas/dance-duo.tsx`, `engine/dance-state.ts`, `buildDance`):
 
-- 250 vh sticky stage after Gallery. The couple is **one particle cloud built like the heart** (him lavender, her gold): 14,000 particles on high, 7,000 on mid.
-- **12 key poses sampled into 48 frames**: walk-in → hands join → his hand on her waist, hers on his shoulder → under-arm turn (2 poses) → embrace → lean → lunge → half-dip → **romantic dip** (she leans back gradually and never passes through him).
-- Skeleton poses with **2-bone IK** (`solveLimb`) so joined hands and the waist hold always meet; every particle stays on the same body part across poses, so the figures flow rather than scatter. Hair and skirt sway in the shader.
-- Frame positions live in a float `DataTexture`; the GPU blends between frames. Scroll holds each pose for 30 % of its step, then eases (smoothstep). One extra draw call.
-- The duo fades in over 0.6 s between `top 60%` and `bottom 40%`. The heart rests above at (0, 0.55) s0.18 and **pulses on the dip** (progress ≥ 0.95, rearms below 0.8).
+- 250 vh sticky stage after Gallery. The couple is **one particle cloud built like the heart** (him lavender, her gold): 14,000 particles on high, 7,000 on mid. Mirrored on screen so she stands on the left, as in the reference stills (`private/dance-keyframes/`).
+- **9 key poses after the reference stills** (blueprint 079): standing → hands join → close hold → hands rise → **twirl** under his arm → turn completes → close hold → he lifts the joined hands into the lunge → **dip** (hands released, his free arm out, her back arched away from him, her foot on the floor).
+- **Live skeleton:** every frame the CPU blends two key poses (`interpolateSpec`) and builds 26 shapes with 2-bone IK (`solveLimb`, a fixed elbow side per arm so elbows never flip). The shapes are packed into a `vec4[78]` uniform and the vertex shader places each particle at its fixed (shape, u, v). No baked frames: limbs stay continuous and nothing heavy is built on mount. Hair and skirt sway in the shader.
+- Scroll is damped (rate 8) in `DanceDuo`; `poseAt` holds each pose for 25 % of its step, eases once (smoothstep), and holds the dip over the last 12 %.
+- The duo fades in over 0.6 s between `top 60%` and `bottom 40%`. The heart rests above at (0, 0.55) s0.18 and fires `DANCE_BEATS`: `pulse` at the close hold, `shine` at the twirl, `pulse` + 6 tap hearts at the dip (each re-arms 0.1 below itself).
 - Copy: `danceTitle`, `danceLine`.
-- Low / static / calm: an SVG silhouette pair in the dip pose, generated from the same skeleton.
-- Tests: `dance-state.test.ts`, `dance-geometry.test.ts` (per-frame movement capped, she stays on his right).
+- Low / static / calm: the dip still `public/dance-reel/posters/dip.webp` (from `scripts/prepare-dance-reel.mjs`).
+- Tests: `dance-state.test.ts` (`poseAt`, beats, damping), `dance-geometry.test.ts` (no elbow flip, continuous motion through the dance, floor, joined hands, packing round-trip, particle weights).
 
 **Unverified:** ≥ 40 fps on mid tier.
 

@@ -1135,3 +1135,29 @@ Implemented M28–M33 in the order M28 → M32 → M29 → M31 → M30 → M33:
 ### Verification
 
 - eslint (changed files) and love vitest (140 tests) pass; tsc reports errors only in generated `.next/dev/types` (dev server output), none in `src/`. Not checked in a browser.
+
+## 2026-11-26: Blueprint 078 (Dance keyframe reel, smooth dip and asset loading)
+
+- Interim Phase 11 player: the Dance now plays four AI keyframe stills (standing → close hold → twirl → dip) instead of the particle couple. Sources are in git-ignored `private/dance-keyframes/`.
+- `scripts/prepare-dance-reel.mjs`: scales each still so his head-to-floor height matches, sets a shared floor line, remaps the backdrop onto the page night color (per-channel levels), feathers the edges and writes `public/dance-reel/{desktop 768×960, mobile 512×640}`, `posters/{start,dip}.webp` and `manifest.json` (desktop set ≈ 120 KB). Tuning sheet: `private/dance-reel-contact.webp`.
+- `engine/dance-reel-math.ts` (+ test): `reelFrame` (55 % hold, smoothstep crossfade, last 10 % held on the dip), `REEL_BEATS`, `damp`, `loadOrder`, `nearestLoaded`. `engine/dance-reel-loader.ts`: start pose and dip first, 2 concurrent, `img.decode()`.
+- `sections/dance-reel.tsx`: one 2D canvas on `gsap.ticker`, damped `dance.t`, DPR ≤ 1.5, draws only on change. `sections/dance.tsx`: Calm/static show the dip poster.
+- `story.ts` `buildDance`: `pulse` at the close hold, `shine` at the twirl, `pulse` + `spawnTapHearts(6)` at the dip; each beat re-arms 0.1 below itself.
+- `DANCE_REEL` (engine/dance-state.ts) = false restores the particle duo. Its dip jitter is fixed: `dance-shaders.ts` clamped the next frame to 31 of 48.
+
+### Verification
+
+- tsc, eslint (changed files) and love vitest (34 files, 148 tests) pass. Contact sheet checked by eye (floor, scale, backdrop blend).
+- Headless Chrome on the dev server (canvas captured at 7 scroll stops): poses play in order and the dip holds. A ghost of the previous pose in the feathered edges was found and fixed (the outgoing pose now fades over the second half of each crossfade). Not checked on a real phone or with the gate passed by hand.
+
+## 2026-11-26: Blueprint 079 (particle couple dances the keyframes; reel removed)
+
+- Direction change: the 4 AI stills are pose references only; the particle couple performs the dance. 078's reel player, loader, math and frame sets were removed; `public/dance-reel/posters/dip.webp` stays as the Calm / reduced-motion / low / static still (`scripts/prepare-dance-reel.mjs` now writes only that).
+- `canvas/dance-silhouettes.ts`: 9 new keyframes after the stills (standing → join → close hold → hands rise → twirl → turn completes → close hold → hands lifted into the lunge → dip with hands released). `solveLimb` takes a fixed bend side (his arms −1, hers +1), so elbows no longer flip overhead. `build` exported as `buildPose`; `SHAPE_COUNT` = 26. The 48-frame bake (`buildFrames`, `DANCE_FRAMES`, `FRAME_COUNT`, `DIP_FRAME`) is gone.
+- Live skeleton: `dance-geometry.ts` `buildDanceParticles` (fixed shape, u, v per particle), `packShapes`/`unpackShape` (3 vec4 per shape); `dance-shaders.ts` evaluates `pointOn` in GLSL from `uShapes[78]`; `dance-duo.tsx` damps `dance.t`, rebuilds the pose with `poseAt` + `interpolateSpec` when it changes, and mirrors with a negative x-scale. The 11 MB DataTexture and its mount-time build are gone.
+- `engine/dance-state.ts`: `poseAt` (25 % hold, one smoothstep, last 12 % on the dip), `keyAt`, `DANCE_BEATS`, `BEAT_REARM`, `damp`. `story.ts` fires the beats (pulse / shine / pulse + tap hearts).
+- Found while testing: in the first draft the joined hands sat on her shoulder in the lunge, so releasing them swung her forearm through the shoulder (an IK near-singularity, a visible snap). Fixed by lifting the joined hands overhead in that key. His front shin in the dip was also put near vertical, so the foot stays on the floor.
+
+### Verification
+
+- tsc, eslint (changed files) and love vitest pass. Poses checked as a mirrored SVG strip against the stills.
