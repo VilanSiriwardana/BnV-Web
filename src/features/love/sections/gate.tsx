@@ -28,10 +28,10 @@ const AMBIENT = Array.from({ length: 14 }, (_, i) => {
   const r = (k: number) =>
     (((Math.sin((i + 1) * 12.9898 * k) * 43758.5453) % 1) + 1) % 1;
   return {
-    left: `${4 + r(1) * 92}%`,
+    left: `${(4 + r(1) * 92).toFixed(2)}%`,
     size: 10 + Math.round(r(2) * 16),
-    dur: `${10 + r(3) * 8}s`,
-    delay: `${-r(4) * 14}s`,
+    dur: `${(10 + r(3) * 8).toFixed(2)}s`,
+    delay: `${(-r(4) * 14).toFixed(2)}s`,
     sway: `${Math.round((r(5) - 0.5) * 60)}px`,
   };
 });
@@ -113,8 +113,7 @@ export function Gate({
   }, [ready]);
 
   useEffect(() => {
-    if (timedOut && !sceneReady && (tier === 'high' || tier === 'mid'))
-      setTier('low');
+    if (timedOut && !sceneReady && tier === 'high') setTier('mid');
   }, [timedOut, sceneReady, tier, setTier]);
 
   // Intro drift (1 → load → rest) and one idle nudge; GSAP only writes --sep.

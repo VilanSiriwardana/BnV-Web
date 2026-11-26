@@ -18,7 +18,6 @@ import {
   ritualState,
   scrubGalleryDoor,
 } from './gallery-ritual';
-import { requestGalleryReveal } from './gallery-reveal';
 import { claimCamera, galleryState, releaseCamera } from './gallery-state';
 import { heart } from './heart-state';
 import { memoriesState } from './memories-state';
@@ -540,7 +539,7 @@ const buildGallery: SectionBuilder = (root, mobile) => {
     )
     .fromTo(heart, { scale: from.scale }, { scale: to.scale, ...scrub }, 0);
   // Blueprint 073: night closes in over the last stretch so the camera swap at the pin is hidden;
-  // the heart-iris (ui/heart-iris.tsx) then opens from the heart onto the door.
+  // Blueprint 077: it lifts once the door is reached.
   const veil = document.querySelector('[data-gallery-veil]');
   if (veil)
     gsap.fromTo(
@@ -574,11 +573,20 @@ const buildGallery: SectionBuilder = (root, mobile) => {
     },
     // Blueprint 053: arriving forward locks scroll at the door until the unlock ritual opens it.
     onToggle: (self) => {
-      if (!self.isActive) return leaveGallery();
+      if (!self.isActive) {
+        if (veil) gsap.set(veil, { autoAlpha: 0 });
+        return leaveGallery();
+      }
       claimCamera();
       if (self.direction > 0) {
         arriveAtDoor(self.start + 2);
-        requestGalleryReveal();
+        if (veil)
+          gsap.to(veil, {
+            autoAlpha: 0,
+            duration: 0.5,
+            delay: 0.1,
+            ease: 'power1.out',
+          });
       }
     },
   });

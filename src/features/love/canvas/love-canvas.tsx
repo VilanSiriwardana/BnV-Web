@@ -36,7 +36,6 @@ type Props = {
   /** Blueprint 061: Twelve Reasons book pages. */
   reasons?: string[];
   onDecline: () => void;
-  onIncline: () => void;
   debug?: boolean;
   onHeartTap?: () => void;
   onReady?: () => void;
@@ -54,7 +53,6 @@ export default function LoveCanvas({
   galleryEnd,
   reasons,
   onDecline,
-  onIncline,
   debug,
   onHeartTap,
   onReady,
@@ -86,12 +84,8 @@ export default function LoveCanvas({
         onReady?.();
       }}
     >
-      {/* Step down on decline; step up only after a long stable run (flipflops ends adaptation). */}
-      <PerformanceMonitor
-        onDecline={onDecline}
-        onIncline={onIncline}
-        flipflops={3}
-      />
+      {/* Blueprint 076: one step down at most, never back up. */}
+      <PerformanceMonitor onDecline={onDecline} flipflops={1} />
       <ambientLight intensity={0.6} />
       <directionalLight position={[3, 4, 5]} intensity={1} />
       <Heart tier={tier} onTap={onHeartTap} spell={spell}>

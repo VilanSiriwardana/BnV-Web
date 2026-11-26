@@ -1102,3 +1102,36 @@ Implemented M28–M33 in the order M28 → M32 → M29 → M31 → M30 → M33:
 ### Verification
 
 - `tsc --noEmit`, eslint (changed files) and vitest (love: 33 files, 140 tests) pass. Not checked in a browser.
+
+## 2026-11-26: Blueprint 075 (Love console errors and flicker)
+
+- `sections/gate.tsx`: `AMBIENT` `left`/`dur`/`delay` rounded with `toFixed(2)` to fix the hydration mismatch (the server and client serialised the floats differently).
+- Ran `scripts/prepare-love-images.mjs` (no sourceDir): added the missing `love-gallery-*-1024.webp` and `love-portrait-01(-1024).webp`; existing originals unchanged. Fixes the `smallSrc` 404s.
+- `THREE.Clock` deprecation comes from @react-three/fiber internals; X4122 is ANGLE shader noise. Neither needs action.
+- Flicker: not yet diagnosed; the owner still needs to check a prod build (`npm run build && npm run start`).
+
+### Verification
+
+- `tsc --noEmit`, eslint (gate.tsx) and `gallery-textures.test.ts` pass. Not checked in a browser.
+
+## 2026-11-26: Blueprint 076 (tier change no longer rebuilds the story)
+
+- Cause of the mid-Memories breakage: a PerformanceMonitor step-down changed `tier`, which re-ran `useGSAP` in `love-experience.tsx`. That reverted every ScrollTrigger, called `window.scrollTo(0,0)` while Lenis was mid-page, and left the heart at hero values.
+- `love-experience.tsx`: the story depends on `quiet` only; the tier is read through `tierRef`; a tier change now only calls `ScrollTrigger.refresh()`. Decline steps down once per visit (`steppedRef`); `onIncline` was removed.
+- `canvas/love-canvas.tsx`: `PerformanceMonitor` has `onDecline` only, `flipflops={1}`.
+- `sections/gate.tsx`: the 6 s load fallback is now high → mid (was → low).
+
+### Verification
+
+- tsc, eslint (changed files) and love vitest; see the session report. Not checked in a browser.
+
+## 2026-11-26: Blueprint 077 (HeartIris removed, plain dark fade)
+
+- Deleted `ui/heart-iris.tsx` (full-screen SVG mask with a drop-shadow over the canvas, repainted every scroll frame near the Gallery) and `engine/gallery-reveal.ts`.
+- `love-experience.tsx`: a plain `div[data-gallery-veil]` (night background, opacity only) replaces it.
+- `story.ts` `buildGallery`: the existing scrubbed veil still closes in; on forward entry it fades out (0.5 s) after `arriveAtDoor`, and resets to 0 when the Gallery deactivates. `requestGalleryReveal` and its Lenis force-jump were removed. `heart-director.ts` needed no change.
+- Next: the owner profiles a prod build (Memories → Gallery) before any off-screen scene pausing.
+
+### Verification
+
+- eslint (changed files) and love vitest (140 tests) pass; tsc reports errors only in generated `.next/dev/types` (dev server output), none in `src/`. Not checked in a browser.

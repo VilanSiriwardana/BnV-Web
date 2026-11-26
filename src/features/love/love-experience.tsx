@@ -29,7 +29,6 @@ import { Timeline } from './sections/timeline';
 import { Wish } from './sections/wish';
 import { CalmModeToggle } from './ui/calm-mode-toggle';
 import { FoundChip } from './ui/found-chip';
-import { HeartIris } from './ui/heart-iris';
 import { LoveSlugContext } from './ui/hidden-heart';
 import { MusicToggle } from './ui/music-toggle';
 import { LoveCursor } from './ui/love-cursor';
@@ -76,7 +75,10 @@ export function LoveExperience({ site }: { site: LoveSiteConfig }) {
 
 function LoveStory({ site }: { site: LoveSiteConfig }) {
   const quiet = useQuiet();
-  const { tier, setTier, stepDown, stepUp } = useTier();
+  const { tier, setTier, stepDown } = useTier();
+  // Blueprint 076: the story reads the tier once; a tier change only re-measures.
+  const tierRef = useRef(tier);
+  const steppedRef = useRef(false);
   const showCanvas = !quiet;
   const debug =
     useSyncExternalStore(noSubscribe, readDebug, serverFalse) &&
@@ -107,12 +109,20 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
   useGSAP(
     () => {
       window.scrollTo(0, 0);
-      const cleanup = buildStory(rootRef.current!, { quiet, tier });
+      const cleanup = buildStory(rootRef.current!, {
+        quiet,
+        tier: tierRef.current,
+      });
       document.fonts.ready.then(() => ScrollTrigger.refresh());
       return cleanup;
     },
-    { scope: rootRef, dependencies: [quiet, tier] },
+    { scope: rootRef, dependencies: [quiet] },
   );
+
+  useEffect(() => {
+    tierRef.current = tier;
+    ScrollTrigger.refresh();
+  }, [tier]);
 
   return (
     <div
@@ -136,8 +146,11 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
           galleryEnd={site.galleryEnd}
           reasons={site.reasons}
           onContextLost={() => setTier('static')}
-          onDecline={stepDown}
-          onIncline={stepUp}
+          onDecline={() => {
+            if (steppedRef.current) return;
+            steppedRef.current = true;
+            stepDown();
+          }}
           debug={debug}
           onHeartTap={tapHeart}
           onReady={() => setCanvasReady(true)}
@@ -212,7 +225,13 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
       />
       {entered && <MusicToggle />}
       {entered && <FoundChip slug={site.slug} />}
-      {showCanvas && <HeartIris />}
+      {showCanvas && (
+        <div
+          aria-hidden
+          data-gallery-veil
+          className="pointer-events-none invisible fixed inset-0 z-40 bg-[var(--night-background)] opacity-0"
+        />
+      )}
       <LoveScrollbar />
       <CalmModeToggle />
     </div>
