@@ -50,6 +50,7 @@ type ScrollOptions = {
   offset?: number;
   duration?: number;
   immediate?: boolean;
+  force?: boolean;
 };
 
 export function useLoveScroll() {

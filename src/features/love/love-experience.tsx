@@ -29,6 +29,7 @@ import { Timeline } from './sections/timeline';
 import { Wish } from './sections/wish';
 import { CalmModeToggle } from './ui/calm-mode-toggle';
 import { FoundChip } from './ui/found-chip';
+import { HeartIris } from './ui/heart-iris';
 import { LoveSlugContext } from './ui/hidden-heart';
 import { MusicToggle } from './ui/music-toggle';
 import { LoveCursor } from './ui/love-cursor';
@@ -155,14 +156,6 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
         />
         <Memories hint={site.copy.memoriesHint} memories={site.memories} />
         <Timeline title={site.copy.timelineTitle} items={site.timeline} />
-        <Starlight
-          line={site.copy.starlightLine}
-          hint={site.copy.skyHint ?? 'Join the stars, one to the next.'}
-          done={site.copy.skyDone ?? 'It was always a heart.'}
-          reveal={site.copy.skyReveal ?? []}
-          slug={site.slug}
-          memories={site.memories}
-        />
         <Gallery
           title={site.copy.galleryTitle}
           photos={site.gallery}
@@ -171,6 +164,14 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
           welcome={site.copy.galleryWelcome}
           plaque={site.copy.galleryPlaque}
           ritual={site.copy.galleryRitual}
+        />
+        <Starlight
+          line={site.copy.starlightLine}
+          hint={site.copy.skyHint ?? 'Join the stars, one to the next.'}
+          done={site.copy.skyDone ?? 'It was always a heart.'}
+          reveal={site.copy.skyReveal ?? []}
+          slug={site.slug}
+          memories={site.memories}
         />
         <Dance title={site.copy.danceTitle} line={site.copy.danceLine} />
         <Reasons
@@ -208,6 +209,7 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
       />
       {entered && <MusicToggle />}
       {entered && <FoundChip slug={site.slug} />}
+      {showCanvas && <HeartIris />}
       <LoveScrollbar />
       <CalmModeToggle />
     </div>

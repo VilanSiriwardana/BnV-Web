@@ -38,7 +38,7 @@ import { inflatedHeartGeometry, useHeartEnvMap } from './mini-hearts';
 import { mulberry32 } from './heart-geometry';
 
 const WARM = '#ffd29a';
-const FOG = new Fog('#1c0b16', 5, 20);
+export const FOG = new Fog('#1c0b16', 5, 20);
 const MAX_LIGHTS = TIERS.high.galleryLights;
 const MAX_MOTES = TIERS.high.galleryMotes;
 const LIGHT_AHEAD = [0.03, 0.12, 0.22];

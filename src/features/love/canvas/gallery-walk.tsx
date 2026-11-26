@@ -1,7 +1,7 @@
 'use client';
 
-import { useFrame } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import { useEffect, useMemo, useRef } from 'react';
 import type { Group } from 'three';
 
 import type { PhotoRef } from '../config';
@@ -19,7 +19,7 @@ import type { Tier } from '../engine/tiers';
 import { GalleryCameraRig } from './gallery-camera-rig';
 import { GalleryCorridor } from './gallery-corridor';
 import { GalleryFrames } from './gallery-frames';
-import { GalleryLights } from './gallery-lights';
+import { FOG, GalleryLights } from './gallery-lights';
 import { GalleryRitual } from './gallery-ritual';
 
 /** Gilded border on both sides, metres (gallery-frames.tsx BORDER × 2). */
@@ -52,6 +52,33 @@ export function GalleryWalk({ tier, gallery, galleryEnd }: Props) {
   useFrame(() => {
     if (group.current) group.current.visible = galleryState.active;
   });
+
+  // Blueprint 071: compile the corridor (with its fog) while idle, so the reveal never stalls.
+  const get = useThree((s) => s.get);
+  useEffect(() => {
+    let cancelled = false;
+    const warm = async () => {
+      const g = group.current;
+      if (cancelled || !g || galleryState.active) return;
+      const { gl, scene, camera } = get();
+      const fog = scene.fog;
+      g.visible = true;
+      scene.fog = FOG;
+      // compileAsync builds the programs synchronously; restore before the next frame renders.
+      const done = gl.compileAsync(scene, camera);
+      scene.fog = fog;
+      g.visible = galleryState.active;
+      await done.catch(() => undefined);
+    };
+    const idle = window.requestIdleCallback
+      ? window.requestIdleCallback(() => void warm(), { timeout: 4000 })
+      : window.setTimeout(() => void warm(), 1500);
+    return () => {
+      cancelled = true;
+      if (window.cancelIdleCallback) window.cancelIdleCallback(idle);
+      else window.clearTimeout(idle);
+    };
+  }, [get]);
 
   return (
     <>

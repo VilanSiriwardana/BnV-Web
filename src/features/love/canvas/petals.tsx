@@ -69,9 +69,13 @@ void main() {
   // Blueprint 070: radial spray to all sides; the drift begins once the burst settles.
   vec2 dir = vec2(cos(ang), sin(ang));
   float a0 = max(age, 0.0);
-  vec2 spray = uBurstOrigin + dir * (1.4 + aSeed.y * 1.6) * uReachScale * uBurstEase;
-  // Blueprint 069: no pause after the spray; each petal drifts on into its full-screen slot.
-  float spread = smoothstep(0.9, 2.6 + aSeed.w * 0.6, a0);
+  // Blueprint 071: boom: explosive drag-shaped flight with a light gravity arc, small → full size,
+  // drifting into the fall while still moving.
+  float fly = (1.0 - exp(-a0 * 5.0)) * step(0.001, uBurstEase);
+  vec2 spray = uBurstOrigin + dir * (1.4 + aSeed.y * 1.6) * uReachScale * fly
+    - vec2(0.0, 0.25 * a0 * a0 * uReachScale);
+  float spread = 1.0 - exp(-max(a0 - 0.35, 0.0) * (0.9 + aSeed.w * 0.5));
+  float bloom = 1.0 - exp(-a0 * 7.0);
   float speed = 0.18 + aSeed.w * 0.12;
   float fall = mod(aSeed.y * uSpan.y - t * speed, uSpan.y);
   vec3 slot = vec3(
@@ -80,8 +84,7 @@ void main() {
     (aSeed.z - 0.5) * 3.0
   );
   vec3 base = mix(vec3(spray, 0.0), slot, spread);
-  float k = spread;
-  p *= mix(0.35, 1.0, spread);
+  p *= mix(0.3, 1.0, bloom);
   // Blueprint 062: pull toward the heart origin when gathered.
   vec3 core = vec3(uOrigin + (aSeed.xy - 0.5) * 0.12, 0.0);
   // Blueprint 066: the heart inhales: petals spiral in, fastest near the core.
@@ -100,8 +103,8 @@ void main() {
 
   float seam = smoothstep(0.0, 0.08, fall / uSpan.y) * smoothstep(1.0, 0.92, fall / uSpan.y);
   seam = mix(seam, 1.0, max(g, 1.0 - spread));
-  vec3 tumble = rot(t * (0.6 + aSeed.w) + aSeed.w * 6.28, t * 0.4 + aSeed.x * 6.28) * p;
-  vec3 local = base + mix(p, tumble, k);
+  float spin = t * (0.6 + aSeed.w) + aSeed.w * 6.28 + fly * (6.0 + aSeed.w * 6.0);
+  vec3 local = base + rot(spin, t * 0.4 + atan(dir.y, dir.x)) * p;
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(local, 1.0);
   vColor = aColor;

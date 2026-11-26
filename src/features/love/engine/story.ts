@@ -458,7 +458,8 @@ const buildStarlight: SectionBuilder = (root, mobile) => {
   const el = root.querySelector<HTMLElement>('#starlight');
   if (!el) return;
   baselineOn(el, 'starlight');
-  const from = poseFor('timeline', mobile);
+  // Blueprint 071: Starlight now follows the gallery.
+  const from = poseFor('gallery', mobile);
   const wait = mobile ? SKY_WAIT.mobile : SKY_WAIT.desktop;
   const line = el.querySelector('[data-starlight-line]');
   const sky = el.querySelector('[data-sky]');
@@ -514,30 +515,11 @@ function leaveGallery() {
   releaseCamera();
 }
 
-const buildGallery: SectionBuilder = (root, mobile) => {
+const buildGallery: SectionBuilder = (root) => {
   const el = root.querySelector<HTMLElement>('#gallery');
   if (!el) return;
   baselineOn(el, 'gallery');
-  const from = poseFor('starlight', mobile);
-  const to = poseFor('gallery', mobile);
-  const scrub = { immediateRender: false, ease: 'none' };
-  gsap
-    .timeline({
-      scrollTrigger: {
-        trigger: el,
-        start: 'top bottom',
-        end: 'top 20%',
-        scrub: 0.8,
-      },
-    })
-    .fromTo(
-      heart.ndc,
-      { x: from.x, y: from.y },
-      { x: to.x, y: to.y, ...scrub },
-      0,
-    )
-    .fromTo(heart, { scale: from.scale }, { scale: to.scale, ...scrub }, 0);
-
+  // Blueprint 071: the arrow strike's heart-iris carries her in; no approach tween.
   ScrollTrigger.create({
     trigger: el,
     start: 'top top',
@@ -567,7 +549,7 @@ const buildDance: SectionBuilder = (root, mobile) => {
   const el = root.querySelector<HTMLElement>('#dance');
   if (!el) return;
   baselineOn(el, 'dance');
-  const from = poseFor('gallery', mobile);
+  const from = poseFor('starlight', mobile);
   const to = poseFor('dance', mobile);
   const scrub = { immediateRender: false, ease: 'none' };
   gsap
@@ -933,8 +915,8 @@ const sections = [
   buildBloom,
   buildMemories,
   buildTimeline,
-  buildStarlight,
   buildGallery,
+  buildStarlight,
   buildDance,
   buildReasons,
   buildWish,
