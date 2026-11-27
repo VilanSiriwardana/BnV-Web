@@ -14,21 +14,25 @@ import {
   AdditiveBlending,
   BackSide,
   CanvasTexture,
-  CatmullRomCurve3,
   Color,
+  DoubleSide,
   type Group,
   MeshPhysicalMaterial,
   type PointLight,
   SpriteMaterial,
-  TubeGeometry,
+  Vector2,
   Vector3,
 } from 'three';
 
+import { createRibbon, drapeBand, smooth, updateRibbon } from './gift-ribbon';
 import { registerGiftStage } from './gift-stage';
+import { paperGrain, satinWeave } from './gift-textures';
 import { readTokenColors } from './token-colors';
 
 type Props = {
   progress: RefObject<{ value: number }>;
+  /** 0 → 1 drop-in as the row scrolls into view (already eased by GSAP). */
+  intro: RefObject<{ value: number }>;
   sealed: boolean;
 };
 
@@ -37,23 +41,55 @@ const H = 0.95;
 const LID_H = 0.24;
 const LID_W = W + 0.1;
 const WALL = 0.05;
-const BAND = 0.18;
-const HALF = (LID_W + 0.02) / 2;
-/** Lid half-bands: direction in the lid plane and the hinge axis they tip around. */
+const BAND = 0.16;
+const TOP = H / 2 + LID_H - 0.04;
+const LID_EDGE = LID_W / 2;
+const LID_BOT = H / 2 - 0.04;
+const FLOOR = -H / 2;
+
+/** Lid-and-face drape for one band: [distance from centre, height]. */
+const profile = (e: number) =>
+  [
+    [0, TOP + e],
+    [0.22, TOP + e],
+    [0.46, TOP + e],
+    [LID_EDGE - 0.06, TOP + e],
+    [LID_EDGE + e, TOP - 0.05],
+    [LID_EDGE + e, LID_BOT + 0.05],
+    [LID_EDGE + e, LID_BOT],
+    [W / 2 + e, LID_BOT - 0.03],
+    [W / 2 + e, 0.05],
+    [W / 2 + e, FLOOR + 0.02],
+  ] as const;
+
 const BANDS = [
-  { dir: [1, 0], rot: 0 },
-  { dir: [-1, 0], rot: Math.PI },
-  { dir: [0, 1], rot: -Math.PI / 2 },
-  { dir: [0, -1], rot: Math.PI / 2 },
+  { dir: [1, 0], e: 0.008 },
+  { dir: [-1, 0], e: 0.008 },
+  { dir: [0, 1], e: 0.004 },
+  { dir: [0, -1], e: 0.004 },
 ] as const;
 
-const smooth = (a: number, b: number, x: number) => {
-  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
-  return t * t * (3 - 2 * t);
+const LOOP: [number, number, number][] = [
+  [0, 0, 0],
+  [-0.1, 0.1, 0.03],
+  [-0.27, 0.17, 0.02],
+  [-0.35, 0.07, 0],
+  [-0.22, 0.0, -0.01],
+  [-0.03, 0.0, 0],
+];
+const TAIL: [number, number, number][] = [
+  [0, -0.01, 0.03],
+  [-0.06, -0.025, 0.13],
+  [-0.12, -0.035, 0.25],
+  [-0.19, -0.035, 0.37],
+];
+
+const easeOutBack = (t: number) => {
+  const c = 1.4;
+  return 1 + (c + 1) * (t - 1) ** 3 + c * (t - 1) ** 2;
 };
 
-const curve = (pts: [number, number, number][]) =>
-  new CatmullRomCurve3(pts.map((p) => new Vector3(...p)));
+const v3 = ([x, y, z]: readonly number[]) => new Vector3(x, y, z);
 
 function useGiftParts() {
   const parts = useMemo(() => {
@@ -66,43 +102,58 @@ function useGiftParts() {
     const goldC = c.gold.night ?? new Color('#d4ac63');
     const box = lav.clone().multiplyScalar(0.82);
     const lid = lav.clone().lerp(ivory, 0.25);
-    const satin = (color: Color, sheen: Color) =>
+    const grain = paperGrain();
+    const weave = satinWeave();
+    const paper = (color: Color, sheen: Color) =>
       new MeshPhysicalMaterial({
         color,
-        roughness: 0.55,
-        sheen: 1,
-        sheenRoughness: 0.4,
+        roughness: 0.62,
+        sheen: 0.8,
+        sheenRoughness: 0.5,
         sheenColor: sheen,
-        clearcoat: 0.25,
-        clearcoatRoughness: 0.4,
+        clearcoat: 0.18,
+        clearcoatRoughness: 0.5,
+        bumpMap: grain,
+        bumpScale: 0.6,
       });
-    const gold = (fade = false) =>
-      new MeshPhysicalMaterial({
-        color: goldC,
-        metalness: 0.9,
-        roughness: 0.35,
-        clearcoat: 0.6,
-        clearcoatRoughness: 0.2,
-        transparent: fade,
-      });
-    const loopL = curve([
-      [0, 0, 0],
-      [-0.12, 0.14, 0.02],
-      [-0.32, 0.2, 0],
-      [-0.38, 0.07, -0.02],
-      [-0.18, 0.02, 0],
-      [0, 0, 0],
-    ]);
-    const loopR = curve(loopL.points.map((p) => [-p.x, p.y, p.z]));
-    const tailL = curve([
-      [0, 0, 0.02],
-      [-0.08, -0.03, 0.14],
-      [-0.16, -0.05, 0.3],
-      [-0.22, -0.06, 0.42],
-    ]);
-    const tailR = curve(tailL.points.map((p) => [-p.x, p.y, p.z]));
-    const tube = (cv: CatmullRomCurve3, closed = false) =>
-      new TubeGeometry(cv, 48, 0.035, 8, closed);
+    const satinGold = new MeshPhysicalMaterial({
+      color: goldC,
+      metalness: 0.55,
+      roughness: 0.3,
+      sheen: 1,
+      sheenRoughness: 0.25,
+      sheenColor: goldC.clone().lerp(ivory, 0.5),
+      anisotropy: 0.7,
+      clearcoat: 0.3,
+      clearcoatRoughness: 0.25,
+      bumpMap: weave,
+      bumpScale: 0.35,
+      side: DoubleSide,
+    });
+
+    const bands = BANDS.map((b) => {
+      const pts = profile(b.e).map(([r, y]) =>
+        v3([b.dir[0] * r, y, b.dir[1] * r]),
+      );
+      return createRibbon(pts, new Vector3(-b.dir[1], 0, b.dir[0]), BAND, 48);
+    });
+    const knotY = TOP + 0.03;
+    const loops = [1, -1].map((m) =>
+      createRibbon(
+        LOOP.map(([x, y, z]) => v3([x * -m, y + knotY, z])),
+        new Vector3(0, 0, 1),
+        0.13,
+        32,
+      ),
+    );
+    const tails = [1, -1].map((m) =>
+      createRibbon(
+        TAIL.map(([x, y, z]) => v3([x * -m, y + knotY, z])),
+        new Vector3(0.86, 0, 0.5 * m),
+        0.12,
+        16,
+      ),
+    );
 
     const canvas = document.createElement('canvas');
     canvas.width = canvas.height = 64;
@@ -120,20 +171,26 @@ function useGiftParts() {
       boxC: box,
       lidC: lid,
       grey: new Color('#5d5866'),
-      body: satin(box.clone(), lid),
-      cap: satin(lid.clone(), ivory),
+      body: paper(box.clone(), lid),
+      cap: paper(lid.clone(), ivory),
       liner: new MeshPhysicalMaterial({
         color: lav.clone().multiplyScalar(0.4),
         roughness: 0.9,
         side: BackSide,
       }),
-      gold: gold(),
-      bowGold: gold(true),
-      bandGold: gold(true),
-      loopL: tube(loopL),
-      loopR: tube(loopR),
-      tailL: tube(tailL),
-      tailR: tube(tailR),
+      gold: new MeshPhysicalMaterial({
+        color: goldC,
+        metalness: 0.9,
+        roughness: 0.35,
+        clearcoat: 0.6,
+        clearcoatRoughness: 0.2,
+      }),
+      satinGold,
+      grain,
+      weave,
+      bands,
+      loops,
+      tails,
       glowTex,
       glow: new SpriteMaterial({
         map: glowTex,
@@ -142,76 +199,110 @@ function useGiftParts() {
         opacity: 0,
         depthWrite: false,
       }),
+      knotY,
     };
   }, []);
   useEffect(
-    () => () =>
+    () => () => {
       Object.values(parts).forEach((p) => {
-        if ('dispose' in p) p.dispose();
-      }),
+        if (p && typeof p === 'object' && 'dispose' in p) p.dispose();
+      });
+      [...parts.bands, ...parts.loops, ...parts.tails].forEach((r) =>
+        r.geometry.dispose(),
+      );
+    },
     [parts],
   );
   return parts;
 }
 
-function Gift({ progress, sealed }: Props) {
+const tmp = new Vector2();
+const origin = new Vector2();
+
+function Gift({ progress, intro, sealed }: Props) {
   const p = useGiftParts();
   const root = useRef<Group>(null);
   const lid = useRef<Group>(null);
   const bow = useRef<Group>(null);
-  const loops = useRef<(Group | null)[]>([]);
-  const tails = useRef<(Group | null)[]>([]);
-  const bands = useRef<(Group | null)[]>([]);
   const lock = useRef<Group>(null);
   const light = useRef<PointLight>(null);
+  const last = useRef(-1);
 
   const partsRef = useRef(p);
   useFrame(({ clock }, dt) => {
     const p = partsRef.current;
     const v = progress.current?.value ?? 0;
-    const pull = smooth(0, 0.18, v);
-    const shrink = smooth(0.08, 0.32, v);
-    const lift = smooth(0.28, 0.42, v);
-    const slide = smooth(0.18, 0.42, v);
-    const open = smooth(0.42, 0.8, v);
-    const spill = smooth(0.6, 1, v);
+    const k = intro.current?.value ?? 1;
     const t = clock.elapsedTime;
 
     if (root.current) {
-      root.current.rotation.y = -0.55 + (sealed ? 0 : Math.sin(t * 0.7) * 0.08);
-      root.current.position.y = -0.45 + (sealed ? 0 : Math.sin(t * 1.1) * 0.02);
+      const idle = sealed || v > 0 ? 0 : 1;
+      root.current.rotation.y = -0.55 + Math.sin(t * 0.7) * 0.08 * idle;
+      root.current.rotation.z = (1 - k) * 0.18;
+      root.current.position.y =
+        -0.45 + (1 - k) * 0.9 + Math.sin(t * 1.1) * 0.02 * idle;
     }
-    tails.current.forEach((g, i) => {
-      if (!g) return;
-      const side = i === 0 ? 1 : -1;
-      g.rotation.y = side * pull * 0.5;
-      g.rotation.z = side * pull * 0.25;
-    });
-    loops.current.forEach((g) => g?.scale.setScalar(1 - shrink * 0.75));
-    if (bow.current) bow.current.position.y = LID_H / 2 + lift * 0.15;
-    p.bowGold.opacity = 1 - lift;
-    bands.current.forEach((g, i) => {
-      if (!g) return;
-      const [dx, dz] = BANDS[i].dir;
-      const out = slide * 0.35;
-      g.position.set(dx * out, -0.5 * slide * slide, dz * out);
-      g.children[0].rotation.z = -slide * 0.6;
-    });
-    p.bandGold.opacity = 1 - smooth(0.3, 0.42, v);
+    if (bow.current) {
+      // Settling wobble after the drop, then the knot slips through and is gone.
+      bow.current.rotation.z = Math.sin(t * 11) * (1 - k) * 0.35;
+      bow.current.scale.setScalar(Math.max(0.0001, 1 - smooth(0.26, 0.4, v)));
+    }
+
+    // Ribbon geometry only rebuilds while the untie progress moves.
+    if (Math.abs(v - last.current) > 1e-4) {
+      last.current = v;
+      const pull = smooth(0, 0.18, v);
+      const collapse = smooth(0.1, 0.32, v);
+      const slide = smooth(0.14, 0.42, v);
+      p.tails.forEach((r, i) => {
+        const m = i === 0 ? 1 : -1;
+        r.curve.points.forEach((pt, j) => {
+          const [x, y, z] = TAIL[j];
+          const s = 1 + pull * 0.6 * (j / 3);
+          pt.set(x * -m * s, y + p.knotY - pull * 0.01 * j, z * s);
+        });
+        updateRibbon(r);
+      });
+      p.loops.forEach((r, i) => {
+        const m = i === 0 ? 1 : -1;
+        // Pulling the tail draws the loop back through the knot.
+        const s = 1 - collapse * 0.94 - pull * 0.12;
+        r.curve.points.forEach((pt, j) => {
+          const [x, y, z] = LOOP[j];
+          tmp.set(x * -m, y).rotateAround(origin, m * collapse * 0.5);
+          pt.set(tmp.x * s, tmp.y * s + p.knotY, z * s);
+        });
+        updateRibbon(r);
+      });
+      p.bands.forEach((r, i) => {
+        drapeBand(
+          r.curve.points,
+          profile(BANDS[i].e),
+          BANDS[i].dir,
+          slide,
+          LID_EDGE,
+          FLOOR,
+        );
+        updateRibbon(r);
+      });
+    }
+
+    const open = smooth(0.42, 0.82, v);
     if (lid.current) {
-      lid.current.rotation.x = -open * 0.45;
-      lid.current.position.y = H / 2 + open * 0.25;
+      lid.current.rotation.x = -easeOutBack(open) * 1.75;
+      lid.current.position.y = H / 2 + Math.sin(Math.PI * open) * 0.12;
     }
     const s = sealed ? 0.65 : 0;
     p.body.color.copy(p.boxC).lerp(p.grey, s);
     p.cap.color.copy(p.lidC).lerp(p.grey, s);
     if (lock.current) {
-      const k = lock.current.scale.x;
+      const l = lock.current.scale.x;
       lock.current.scale.setScalar(
-        k + ((sealed ? 1 : 0) - k) * Math.min(1, dt * 8),
+        l + ((sealed ? 1 : 0) - l) * Math.min(1, dt * 8),
       );
       lock.current.visible = lock.current.scale.x > 0.01;
     }
+    const spill = smooth(0.6, 1, v);
     if (light.current) light.current.intensity = spill * 2;
     p.glow.opacity = spill * 0.35;
   });
@@ -248,24 +339,29 @@ function Gift({ progress, sealed }: Props) {
           args={[W - WALL * 2 - 0.004, H - WALL, W - WALL * 2 - 0.004]}
         />
       </mesh>
-      {[1, -1].map((s) => (
+      {/* One continuous satin band per side: over the lid, down the face; it slides off and spills. */}
+      {p.bands.map((r) => (
         <mesh
-          key={`bz${s}`}
-          material={p.gold}
-          position={[0, 0, s * (W / 2 + 0.006)]}
-        >
-          <boxGeometry args={[BAND, H, 0.012]} />
-        </mesh>
+          key={r.geometry.uuid}
+          geometry={r.geometry}
+          material={p.satinGold}
+        />
       ))}
-      {[1, -1].map((s) => (
-        <mesh
-          key={`bx${s}`}
-          material={p.gold}
-          position={[s * (W / 2 + 0.006), 0, 0]}
-        >
-          <boxGeometry args={[0.012, H, BAND]} />
-        </mesh>
-      ))}
+      <group ref={bow} position={[0, 0, 0]}>
+        {[...p.loops, ...p.tails].map((r) => (
+          <mesh
+            key={r.geometry.uuid}
+            geometry={r.geometry}
+            material={p.satinGold}
+          />
+        ))}
+        <RoundedBox
+          args={[0.12, 0.07, 0.15]}
+          radius={0.03}
+          position={[0, p.knotY, 0.005]}
+          material={p.satinGold}
+        />
+      </group>
       <pointLight
         ref={light}
         position={[0, 0, 0]}
@@ -276,66 +372,13 @@ function Gift({ progress, sealed }: Props) {
       <sprite material={p.glow} position={[0, H / 2 - 0.2, 0]} scale={0.9} />
       {/* Lid hinges on its back-top edge. */}
       <group ref={lid} position={[0, H / 2, -LID_W / 2]}>
-        <group>
-          <group position={[0, LID_H / 2 - 0.04, LID_W / 2]}>
-            <RoundedBox
-              args={[LID_W, LID_H, LID_W]}
-              radius={0.05}
-              smoothness={4}
-              material={p.cap}
-            />
-            {BANDS.map((b, i) => (
-              <group
-                key={b.rot}
-                ref={(g) => {
-                  bands.current[i] = g;
-                }}
-              >
-                <group rotation-y={b.rot}>
-                  <mesh position={[HALF / 2, 0, 0]} material={p.bandGold}>
-                    <boxGeometry args={[HALF, LID_H + 0.02, BAND]} />
-                  </mesh>
-                </group>
-              </group>
-            ))}
-            <group ref={bow} position={[0, LID_H / 2, 0]}>
-              {[p.tailL, p.tailR].map((geo, i) => (
-                <group
-                  key={geo.uuid}
-                  ref={(g) => {
-                    tails.current[i] = g;
-                  }}
-                >
-                  <mesh
-                    geometry={geo}
-                    material={p.bowGold}
-                    scale={[1, 0.5, 1]}
-                  />
-                </group>
-              ))}
-              {[p.loopL, p.loopR].map((geo, i) => (
-                <group
-                  key={geo.uuid}
-                  ref={(g) => {
-                    loops.current[i] = g;
-                  }}
-                >
-                  <mesh
-                    geometry={geo}
-                    material={p.bowGold}
-                    scale={[1, 1, 0.4]}
-                  />
-                </group>
-              ))}
-              <mesh
-                material={p.bowGold}
-                scale={[1, 0.8, 0.8]}
-                position={[0, 0.02, 0]}
-              >
-                <sphereGeometry args={[0.06, 24, 16]} />
-              </mesh>
-            </group>
-          </group>
+        <group position={[0, LID_H / 2 - 0.04, LID_W / 2]}>
+          <RoundedBox
+            args={[LID_W, LID_H, LID_W]}
+            radius={0.05}
+            smoothness={4}
+            material={p.cap}
+          />
         </group>
       </group>
       <group ref={lock} position={[0, -0.05, W / 2 + 0.06]}>
@@ -359,12 +402,18 @@ function StageBridge() {
 
 // Blueprint 085: one shared, on-demand Canvas for the whole gift row; each GiftBox draws into
 // its own button through a drei View (one WebGL context instead of three).
-export default function GiftCanvas({ onLost }: { onLost?: () => void }) {
+export default function GiftCanvas({
+  onLost,
+  dpr = [1, 1.25],
+}: {
+  onLost?: () => void;
+  dpr?: [number, number];
+}) {
   return (
     <Canvas
       aria-hidden
       frameloop="demand"
-      dpr={[1, 1.25]}
+      dpr={dpr}
       gl={{ alpha: true, antialias: true, powerPreference: 'low-power' }}
       style={{
         position: 'absolute',
@@ -403,7 +452,7 @@ function GiftScene(props: Props) {
         fov={30}
         onUpdate={(c) => c.lookAt(0, 0.1, 0)}
       />
-      <ambientLight intensity={0.35} />
+      <ambientLight intensity={0.3} />
       <directionalLight position={[3, 4, 3]} intensity={1.4} />
       <directionalLight
         position={[-3, 2, -2]}
@@ -412,7 +461,7 @@ function GiftScene(props: Props) {
       />
       <Environment resolution={64} frames={1}>
         <Lightformer
-          intensity={2}
+          intensity={2.2}
           position={[0, 3, 2]}
           scale={[6, 2, 1]}
           color="#fff4e0"
@@ -425,18 +474,25 @@ function GiftScene(props: Props) {
           color="#cdb9ef"
         />
         <Lightformer
-          intensity={1.4}
+          intensity={1.6}
           position={[4, 1, -1]}
           rotation-y={-Math.PI / 2}
           scale={[3, 3, 1]}
           color="#e3c27e"
+        />
+        <Lightformer
+          intensity={0.8}
+          position={[0, -2, 3]}
+          rotation-x={-Math.PI / 3}
+          scale={[5, 1, 1]}
+          color="#f6efe6"
         />
       </Environment>
       <Gift {...props} />
       <ContactShadows
         position={[0, -0.93, 0]}
         opacity={0.45}
-        scale={2.6}
+        scale={3.2}
         blur={2.6}
         far={1.6}
         frames={1}

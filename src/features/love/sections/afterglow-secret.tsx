@@ -308,17 +308,30 @@ export function AfterglowSecret({
                   />
                 ))}
               </div>
-              <ul ref={chips} className="grid gap-2.5 text-left sm:grid-cols-2">
-                {HIDDEN_HEART_IDS.map((id) => {
+              <ul
+                ref={chips}
+                className="grid auto-rows-fr gap-2.5 text-left sm:grid-cols-2"
+              >
+                {HIDDEN_HEART_IDS.map((id, i) => {
                   const { icon: Icon, text } = HIDDEN_HEART_CLUES[id];
                   const got = found.includes(id);
+                  const lastOdd =
+                    i === HIDDEN_HEART_IDS.length - 1 &&
+                    HIDDEN_HEART_IDS.length % 2 === 1;
                   return (
-                    <li key={id}>
+                    <li
+                      key={id}
+                      className={cn(
+                        'h-full',
+                        lastOdd &&
+                          'sm:col-span-2 sm:mx-auto sm:w-[calc(50%-0.3125rem)]',
+                      )}
+                    >
                       <button
                         type="button"
                         onClick={() => focusHiddenHeart(id, scrollTo)}
                         className={cn(
-                          'focus-ring relative flex w-full items-center gap-3.5 rounded-2xl border bg-[color-mix(in_oklab,var(--surface)_60%,transparent)] px-4 py-3 text-left font-serif text-base tracking-wide backdrop-blur-sm transition-[border-color,box-shadow,color] duration-500',
+                          'focus-ring relative flex h-full min-h-16 w-full items-center gap-3 rounded-2xl border bg-[color-mix(in_oklab,var(--surface)_60%,transparent)] px-3.5 py-3 text-left font-serif text-[0.95rem] leading-snug tracking-wide text-balance backdrop-blur-sm transition-[border-color,box-shadow,color] duration-500',
                           got
                             ? 'border-gold/60 text-gold-text shadow-[0_0_22px_-8px_var(--gold)]'
                             : 'border-gold/15 text-foreground/90 hover:border-gold/35',

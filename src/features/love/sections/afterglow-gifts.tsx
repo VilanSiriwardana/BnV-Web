@@ -41,7 +41,8 @@ export function AfterglowGifts({
   const [glOk, setGlOk] = useState(true);
   const [near, setNear] = useState(false);
   const row = useRef<HTMLDivElement>(null);
-  const three = !quiet && glOk && (tier === 'high' || tier === 'mid');
+  // The gift Canvas is on-demand and cheap, so it stays on when the main scene steps down to `low`.
+  const three = !quiet && glOk && tier !== 'static';
 
   // Blueprint 085: mount the shared gift Canvas only near the row; idle sway redraws at 30 fps.
   useEffect(() => {
@@ -117,7 +118,12 @@ export function AfterglowGifts({
             );
           })}
         </ul>
-        {three && near && <GiftCanvas onLost={() => setGlOk(false)} />}
+        {three && near && (
+          <GiftCanvas
+            dpr={tier === 'low' ? [1, 1] : [1, 1.25]}
+            onLost={() => setGlOk(false)}
+          />
+        )}
       </div>
     </div>
   );

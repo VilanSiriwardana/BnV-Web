@@ -53,17 +53,29 @@ export function GiftBox({
   const ready = useGiftStageReady();
   const live = three && ready;
   const progress = useRef({ value: opened ? 1 : 0 });
+  const intro = useRef({ value: quiet ? 1 : 0 });
   const button = useRef<HTMLButtonElement>(null);
   const svg = useRef<SVGSVGElement>(null);
 
   // Blueprint 085: rise in once, staggered along the row.
   useEffect(() => {
     const el = button.current;
-    if (!el || quiet) return;
+    if (!el || quiet) {
+      intro.current.value = 1;
+      return;
+    }
     gsap.set(el, { autoAlpha: 0, y: 24, scale: 0.92 });
     const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return;
       io.disconnect();
+      // The 3D gift drops in and settles (its bow wobbles) while the button fades up.
+      gsap.to(intro.current, {
+        value: 1,
+        duration: 1.1,
+        delay: index * 0.14,
+        ease: 'back.out(1.6)',
+        onUpdate: requestGiftFrame,
+      });
       gsap.to(el, {
         autoAlpha: 1,
         y: 0,
@@ -279,7 +291,12 @@ export function GiftBox({
           />
         )}
         {live && (
-          <GiftView track={button} progress={progress} sealed={sealed} />
+          <GiftView
+            track={button}
+            progress={progress}
+            intro={intro}
+            sealed={sealed}
+          />
         )}
         <svg
           ref={svg}

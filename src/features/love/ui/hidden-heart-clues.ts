@@ -17,6 +17,6 @@ export const HIDDEN_HEART_CLUES: Record<
   hero: { icon: UserRound, text: 'Near your name' },
   memories: { icon: Images, text: 'The memories title' },
   timeline: { icon: Spline, text: 'The end of our thread' },
-  gallery: { icon: Camera, text: 'One gallery photo' },
+  gallery: { icon: Camera, text: 'Photo gallery' },
   letter: { icon: PenLine, text: 'My signature' },
 };

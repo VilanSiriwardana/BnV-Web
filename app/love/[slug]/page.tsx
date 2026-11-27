@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { getLoveSite } from '@/features/love/config';
 import { LoveExperience } from '@/features/love/love-experience';
 
-const title = 'A little something';
+const title = "Bubu's Birthday";
 
 // Private page: neutral title, no names in previews, never indexed (ADR-0028).
 export const metadata: Metadata = {
