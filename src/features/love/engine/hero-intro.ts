@@ -42,7 +42,11 @@ function startIdle(delay: number) {
 // Experience §6 timings. Played once by the gate tap; `from` is the seed's NDC position.
 export function playHeroIntro(
   root: HTMLElement,
-  { from, calm }: { from?: { x: number; y: number }; calm: boolean },
+  {
+    from,
+    calm,
+    onDone,
+  }: { from?: { x: number; y: number }; calm: boolean; onDone?: () => void },
 ) {
   killHeroIntro();
   entered = true;
@@ -59,6 +63,7 @@ export function playHeroIntro(
     Object.assign(heart.ndc, { x: pose.x, y: pose.y });
     heart.form = 1;
     heart.ambientIn = 1;
+    if (onDone) gsap.delayedCall(0.6, onDone);
     return;
   }
   if (window.matchMedia(REDUCED_MOTION_QUERY).matches) {
@@ -70,6 +75,7 @@ export function playHeroIntro(
       { autoAlpha: 0 },
       { autoAlpha: 1, duration: 0.3 },
     );
+    if (onDone) gsap.delayedCall(0.6, onDone);
     return;
   }
 
@@ -105,7 +111,8 @@ export function playHeroIntro(
     )
     .fromTo(cue, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, 5)
     // Ambient hearts wait for the intro to finish, then ease in.
-    .to(heart, { ambientIn: 1, duration: 1.6, ease: 'sine.inOut' }, 5.4);
+    .to(heart, { ambientIn: 1, duration: 1.6, ease: 'sine.inOut' }, 5.4)
+    .call(() => onDone?.(), [], 6.4);
   // Hide the copy before the first frame so nothing flashes before the intro reaches it.
   intro.progress(0.0001).progress(0);
   if (cue?.firstElementChild)

@@ -25,3 +25,11 @@ export function writeJSON(key: string, value: unknown): void {
     // Blocked or full: progress stays session-only.
   }
 }
+
+export function removeJSON(key: string): void {
+  try {
+    store()?.removeItem(key);
+  } catch {
+    // Blocked: nothing to remove.
+  }
+}

@@ -1,17 +1,24 @@
 'use client';
 
 import { CalendarPlus, MapPin } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
+import { useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 
 import type { LoveSiteConfig } from '../config';
+import { requestGiftFrame } from '../canvas/gift-stage';
 import { countdownParts } from '../engine/countdown';
 import { director } from '../engine/heart-director';
 import { progressSet, usePersistedSet } from '../engine/hidden-hearts';
 import { buildIcs, downloadIcs } from '../engine/ics';
+import { useTier } from '../engine/tier-provider';
+import { useQuiet } from '../engine/use-quiet';
+import { gsap } from '../ui/afterglow-motion';
 import { GiftBox } from '../ui/gift-box';
 import { labelText } from './love-section';
+
+const GiftCanvas = dynamic(() => import('../canvas/gift-3d'), { ssr: false });
 
 type Gifts = NonNullable<NonNullable<LoveSiteConfig['afterglow']>['gifts']>;
 type Plan = NonNullable<Gifts['items'][number]['plan']>;
@@ -29,6 +36,35 @@ export function AfterglowGifts({
   const set = progressSet(slug, 'gifts');
   const opened = usePersistedSet(set);
   const pickedOne = gifts.mode === 'pick-one' && opened.length > 0;
+  const quiet = useQuiet();
+  const { tier } = useTier();
+  const [glOk, setGlOk] = useState(true);
+  const [near, setNear] = useState(false);
+  const row = useRef<HTMLDivElement>(null);
+  const three = !quiet && glOk && (tier === 'high' || tier === 'mid');
+
+  // Blueprint 085: mount the shared gift Canvas only near the row; idle sway redraws at 30 fps.
+  useEffect(() => {
+    const el = row.current;
+    if (!el || !three) return;
+    const io = new IntersectionObserver(([e]) => setNear(e.isIntersecting), {
+      rootMargin: '200px 0px',
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [three]);
+
+  useEffect(() => {
+    if (!three || !near) return;
+    let last = 0;
+    const tick = (time: number) => {
+      if (time - last < 1 / 30) return;
+      last = time;
+      requestGiftFrame();
+    };
+    gsap.ticker.add(tick);
+    return () => gsap.ticker.remove(tick);
+  }, [three, near]);
 
   return (
     <div data-reveal className="w-full">
@@ -42,43 +78,47 @@ export function AfterglowGifts({
             ? 'One at a time, in order. Hold each until the ribbon lets go.'
             : 'Hold each one until the ribbon lets go.'}
       </p>
-      <ul className="mt-10 grid justify-items-center gap-10 md:grid-cols-3">
-        {gifts.items.map((g, i) => {
-          const isOpen = opened.includes(g.id);
-          return (
-            <li key={g.id} className="w-full">
-              <GiftBox
-                index={i}
-                total={gifts.items.length}
-                label={g.label}
-                opened={isOpen}
-                sealed={
-                  !isOpen &&
-                  (gifts.mode === 'sequence'
-                    ? gifts.items
-                        .slice(0, i)
-                        .some((p) => !opened.includes(p.id))
-                    : pickedOne)
-                }
-                sealedLabel={
-                  gifts.mode === 'sequence'
-                    ? 'Open the one before first'
-                    : undefined
-                }
-                onOpen={() => set.add(g.id)}
-              >
-                <div className={card}>
-                  <p className="font-display text-h4 text-gold-text">
-                    {g.title}
-                  </p>
-                  <p className="text-body mt-2 text-pretty">{g.text}</p>
-                  {g.plan && <PlanCard title={g.title} plan={g.plan} />}
-                </div>
-              </GiftBox>
-            </li>
-          );
-        })}
-      </ul>
+      <div ref={row} className="relative mt-10">
+        <ul className="grid justify-items-center gap-10 md:grid-cols-3">
+          {gifts.items.map((g, i) => {
+            const isOpen = opened.includes(g.id);
+            return (
+              <li key={g.id} className="w-full">
+                <GiftBox
+                  index={i}
+                  total={gifts.items.length}
+                  label={g.label}
+                  opened={isOpen}
+                  sealed={
+                    !isOpen &&
+                    (gifts.mode === 'sequence'
+                      ? gifts.items
+                          .slice(0, i)
+                          .some((p) => !opened.includes(p.id))
+                      : pickedOne)
+                  }
+                  sealedLabel={
+                    gifts.mode === 'sequence'
+                      ? 'Open the one before first'
+                      : undefined
+                  }
+                  onOpen={() => set.add(g.id)}
+                  three={three && near}
+                >
+                  <div className={card}>
+                    <p className="font-display text-h4 text-gold-text">
+                      {g.title}
+                    </p>
+                    <p className="text-body mt-2 text-pretty">{g.text}</p>
+                    {g.plan && <PlanCard title={g.title} plan={g.plan} />}
+                  </div>
+                </GiftBox>
+              </li>
+            );
+          })}
+        </ul>
+        {three && near && <GiftCanvas onLost={() => setGlOk(false)} />}
+      </div>
     </div>
   );
 }

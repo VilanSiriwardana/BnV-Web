@@ -1,12 +1,20 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { createPersistedSet, HIDDEN_HEART_IDS } from './hidden-hearts';
+import {
+  createPersistedSet,
+  ensureFreshProgress,
+  HIDDEN_HEART_IDS,
+  progressSet,
+  progressValue,
+  resetProgress,
+} from './hidden-hearts';
 
 function memoryStore() {
   const m = new Map<string, string>();
   return {
     getItem: (k: string) => m.get(k) ?? null,
     setItem: (k: string, v: string) => void m.set(k, v),
+    removeItem: (k: string) => void m.delete(k),
   };
 }
 
@@ -46,5 +54,45 @@ describe('hidden hearts', () => {
     store.setItem('love:s:hearts', '{"x":1}');
     vi.stubGlobal('localStorage', store);
     expect(createPersistedSet('love:s:hearts').count()).toBe(0);
+  });
+
+  it('clear empties the set, persists it and notifies', () => {
+    vi.stubGlobal('localStorage', memoryStore());
+    const set = createPersistedSet('love:c:hearts');
+    set.add('hero');
+    const fn = vi.fn();
+    set.subscribe(fn);
+    set.clear();
+    expect(set.count()).toBe(0);
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(createPersistedSet('love:c:hearts').count()).toBe(0);
+  });
+
+  it('resetProgress clears gifts, notes, hearts and the wish', () => {
+    vi.stubGlobal('localStorage', memoryStore());
+    for (const n of ['gifts', 'notes', 'hearts'] as const)
+      progressSet('r', n).add('x');
+    progressValue('r', 'wish').set('forever');
+    resetProgress('r');
+    for (const n of ['gifts', 'notes', 'hearts'] as const)
+      expect(progressSet('r', n).count()).toBe(0);
+    expect(progressValue('r', 'wish').get()).toBe('');
+  });
+
+  it('ensureFreshProgress resets once when the cache marker is missing', async () => {
+    vi.stubGlobal('localStorage', memoryStore());
+    const keys = new Set<string>();
+    vi.stubGlobal('caches', {
+      open: async () => ({
+        match: async (u: string) => keys.has(u) || undefined,
+        put: async (u: string) => void keys.add(u),
+      }),
+    });
+    progressSet('f', 'hearts').add('hero');
+    await ensureFreshProgress('f');
+    expect(progressSet('f', 'hearts').count()).toBe(0);
+    progressSet('f', 'hearts').add('memories');
+    await ensureFreshProgress('f');
+    expect(progressSet('f', 'hearts').count()).toBe(1);
   });
 });
