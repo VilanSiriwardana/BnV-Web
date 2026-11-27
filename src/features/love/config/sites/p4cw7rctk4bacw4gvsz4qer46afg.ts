@@ -22,6 +22,7 @@ export const site: LoveSiteConfig = {
     wishPrompt: 'Make a wish',
     wishDone: 'May every wish come true.',
     letterTitle: 'A letter for you',
+    finaleName: 'Baby',
     finaleMessage: 'Thank you for every ordinary day that became our story.',
     reasonsTitle: 'Twelve reasons, for now',
     reasonsHint: 'Turn the ring, or let the scroll turn it for you.',

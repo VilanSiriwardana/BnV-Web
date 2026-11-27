@@ -36,6 +36,8 @@ export type LoveSiteConfig = {
     wishDone: string;
     letterTitle: string;
     finaleMessage: string;
+    /** Finale heading name; default recipient name. */
+    finaleName?: string;
     bloomLines?: [string, string, string];
     bloomEmphasis?: string;
     reasonsTitle?: string;

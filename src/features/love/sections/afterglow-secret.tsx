@@ -1,17 +1,6 @@
 'use client';
 
-import {
-  Camera,
-  Check,
-  Images,
-  Lightbulb,
-  Lock,
-  type LucideIcon,
-  PenLine,
-  Sparkles,
-  Spline,
-  UserRound,
-} from 'lucide-react';
+import { ArrowUpRight, Check, Lightbulb, Lock, Sparkles } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -22,12 +11,14 @@ import { playChime } from '../engine/chime';
 import { director } from '../engine/heart-director';
 import {
   HIDDEN_HEART_IDS,
-  type HiddenHeartId,
   hiddenHearts,
   usePersistedSet,
 } from '../engine/hidden-hearts';
+import { useLoveScroll } from '../engine/scroll-engine';
 import { useQuiet } from '../engine/use-quiet';
 import { gsap, inkReveal, sparkBurst } from '../ui/afterglow-motion';
+import { focusHiddenHeart } from '../ui/hidden-heart';
+import { HIDDEN_HEART_CLUES } from '../ui/hidden-heart-clues';
 import { NoteDialog } from '../ui/note-dialog';
 import { socketAt, VaultLock } from '../ui/vault-lock';
 import { HeartDivider } from './letter-ornaments';
@@ -36,17 +27,6 @@ import { labelText } from './love-section';
 
 type Secret = NonNullable<NonNullable<LoveSiteConfig['afterglow']>['secret']>;
 const TOTAL = HIDDEN_HEART_IDS.length;
-
-const CLUES: Record<
-  HiddenHeartId,
-  { icon: LucideIcon; text: string; tone: string }
-> = {
-  hero: { icon: UserRound, text: 'Near your name', tone: 'text-secondary' },
-  memories: { icon: Images, text: 'The memories title', tone: 'text-primary' },
-  timeline: { icon: Spline, text: 'The end of our thread', tone: 'text-gold' },
-  gallery: { icon: Camera, text: 'One gallery photo', tone: 'text-secondary' },
-  letter: { icon: PenLine, text: 'My signature', tone: 'text-primary' },
-};
 
 /** A constellation line is drawn once both of its sockets hold a heart. */
 const lineLit = (found: readonly string[], i: number) =>
@@ -59,13 +39,12 @@ const lineLit = (found: readonly string[], i: number) =>
 export function AfterglowSecret({
   slug,
   secret,
-  hint,
 }: {
   slug: string;
   secret: Secret;
-  hint: string;
 }) {
   const quiet = useQuiet();
+  const { scrollTo } = useLoveScroll();
   const found = usePersistedSet(hiddenHearts(slug));
   const count = found.length;
   const unlocked = count >= TOTAL;
@@ -331,52 +310,51 @@ export function AfterglowSecret({
               </div>
               <ul ref={chips} className="grid gap-2.5 text-left sm:grid-cols-2">
                 {HIDDEN_HEART_IDS.map((id) => {
-                  const { icon: Icon, text, tone } = CLUES[id];
+                  const { icon: Icon, text } = HIDDEN_HEART_CLUES[id];
                   const got = found.includes(id);
                   return (
-                    <li
-                      key={id}
-                      className={cn(
-                        'glass relative flex items-center gap-3 rounded-xl border px-3 py-2.5 font-sans text-sm transition-colors',
-                        got
-                          ? 'border-gold/70 bg-gold/10 text-gold-text shadow-[0_0_18px_-6px_var(--gold)]'
-                          : 'border-gold/20 bg-surface/80 text-foreground/85',
-                      )}
-                    >
-                      <span
-                        aria-hidden
+                    <li key={id}>
+                      <button
+                        type="button"
+                        onClick={() => focusHiddenHeart(id, scrollTo)}
                         className={cn(
-                          'bg-background/60 grid size-8 shrink-0 place-items-center rounded-full',
-                          got ? 'text-gold' : tone,
+                          'focus-ring relative flex w-full items-center gap-3.5 rounded-2xl border bg-[color-mix(in_oklab,var(--surface)_60%,transparent)] px-4 py-3 text-left font-serif text-base tracking-wide backdrop-blur-sm transition-[border-color,box-shadow,color] duration-500',
+                          got
+                            ? 'border-gold/60 text-gold-text shadow-[0_0_22px_-8px_var(--gold)]'
+                            : 'border-gold/15 text-foreground/90 hover:border-gold/35',
                         )}
                       >
-                        {got ? (
-                          <Check className="size-4" />
-                        ) : (
-                          <Icon className="size-4" />
-                        )}
-                      </span>
-                      {got && (
                         <span
                           aria-hidden
-                          className="bg-gold text-background absolute -top-1.5 -right-1.5 grid size-5 place-items-center rounded-full shadow-[0_0_10px_var(--gold)]"
+                          className={cn(
+                            'ring-gold/10 grid size-9 shrink-0 place-items-center rounded-full border ring-1 transition-colors duration-500',
+                            got
+                              ? 'border-gold bg-gold text-background'
+                              : 'border-gold/40 bg-gold/5 text-gold',
+                          )}
                         >
-                          <Check className="size-3" />
+                          {got ? (
+                            <Check className="size-4" />
+                          ) : (
+                            <Icon className="size-4" strokeWidth={1.5} />
+                          )}
                         </span>
-                      )}
-                      <span className="min-w-0">
-                        {text}
-                        <span className="sr-only">
-                          {got ? ', found' : ', not found yet'}
+                        <span className="min-w-0">
+                          <span className="sr-only">Go to: </span>
+                          {text}
+                          <span className="sr-only">
+                            {got ? ', found' : ', not found yet'}
+                          </span>
                         </span>
-                      </span>
+                        <ArrowUpRight
+                          aria-hidden
+                          className="text-gold/60 ml-auto size-4 shrink-0"
+                        />
+                      </button>
                     </li>
                   );
                 })}
               </ul>
-              <p className="text-small text-muted-foreground border-gold/40 mt-4 border-l-2 pl-3 text-left text-pretty italic">
-                {hint}
-              </p>
             </div>
           )}
         </div>

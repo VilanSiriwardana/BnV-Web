@@ -5,6 +5,7 @@ import { Mic, X } from 'lucide-react';
 import {
   type ReactNode,
   useCallback,
+  useContext,
   useEffect,
   useId,
   useRef,
@@ -19,10 +20,12 @@ import { director } from '../engine/heart-director';
 import { candle } from '../engine/candle-state';
 import { WISH_BLOW_TOP, WISH_REST, WISH_TOP } from '../engine/heart-path';
 import { heart } from '../engine/heart-state';
+import { progressValue } from '../engine/hidden-hearts';
 import { useQuiet } from '../engine/use-quiet';
 import { onSessionReset, session } from '../engine/session';
 import { useBlow } from '../hooks/use-blow';
 import { useHold } from '../hooks/use-hold';
+import { LoveSlugContext } from '../ui/hidden-heart';
 import { LoveSection, sectionTitle } from './love-section';
 
 const HOLD_MS = 2400;
@@ -60,6 +63,8 @@ export function Wish({
   const timer = useRef<gsap.core.Tween | null>(null);
   const [phase, setPhase] = useState<Phase>('idle');
   const [writing, setWriting] = useState(false);
+  const wishStore = progressValue(useContext(LoveSlugContext), 'wish');
+  const [text, setText] = useState(() => wishStore.get());
   const writeToggle = useRef<HTMLButtonElement>(null);
   const writePanel = useRef<HTMLDivElement>(null);
   const closeWriting = useCallback(() => {
@@ -151,11 +156,33 @@ export function Wish({
       });
     candle.blow = 0;
     if (ring.current) ring.current.style.strokeDashoffset = `${RING_C}`;
+    setText(wishStore.get());
     setPhase('idle');
-  }, [reset, snuff]);
+  }, [reset, snuff, wishStore]);
 
   useEffect(() => onSessionReset(again), [again]);
   useEffect(() => () => void timer.current?.kill(), []);
+
+  // Blueprint 085: seal the wish (stored locally only), fold the note away, then the usual ending.
+  const sealWish = () => {
+    const value = text.trim();
+    if (!value) return;
+    wishStore.set(value);
+    const finish = () => {
+      setWriting(false);
+      onComplete();
+    };
+    if (quiet || !writePanel.current) return finish();
+    gsap.to(writePanel.current, {
+      scale: 0.1,
+      autoAlpha: 0,
+      y: -120,
+      borderRadius: '50%',
+      duration: 0.7,
+      ease: 'power2.in',
+      onComplete: finish,
+    });
+  };
 
   const busy = phase !== 'idle';
 
@@ -364,7 +391,7 @@ export function Wish({
           Write your wish
         </Button>
         {writing && (
-          // Never stored or sent (Tech Stack §9.3): uncontrolled, no name, no form.
+          // Stored locally only (ADR-0032 progress pattern); never sent.
           <div
             ref={writePanel}
             className="love-parchment relative mt-3 w-full max-w-sm rounded-lg p-4 pt-12 text-left max-md:fixed max-md:inset-x-0 max-md:bottom-0 max-md:z-30 max-md:max-w-none max-md:rounded-b-none max-md:pb-[max(1rem,env(safe-area-inset-bottom))]"
@@ -382,11 +409,29 @@ export function Wish({
               aria-label="Your wish"
               autoComplete="off"
               rows={3}
-              className="font-serif text-lg"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                  e.preventDefault();
+                  sealWish();
+                }
+              }}
+              className="border-gold/50 caret-gold focus-visible:border-gold focus-visible:ring-gold/30 bg-[color-mix(in_oklab,white_55%,transparent)] font-serif text-lg text-inherit placeholder:text-current/50"
             />
-            <p className="text-small mt-2 font-sans opacity-70">
-              Stays on this device, never sent.
-            </p>
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <p className="text-small font-sans opacity-70">
+                Kept only on this device.
+              </p>
+              <Button
+                variant="love-primary"
+                size="sm"
+                disabled={!text.trim() || busy}
+                onClick={sealWish}
+              >
+                Make my wish
+              </Button>
+            </div>
           </div>
         )}
       </div>
@@ -410,7 +455,12 @@ function FlatCandle({ lit }: { lit: boolean }) {
         width="4"
         height="14"
         rx="1"
-        className="fill-gold/70"
+        className="fill-foreground/90"
+      />
+      <path
+        d="M30 26 l4 -3 M30 30 l4 -3 M30 34 l4 -3"
+        className="stroke-gold fill-none"
+        strokeWidth="1.2"
       />
       <rect
         x="14"
@@ -418,7 +468,7 @@ function FlatCandle({ lit }: { lit: boolean }) {
         width="36"
         height="12"
         rx="3"
-        className="fill-primary/60"
+        className="fill-primary/80"
       />
       <path
         d="M14 40 q4.5 5 9 0 q4.5 5 9 0 q4.5 5 9 0 q4.5 5 9 0"
@@ -431,7 +481,19 @@ function FlatCandle({ lit }: { lit: boolean }) {
         width="52"
         height="16"
         rx="3"
-        className="fill-secondary/60"
+        className="fill-primary/60"
+      />
+      <path
+        d="M6 52 q5.5 5 11 0 q5.5 5 11 0 q5.5 5 11 0 q5.5 5 11 0 q4 4 8 0"
+        className="stroke-foreground/70 fill-none"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M8 62 H56"
+        className="stroke-gold fill-none"
+        strokeWidth="1.5"
+        strokeDasharray="0.1 3.4"
+        strokeLinecap="round"
       />
       <rect
         x="4"

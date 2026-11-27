@@ -1191,3 +1191,20 @@ Implemented M28–M33 in the order M28 → M32 → M29 → M31 → M30 → M33:
 ### Verification
 
 - tsc and eslint (src/features/love, scripts) are clean; love vitest has 32 files and 134 tests passing. Dev server `/love/<slug>` returns 200. Not re-checked in a browser.
+
+## 2026-11-27 — Blueprint 083: finale, gifts, hints polish (Love Site)
+
+- Finale heading uses new `copy.finaleName` ('Baby'); Replay and Music link removed from the finale (Replay stays in Afterglow).
+- Gift boxes: new `canvas/gift-3d.tsx` R3F gift driven by GiftBox's GSAP timeline progress (high/mid tier, in-view only, SVG fallback for calm/low tier/context loss); SVG ribbon now splays upward/outward with gradient fills.
+- Hidden-heart hints: redundant hint line removed, all icons gold, premium chip styling.
+
+## 2026-11-27 — Blueprint 084: gift + wish cake realism (Love Site)
+
+- `canvas/gift-3d.tsx` rebuilt: lavender satin box/lid, brushed-gold tube ribbon bow; untie = tails pull, loops shrink into knot, lid half-bands slide off and drop; lid hinges on its back edge; soft gold sprite glow. Canvas confined to the button (no header overlap); SVG fallback recoloured lavender.
+- `canvas/wish-candle.tsx`: physical-material cake (lavender sponge, ivory drip frosting, gold pearls/board, ivory candle with gold helix) plus a flame point light that dims on blow-out; removed `cakeVertex`/`cakeFragment`. Calm SVG cake recoloured.
+
+## 2026-11-27 — Blueprint 085: open gifts, saved wish, progress reset, linked hints, hunt intro (Love Site)
+- Progress: `PersistedSet.clear`, `progressValue` (wish), `resetProgress`, `ensureFreshProgress` (Cache Storage marker) in `engine/hidden-hearts.ts`; Replay resets progress.
+- Gifts: open-top hollow box with liner; one shared on-demand Canvas (`canvas/gift-3d.tsx` + drei View, `canvas/gift-stage.ts`), staggered entrance, SVG→3D cross-fade.
+- Wish: "Make my wish" seals and stores locally; "Your wish" card in Afterglow.
+- Hints: chips scroll to and pulse their heart (`focusHiddenHeart`, gallery opens the ritual first); `ui/hunt-intro-dialog.tsx` after the hero intro, once per progress lifetime.

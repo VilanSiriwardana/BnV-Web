@@ -5,20 +5,26 @@ import { RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 import type { LoveSiteConfig } from '../config';
+import { progressValue, usePersistedValue } from '../engine/hidden-hearts';
 import { useLoveScroll } from '../engine/scroll-engine';
 import { useQuiet } from '../engine/use-quiet';
-import { HIDDEN_HEART_HINT_SECTIONS } from '../ui/hidden-heart-placements';
 import { AfterglowGifts } from './afterglow-gifts';
 import { AfterglowNotes } from './afterglow-notes';
 import { AfterglowSecret } from './afterglow-secret';
 import { HeartDivider } from './letter-ornaments';
-import { LoveSection, proseColumn, sectionTitle } from './love-section';
+import {
+  LoveSection,
+  labelText,
+  proseColumn,
+  sectionTitle,
+} from './love-section';
 
 type Props = { site: LoveSiteConfig; onReplay: () => void };
 
 // Romance Additions F6: a quiet room after the Finale, natural flow (no pin, no stage).
 export function Afterglow({ site, onReplay }: Props) {
   const room = site.afterglow;
+  const wish = usePersistedValue(progressValue(site.slug, 'wish'));
   if (!room) return null;
   return (
     <LoveSection id="afterglow" depth={0.5} className="overflow-hidden">
@@ -40,6 +46,18 @@ export function Afterglow({ site, onReplay }: Props) {
         </p>
       )}
       <div className="mt-24 flex w-full flex-col items-center gap-32">
+        {wish && (
+          <div
+            data-reveal
+            className="love-parchment mx-auto w-full max-w-sm rounded-lg p-6 text-left"
+          >
+            <p className={labelText}>Your wish</p>
+            <p className="mt-2 font-serif text-lg text-pretty italic">{wish}</p>
+            <div className="mt-4">
+              <HeartDivider />
+            </div>
+          </div>
+        )}
         {room.gifts && <AfterglowGifts slug={site.slug} gifts={room.gifts} />}
         {room.openWhen && room.openWhen.length > 0 && (
           <AfterglowNotes
@@ -49,13 +67,7 @@ export function Afterglow({ site, onReplay }: Props) {
           />
         )}
         {room.secret && (
-          <AfterglowSecret
-            slug={site.slug}
-            secret={room.secret}
-            hint={
-              site.hidden?.hint ?? `Look near ${HIDDEN_HEART_HINT_SECTIONS}.`
-            }
-          />
+          <AfterglowSecret slug={site.slug} secret={room.secret} />
         )}
       </div>
       <div data-reveal className="mt-32 flex flex-col items-center gap-6">

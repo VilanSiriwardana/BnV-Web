@@ -54,39 +54,3 @@ void main() {
   gl_FragColor = vec4(uColor, wisp * 0.45 * fade * uVisible);
 }
 `;
-
-// Blueprint 065: a solid, softly lit cake tier (or striped candle) instead of loose particles.
-export const cakeVertex = /* glsl */ `
-varying vec3 vN;
-varying vec3 vP;
-void main() {
-  vN = normalize(normal);
-  vP = position;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-
-export const cakeFragment = /* glsl */ `
-uniform vec3 uBase;
-uniform vec3 uFrost;
-uniform vec3 uTrim;
-uniform float uHalf;
-uniform float uStripe;
-uniform float uVisible;
-varying vec3 vN;
-varying vec3 vP;
-void main() {
-  float light = 0.55 + 0.45 * max(0.0, dot(vN, normalize(vec3(-0.35, 0.8, 0.6))));
-  float ang = atan(vP.z, vP.x);
-  // Frosting: the top plus a scalloped drip band down the side.
-  float drip = uHalf - (0.18 + 0.1 * abs(sin(ang * 7.0))) * uHalf * 2.0 * 0.35;
-  float frost = max(step(0.6, vN.y), step(drip, vP.y));
-  vec3 col = mix(uBase, uFrost, frost);
-  // Gold trim at the base.
-  col = mix(col, uTrim, step(vP.y, -uHalf + uHalf * 0.12) * (1.0 - step(0.6, abs(vN.y))));
-  // Candle: diagonal stripes.
-  col = mix(col, uTrim, uStripe * step(0.5, fract((vP.y * 14.0 + ang * 0.6))));
-  gl_FragColor = vec4(col * light, uVisible);
-  #include <colorspace_fragment>
-}
-`;

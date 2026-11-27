@@ -1,11 +1,7 @@
 'use client';
 
-import { RotateCcw } from 'lucide-react';
 import { type ReactNode, useRef } from 'react';
 
-import { Button } from '@/components/ui/button';
-
-import { useMusicToggle } from '../ui/music-toggle';
 import { QuietHeart } from '../ui/static-heart';
 import { QuietSpell, useSpellFade } from './finale-spell';
 import { TinyHeart } from './letter-ornaments';
@@ -20,23 +16,14 @@ type Props = {
   name: string;
   message: string;
   credit: string;
-  onReplay: () => void;
   /** F1: the two phrases the heart spells. */
   spell: [string, string];
   children?: ReactNode;
 };
 
 // Experience §14, Romance Additions §9.6. The heart sits high (HEART_PATH.finale) and its zone
-// stays clear of text; finaleSpell and Replay are driven from story.ts and love-experience.tsx.
-export function Finale({
-  name,
-  message,
-  credit,
-  onReplay,
-  spell,
-  children,
-}: Props) {
-  const { muted, toggle } = useMusicToggle();
+// stays clear of text; finaleSpell is driven from story.ts; Replay lives in the Afterglow.
+export function Finale({ name, message, credit, spell, children }: Props) {
   const text = useRef<HTMLDivElement>(null);
   useSpellFade(text);
   return (
@@ -72,26 +59,7 @@ export function Finale({
           <TinyHeart className="size-3" />
           <span className="bg-gold/50 h-px flex-1" />
         </div>
-        <Button
-          variant="love-primary"
-          size="lg"
-          className="mt-6"
-          onClick={onReplay}
-        >
-          <RotateCcw aria-hidden className="text-gold" />
-          Replay our story
-        </Button>
-        <div className="mt-4 flex flex-col items-center gap-3">
-          <Button
-            variant="love-link"
-            size="inline"
-            aria-pressed={!muted}
-            onClick={toggle}
-          >
-            ♪ Music {muted ? 'on' : 'off'}
-          </Button>
-          {children}
-        </div>
+        <div className="mt-6 flex flex-col items-center gap-3">{children}</div>
         {credit && <p className={`${labelText} mt-8`}>Music: {credit}</p>}
       </div>
     </LoveSection>

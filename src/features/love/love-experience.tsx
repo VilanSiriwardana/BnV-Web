@@ -9,6 +9,12 @@ import type { LoveSiteConfig } from './config';
 import { MotionPrefsProvider } from './engine/motion-prefs-provider';
 import { ScrollEngine, useLoveScroll } from './engine/scroll-engine';
 import { director } from './engine/heart-director';
+import {
+  ensureFreshProgress,
+  huntIntroKey,
+  resetProgress,
+} from './engine/hidden-hearts';
+import { readJSON, writeJSON } from './engine/persist';
 import { resetSession } from './engine/session';
 import { killHeroIntro, playHeroIntro, tapHeart } from './engine/hero-intro';
 import { buildStory } from './engine/story';
@@ -29,6 +35,7 @@ import { Timeline } from './sections/timeline';
 import { Wish } from './sections/wish';
 import { CalmModeToggle } from './ui/calm-mode-toggle';
 import { FoundChip } from './ui/found-chip';
+import { HuntIntroDialog } from './ui/hunt-intro-dialog';
 import { LoveSlugContext } from './ui/hidden-heart';
 import { MusicToggle } from './ui/music-toggle';
 import { LoveCursor } from './ui/love-cursor';
@@ -86,6 +93,11 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [canvasReady, setCanvasReady] = useState(false);
   const [entered, setEntered] = useState(false);
+  const [hunt, setHunt] = useState(false);
+
+  useEffect(() => {
+    void ensureFreshProgress(site.slug);
+  }, [site.slug]);
 
   useEffect(() => killHeroIntro, []);
   const name = site.recipient.name;
@@ -100,6 +112,7 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
 
   // Experience §14 Replay: clean flags and heart, then glide home; the hero re-weaves on arrival.
   const replay = () => {
+    resetProgress(site.slug);
     resetSession();
     director.settle();
     ScrollTrigger.refresh();
@@ -202,11 +215,10 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
         />
         <Letter title={site.copy.letterTitle} letter={site.letter} />
         <Finale
-          name={name}
+          name={site.copy.finaleName ?? name}
           message={site.copy.finaleMessage}
           spell={spell}
           credit={site.music.credit}
-          onReplay={replay}
         >
           {site.afterglow && <AfterglowLink />}
         </Finale>
@@ -220,11 +232,24 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
         sceneReady={canvasReady || !showCanvas}
         onEnter={(seed) => {
           setEntered(true);
-          playHeroIntro(rootRef.current!, { from: seed, calm: quiet });
+          playHeroIntro(rootRef.current!, {
+            from: seed,
+            calm: quiet,
+            onDone: () => {
+              if (!readJSON(huntIntroKey(site.slug), false)) setHunt(true);
+            },
+          });
         }}
       />
       {entered && <MusicToggle />}
       {entered && <FoundChip slug={site.slug} />}
+      <HuntIntroDialog
+        open={hunt}
+        onClose={() => {
+          writeJSON(huntIntroKey(site.slug), true);
+          setHunt(false);
+        }}
+      />
       {showCanvas && (
         <div
           aria-hidden

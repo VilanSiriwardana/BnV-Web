@@ -4,26 +4,29 @@ import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import {
   AdditiveBlending,
+  CatmullRomCurve3,
   Color,
   CylinderGeometry,
+  DoubleSide,
   type Group,
+  InstancedMesh,
+  type Material,
   MeshBasicMaterial,
+  MeshPhysicalMaterial,
   NormalBlending,
+  Object3D,
   PlaneGeometry,
+  type PointLight,
   ShaderMaterial,
+  SphereGeometry,
+  TubeGeometry,
   Vector3,
 } from 'three';
 
 import { candle } from '../engine/candle-state';
 import { ndcToWorld, WISH_STAR_NDC } from '../engine/heart-path';
 import { TIERS, type Tier } from '../engine/tiers';
-import {
-  cakeFragment,
-  cakeVertex,
-  flameFragment,
-  quadVertex,
-  smokeFragment,
-} from './candle-shaders';
+import { flameFragment, quadVertex, smokeFragment } from './candle-shaders';
 import { readTokenColors } from './token-colors';
 
 // Cake layout (world units, relative to the flame's base at the wish-star point).
@@ -32,35 +35,57 @@ const UPPER = { y: -0.52, h: 0.2, r: 0.4 };
 const STICK = { y: -0.3, h: 0.3, w: 0.05 };
 // Blueprint 065: a slight downward look so the frosted tops read as a cake.
 const TILT = 0.32;
+const PEARL = 0.022;
 
-function tierMaterial(
-  base: Color,
-  frost: Color,
-  trim: Color,
-  half: number,
-  stripe = 0,
-) {
-  return new ShaderMaterial({
-    vertexShader: cakeVertex,
-    fragmentShader: cakeFragment,
-    transparent: true,
-    uniforms: {
-      uBase: { value: base },
-      uFrost: { value: frost },
-      uTrim: { value: trim },
-      uHalf: { value: half },
-      uStripe: { value: stripe },
-      uVisible: { value: 0 },
-    },
-  });
+/** An open frosting skirt whose lower edge hangs in uneven drips. */
+function dripGeometry(r: number, h: number) {
+  const geo = new CylinderGeometry(r, r, h, 48, 6, true);
+  const pos = geo.attributes.position;
+  const top = h / 2;
+  for (let i = 0; i < pos.count; i++) {
+    const a = Math.atan2(pos.getZ(i), pos.getX(i));
+    const wave = 0.5 + 0.5 * Math.sin(a * 7) * Math.cos(a * 3);
+    const f = 0.3 + 0.7 * wave * wave;
+    pos.setY(i, top - (top - pos.getY(i)) * f);
+  }
+  geo.computeVertexNormals();
+  return geo;
 }
 
-// Romance Additions F5: cake, candle, flame and smoke at the wish-star point. Mounted by
-// love-canvas only while the Wish section is near (candle.visible > 0).
+function pearlRing(r: number, y: number, material: Material) {
+  const n = Math.round((2 * Math.PI * r) / (PEARL * 2.3));
+  const mesh = new InstancedMesh(new SphereGeometry(PEARL, 10, 8), material, n);
+  const d = new Object3D();
+  for (let i = 0; i < n; i++) {
+    const a = (i / n) * Math.PI * 2;
+    d.position.set(Math.cos(a) * r, y, Math.sin(a) * r);
+    d.updateMatrix();
+    mesh.setMatrixAt(i, d.matrix);
+  }
+  return mesh;
+}
+
+function helixGeometry() {
+  const r = STICK.w / 2 + 0.004;
+  const pts = Array.from({ length: 61 }, (_, i) => {
+    const t = i / 60;
+    const a = t * Math.PI * 2 * 3;
+    return new Vector3(
+      Math.cos(a) * r,
+      -STICK.h / 2 + t * STICK.h,
+      Math.sin(a) * r,
+    );
+  });
+  return new TubeGeometry(new CatmullRomCurve3(pts), 120, 0.006, 6, false);
+}
+
+// Romance Additions F5 + blueprint 084: a lit lavender, ivory and gold cake with a candle, flame
+// and smoke at the wish-star point. Mounted by love-canvas only while the Wish section is near.
 export function WishCandle({ tier }: { tier: Tier }) {
   const group = useRef<Group>(null);
+  const flameLight = useRef<PointLight>(null);
   const point = useMemo(() => new Vector3(), []);
-  // Low tiers keep the flat cake (two tinted planes).
+  // Low tiers keep the flat cake (tinted planes).
   const solid = TIERS[tier].cakeParticles > 0;
 
   const parts = useMemo(() => {
@@ -70,7 +95,7 @@ export function WishCandle({ tier }: { tier: Tier }) {
     const lav = c?.primary.night ?? new Color('#b9a3e3');
     const rose = c?.secondary.night ?? new Color('#e8a0b4');
     const ivory = c?.foreground.night ?? new Color('#fff');
-    const cream = ivory.clone().lerp(rose, 0.18);
+    const cream = ivory.clone().lerp(gold, 0.08);
     const quad = new PlaneGeometry(1, 1);
     const flame = new ShaderMaterial({
       vertexShader: quadVertex,
@@ -101,52 +126,80 @@ export function WishCandle({ tier }: { tier: Tier }) {
         uVisible: { value: 0 },
       },
     });
-    const flatLower = new MeshBasicMaterial({
-      color: lav,
+    const flat = (color: Color) =>
+      new MeshBasicMaterial({ color, transparent: true, opacity: 0 });
+    const sponge = new MeshPhysicalMaterial({
+      color: lav.clone().multiplyScalar(0.85),
+      roughness: 0.8,
+      sheen: 1,
+      sheenRoughness: 0.5,
+      sheenColor: cream,
       transparent: true,
       opacity: 0,
     });
-    const flatUpper = new MeshBasicMaterial({
+    const frost = new MeshPhysicalMaterial({
+      color: cream,
+      roughness: 0.35,
+      clearcoat: 0.5,
+      clearcoatRoughness: 0.3,
+      side: DoubleSide,
+      transparent: true,
+      opacity: 0,
+    });
+    const goldMat = new MeshPhysicalMaterial({
       color: gold,
+      metalness: 0.9,
+      roughness: 0.3,
       transparent: true,
       opacity: 0,
     });
-    const flatStick = new MeshBasicMaterial({
-      color: gold,
+    const wax = new MeshPhysicalMaterial({
+      color: ivory,
+      roughness: 0.5,
+      sheen: 0.6,
+      sheenColor: gold,
       transparent: true,
       opacity: 0,
     });
-    const lowerMat = tierMaterial(
-      rose.clone().multiplyScalar(0.75),
-      cream,
-      gold,
-      LOWER.h / 2,
-    );
-    const upperMat = tierMaterial(
-      lav.clone().multiplyScalar(0.8),
-      cream,
-      gold,
-      UPPER.h / 2,
-    );
-    const stickMat = tierMaterial(cream, cream, rose, STICK.h / 2, 1);
     return {
       quad,
-      lowerGeo: new CylinderGeometry(LOWER.r, LOWER.r, LOWER.h, 48),
-      upperGeo: new CylinderGeometry(UPPER.r, UPPER.r, UPPER.h, 48),
-      stickGeo: new CylinderGeometry(STICK.w / 2, STICK.w / 2, STICK.h, 16),
       flame,
       smoke,
-      flatLower,
-      flatUpper,
-      flatStick,
-      lowerMat,
-      upperMat,
-      stickMat,
+      flatLower: flat(lav),
+      flatUpper: flat(ivory),
+      flatStick: flat(gold),
+      sponge,
+      frost,
+      goldMat,
+      wax,
+      lowerGeo: new CylinderGeometry(LOWER.r, LOWER.r, LOWER.h, 48),
+      upperGeo: new CylinderGeometry(UPPER.r, UPPER.r, UPPER.h, 48),
+      lowerCap: new CylinderGeometry(LOWER.r + 0.01, LOWER.r + 0.01, 0.03, 48),
+      upperCap: new CylinderGeometry(UPPER.r + 0.01, UPPER.r + 0.01, 0.03, 48),
+      lowerDrip: dripGeometry(LOWER.r + 0.012, LOWER.h * 0.45),
+      upperDrip: dripGeometry(UPPER.r + 0.012, UPPER.h * 0.45),
+      board: new CylinderGeometry(LOWER.r + 0.08, LOWER.r + 0.1, 0.03, 48),
+      stickGeo: new CylinderGeometry(STICK.w / 2, STICK.w / 2, STICK.h, 16),
+      helix: helixGeometry(),
+      lowerPearls: pearlRing(
+        LOWER.r + 0.006,
+        LOWER.y - LOWER.h / 2 + PEARL,
+        goldMat,
+      ),
+      upperPearls: pearlRing(
+        UPPER.r + 0.006,
+        UPPER.y - UPPER.h / 2 + PEARL,
+        goldMat,
+      ),
     };
   }, []);
 
   useEffect(
-    () => () => Object.values(parts).forEach((p) => p.dispose()),
+    () => () =>
+      Object.values(parts).forEach((p) => {
+        if (p instanceof InstancedMesh) p.geometry.dispose();
+        p.dispose();
+      }),
     [parts],
   );
 
@@ -167,10 +220,16 @@ export function WishCandle({ tier }: { tier: Tier }) {
     su.uTime.value = fu.uTime.value;
     su.uOut.value = candle.out;
     su.uVisible.value = v;
-    for (const m of [p.lowerMat, p.upperMat, p.stickMat]) {
-      m.uniforms.uVisible.value = v;
+    for (const m of [p.sponge, p.frost, p.goldMat, p.wax]) {
+      m.opacity = v;
       m.depthWrite = v > 0.99;
     }
+    if (flameLight.current)
+      flameLight.current.intensity =
+        v *
+        (1 - candle.out) *
+        (1 - 0.3 * candle.blow) *
+        (2.2 + 0.1 * Math.sin(fu.uTime.value * 23));
     p.flatStick.opacity = v;
     p.flatLower.opacity = v * 0.55;
     p.flatUpper.opacity = v * 0.55;
@@ -187,25 +246,56 @@ export function WishCandle({ tier }: { tier: Tier }) {
     g.position.set(w.x, w.y + s * 0.25, 0.05);
   });
 
+  const tierTop = (t: typeof LOWER) => t.y + t.h / 2;
+
   return (
     <group ref={group} visible={false}>
       {solid ? (
         <group rotation={[TILT, 0, 0]}>
-          <mesh
-            geometry={parts.lowerGeo}
-            material={parts.lowerMat}
-            position={[0, LOWER.y, 0]}
+          <pointLight
+            ref={flameLight}
+            position={[0, 0.1, 0.15]}
+            color={parts.goldMat.color}
+            intensity={0}
+            distance={2.5}
           />
           <mesh
-            geometry={parts.upperGeo}
-            material={parts.upperMat}
-            position={[0, UPPER.y, 0]}
+            geometry={parts.board}
+            material={parts.goldMat}
+            position={[0, LOWER.y - LOWER.h / 2 - 0.015, 0]}
           />
-          <mesh
-            geometry={parts.stickGeo}
-            material={parts.stickMat}
-            position={[0, STICK.y, 0]}
-          />
+          {[
+            [LOWER, parts.lowerGeo, parts.lowerCap, parts.lowerDrip],
+            [UPPER, parts.upperGeo, parts.upperCap, parts.upperDrip],
+          ].map(([t, body, cap, drip]) => {
+            const tt = t as typeof LOWER;
+            const dripH = tt.h * 0.45;
+            return (
+              <group key={tt.y}>
+                <mesh
+                  geometry={body as CylinderGeometry}
+                  material={parts.sponge}
+                  position={[0, tt.y, 0]}
+                />
+                <mesh
+                  geometry={cap as CylinderGeometry}
+                  material={parts.frost}
+                  position={[0, tierTop(tt), 0]}
+                />
+                <mesh
+                  geometry={drip as CylinderGeometry}
+                  material={parts.frost}
+                  position={[0, tierTop(tt) - dripH / 2, 0]}
+                />
+              </group>
+            );
+          })}
+          <primitive object={parts.lowerPearls} />
+          <primitive object={parts.upperPearls} />
+          <group position={[0, STICK.y, 0]}>
+            <mesh geometry={parts.stickGeo} material={parts.wax} />
+            <mesh geometry={parts.helix} material={parts.goldMat} />
+          </group>
         </group>
       ) : (
         <>
