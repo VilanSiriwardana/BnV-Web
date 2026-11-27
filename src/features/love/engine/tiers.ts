@@ -14,7 +14,6 @@ export const TIERS = {
     confetti: 300,
     miniHearts: 40,
     petals: 120,
-    danceParticles: 19600,
     cakeParticles: 1500,
     galleryLights: 3,
     galleryReflection: true,
@@ -33,7 +32,6 @@ export const TIERS = {
     confetti: 160,
     miniHearts: 28,
     petals: 70,
-    danceParticles: 9800,
     cakeParticles: 800,
     galleryLights: 2,
     galleryReflection: false,
@@ -52,7 +50,6 @@ export const TIERS = {
     confetti: 80,
     miniHearts: 18,
     petals: 40,
-    danceParticles: 0,
     cakeParticles: 0,
     galleryLights: 1,
     galleryReflection: false,
@@ -71,7 +68,6 @@ export const TIERS = {
     confetti: 0,
     miniHearts: 0,
     petals: 0,
-    danceParticles: 0,
     cakeParticles: 0,
     galleryLights: 0,
     galleryReflection: false,
@@ -92,7 +88,6 @@ export const TIERS = {
     confetti: number;
     miniHearts: number;
     petals: number;
-    danceParticles: number;
     cakeParticles: number;
     galleryLights: number;
     galleryReflection: boolean;

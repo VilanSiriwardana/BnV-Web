@@ -25,6 +25,7 @@ export const PETAL_SECTIONS: Partial<Record<SectionId, { dim: number }>> = {
   memories: { dim: 0 },
   timeline: { dim: 0 },
   starlight: { dim: 0.3 },
+  dance: { dim: 0 },
   letter: { dim: 0.35 },
   finale: { dim: 0 },
 };
@@ -77,11 +78,12 @@ export const HEART_PATH: Record<SectionId, PathEntry> = {
     gold: 0.4,
     glow: 0.35,
   },
+  // Blueprint 082: the heart steps aside to the corner while the couple dance.
   dance: {
-    desktop: { x: 0, y: 0.55, scale: 0.18 },
-    mobile: { x: 0, y: 0.62, scale: 0.16 },
+    desktop: { x: 0.84, y: 0.7, scale: 0.11 },
+    mobile: { x: 0.8, y: 0.82, scale: 0.09 },
     gold: 0.45,
-    glow: 0.45,
+    glow: 0.4,
   },
   reasons: {
     desktop: { x: 0, y: 0.5, scale: 0.2 },

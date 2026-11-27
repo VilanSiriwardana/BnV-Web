@@ -7,10 +7,6 @@ import { imageQuality } from '@/config/images';
 
 import manifest from '../canvas/dance-reel-manifest.json';
 import { useQuiet } from '../engine/use-quiet';
-import { LoveSection } from './love-section';
-
-type Props = { title: string };
-
 const { width, height } = manifest.desktop;
 // Colour-matched (opaque) frames only: the remapped backdrop fades into the page at every edge.
 const edgeFade = [
@@ -34,52 +30,47 @@ const floorStyle: CSSProperties = {
   ].join(', '),
 };
 
-// Blueprint 080: the couple clip after the particle Dance, scrubbed by story.ts buildDanceReel.
+// Blueprint 082: the couple clip inside the Dance section, scrubbed by story.ts buildDance.
 // Calm, reduced motion and the static tier show the dip still instead.
-export function DanceReel({ title }: Props) {
+export function DanceReelFrame() {
   const quiet = useQuiet();
 
   return (
-    <LoveSection id="dance-reel" depth={0.5} stage="200vh">
-      <h2 id="dance-reel-title" className="sr-only">
-        {title}
-      </h2>
-      <div
-        data-dance-reel-frame
-        style={frameStyle}
-        className="relative w-[min(92vw,62vh)] md:w-[min(60vw,64vh)]"
-      >
-        {manifest.alpha && (
-          <div
-            aria-hidden
-            data-dance-reel-floor
-            style={floorStyle}
-            className="absolute inset-x-[8%] bottom-0 h-[16%] rounded-[50%]"
-          />
-        )}
-        <Image
-          data-dance-reel-poster
-          src={
-            quiet
-              ? '/dance-reel/posters/reel-dip.webp'
-              : '/dance-reel/posters/reel-start.webp'
-          }
-          alt=""
+    <div
+      data-dance-reel-frame
+      style={frameStyle}
+      className="relative mt-6 w-[min(88vw,46svh)] md:w-[min(60vw,52svh)]"
+    >
+      {manifest.alpha && (
+        <div
           aria-hidden
-          fill
-          sizes="(min-width: 768px) 60vw, 88vw"
-          quality={imageQuality.default}
-          className="object-contain"
+          data-dance-reel-floor
+          style={floorStyle}
+          className="absolute inset-x-[8%] bottom-0 h-[16%] rounded-[50%]"
         />
-        {!quiet && (
-          <canvas
-            data-dance-reel
-            role="img"
-            aria-label="The couple dance: a spin, then a gentle dip"
-            className="absolute inset-0 size-full"
-          />
-        )}
-      </div>
-    </LoveSection>
+      )}
+      <Image
+        data-dance-reel-poster
+        src={
+          quiet
+            ? '/dance-reel/posters/reel-dip.webp'
+            : '/dance-reel/posters/reel-start.webp'
+        }
+        alt=""
+        aria-hidden
+        fill
+        sizes="(min-width: 768px) 52vh, 88vw"
+        quality={imageQuality.default}
+        className="object-contain"
+      />
+      {!quiet && (
+        <canvas
+          data-dance-reel
+          role="img"
+          aria-label="The couple dance: a spin, then a gentle dip"
+          className="absolute inset-0 size-full"
+        />
+      )}
+    </div>
   );
 }

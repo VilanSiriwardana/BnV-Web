@@ -9,7 +9,7 @@ import { LETTER_OPEN_EVENT, session, SKY_COMPLETE_EVENT } from './session';
 import { poseFor, type SectionId, SKY_WAIT, WISH_REST } from './heart-path';
 import { candle } from './candle-state';
 import { spawnTapHearts } from '../canvas/mini-hearts';
-import { BEAT_REARM, DANCE_BEATS, dance } from './dance-state';
+import { BEAT_REARM } from './dance-reel-math';
 import reelManifest from '../canvas/dance-reel-manifest.json';
 import { createDanceReel } from './dance-reel-player';
 import { reasons } from './reasons-state';
@@ -596,11 +596,14 @@ const buildGallery: SectionBuilder = (root, mobile) => {
   return leaveGallery;
 };
 
-// Experience §19.6: the duo fades in while the stage is on screen; scroll scrubs the move,
-// the heart floats above them and pulses once on the dip.
-const buildDance: SectionBuilder = (root, mobile) => {
+// Blueprint 082: the couple clip plays under the title; the heart steps aside, petals fall,
+// scroll scrubs the frames and the heart pulses on the dip.
+const buildDance: SectionBuilder = (root, mobile, tier) => {
   const el = root.querySelector<HTMLElement>('#dance');
-  if (!el) return;
+  const canvas = el?.querySelector<HTMLCanvasElement>(
+    'canvas[data-dance-reel]',
+  );
+  if (!el || !canvas) return;
   baselineOn(el, 'dance');
   const from = poseFor('gallery', mobile);
   const to = poseFor('dance', mobile);
@@ -621,52 +624,6 @@ const buildDance: SectionBuilder = (root, mobile) => {
       0,
     )
     .fromTo(heart, { scale: from.scale }, { scale: to.scale, ...scrub }, 0);
-  ScrollTrigger.create({
-    trigger: el,
-    start: 'top 60%',
-    end: 'bottom 40%',
-    onToggle: ({ isActive }) =>
-      gsap.to(dance, {
-        visible: isActive ? 1 : 0,
-        duration: 0.6,
-        overwrite: 'auto',
-      }),
-  });
-  // Blueprint 079: the dance beats, each re-armed once scroll drops back below it.
-  const armed = DANCE_BEATS.map(() => true);
-  const playBeat = (event: (typeof DANCE_BEATS)[number]['event']) => {
-    if (event === 'twirl') return director.play('shine');
-    if (event === 'dip') spawnTapHearts(6);
-    return director.play('pulse');
-  };
-  ScrollTrigger.create({
-    trigger: el,
-    start: 'top top',
-    end: 'bottom bottom',
-    onUpdate: ({ progress }) => {
-      dance.t = progress;
-      DANCE_BEATS.forEach(({ at, event }, i) => {
-        if (armed[i] && progress >= at) {
-          armed[i] = false;
-          playBeat(event);
-        } else if (progress < at - BEAT_REARM) armed[i] = true;
-      });
-    },
-  });
-  return () => {
-    dance.t = 0;
-    dance.visible = 0;
-  };
-};
-
-// Blueprint 080: the couple clip fades in as the duo leaves; scroll scrubs its frames, the heart pulses on the dip.
-const buildDanceReel: SectionBuilder = (root, mobile, tier) => {
-  const el = root.querySelector<HTMLElement>('#dance-reel');
-  const canvas = el?.querySelector<HTMLCanvasElement>(
-    'canvas[data-dance-reel]',
-  );
-  if (!el || !canvas) return;
-  baselineOn(el, 'dance');
   const frame = el.querySelector('[data-dance-reel-frame]');
   const poster = el.querySelector('[data-dance-reel-poster]');
   const reel = createDanceReel(canvas, {
@@ -1040,7 +997,6 @@ const sections = [
   buildStarlight,
   buildGallery,
   buildDance,
-  buildDanceReel,
   buildReasons,
   buildWish,
   buildLetter,

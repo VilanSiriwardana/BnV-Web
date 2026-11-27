@@ -1,8 +1,8 @@
 import gsap from 'gsap';
 
 import manifest from '../canvas/dance-reel-manifest.json';
-import { damp } from './dance-state';
 import {
+  damp,
   frameAt,
   loadOrder,
   REEL_WINDOW,
@@ -17,7 +17,7 @@ export type DanceReel = {
 };
 
 const CONCURRENCY = 4;
-const RATE = 8;
+const RATE = 6;
 const MAX_DPR = 1.5;
 const COUNT = manifest.frames;
 const pad4 = (i: number) => String(i).padStart(4, '0');

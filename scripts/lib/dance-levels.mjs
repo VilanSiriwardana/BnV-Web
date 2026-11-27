@@ -1,4 +1,4 @@
-// Blueprint 081: shared backdrop → page colour helpers for the dance scripts (moved from prepare-dance-reel.mjs).
+// Blueprint 081: shared backdrop → page colour helpers for the dance scripts (used by prepare-dance-video.mjs).
 import sharp from 'sharp';
 
 // --night-depth-background at the Dance depth (≈ 0.5 between --night-background and --night-surface).

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { frameAt, loadOrder, windowAround } from './dance-reel-math';
+import { damp, frameAt, loadOrder, windowAround } from './dance-reel-math';
 
 describe('frameAt', () => {
   it('maps progress to the nearest frame and clamps', () => {
@@ -35,5 +35,15 @@ describe('loadOrder', () => {
       Array.from({ length: 121 }, (_, i) => i),
     );
     expect(loadOrder(1)).toEqual([0]);
+  });
+});
+
+describe('damp', () => {
+  it('eases toward the target without overshooting', () => {
+    expect(damp(0, 1, 0, 5)).toBe(0);
+    expect(damp(0, 1, 10, 5)).toBeCloseTo(1);
+    const step = damp(0, 1, 0.016, 4);
+    expect(step).toBeGreaterThan(0);
+    expect(step).toBeLessThan(1);
   });
 });

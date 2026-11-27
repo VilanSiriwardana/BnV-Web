@@ -606,7 +606,7 @@ Each decision should include:
 
 ## ADR-0034 - Love Site Dance as a Pre-Rendered Frame Sequence
 
-- Status: Proposed (accepted when the final clip passes QA in Phase 11)
+- Status: Accepted (2026-11-27)
 - Date: 2026-11-20
 - Context: Generated particle silhouettes cannot reach believable partner contact (hands, spin, dip).
 - Decision:
@@ -616,6 +616,7 @@ Each decision should include:
 - Consequences: Adds about 4–5 MB (desktop) / 2.5 MB (mobile) of frames loaded after the gate.
 - Amendment (2026-11-27, blueprint 080): by owner choice the first clip ships as a separate `#dance-reel` section **after** the particle Dance, which stays. 121 frames per set (desktop 720 w ≈ 1.8 MB, mobile 480 w ≈ 1.1 MB) from `scripts/prepare-dance-video.mjs` (system ffmpeg + sharp), loaded when the Gallery comes into view.
 - Amendment (2026-11-27, blueprint 081): the reel frames carry an alpha matte from Robust Video Matting (resnet50, CPU), run offline via `scripts/matte-dance-video.py` in a git-ignored Python venv (`private/matte-venv`). RVM is GPL-3.0 and is a dev tool only; nothing from it ships. Soft edges are decontaminated against the measured backdrop colour, and a CSS spotlight pool grounds the couple. Alpha frames weigh desktop ≈ 4.3 MB / mobile ≈ 2.6 MB (alphaQuality 50). Known flaw accepted by the owner: during the spin his shadowed back leg is partly transparent and the inside of her skirt shows grey smudges. Fallback: `prepare-dance-video.mjs` without `--matte` remaps the backdrop to the page colour (opaque, edge-faded).
+- Amendment (2026-11-27, blueprint 082): the reel replaced the particle Dance inside `#dance` (under the title and line, 400 vh stage); the heart rests top-right and petals fall. The particle code and assets were removed (`dance-duo`, `dance-points`, `dance-shaders`, `dance-manifest.json`, `dance-state`, `points.bin`, `prepare-dance-points.mjs`, `prepare-dance-reel.mjs`, `posters/dip.webp`, tier `danceParticles`). `damp` and `BEAT_REARM` now live in `engine/dance-reel-math.ts`. Status: Accepted.
 - Related Documents:
   - [../references/love-site/Dance-Clip-Production-Guide.md](../references/love-site/Dance-Clip-Production-Guide.md)
 

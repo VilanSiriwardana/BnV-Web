@@ -19,7 +19,6 @@ import { Bloom } from './sections/bloom';
 import { Starlight } from './sections/starlight';
 import { Finale } from './sections/finale';
 import { Dance } from './sections/dance';
-import { DanceReel } from './sections/dance-reel';
 import { Gallery } from './sections/gallery';
 import { Gate } from './sections/gate';
 import { Hero } from './sections/hero';
@@ -189,7 +188,6 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
         />
 
         <Dance title={site.copy.danceTitle} line={site.copy.danceLine} />
-        <DanceReel title={site.copy.danceTitle} />
         <Reasons
           title={site.copy.reasonsTitle ?? 'Reasons'}
           hint={site.copy.reasonsHint ?? ''}

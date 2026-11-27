@@ -21,3 +21,10 @@ export function loadOrder(count: number, stride = 8) {
   for (let i = 0; i < count; i++) if (i % stride) rest.push(i);
   return [...coarse, ...rest];
 }
+
+// A beat re-arms once scroll drops this far below it.
+export const BEAT_REARM = 0.1;
+
+// Frame-rate independent ease toward the scroll target.
+export const damp = (current: number, target: number, dt: number, rate = 5) =>
+  current + (target - current) * (1 - Math.exp(-rate * dt));

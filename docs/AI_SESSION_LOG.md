@@ -1181,3 +1181,13 @@ Implemented M28–M33 in the order M28 → M32 → M29 → M31 → M30 → M33:
 - `scripts/prepare-dance-video.mjs`: `--matte` (decontaminate F = (C − (1−a)·bg)/a, alpha WebP q74 / alphaQuality 50), `--preview` (hold/spin/dip composites over the page colour in `private/dance-matte-preview/`), default = colour-match fallback. Manifest gains `alpha`. Run: `node scripts/prepare-dance-video.mjs --matte` → desktop 4.28 MB, mobile 2.56 MB.
 - `sections/dance-reel.tsx`: edge mask only when `!manifest.alpha`; `data-dance-reel-floor` spotlight pool (theme tokens) when alpha.
 - Preview gate: hold and dip clean; spin shows a faint back leg (his) and grey smudges inside her skirt. The owner accepted this.
+
+## 2026-11-27: Blueprint 082 (particle-dance code removed)
+
+- The reel now plays inside `#dance` (sections/dance.tsx → `DanceReelFrame`; story.ts `buildDance` drives it; the heart moves to the `dance` pose top-right; `PETAL_SECTIONS.dance`). The separate `#dance-reel` section and the `DanceDuo` mount are gone.
+- `damp` and `BEAT_REARM` moved verbatim into `engine/dance-reel-math.ts` (+ a `damp` test).
+- Deleted: `canvas/dance-duo.tsx`, `canvas/dance-points.ts` (+ test), `canvas/dance-shaders.ts`, `canvas/dance-manifest.json`, `engine/dance-state.ts` (+ test), `public/dance-reel/points.bin`, `public/dance-reel/posters/dip.webp`, `scripts/prepare-dance-points.mjs`, `scripts/prepare-dance-reel.mjs`; `danceParticles` dropped from `engine/tiers.ts`.
+
+### Verification
+
+- tsc and eslint (src/features/love, scripts) are clean; love vitest has 32 files and 134 tests passing. Dev server `/love/<slug>` returns 200. Not re-checked in a browser.
