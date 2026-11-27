@@ -2,6 +2,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 
+import { markNear } from './act-state';
 import { launchConfetti } from './confetti-state';
 import { buildFinaleSpell, director } from './heart-director';
 import { replayHeroWeave } from './hero-intro';
@@ -1045,6 +1046,17 @@ export function buildStory(
   root: HTMLElement,
   ctx: { quiet: boolean; tier: Tier },
 ) {
+  // Blueprint 089: a section's 3D act mounts one viewport before the section arrives.
+  const acts = Array.from(
+    root.querySelectorAll<HTMLElement>('[data-love-section]'),
+  ).map((el) =>
+    ScrollTrigger.create({
+      trigger: el,
+      start: 'top 200%',
+      once: true,
+      onEnter: () => markNear(el.id),
+    }),
+  );
   const mm = gsap.matchMedia();
   mm.add(
     {
@@ -1069,6 +1081,7 @@ export function buildStory(
   );
   return () => {
     mm.revert();
+    acts.forEach((t) => t.kill());
     clearTheme(root);
   };
 }

@@ -1204,7 +1204,16 @@ Implemented M28–M33 in the order M28 → M32 → M29 → M31 → M30 → M33:
 - `canvas/wish-candle.tsx`: physical-material cake (lavender sponge, ivory drip frosting, gold pearls/board, ivory candle with gold helix) plus a flame point light that dims on blow-out; removed `cakeVertex`/`cakeFragment`. Calm SVG cake recoloured.
 
 ## 2026-11-27 — Blueprint 085: open gifts, saved wish, progress reset, linked hints, hunt intro (Love Site)
+
 - Progress: `PersistedSet.clear`, `progressValue` (wish), `resetProgress`, `ensureFreshProgress` (Cache Storage marker) in `engine/hidden-hearts.ts`; Replay resets progress.
 - Gifts: open-top hollow box with liner; one shared on-demand Canvas (`canvas/gift-3d.tsx` + drei View, `canvas/gift-stage.ts`), staggered entrance, SVG→3D cross-fade.
 - Wish: "Make my wish" seals and stores locally; "Your wish" card in Afterglow.
 - Hints: chips scroll to and pulse their heart (`focusHiddenHeart`, gallery opens the ritual first); `ui/hunt-intro-dialog.tsx` after the hero intro, once per progress lifetime.
+
+## 2026-11-27 — Blueprint 089: lazy acts + bundle trimming (Love Site)
+
+- `engine/act-state.ts` (`markNear`, `markAllNear`, `useNear`): grow-only set of sections one viewport away; `engine/story.ts` adds one `once` trigger per `[data-love-section]` (`top 200%`).
+- `canvas/love-canvas.tsx`: `MemoryOrbs`, `GalleryWalk`, `ReasonsBook`, `WishStar`, `WishCandle` now `React.lazy`, mounted only when their section is near (code + textures deferred). `?debug` mounts all.
+- `next.config.ts`: `experimental.optimizePackageImports` for drei and framer-motion.
+- Skipped (already handled or not loaded): favicon-heart.svg and dance-vid.mp4 unreferenced; GiftCanvas already gated by `near`; gallery images already lazy via next/image; postprocessing already tier-gated; hidden tabs already pause rAF.
+- Not measured: Next 16 build output lists no per-route sizes; Lighthouse not run in this session.

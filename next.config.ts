@@ -22,6 +22,10 @@ const nextConfig: NextConfig = {
     process.env.NODE_ENV === 'development'
       ? ['unstopped-unequal-lantern.ngrok-free.dev']
       : undefined,
+  // Blueprint 089: tree-shake barrel imports from the Love Site's heaviest libraries.
+  experimental: {
+    optimizePackageImports: ['@react-three/drei', 'framer-motion'],
+  },
   async headers() {
     return [{ source: '/(.*)', headers: securityHeaders }];
   },

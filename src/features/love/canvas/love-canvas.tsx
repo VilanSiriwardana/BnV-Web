@@ -9,23 +9,36 @@ import {
   Vignette,
 } from '@react-three/postprocessing';
 import { ToneMappingMode } from 'postprocessing';
-import { Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 
 import type { LoveSiteConfig } from '../config';
 import { TIERS, type Tier } from '../engine/tiers';
 import { Arrow } from './arrow';
 import { Confetti } from './confetti';
 import { Heart } from './heart';
-import { MemoryOrbs } from './memory-orbs';
-import { GalleryWalk } from './gallery-walk';
 import { AmbientHearts, MiniHearts } from './mini-hearts';
 import { Petals } from './petals';
-import { ReasonsBook } from './reasons-book';
 import { ShockRing } from './shock-ring';
 import { Sparks } from './sparks';
-import { WishStar } from './wish-star';
-import { WishCandle } from './wish-candle';
 import { renderStats } from '../engine/render-stats';
+import { markAllNear, useNear } from '../engine/act-state';
+
+// Blueprint 089: later acts load their code and textures only when their section is near.
+const MemoryOrbs = lazy(() =>
+  import('./memory-orbs').then((m) => ({ default: m.MemoryOrbs })),
+);
+const GalleryWalk = lazy(() =>
+  import('./gallery-walk').then((m) => ({ default: m.GalleryWalk })),
+);
+const ReasonsBook = lazy(() =>
+  import('./reasons-book').then((m) => ({ default: m.ReasonsBook })),
+);
+const WishStar = lazy(() =>
+  import('./wish-star').then((m) => ({ default: m.WishStar })),
+);
+const WishCandle = lazy(() =>
+  import('./wish-candle').then((m) => ({ default: m.WishCandle })),
+);
 
 type Props = {
   tier: Tier;
@@ -60,6 +73,13 @@ export default function LoveCanvas({
   candleMode,
 }: Props) {
   const config = TIERS[tier];
+  const memoriesNear = useNear('memories');
+  const galleryNear = useNear('gallery');
+  const reasonsNear = useNear('reasons');
+  const wishNear = useNear('wish');
+  useEffect(() => {
+    if (debug) markAllNear();
+  }, [debug]);
   return (
     <Canvas
       aria-hidden
@@ -93,17 +113,25 @@ export default function LoveCanvas({
       <Petals tier={tier} />
       <AmbientHearts tier={tier} />
       <Suspense fallback={null}>
-        <MemoryOrbs tier={tier} memories={memories} />
+        {memoriesNear && <MemoryOrbs tier={tier} memories={memories} />}
       </Suspense>
-      <GalleryWalk tier={tier} gallery={gallery} galleryEnd={galleryEnd} />
-      {tier !== 'low' && reasons && reasons.length > 0 && (
-        <ReasonsBook tier={tier} items={reasons} />
-      )}
+      <Suspense fallback={null}>
+        {galleryNear && (
+          <GalleryWalk tier={tier} gallery={gallery} galleryEnd={galleryEnd} />
+        )}
+      </Suspense>
+      <Suspense fallback={null}>
+        {reasonsNear && tier !== 'low' && reasons && reasons.length > 0 && (
+          <ReasonsBook tier={tier} items={reasons} />
+        )}
+      </Suspense>
       <ShockRing />
       <Sparks />
       <Arrow />
-      <WishStar />
-      {candleMode && <WishCandle tier={tier} />}
+      <Suspense fallback={null}>
+        {wishNear && <WishStar />}
+        {wishNear && candleMode && <WishCandle tier={tier} />}
+      </Suspense>
       <Confetti tier={tier} />
       {config.bloom !== 'off' && (
         <EffectComposer multisampling={0}>
