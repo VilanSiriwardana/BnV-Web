@@ -15,7 +15,6 @@ import { routes } from '@/config/routes';
 import { sizeGuides } from '@/data/size-guides';
 import {
   getProductBySlug,
-  getProductSlugs,
   getRelatedProducts,
 } from '@/features/catalog/queries';
 import {
@@ -27,13 +26,11 @@ import {
 import { JsonLd, breadcrumbJsonLd, productJsonLd } from '@/lib/seo/jsonld';
 import { pageMetadata } from '@/lib/seo/metadata';
 
-export const revalidate = 300;
+// Rendered per request: no database is reachable at build time.
+// Restore `revalidate` + generateStaticParams once a hosted DB exists.
+export const dynamic = 'force-dynamic';
 
 type Props = { params: Promise<{ slug: string }> };
-
-export async function generateStaticParams() {
-  return (await getProductSlugs()).map(({ slug }) => ({ slug }));
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;

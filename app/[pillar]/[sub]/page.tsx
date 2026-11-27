@@ -6,28 +6,15 @@ import { pillars, routes, type Pillar } from '@/config/routes';
 import {
   getCategory,
   getCategoryProducts,
-  getSubcategorySlugs,
   subcategorySlug,
 } from '@/features/catalog/queries';
 import { pageMetadata } from '@/lib/seo/metadata';
 
-export const revalidate = 300;
+// Rendered per request: no database is reachable at build time.
+// Restore `revalidate` + generateStaticParams once a hosted DB exists.
+export const dynamic = 'force-dynamic';
 
 type Props = { params: Promise<{ pillar: string; sub: string }> };
-
-export async function generateStaticParams() {
-  const rows = await getSubcategorySlugs();
-  return rows.flatMap((row) =>
-    row.parent
-      ? [
-          {
-            pillar: row.parent.slug,
-            sub: row.slug.slice(row.parent.slug.length + 1),
-          },
-        ]
-      : [],
-  );
-}
 
 // D-21: /<pillar>/<sub> resolves to category slug <pillar>-<sub> under that pillar.
 async function load(pillar: string, sub: string) {

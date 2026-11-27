@@ -7,14 +7,12 @@ import { pillars, routes, type Pillar } from '@/config/routes';
 import { getCategory, getCategoryProducts } from '@/features/catalog/queries';
 import { pageMetadata } from '@/lib/seo/metadata';
 
-export const revalidate = 300;
+// Rendered per request: no database is reachable at build time.
+// Restore `revalidate` + generateStaticParams once a hosted DB exists.
+export const dynamic = 'force-dynamic';
 export const dynamicParams = false;
 
 type Props = { params: Promise<{ pillar: string }> };
-
-export function generateStaticParams() {
-  return pillars.map((pillar) => ({ pillar }));
-}
 
 const isPillar = (value: string): value is Pillar =>
   (pillars as readonly string[]).includes(value);

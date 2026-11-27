@@ -9,7 +9,9 @@ import {
 import { shoots } from '@/data/portfolio';
 import { absoluteUrl } from '@/lib/seo/canonical';
 
-export const revalidate = 3600;
+// Rendered per request: no database is reachable at build time.
+// Restore `revalidate` once a hosted DB exists.
+export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [products, collections, subcategories] = await Promise.all([

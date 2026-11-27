@@ -13,7 +13,9 @@ import { ShowcaseRail } from '@/features/home/sections/showcase-rail';
 import { TeaserBento } from '@/features/home/sections/teaser-bento';
 import { TrustStrip } from '@/features/home/sections/trust-strip';
 
-export const revalidate = 300;
+// Rendered per request: no database is reachable at build time.
+// Restore `revalidate` once a hosted DB exists.
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: { absolute: siteConfig.defaultTitle },
