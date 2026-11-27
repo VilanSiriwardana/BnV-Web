@@ -18,6 +18,7 @@ import {
 } from '../engine/gallery-path';
 import { decayRitualKick, ritualState } from '../engine/gallery-ritual';
 import { galleryState } from '../engine/gallery-state';
+import { useMotionPrefs } from '../engine/motion-prefs';
 
 const { damp, lerp } = MathUtils;
 // Narrow (portrait) screens widen the walk view so the doorway and both corridor walls stay in frame.
@@ -33,6 +34,11 @@ const posB = new Vector3();
 const lookB = new Vector3();
 const kickOffset = new Vector3();
 const backOff = new Vector3();
+const fromPos = new Vector3();
+const fromLook = new Vector3();
+// Blueprint 086: entering eases from wherever the story camera was instead of snapping.
+const ENTER_S = 0.3;
+const RELEASE_RATE = 10;
 
 type Props = {
   curve: CatmullRomCurve3;
@@ -47,6 +53,9 @@ type Props = {
 export function GalleryCameraRig({ curve, order, sizes }: Props) {
   const smooth = useRef(0);
   const owned = useRef(false);
+  const enter = useRef(1);
+  const fromFov = useRef(STORY_FOV);
+  const { calm } = useMotionPrefs();
 
   function pose(index: number, aspect: number, pos: Vector3, look: Vector3) {
     const slot = order[index];
@@ -67,14 +76,27 @@ export function GalleryCameraRig({ curve, order, sizes }: Props) {
     const cam = state.camera as PerspectiveCamera;
     if (galleryState.cameraOwner !== 'gallery') {
       owned.current = false;
-      if (!galleryState.releasePending) return;
-      galleryState.releasePending = false;
-      cam.rotation.set(0, 0, 0);
-      cam.fov = STORY_FOV;
-      cam.updateProjectionMatrix();
+      if (galleryState.releasePending) {
+        galleryState.releasePending = false;
+        cam.rotation.set(0, 0, 0);
+        if (calm) cam.fov = STORY_FOV;
+        cam.updateProjectionMatrix();
+      }
+      // Ease the fov home over a few frames rather than in one.
+      if (Math.abs(cam.fov - STORY_FOV) > 1e-3) {
+        cam.fov = damp(cam.fov, STORY_FOV, RELEASE_RATE, delta);
+        if (Math.abs(cam.fov - STORY_FOV) < 0.01) cam.fov = STORY_FOV;
+        cam.updateProjectionMatrix();
+      }
       return;
     }
-    // Entering (or re-entering) jumps straight to the current scroll spot: never fly in.
+    if (!owned.current) {
+      enter.current = calm ? 1 : 0;
+      fromPos.copy(cam.position);
+      cam.getWorldDirection(fromLook).add(cam.position);
+      fromFov.current = cam.fov;
+    }
+    // Entering jumps the walk to the current scroll spot; the camera itself eases in (ENTER_S).
     smooth.current = owned.current
       ? damp(smooth.current, galleryState.walk, 3.5, delta)
       : galleryState.walk;
@@ -88,10 +110,17 @@ export function GalleryCameraRig({ curve, order, sizes }: Props) {
     // Strike kick from the unlock ritual (decays within ~150 ms).
     decayRitualKick(delta);
     const kick = ritualState.kick;
+    let fov = lerp(fovA, fovB, blend);
+    if (enter.current < 1) {
+      enter.current = Math.min(1, enter.current + delta / ENTER_S);
+      const e = 1 - (1 - enter.current) ** 3;
+      posA.lerpVectors(fromPos, posA, e);
+      lookA.lerpVectors(fromLook, lookA, e);
+      fov = lerp(fromFov.current, fov, e);
+    }
     cam.position.copy(posA);
     if (kick) cam.position.add(kickOffset.set(0.015 * kick, -0.01 * kick, 0));
     cam.lookAt(lookA);
-    const fov = lerp(fovA, fovB, blend);
     if (Math.abs(cam.fov - fov) > 1e-3) {
       cam.fov = fov;
       cam.updateProjectionMatrix();

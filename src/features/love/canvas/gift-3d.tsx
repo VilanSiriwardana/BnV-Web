@@ -26,7 +26,7 @@ import {
 
 import { createRibbon, drapeBand, smooth, updateRibbon } from './gift-ribbon';
 import { registerGiftStage } from './gift-stage';
-import { paperGrain, satinWeave } from './gift-textures';
+import { sharedGiftMaps } from './gift-textures';
 import { readTokenColors } from './token-colors';
 
 type Props = {
@@ -102,8 +102,7 @@ function useGiftParts() {
     const goldC = c.gold.night ?? new Color('#d4ac63');
     const box = lav.clone().multiplyScalar(0.82);
     const lid = lav.clone().lerp(ivory, 0.25);
-    const grain = paperGrain();
-    const weave = satinWeave();
+    const { grain, weave } = sharedGiftMaps();
     const paper = (color: Color, sheen: Color) =>
       new MeshPhysicalMaterial({
         color,
@@ -205,6 +204,7 @@ function useGiftParts() {
   useEffect(
     () => () => {
       Object.values(parts).forEach((p) => {
+        if (p === parts.grain || p === parts.weave) return;
         if (p && typeof p === 'object' && 'dispose' in p) p.dispose();
       });
       [...parts.bands, ...parts.loops, ...parts.tails].forEach((r) =>

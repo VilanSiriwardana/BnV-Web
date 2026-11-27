@@ -5,6 +5,8 @@ import {
   SHATTER_DURATION,
   fracturePane,
   shardMotion,
+  shardPoseAt,
+  shardVelocities,
   triangleArea,
 } from './glass-fracture';
 
@@ -32,5 +34,22 @@ describe('glass fracture', () => {
     expect(pose.opacity).toBe(1);
     shardMotion(shard, 0, SHATTER_DURATION, { x: 0, y: 0 }, pose);
     expect(pose.opacity).toBe(0);
+  });
+
+  it('precomputed velocities reproduce shardMotion exactly', () => {
+    const shards = fracturePane(0.34, 0.26, 32);
+    const impact = { x: 0.05, y: -0.02 };
+    const push = { x: 0.3, y: -0.4 };
+    const vel = shardVelocities(shards, impact, push);
+    const a: ShardPose = { x: 0, y: 0, z: 0, rx: 0, ry: 0, opacity: 0 };
+    const b: ShardPose = { ...a };
+    shards.forEach((s, i) => {
+      for (const t of [0.1, 0.8, 1.3]) {
+        shardMotion(s, i, t, impact, a, push);
+        shardPoseAt(vel, i, s, t, b);
+        for (const k of Object.keys(a) as (keyof ShardPose)[])
+          expect(b[k]).toBeCloseTo(a[k], 5);
+      }
+    });
   });
 });

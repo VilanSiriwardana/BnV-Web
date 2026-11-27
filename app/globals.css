@@ -161,19 +161,14 @@
 
 /* The gate uses the Love Site's night palette before the story begins. */
 [data-love-root] .love-gate {
-  /* Same near-black night as the story, with only a faint glow behind the lights and a vignette. */
+  /* Blueprint 086: near-black night and a deep vignette; only the lights themselves glow. */
   background:
     radial-gradient(
       ellipse 120% 90% at 50% 50%,
-      transparent 45%,
-      color-mix(in oklab, black 55%, transparent) 100%
+      transparent 32%,
+      color-mix(in oklab, black 72%, transparent) 100%
     ),
-    radial-gradient(
-      ellipse 34% 24% at 50% 50%,
-      color-mix(in oklab, var(--night-primary) 5%, transparent),
-      transparent 70%
-    ),
-    var(--night-background);
+    color-mix(in oklab, var(--night-background) 82%, black);
 }
 
 [data-love-root] .love-gate-frame {
@@ -201,9 +196,7 @@
   bottom: -3rem;
   opacity: 0;
   color: color-mix(in oklab, var(--night-primary) 70%, var(--night-gold));
-  filter: drop-shadow(
-    0 0 6px color-mix(in oklab, var(--night-primary) 50%, transparent)
-  );
+  will-change: transform, opacity;
   animation: love-gate-heart var(--dur, 12s) ease-in var(--delay, 0s) infinite;
 }
 
@@ -295,11 +288,13 @@
 }
 [data-love-root] .love-gate-light--lavender {
   --c: var(--primary);
-  left: calc(50% - var(--sep) * var(--gate-reach));
+  left: 50%;
+  transform: translate3d(calc(var(--sep) * var(--gate-reach) * -1), 0, 0);
 }
 [data-love-root] .love-gate-light--gold {
   --c: var(--gold);
-  left: calc(50% + var(--sep) * var(--gate-reach));
+  left: 50%;
+  transform: translate3d(calc(var(--sep) * var(--gate-reach)), 0, 0);
 }
 [data-love-root] .love-gate-light--gold > span {
   animation-duration: 7s;
@@ -343,7 +338,8 @@
     color-mix(in oklab, var(--primary) 18%, transparent),
     transparent 65%
   );
-  opacity: calc((1 - var(--sep)) * 0.8);
+  /* Zero at rest; it only blooms as the lights meet. */
+  opacity: clamp(0, calc((0.4 - var(--sep)) * 2), 0.8);
   pointer-events: none;
 }
 [data-love-root] .love-gate-merge {
@@ -406,7 +402,7 @@
 @keyframes love-gate-rise {
   from {
     opacity: 0;
-    filter: blur(12px);
+    transform: translateY(12px);
   }
 }
 [data-love-root] .love-gate-hint {
@@ -440,6 +436,9 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   mix-blend-mode: soft-light;
   opacity: 0.45;
+}
+[data-love-root] .love-gate > .love-grain {
+  opacity: 0.3;
 }
 
 [data-love-root] .love-parchment {

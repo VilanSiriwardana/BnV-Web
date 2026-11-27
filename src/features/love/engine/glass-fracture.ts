@@ -92,3 +92,50 @@ export function shardMotion(
     t < 0.9 ? 1 : Math.max(0, 1 - (t - 0.9) / (SHATTER_DURATION - 0.9));
   return out;
 }
+
+const NO_PUSH: Point2 = { x: 0, y: 0 };
+const VEL = 5;
+
+/** Blueprint 086: `shardMotion`'s random draws, once per strike (vx, vy, vz, rx, ry per shard). */
+export function shardVelocities(
+  shards: readonly Shard[],
+  impact: Point2,
+  push: Point2 = NO_PUSH,
+  out = new Float32Array(shards.length * VEL),
+) {
+  shards.forEach((shard, i) => {
+    const rand = mulberry32(i * 97 + 13);
+    const ox = shard.centroid.x - impact.x;
+    const oy = shard.centroid.y - impact.y;
+    const d = Math.hypot(ox, oy) || 1;
+    const burst = 0.6 + rand() * 0.9;
+    const o = i * VEL;
+    out[o] = (ox / d) * burst + push.x * 0.8;
+    out[o + 1] = (oy / d) * burst + 0.4 * rand() - push.y * 0.8;
+    out[o + 2] = 0.9 + rand() * 1.1;
+    out[o + 3] = (rand() - 0.5) * 14;
+    out[o + 4] = (rand() - 0.5) * 14;
+  });
+  return out;
+}
+
+/** Allocation-free twin of `shardMotion`, reading precomputed `shardVelocities`. */
+export function shardPoseAt(
+  vel: Float32Array,
+  i: number,
+  shard: Shard,
+  t: number,
+  out: ShardPose,
+) {
+  const o = i * VEL;
+  out.x = shard.centroid.x + vel[o] * t;
+  out.y = shard.centroid.y + vel[o + 1] * t - 0.5 * GRAVITY * t * t;
+  out.z = vel[o + 2] * t;
+  out.rx = vel[o + 3] * t;
+  out.ry = vel[o + 4] * t;
+  out.opacity = shardOpacity(t);
+  return out;
+}
+
+export const shardOpacity = (t: number) =>
+  t < 0.9 ? 1 : Math.max(0, 1 - (t - 0.9) / (SHATTER_DURATION - 0.9));

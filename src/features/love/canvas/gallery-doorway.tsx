@@ -199,12 +199,8 @@ export function GalleryDoorway({ curve }: { curve: CatmullRomCurve3 }) {
     // Light pours in as the doors part and fades once she is through.
     const through = 1 - MathUtils.smoothstep(galleryState.walk, 0.05, 0.12);
     const o = open * through;
-    for (const mesh of [light.current, spill.current]) {
-      if (!mesh) continue;
-      const m = mesh.material as MeshBasicMaterial;
-      m.opacity = o * (mesh === light.current ? 0.95 : 0.5);
-      mesh.visible = m.opacity > 0.001;
-    }
+    pour(light.current, o * 0.95);
+    pour(spill.current, o * 0.5);
   });
 
   const { gold, lacquer, panel, stone } = kit.materials;
@@ -508,4 +504,10 @@ function WelcomePlaque() {
       <planeGeometry args={[PLAQUE_W, PLAQUE_H]} />
     </mesh>
   );
+}
+
+function pour(mesh: Mesh | null, opacity: number) {
+  if (!mesh) return;
+  (mesh.material as MeshBasicMaterial).opacity = opacity;
+  mesh.visible = opacity > 0.001;
 }

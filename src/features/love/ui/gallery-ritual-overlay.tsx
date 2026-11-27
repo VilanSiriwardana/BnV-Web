@@ -118,7 +118,6 @@ export function GalleryRitualOverlay({
         {
           y: 12,
           opacity: 0,
-          filter: 'blur(6px)',
           duration: 0.5,
           stagger: 0.04,
           ease: 'power2.out',
@@ -195,6 +194,13 @@ export function GalleryRitualOverlay({
       if (!el || !a) return;
       const { screen } = ritualState;
       const m = ritualState.mode;
+      // Blueprint 086: nothing to point at mid-smash; let the shards have the frame.
+      if (m === 'smashing') {
+        if (!draw.paused()) draw.pause();
+        el.style.opacity = a.style.opacity = '0';
+        return;
+      }
+      if (draw.paused()) draw.resume();
       const s =
         m === 'locked'
           ? screen.case

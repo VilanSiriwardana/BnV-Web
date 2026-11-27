@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { type ReactNode, useEffect, useRef } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils/cn';
 
@@ -57,6 +57,10 @@ export function GiftBox({
   const button = useRef<HTMLButtonElement>(null);
   const svg = useRef<SVGSVGElement>(null);
 
+  const [seen, setSeen] = useState(false);
+  const [waited, setWaited] = useState(false);
+  const introStarted = useRef(false);
+
   // Blueprint 085: rise in once, staggered along the row.
   useEffect(() => {
     const el = button.current;
@@ -68,6 +72,25 @@ export function GiftBox({
     const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return;
       io.disconnect();
+      setSeen(true);
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [quiet]);
+
+  // Blueprint 086: wait for the 3D gift (at most 1.2 s) so the drop-in is never half over.
+  useEffect(() => {
+    if (!seen || !three || live) return;
+    const id = window.setTimeout(() => setWaited(true), 1200);
+    return () => window.clearTimeout(id);
+  }, [seen, three, live]);
+
+  useEffect(() => {
+    const el = button.current;
+    if (!el || quiet || !seen || introStarted.current) return;
+    if (three && !live && !waited) return;
+    introStarted.current = true;
+    {
       // The 3D gift drops in and settles (its bow wobbles) while the button fades up.
       gsap.to(intro.current, {
         value: 1,
@@ -85,10 +108,8 @@ export function GiftBox({
         ease: 'love-soft',
         clearProps: 'transform,opacity,visibility',
       });
-    });
-    io.observe(el);
-    return () => io.disconnect();
-  }, [quiet, index]);
+    }
+  }, [quiet, index, seen, three, live, waited]);
 
   // The flat gift stays until the shared Canvas is ready, then hands over.
   useEffect(() => {
@@ -172,9 +193,9 @@ export function GiftBox({
       return;
     }
     if (sealed) {
+      gsap.set(el, { filter: 'grayscale(0.7)' });
       gsap.to(el, {
         y: 10,
-        filter: 'grayscale(0.7)',
         duration: 0.8,
         ease: 'power2.out',
         delay: index * 0.08,
@@ -216,16 +237,15 @@ export function GiftBox({
       c.getBoundingClientRect().top;
     gsap.fromTo(
       c,
-      { y: dy, scale: 0.5, opacity: 0, clipPath: 'inset(0% 0% 100% 0%)' },
+      { y: dy, scale: 0.5, opacity: 0 },
       {
         y: 0,
         scale: 1,
         opacity: 1,
-        clipPath: 'inset(0% 0% 0% 0%)',
         duration: 1,
         delay: 0.65,
         ease: 'love-soft',
-        clearProps: 'clipPath,transform',
+        clearProps: 'transform',
       },
     );
   }, [opened, quiet]);
@@ -302,7 +322,7 @@ export function GiftBox({
           ref={svg}
           aria-hidden
           viewBox="0 0 120 120"
-          className="size-full overflow-visible drop-shadow-[0_14px_18px_color-mix(in_oklab,var(--primary)_25%,transparent)]"
+          className="size-full overflow-visible drop-shadow-[0_14px_18px_color-mix(in_oklab,var(--primary)_25%,transparent)] will-change-[opacity]"
         >
           <defs>
             <linearGradient

@@ -41,3 +41,12 @@ export function paperGrain() {
   tex.repeat.set(3, 3);
   return tex;
 }
+
+// Blueprint 086: the procedural maps are identical for every gift; build them once per page.
+let shared: {
+  grain: ReturnType<typeof paperGrain>;
+  weave: ReturnType<typeof satinWeave>;
+} | null = null;
+export function sharedGiftMaps() {
+  return (shared ??= { grain: paperGrain(), weave: satinWeave() });
+}

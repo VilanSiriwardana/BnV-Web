@@ -8,20 +8,21 @@ import type { PhotoRef } from '../config';
 /**
  * Inspect indices to keep resident: the `count` frames nearest the camera, preferring the ones
  * ahead (a frame behind costs twice its distance). `ts` are the frames' curve parameters, `at` the
- * camera's; `pinned` (the open frame) is always kept.
+ * camera's; `pinned` (the open frame, the end portrait) is always kept.
  */
 export function residentWindow(
   ts: readonly number[],
   at: number,
   count: number,
-  pinned = -1,
+  pinned: number | readonly number[] = -1,
 ) {
   const ranked = ts
     .map((t, i) => ({ i, d: t >= at ? t - at : (at - t) * 2 }))
     .sort((a, b) => a.d - b.d)
     .map((r) => r.i);
   const keep = new Set(ranked.slice(0, count));
-  if (pinned >= 0) keep.add(pinned);
+  for (const p of typeof pinned === 'number' ? [pinned] : pinned)
+    if (p >= 0) keep.add(p);
   return keep;
 }
 

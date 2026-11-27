@@ -110,20 +110,28 @@ export function magneticTilt(el: HTMLElement | SVGElement, strength = 8) {
   gsap.set(el, { transformPerspective: 700 });
   const rx = gsap.quickTo(el, 'rotationX', { duration: 0.5, ease: 'power3' });
   const ry = gsap.quickTo(el, 'rotationY', { duration: 0.5, ease: 'power3' });
+  // Blueprint 086: measure on enter, not on every move.
+  let r: DOMRect | null = null;
+  const enter = () => {
+    r = el.getBoundingClientRect();
+  };
   const move = (ev: Event) => {
     const e = ev as PointerEvent;
     if (e.pointerType !== 'mouse') return;
-    const r = el.getBoundingClientRect();
+    r ??= el.getBoundingClientRect();
     ry(((e.clientX - r.left) / r.width - 0.5) * strength * 2);
     rx(-((e.clientY - r.top) / r.height - 0.5) * strength * 2);
   };
   const leave = () => {
+    r = null;
     rx(0);
     ry(0);
   };
+  el.addEventListener('pointerenter', enter);
   el.addEventListener('pointermove', move);
   el.addEventListener('pointerleave', leave);
   return () => {
+    el.removeEventListener('pointerenter', enter);
     el.removeEventListener('pointermove', move);
     el.removeEventListener('pointerleave', leave);
     gsap.set(el, { clearProps: 'transform' });

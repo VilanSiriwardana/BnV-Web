@@ -46,7 +46,7 @@ const { damp } = MathUtils;
 const BORDER = 0.09;
 const MAT = 0.035;
 const DECOR = ['map', 'mirror', 'empty', 'map'] as const;
-const RESIDENCY_EVERY = 0.25; // seconds
+const RESIDENCY_EVERY = 0.15; // seconds
 const PLACEHOLDER = new Color('#3a2a30');
 const tmp = new Vector3();
 
@@ -211,12 +211,16 @@ export function GalleryFrames({ curve, slots, photos, tier }: Props) {
     m.needsUpdate = true;
   }
 
+  // The end portrait hangs in view for the whole walk: always sharp, hi-res above `low`.
+  const hiResFor = (k: number) =>
+    TIERS[tier].galleryHiRes || (k === order.length - 1 && tier !== 'low');
+
   function updateResidency() {
     const keep = residentWindow(
       order.map((s) => s.t),
       galleryState.walk * WALK_END,
       TIERS[tier].galleryResident,
-      inspectIndex(),
+      [inspectIndex(), order.length - 1],
     );
     for (const [k, t] of resident.current)
       if (!keep.has(k)) {
@@ -229,12 +233,15 @@ export function GalleryFrames({ curve, slots, photos, tier }: Props) {
         cancel();
         loading.current.delete(k);
       }
+    // Blueprint 086: start at most two loads per tick so decodes and uploads never land together.
+    let starts = 0;
     for (const k of keep) {
       const photo = photos[k];
       if (!photo || resident.current.has(k) || loading.current.has(k)) continue;
+      if (++starts > 2) break;
       loading.current.set(
         k,
-        loadPhotoTexture(photo, TIERS[tier].galleryHiRes, (t) => {
+        loadPhotoTexture(photo, hiResFor(k), (t) => {
           loading.current.delete(k);
           resident.current.set(k, t);
           setMap(k, t);

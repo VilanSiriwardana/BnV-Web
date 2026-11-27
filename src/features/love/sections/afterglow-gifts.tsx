@@ -40,6 +40,8 @@ export function AfterglowGifts({
   const { tier } = useTier();
   const [glOk, setGlOk] = useState(true);
   const [near, setNear] = useState(false);
+  // Blueprint 086: once mounted the gift Canvas stays, so coming back never recompiles.
+  const [mounted, setMounted] = useState(false);
   const row = useRef<HTMLDivElement>(null);
   // The gift Canvas is on-demand and cheap, so it stays on when the main scene steps down to `low`.
   const three = !quiet && glOk && tier !== 'static';
@@ -48,9 +50,13 @@ export function AfterglowGifts({
   useEffect(() => {
     const el = row.current;
     if (!el || !three) return;
-    const io = new IntersectionObserver(([e]) => setNear(e.isIntersecting), {
-      rootMargin: '200px 0px',
-    });
+    const io = new IntersectionObserver(
+      ([e]) => {
+        setNear(e.isIntersecting);
+        if (e.isIntersecting) setMounted(true);
+      },
+      { rootMargin: '600px 0px' },
+    );
     io.observe(el);
     return () => io.disconnect();
   }, [three]);
@@ -104,7 +110,7 @@ export function AfterglowGifts({
                       : undefined
                   }
                   onOpen={() => set.add(g.id)}
-                  three={three && near}
+                  three={three && mounted}
                 >
                   <div className={card}>
                     <p className="font-display text-h4 text-gold-text">
@@ -118,7 +124,7 @@ export function AfterglowGifts({
             );
           })}
         </ul>
-        {three && near && (
+        {three && mounted && (
           <GiftCanvas
             dpr={tier === 'low' ? [1, 1] : [1, 1.25]}
             onLost={() => setGlOk(false)}

@@ -232,7 +232,7 @@ export function Gate({
               aria-hidden
               className="pointer-events-none absolute inset-0 overflow-hidden"
             >
-              {AMBIENT.map((h, i) => (
+              {(tier === 'high' ? AMBIENT : AMBIENT.slice(0, 8)).map((h, i) => (
                 <svg
                   key={i}
                   viewBox="0 0 100 92"

@@ -35,7 +35,9 @@ import {
   type ShardPose,
   SHATTER_DURATION,
   fracturePane,
-  shardMotion,
+  shardOpacity,
+  shardPoseAt,
+  shardVelocities,
 } from '../engine/glass-fracture';
 import { TIERS, type Tier } from '../engine/tiers';
 import { placeAcross } from './gallery-corridor';
@@ -135,7 +137,18 @@ export function GalleryRitual({ curve, tier }: Props) {
       depthWrite: false,
       side: DoubleSide,
     });
-    const shardMat = glass.clone();
+    // Blueprint 086: low tier flies plain transparent shards (no clearcoat pass).
+    const shardMat =
+      tier === 'low'
+        ? new MeshStandardMaterial({
+            color: '#e8f0ff',
+            transparent: true,
+            opacity: 0.35,
+            roughness: 0.1,
+            depthWrite: false,
+            side: DoubleSide,
+          })
+        : glass.clone();
     shardMat.opacity = 0.35;
     const keyMat = new MeshStandardMaterial({
       color: '#f0cf72',
@@ -215,7 +228,10 @@ export function GalleryRitual({ curve, tier }: Props) {
         key: createKeyGeometry(),
       },
     };
-  }, []);
+  }, [tier]);
+
+  const vel = useMemo(() => new Float32Array(shards.length * 5), [shards]);
+  const velAt = useRef(-1);
 
   const shardGeo = useMemo(() => {
     const g = new BufferGeometry();
@@ -264,24 +280,32 @@ export function GalleryRitual({ curve, tier }: Props) {
     if (sm) {
       sm.visible = t >= 0 && t < SHATTER_DURATION;
       if (sm.visible) {
+        if (velAt.current !== s.shatterAt) {
+          velAt.current = s.shatterAt;
+          shardVelocities(shards, s.impact, s.swipe, vel);
+        }
         const pos = sm.geometry.attributes.position as BufferAttribute;
-        shards.forEach((shard, i) => {
-          shardMotion(shard, i, t, s.impact, pose, s.swipe);
+        const verts = pos.array as Float32Array;
+        for (let i = 0; i < shards.length; i++) {
+          const shard = shards[i];
+          shardPoseAt(vel, i, shard, t, pose);
           const cr = Math.cos(pose.rx);
           const sr = Math.sin(pose.rx);
           const cy = Math.cos(pose.ry);
           const sy = Math.sin(pose.ry);
-          [shard.a, shard.b, shard.c].forEach((p, v) => {
+          for (let v = 0; v < 3; v++) {
+            const p = v === 0 ? shard.a : v === 1 ? shard.b : shard.c;
             const lx = p.x - shard.centroid.x;
             const ly = p.y - shard.centroid.y;
             const y1 = ly * cr;
             const z1 = ly * sr;
-            const x2 = lx * cy + z1 * sy;
-            const z2 = -lx * sy + z1 * cy;
-            pos.setXYZ(i * 3 + v, pose.x + x2, pose.y + y1, pose.z + z2);
-          });
-          (sm.material as MeshPhysicalMaterial).opacity = 0.35 * pose.opacity;
-        });
+            const o = (i * 3 + v) * 3;
+            verts[o] = pose.x + lx * cy + z1 * sy;
+            verts[o + 1] = pose.y + y1;
+            verts[o + 2] = pose.z - lx * sy + z1 * cy;
+          }
+        }
+        (sm.material as MeshStandardMaterial).opacity = 0.35 * shardOpacity(t);
         pos.needsUpdate = true;
       }
     }

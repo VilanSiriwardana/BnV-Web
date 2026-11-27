@@ -18,6 +18,12 @@ describe('gallery texture residency', () => {
     expect(kept.has(9)).toBe(true);
   });
 
+  it('keeps every pinned frame (open frame and end portrait)', () => {
+    const kept = residentWindow(ts, 0, 2, [5, 9]);
+    expect([...kept].sort()).toEqual([0, 1, 5, 9]);
+    expect(residentWindow(ts, 0, 2, [-1, 9]).size).toBe(3);
+  });
+
   it('derives the 1024 px variant name', () => {
     expect(smallSrc('/images/prototype/love-gallery-01.webp')).toBe(
       '/images/prototype/love-gallery-01-1024.webp',

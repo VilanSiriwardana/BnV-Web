@@ -167,6 +167,7 @@ function LoveStory({ site }: { site: LoveSiteConfig }) {
           debug={debug}
           onHeartTap={tapHeart}
           onReady={() => setCanvasReady(true)}
+          idle={!entered}
           spell={spell}
           candleMode={candleMode}
         />

@@ -130,13 +130,15 @@ function GalleryWalkStage({
     [],
   );
 
+  const modeRef = useRef(state.mode);
+
   // Focus ring follows the projected frame (no React state per frame), as in memories.tsx.
   useEffect(() => {
     const tick = () => {
       const el = ring.current;
       if (!el) return;
       const s = galleryState.screen[galleryState.focused];
-      if (!s?.visible || state.mode !== 'walk') {
+      if (!s?.visible || modeRef.current !== 'walk') {
         el.style.opacity = '0';
         return;
       }
@@ -148,8 +150,11 @@ function GalleryWalkStage({
     gsap.ticker.add(tick);
     return () => {
       gsap.ticker.remove(tick);
-      clearFocusedFrame();
     };
+  }, []);
+  useEffect(() => {
+    modeRef.current = state.mode;
+    return () => clearFocusedFrame();
   }, [state.mode]);
 
   const focusTwin = (k: number) => {
@@ -173,7 +178,7 @@ function GalleryWalkStage({
           <span
             aria-hidden
             data-welcome-bloom
-            className="absolute top-1/2 left-1/2 size-[min(80vw,34rem)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--love-aurora-gold)_45%,transparent),transparent_65%)] opacity-0 blur-2xl"
+            className="absolute top-1/2 left-1/2 size-[min(80vw,34rem)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--love-aurora-gold)_40%,transparent),color-mix(in_oklab,var(--love-aurora-gold)_14%,transparent)_38%,transparent_70%)] opacity-0 will-change-[opacity,transform]"
           />
           <h2
             id="gallery-title"

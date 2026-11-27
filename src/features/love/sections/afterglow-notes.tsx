@@ -1,6 +1,6 @@
 'use client';
 
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import 'gsap/ScrollTrigger';
 import { useEffect, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils/cn';
@@ -49,13 +49,16 @@ export function AfterglowNotes({
     const el = list.current;
     if (!el || quiet) return;
     const cards = Array.from(el.children);
+    // Blueprint 086: one layout read for the whole deck.
+    const box = el.getBoundingClientRect();
+    const pile = box.left + box.width / 2;
+    const dx = cards.map((c) => {
+      const r = c.getBoundingClientRect();
+      return pile - (r.left + r.width / 2);
+    });
     const ctx = gsap.context(() => {
       gsap.from(cards, {
-        x: (i: number, c: Element) => {
-          const r = c.getBoundingClientRect();
-          const box = el.getBoundingClientRect();
-          return box.left + box.width / 2 - (r.left + r.width / 2);
-        },
+        x: (i: number) => dx[i],
         y: 80,
         rotation: (i: number) => (i - mid) * 9,
         opacity: 0,
@@ -65,7 +68,6 @@ export function AfterglowNotes({
         scrollTrigger: { trigger: el, start: 'top 82%', once: true },
       });
     }, el);
-    ScrollTrigger.refresh();
     return () => ctx.revert();
   }, [quiet, mid]);
 
@@ -115,25 +117,27 @@ export function AfterglowNotes({
       )}
       <ul ref={list} className="mt-12 grid gap-8 sm:grid-cols-2">
         {notes.map((n, i) => (
-          <li
-            key={n.id}
-            style={{ rotate: `${(i - mid) * FAN_DEG * (i % 2 ? -1 : 1)}deg` }}
-            className="sm:odd:translate-y-3"
-          >
-            <Envelope
-              note={n}
-              opened={opened.includes(n.id)}
-              onOpen={(button, letter) => {
-                set.add(n.id);
-                setReturnTo(button);
-                setOrigin(letter);
-                setActive({
-                  label: 'Open when…',
-                  title: n.label,
-                  paragraphs: n.paragraphs,
-                });
-              }}
-            />
+          <li key={n.id}>
+            {/* The resting fan lives one level down so GSAP owns the li's transform. */}
+            <div
+              style={{ rotate: `${(i - mid) * FAN_DEG * (i % 2 ? -1 : 1)}deg` }}
+              className={i % 2 ? undefined : 'sm:translate-y-3'}
+            >
+              <Envelope
+                note={n}
+                opened={opened.includes(n.id)}
+                onOpen={(button, letter) => {
+                  set.add(n.id);
+                  setReturnTo(button);
+                  setOrigin(letter);
+                  setActive({
+                    label: 'Open when…',
+                    title: n.label,
+                    paragraphs: n.paragraphs,
+                  });
+                }}
+              />
+            </div>
           </li>
         ))}
       </ul>
@@ -162,6 +166,7 @@ function Envelope({
   const letter = useRef<HTMLDivElement>(null);
   const flap = useRef<SVGPathElement>(null);
   const busy = useRef(false);
+  const select = useRef<ReturnType<typeof gsap.utils.selector> | null>(null);
 
   useEffect(() => {
     const el = card.current;
@@ -233,7 +238,7 @@ function Envelope({
     duration: HOLD_MS,
     onProgress: (p) => {
       if (opened || !button.current) return;
-      const q = gsap.utils.selector(button.current);
+      const q = (select.current ??= gsap.utils.selector(button.current));
       gsap.set(q('[data-ring]'), { drawSVG: `0% ${p * 100}%` });
       gsap.set(q('[data-seal]'), {
         scale: 1 + p * 0.08,

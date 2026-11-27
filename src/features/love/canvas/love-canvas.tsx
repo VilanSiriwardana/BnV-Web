@@ -9,7 +9,7 @@ import {
   Vignette,
 } from '@react-three/postprocessing';
 import { ToneMappingMode } from 'postprocessing';
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 
 import type { LoveSiteConfig } from '../config';
 import { TIERS, type Tier } from '../engine/tiers';
@@ -51,6 +51,8 @@ type Props = {
   debug?: boolean;
   onHeartTap?: () => void;
   onReady?: () => void;
+  /** Blueprint 086: the opaque gate is up; after the warm-up frames the loop idles. */
+  idle?: boolean;
   /** GPU context lost (driver reset, memory pressure): the page falls back to the static path. */
   onContextLost?: () => void;
   spell?: [string, string];
@@ -68,11 +70,13 @@ export default function LoveCanvas({
   debug,
   onHeartTap,
   onReady,
+  idle = false,
   onContextLost,
   spell,
   candleMode,
 }: Props) {
   const config = TIERS[tier];
+  const [warm, setWarm] = useState(false);
   const memoriesNear = useNear('memories');
   const galleryNear = useNear('gallery');
   const reasonsNear = useNear('reasons');
@@ -94,15 +98,21 @@ export default function LoveCanvas({
       gl={{ antialias: false, powerPreference: 'high-performance' }}
       dpr={[1, config.dpr]}
       camera={{ position: [0, 0, 6], fov: 45 }}
+      frameloop={idle && warm ? 'demand' : 'always'}
       onCreated={({ gl }) => {
         gl.domElement.addEventListener(
           'webglcontextlost',
           () => onContextLost?.(),
           { once: true },
         );
-        onReady?.();
       }}
     >
+      <FirstFrames
+        onDone={() => {
+          setWarm(true);
+          onReady?.();
+        }}
+      />
       {/* Blueprint 076: one step down at most, never back up. */}
       <PerformanceMonitor onDecline={onDecline} flipflops={1} />
       <ambientLight intensity={0.6} />
@@ -156,6 +166,15 @@ function RenderStatsProbe() {
     renderStats.triangles = gl.info.render.triangles;
     renderStats.textures = gl.info.memory.textures;
     renderStats.geometries = gl.info.memory.geometries;
+  });
+  return null;
+}
+
+/** Fires once real frames (shader compiles included) have rendered, not merely on context creation. */
+function FirstFrames({ onDone }: { onDone: () => void }) {
+  const frames = useRef(0);
+  useFrame(() => {
+    if (++frames.current === 3) onDone();
   });
   return null;
 }

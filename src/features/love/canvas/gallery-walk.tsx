@@ -2,7 +2,7 @@
 
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
-import type { Group } from 'three';
+import type { Group, Object3D } from 'three';
 
 import type { PhotoRef } from '../config';
 import {
@@ -62,11 +62,19 @@ export function GalleryWalk({ tier, gallery, galleryEnd }: Props) {
       if (cancelled || !g || galleryState.active) return;
       const { gl, scene, camera } = get();
       const fog = scene.fog;
+      // Blueprint 086: shards, sparks, hammer, door light and key are hidden until their moment;
+      // three skips invisible objects, so reveal them for the compile too.
+      const hidden: Object3D[] = [];
+      g.traverse((o) => {
+        if (o !== g && !o.visible) hidden.push(o);
+      });
+      hidden.forEach((o) => (o.visible = true));
       g.visible = true;
       scene.fog = FOG;
       // compileAsync builds the programs synchronously; restore before the next frame renders.
       const done = gl.compileAsync(scene, camera);
       scene.fog = fog;
+      hidden.forEach((o) => (o.visible = false));
       g.visible = galleryState.active;
       await done.catch(() => undefined);
     };

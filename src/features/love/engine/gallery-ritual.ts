@@ -127,7 +127,8 @@ function run(cmd: ReturnType<typeof reduceRitual>[1]) {
         .call(() => {
           s.shatterAt = performance.now();
           s.kick = 1;
-          playChime(4);
+          // Blueprint 086: keep audio work off the impact frame.
+          requestAnimationFrame(() => playChime(4));
         })
         .to(s, { hammer: 0.85, duration: 0.12, ease: 'power2.out' })
         .to(s, { hammer: 0, duration: 0.45, ease: 'power2.inOut' }, '+=0.15')
