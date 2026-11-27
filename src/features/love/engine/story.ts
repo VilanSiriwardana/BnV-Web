@@ -10,6 +10,8 @@ import { poseFor, type SectionId, SKY_WAIT, WISH_REST } from './heart-path';
 import { candle } from './candle-state';
 import { spawnTapHearts } from '../canvas/mini-hearts';
 import { BEAT_REARM, DANCE_BEATS, dance } from './dance-state';
+import reelManifest from '../canvas/dance-reel-manifest.json';
+import { createDanceReel } from './dance-reel-player';
 import { reasons } from './reasons-state';
 import { resetGalleryDirector } from './gallery-director';
 import { GALLERY_DOOR_SPAN, walkFromStage } from './gallery-path';
@@ -657,6 +659,65 @@ const buildDance: SectionBuilder = (root, mobile) => {
   };
 };
 
+// Blueprint 080: the couple clip fades in as the duo leaves; scroll scrubs its frames, the heart pulses on the dip.
+const buildDanceReel: SectionBuilder = (root, mobile, tier) => {
+  const el = root.querySelector<HTMLElement>('#dance-reel');
+  const canvas = el?.querySelector<HTMLCanvasElement>(
+    'canvas[data-dance-reel]',
+  );
+  if (!el || !canvas) return;
+  baselineOn(el, 'dance');
+  const frame = el.querySelector('[data-dance-reel-frame]');
+  const poster = el.querySelector('[data-dance-reel-poster]');
+  const reel = createDanceReel(canvas, {
+    set: mobile || tier === 'low' ? 'mobile' : 'desktop',
+    onFirstFrame: () => gsap.to(poster, { autoAlpha: 0, duration: 0.3 }),
+  });
+  const gallery = root.querySelector<HTMLElement>('#gallery');
+  if (!gallery || gallery.getBoundingClientRect().top < window.innerHeight)
+    reel.start();
+  else
+    ScrollTrigger.create({
+      trigger: gallery,
+      start: 'top bottom',
+      once: true,
+      onEnter: reel.start,
+    });
+  gsap.fromTo(
+    frame,
+    { autoAlpha: 0 },
+    {
+      autoAlpha: 1,
+      ease: 'none',
+      immediateRender: false,
+      scrollTrigger: {
+        trigger: el,
+        start: 'top bottom',
+        end: 'top 30%',
+        scrub: 0.8,
+      },
+    },
+  );
+  let armed = true;
+  ScrollTrigger.create({
+    trigger: el,
+    start: 'top top',
+    end: 'bottom bottom',
+    onUpdate: ({ progress }) => {
+      reel.setProgress(progress);
+      if (armed && progress >= reelManifest.dip) {
+        armed = false;
+        director.play('pulse');
+        spawnTapHearts(6);
+      } else if (progress < reelManifest.dip - BEAT_REARM) armed = true;
+    },
+  });
+  return () => {
+    reel.destroy();
+    gsap.set([frame, poster], { clearProps: 'opacity,visibility' });
+  };
+};
+
 // Romance Additions F4: the heart rests above the ring; scroll turns the ring once over the stage.
 const buildReasons: SectionBuilder = (root, mobile) => {
   const el = root.querySelector<HTMLElement>('#reasons');
@@ -979,6 +1040,7 @@ const sections = [
   buildStarlight,
   buildGallery,
   buildDance,
+  buildDanceReel,
   buildReasons,
   buildWish,
   buildLetter,

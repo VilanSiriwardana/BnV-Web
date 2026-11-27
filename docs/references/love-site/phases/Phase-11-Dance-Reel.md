@@ -12,6 +12,8 @@
 
 Paths below are relative to `src/features/love/` unless they start with `app/`, `src/`, `public/`, `scripts/` or `docs/`.
 
+> **Status note (2026-11-27):** the first clip is built as a separate `#dance-reel` section after the particle Dance, which is kept (blueprint 080, ADR-0034 amendment). Step 12's removal does not apply while both stay.
+
 ---
 
 ## 1. Context

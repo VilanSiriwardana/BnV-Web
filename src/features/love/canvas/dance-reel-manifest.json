@@ -1,0 +1,14 @@
+{
+  "frames": 121,
+  "fps": 24,
+  "dip": 0.85,
+  "alpha": true,
+  "desktop": {
+    "width": 720,
+    "height": 757
+  },
+  "mobile": {
+    "width": 480,
+    "height": 505
+  }
+}

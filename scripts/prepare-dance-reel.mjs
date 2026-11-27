@@ -8,6 +8,8 @@ import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 
+import { backgroundOf, levels } from './lib/dance-levels.mjs';
+
 const sourceDir = path.resolve(process.argv[2] ?? 'private/dance-keyframes');
 const outDir = path.join(process.cwd(), 'public', 'dance-reel');
 
@@ -16,37 +18,6 @@ const DIP = { file: 'k4-dip.jpg', head: 25, floor: 1226, cx: 635, size: 1 };
 const SIZE = { width: 768, height: 960 };
 const HIS_HEIGHT = 0.78;
 const FLOOR = 0.95;
-// --night-depth-background at the Dance depth (≈ 0.5 between --night-background and --night-surface).
-const PAGE = [29, 22, 37];
-
-// Mean of the plain backdrop (side edges at mid-height, top centre); the lighter floor glow is left out.
-async function backgroundOf(input) {
-  const { data, info } = await sharp(input)
-    .removeAlpha()
-    .raw()
-    .toBuffer({ resolveWithObject: true });
-  const spots = [
-    [0.02, 0.4],
-    [0.02, 0.6],
-    [0.98, 0.4],
-    [0.98, 0.6],
-    [0.5, 0.01],
-  ];
-  const sums = [0, 0, 0];
-  for (const [fx, fy] of spots) {
-    const x = Math.round(fx * (info.width - 1));
-    const y = Math.round(fy * (info.height - 1));
-    const i = (y * info.width + x) * 3;
-    for (let c = 0; c < 3; c++) sums[c] += data[i + c] / spots.length;
-  }
-  return sums;
-}
-
-// Per-channel levels that move the still's background onto the page color and keep white white.
-const levels = (bg) => ({
-  a: bg.map((b, c) => (255 - PAGE[c]) / (255 - b)),
-  b: bg.map((b, c) => PAGE[c] - (b * (255 - PAGE[c])) / (255 - b)),
-});
 
 const feather = (w, h) => {
   const m = Math.round(Math.min(w, h) * 0.06);

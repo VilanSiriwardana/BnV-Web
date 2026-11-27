@@ -1161,3 +1161,23 @@ Implemented M28–M33 in the order M28 → M32 → M29 → M31 → M30 → M33:
 ### Verification
 
 - tsc, eslint (changed files) and love vitest pass. Poses checked as a mirrored SVG strip against the stills.
+
+## 2026-11-27: Blueprint 080 (Dance video reel after the particle Dance)
+
+- New section `#dance-reel` (`sections/dance-reel.tsx`) mounted after `<Dance>`; the particle couple is untouched. Silent continuation: sr-only heading, canvas with an aria label, edge-fade mask over the clip's plum backdrop.
+- `scripts/prepare-dance-video.mjs`: system ffmpeg (winget `Gyan.FFmpeg`, found in the winget Packages folder or via `FFMPEG`) extracts the 121 frames of `public/dance-reel/dance-vid.mp4` (no audio); sharp writes `public/dance-reel/{desktop 720×757, mobile 480×505}` WebP q74 (≈ 1.8 MB / 1.1 MB), `posters/reel-{start,dip}.webp` and `canvas/dance-reel-manifest.json`.
+- `engine/dance-reel-math.ts` (+ test): `frameAt`, `windowAround`, `loadOrder`, `REEL_WINDOW`. `engine/dance-reel-player.ts`: 4 concurrent fetches into blobs, ImageBitmaps only within ±16 / ±12 frames (closed on eviction), damped progress on `gsap.ticker`, DPR ≤ 1.5, draws only when the shown frame changes.
+- `story.ts` `buildDanceReel`: loading starts when `#gallery` enters the viewport; the frame fades in over the section's entry; `pulse` + `spawnTapHearts(6)` at progress 0.85, re-armed `BEAT_REARM` below. The heart keeps the dance pose and baseline.
+
+### Verification
+
+- tsc, eslint (changed files) and love vitest (34 files, 145 tests) pass. Dev server: `/love/<slug>` returns 200 with `#dance` → `#dance-reel` → `#reasons`; frames are served. Scrub smoothness, memory and real devices not yet checked by hand.
+
+## 2026-11-27: Blueprint 081 (Dance Reel background removal)
+
+- Tooling (dev-only, git-ignored): Python 3.12 (winget), venv `private/matte-venv` with CPU torch 2.15, torchvision, av, pims, tqdm; RVM weights in `private/torch-cache`.
+- `scripts/matte-dance-video.py`: Robust Video Matting resnet50 (`torch.hub`, downsample 0.4) writes 1-based alpha PNGs to `private/dance-video-alpha/` (121 frames, ~75 s on CPU).
+- `scripts/lib/dance-levels.mjs`: `PAGE`, `backgroundOf`, `levels` moved out of `prepare-dance-reel.mjs` (its `dip.webp` output is byte-identical).
+- `scripts/prepare-dance-video.mjs`: `--matte` (decontaminate F = (C − (1−a)·bg)/a, alpha WebP q74 / alphaQuality 50), `--preview` (hold/spin/dip composites over the page colour in `private/dance-matte-preview/`), default = colour-match fallback. Manifest gains `alpha`. Run: `node scripts/prepare-dance-video.mjs --matte` → desktop 4.28 MB, mobile 2.56 MB.
+- `sections/dance-reel.tsx`: edge mask only when `!manifest.alpha`; `data-dance-reel-floor` spotlight pool (theme tokens) when alpha.
+- Preview gate: hold and dip clean; spin shows a faint back leg (his) and grey smudges inside her skirt. The owner accepted this.
