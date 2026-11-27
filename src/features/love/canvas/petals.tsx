@@ -71,19 +71,31 @@ void main() {
   float a0 = max(age, 0.0);
   // Blueprint 071: boom: explosive drag-shaped flight with a light gravity arc, small → full size,
   // drifting into the fall while still moving.
-  float fly = (1.0 - exp(-a0 * 5.0)) * step(0.001, uBurstEase);
-  vec2 spray = uBurstOrigin + dir * (1.4 + aSeed.y * 1.6) * uReachScale * fly
-    - vec2(0.0, 0.25 * a0 * a0 * uReachScale);
-  float spread = 1.0 - exp(-max(a0 - 0.35, 0.0) * (0.9 + aSeed.w * 0.5));
+  float burst = step(0.001, uBurstEase);
+  float fly = (1.0 - exp(-a0 * 5.0)) * burst;
   float bloom = 1.0 - exp(-a0 * 7.0);
   float speed = 0.18 + aSeed.w * 0.12;
-  float fall = mod(aSeed.y * uSpan.y - t * speed, uSpan.y);
-  vec3 slot = vec3(
-    (aSeed.x - 0.5) * uSpan.x + sin(t * 0.5 + aSeed.w * 6.28) * 0.35,
-    fall - uSpan.y * 0.5,
-    (aSeed.z - 0.5) * 3.0
+  float h = uSpan.y;
+  // Blueprint 087: one continuous path, no lanes: drag flight out of the burst, gravity to terminal
+  // speed, a flutter that grows as it slows. A petal only wraps to the top once it is off screen.
+  float ek = 1.0 - exp(-2.2 * a0);
+  // Each petal flies to its own spot across the whole screen, then falls from there.
+  vec2 target = (vec2(aSeed.x, fract(aSeed.y + aSeed.z * 0.37)) - 0.5) * uSpan * 1.05;
+  vec2 flight = (target - uBurstOrigin) * ek;
+  float drop = speed * (a0 - ek / 2.2);
+  float sway = sin(a0 * (1.4 + aSeed.w) + aSeed.x * 6.28) * 0.35 * (1.0 - exp(-a0));
+  vec2 free = mix(
+    vec2((aSeed.x - 0.5) * uSpan.x + sin(t * 0.5 + aSeed.w * 6.28) * 0.35, mod(aSeed.y * h - t * speed, h) - h * 0.5),
+    uBurstOrigin + flight + vec2(sway, -drop),
+    burst
   );
-  vec3 base = mix(vec3(spray, 0.0), slot, spread);
+  float wrapped = step(free.y, -h * 0.5) * burst;
+  float fall = mod(free.y + h * 0.5, h);
+  vec3 base = vec3(
+    mix(free.x, mod(free.x + uSpan.x * 0.5, uSpan.x) - uSpan.x * 0.5, wrapped),
+    mix(free.y, fall - h * 0.5, wrapped),
+    ((aSeed.z - 0.5) * 3.0 + aSeed.w * 1.2) * mix(1.0, ek, burst)
+  );
   p *= mix(0.3, 1.0, bloom);
   // Blueprint 062: pull toward the heart origin when gathered.
   vec3 core = vec3(uOrigin + (aSeed.xy - 0.5) * 0.12, 0.0);
@@ -101,8 +113,9 @@ void main() {
   vec3 outward = vec3(base.xy * 1.2 + vec2(0.0, -0.4), 3.7);
   base = mix(base, outward, a);
 
-  float seam = smoothstep(0.0, 0.08, fall / uSpan.y) * smoothstep(1.0, 0.92, fall / uSpan.y);
-  seam = mix(seam, 1.0, max(g, 1.0 - spread));
+  float seam = smoothstep(0.0, 0.08, fall / h) * smoothstep(1.0, 0.92, fall / h);
+  seam = mix(seam, smoothstep(-h * 0.5, -h * 0.42, free.y), burst * (1.0 - wrapped));
+  seam = mix(seam, 1.0, g);
   float spin = t * (0.6 + aSeed.w) + aSeed.w * 6.28 + fly * (6.0 + aSeed.w * 6.0);
   vec3 local = base + rot(spin, t * 0.4 + atan(dir.y, dir.x)) * p;
 

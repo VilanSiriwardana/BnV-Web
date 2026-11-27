@@ -1,0 +1,22 @@
+{
+  "count": 20000,
+  "xRange": 1.2,
+  "yRange": 2.2,
+  "poses": [
+    {
+      "name": "k1-standing"
+    },
+    {
+      "name": "k2-hold",
+      "beat": "hold"
+    },
+    {
+      "name": "k3-twirl",
+      "beat": "twirl"
+    },
+    {
+      "name": "k4-dip",
+      "beat": "dip"
+    }
+  ]
+}

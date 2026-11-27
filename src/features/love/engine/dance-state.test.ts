@@ -1,9 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { KEYFRAMES } from '../canvas/dance-silhouettes';
-import { damp, DANCE_BEATS, keyAt, poseAt } from './dance-state';
+import {
+  damp,
+  DANCE_BEATS,
+  DANCE_POSES,
+  keyAt,
+  poseAt,
+  restsOn,
+} from './dance-state';
 
-const LAST = KEYFRAMES.length - 1;
+const LAST = DANCE_POSES.length - 1;
 const position = (t: number) => {
   const { index, k } = poseAt(t);
   return index + k;
@@ -30,12 +36,20 @@ describe('poseAt', () => {
     for (let i = 0; i <= LAST; i++) expect(position(keyAt(i))).toBeCloseTo(i);
   });
 
-  it('holds each pose before blending', () => {
-    expect(poseAt(keyAt(3) + 0.01).k).toBe(0);
+  it('rests only on the hold and the dip', () => {
+    for (let i = 0; i < LAST; i++) {
+      const { k } = poseAt(keyAt(i) + 0.005);
+      if (restsOn(DANCE_POSES[i])) expect(k).toBe(0);
+      else expect(k).toBeGreaterThan(0);
+    }
   });
 });
 
 describe('beats', () => {
+  it('are the hold, twirl and dip', () => {
+    expect(DANCE_BEATS.map((b) => b.event)).toEqual(['hold', 'twirl', 'dip']);
+  });
+
   it('fire in order inside the stage', () => {
     const at = DANCE_BEATS.map((b) => b.at);
     expect([...at].sort((a, b) => a - b)).toEqual(at);
